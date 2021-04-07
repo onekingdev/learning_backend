@@ -15,6 +15,11 @@ djangorestframework-simplejwt = "*"
 django-parler = "*"
 django-mptt = "*"
 django-import-export = "*"
+django-extensions = "*"
+django-ckeditor = "*"
+django-cors-headers = "*"
+coreapi = "*"
+django-mailer = "*"
 
 [dev-packages]
 
