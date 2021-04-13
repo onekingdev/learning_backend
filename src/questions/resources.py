@@ -19,4 +19,3 @@ class QuestionAdminResource(resources.ModelResource):
 
 
     def after_import_row(row, row_result, row_number=None, **kwargs):
-        pass
