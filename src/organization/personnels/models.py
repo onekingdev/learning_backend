@@ -20,6 +20,7 @@ class Personnel(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMode
         identification_number = models.CharField(max_length=128, null=True),
         position = models.CharField(max_length=128, null=True)
     )
+    user  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name+' '+self.last_name
