@@ -1,9 +1,9 @@
 from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
-from .models import Audience
+from .models import Student
 
 
 # Register your models here.
-@admin.register(Audience)
-class AudienceAdmin(DraggableMPTTAdmin):
+@admin.register(Student)
+class StudentAdmin(DraggableMPTTAdmin):
     pass

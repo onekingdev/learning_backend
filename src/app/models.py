@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+from django.utils import timezone
+
 
 class ActiveManager(models.Manager):
     def get_queryset(self):
@@ -32,6 +34,20 @@ class BaseModel(models.Model):
 
     def get_meta(self):
         return self._meta
+
+    class Meta:
+        abstract = True
+
+class IsActiveModel(BaseModel):
+    is_active = models.BooleanField(default=True)
+    objects = ActiveManager
+
+    deleted_timestamp = models.DateTimeField('Deleted timestamp', null=True, editable=False)
+
+    def delete(self, *args, **kwargs):
+        self.is_active = False
+        self.deleted_timestamp = timezone.now()
+        self.save(*args, **kwargs)
 
     class Meta:
         abstract = True
@@ -84,8 +100,8 @@ class UUIDModel(BaseModel):
 
 class TimestampModel(models.Model):
 
-    create_timestamp = models.DateTimeField('Timestamp de creación', auto_now_add=True, editable=False)
-    update_timestamp = models.DateTimeField('Timestamp de modificación', auto_now=True, editable=False)
+    create_timestamp = models.DateTimeField('Created timestamp', auto_now_add=True, editable=False)
+    update_timestamp = models.DateTimeField('Updated timestamp', auto_now=True, editable=False)
 
     class Meta:
         abstract = True
