@@ -1,6 +1,7 @@
 from django.db import models
 from app.models import RandomSlugModel, TimestampModel, UUIDModel
 from kb.area_of_knowledges.models import AreaOfKnowledge
+from kb.grades.models import Grade
 
 # Create your models here.
 
