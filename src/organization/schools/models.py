@@ -29,30 +29,12 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         type = models.CharField(max_length=100, null=True)
     )
 
+    organization =  models.ForeignKey(Organization, on_delete=models.PROTECT, null=True, blank=True)
+	address =  models.ForeignKey(Address, on_delete=models.PROTECT, null=True, blank=True)
+	teacher =  models.ManyToManyField(Teacher, on_delete=models.PROTECT, null=True, blank=True)
+	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
+	group =  models.ManyToManyField(Group, on_delete=models.PROTECT, null=True, blank=True)
+
     def __str__(self):
         return self.name
-
-class SchoolOrganization(TimestampModel, RandomSlugModel):
-	PREFIX = "sch_org_"
-	school =  models.ForeignKey(School, on_delete=models.PROTECT, null=True, blank=True)
-	organization =  models.ForeignKey(Organization, on_delete=models.PROTECT, null=True, blank=True)
-
-class SchoolAddress(TimestampModel, RandomSlugModel):
-	PREFIX = "sch_add_"
-	school =  models.ForeignKey(School, on_delete=models.PROTECT, null=True, blank=True)
-	address =  models.ForeignKey(Address, on_delete=models.PROTECT, null=True, blank=True)
-
-class SchoolTeacher(TimestampModel, RandomSlugModel):
-	PREFIX = "sch_tch_"
-	school =  models.ForeignKey(School, on_delete=models.PROTECT, null=True, blank=True)
-	teacher =  models.ManyToManyField(Teacher, on_delete=models.PROTECT, null=True, blank=True)
-
-class SchoolStudent(TimestampModel, RandomSlugModel):
-	PREFIX = "sch_stnd_"
-	school =  models.ForeignKey(School, on_delete=models.PROTECT, null=True, blank=True)
-	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
-
-class SchoolGroup(TimestampModel, RandomSlugModel):
-	PREFIX = "sch_grp_"
-	school =  models.ForeignKey(School, on_delete=models.PROTECT, null=True, blank=True)
-	group =  models.ManyToManyField(Group, on_delete=models.PROTECT, null=True, blank=True)
+	
