@@ -1,9 +1,12 @@
 from django.db import models
+
 from .managers import TopicManager
 from django.utils.text import slugify
+from audiences.models import Audience
 from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
 from kb.area_of_knowledges.models import AreaOfKnowledge
+from kb.grades.models import Grade
 from universal.topics.models import Topic as UniversalTopic
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel
@@ -14,12 +17,15 @@ class Topic(TimestampModel, RandomSlugModel, MPTTModel, TranslatableModel):
     translations = TranslatedFields(
         name  = models.CharField(max_length=128)
     )
+
+    audience = models.ForeignKey(Audience, on_delete=models.PROTECT, null=True, blank=True)
     area_of_knowledge = models.ForeignKey(AreaOfKnowledge, on_delete=models.PROTECT, null=True, blank=True)
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True)
-    universal_topic = models.ForeignKey(UniversalTopic, on_delete=models.PROTECT, null=True, blank=True)
-    # TODO: univ topic debe ser m2m para que se puedan hacer los arboles como deba ser en casda caso
+    universal_topic = models.ManyToManyField(UniversalTopic, on_delete=models.PROTECT, null=True, blank=True)
+    
     # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
     # prerequisites = models.ManyToManyField(
+
 
     objects = TopicManager()
 

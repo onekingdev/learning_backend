@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from audiences.models import Audience
 from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
 from parler.models import TranslatableModel, TranslatedFields
@@ -15,6 +16,7 @@ class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
         slug = models.SlugField(editable=False)
     )
 
+    audience = models.ForeignKey(Audience, on_delete=models.PROTECT, null=True, blank=True)
     universal_area_knowledge = models.ForeignKey(UniversalAreaOfKnowledge, on_delete=models.PROTECT, null=True, blank=True)
 
 

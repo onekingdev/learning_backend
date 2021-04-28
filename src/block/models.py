@@ -1,11 +1,14 @@
 from django.db import models
 from django.utils.text import slugify
 from people.students.models import Student
+from kb.topics.models import Topic
+from content.questions.models import Question
+from content.answer_options.mdoels import AnswerOption
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 
-class BlockConfigurationKeyword(TimestampModel, UUIDModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class BlockConfigurationKeyword(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     """
     Model for cofig keyword.
     Examples:
@@ -18,7 +21,7 @@ class BlockConfigurationKeyword(TimestampModel, UUIDModel, RandomSlugModel, IsAc
 	def __str__(self):
         return self.name
 
-class BlockType(TimestampModel, UUIDModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     """
     Model for types of blocks. These take some config values and are copy pasted to blocks upon block generation
     Examples:
@@ -31,7 +34,7 @@ class BlockType(TimestampModel, UUIDModel, RandomSlugModel, IsActiveModel, Trans
 	def __str__(self):
         return self.name
 
-class BlockTypeConfiguration(TimestampModel, UUIDModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class BlockTypeConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     """
     Model for key-value pairs for a block tpye
     Examples:
@@ -43,16 +46,24 @@ class BlockTypeConfiguration(TimestampModel, UUIDModel, RandomSlugModel, IsActiv
 	data_type  = models.CharField(max_length=128, null=True)
 	value  = models.CharField(max_length=128, null=True)
 
-class Block(TimestampModel, UUIDModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 	PREFIX = 'blck_'
 
+	MODALITY_AI = 'AI'
+    MODALITY_PRACTICE = 'Practice'
+    MODALITY_CHOICES = (
+        ('ai',MODALITY_AI),
+        ('practice',MODALITY_PRACTICE),
+    )
+
 	type_of = models.ForeignKey(BlockType, on_delete=models.PROTECT, null=True)
-	# modality = es un modelo o un choice. tipicamente AI, Pick your path, Practice
+
+	modality = models.ChoiceField(choices=MODALITY_PENDING, default=MODALITY_PRACTICE)
 	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
 	first_presentation_timestamp = models.DateTimeField(null=True)
 	last_presentation_timestamp = models.DateTimeField(null=True)
-    # topics m2m kb topic
-    # questions = models.ManyToManyField('content.questions.Question', through=BlockQuestion), quizas mejor por question_set
+    topics =  models.ManyToManyField(Topic, on_delete=models.PROTECT, null=True, blank=True)
+	questions = models.ManyToManyField(Question, through=BlockQuestion)
     # engangement points
     # coins earned
 
@@ -70,7 +81,7 @@ class Block(TimestampModel, UUIDModel, RandomSlugModel, IsActiveModel, Translata
         return sve
 
 
-class BlockConfiguration(TimestampModel, UUIDModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class BlockConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     """
     Model for key-value pairs for a block tpye
     Examples:
@@ -84,7 +95,7 @@ class BlockConfiguration(TimestampModel, UUIDModel, RandomSlugModel, IsActiveMod
 	value  = models.CharField(max_length=128, null=True)
 	
 
-class BlockPresentation(TimestampModel, UUIDModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 	PREFIX = 'blck_pres_'
 
     # TODO: borrar. block_configuration = models.ForeignKey(BlockConfiguration, on_delete=models.CASCADE, null=True)
@@ -97,7 +108,7 @@ class BlockPresentation(TimestampModel, UUIDModel, RandomSlugModel, IsActiveMode
 
 
 
-class BlockQuestion():
+class BlockQuestion(TimestampModel, RandomSlugModel):
     """
     This model will contain ALL the questions of the block, independently of the presentation of them on block presentation.
     """
@@ -109,24 +120,26 @@ class BlockQuestion():
         ('Correct',STATUS_CORRECT),
         ('Incorrect',STATUS_INCORRECT),
     )
-    # block = FK a block
-    question fk a question
-    chosen_answer FK a options
-    is_correct Bool Nuul
-    is_answered Bool Default False
 
+
+
+    block = models.ForeignKey(Block, on_delete=models.PROTECT, null=True)
+    question = models.ForeignKey(Question, on_delete=models.PROTECT, null=True)
+    chosen_answer = models.ForeignKey(AnswerOption, on_delete=models.PROTECT, null=True)
+    is_correct = models.BooleanField(null=True)
+    is_answered = models.BooleanField(null=True, default=False)
     status = models.ChoiceField(choices=STATUS_CHOICES, default=STATUS_PENDING)
 
     def save
         #save here the status according to business logic
 
 
-class BlockQuestionPresentation():
+class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
     """
     This model will have every presentation of question
     """
-    question # this is for efficiency on db, por facilidad de acceso, editable false, null=true
-    block_question fk a BlockQuestion
+    question = models.ForeignKey(Question, on_delete=models.PROTECT, null=True)
+    block_question = models.ForeignKey(BlockQuestion, on_delete=models.PROTECT, null=True)
 	presentation_timestamp = models.DateTimeField(null=True)
 	submission_timestamp = models.DateTimeField(null=True)
 

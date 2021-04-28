@@ -1,5 +1,6 @@
 from django.db import models
 from grades.models import Grade
+from audiences.models import Audience
 from django.utils.text import slugify
 from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
@@ -16,6 +17,7 @@ class Level(TimestampModel, RandomSlugModel, TranslatableModel):
         name  = models.CharField(max_length=128, null=True),
         slug = models.SlugField(editable=False)
     )
+    audience = models.ForeignKey(Audience, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return self.name
