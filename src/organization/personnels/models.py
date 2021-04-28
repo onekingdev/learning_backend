@@ -11,15 +11,12 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel
 
 class Personnel(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'prs_'
-    translations = TranslatedFields(
-        name  = models.CharField(max_length=128, null=True),
-        last_name  = models.CharField(max_length=128, null=True),
-        gender = models.CharField(max_length=128, null=True),
-        age = models.IntegerField(max_length=3, null=True),
-        contract_date = models.DateField(null=True),
-        identification_number = models.CharField(max_length=128, null=True),
-        position = models.CharField(max_length=128, null=True)
-    )
+    name  = models.CharField(max_length=128, null=True)
+    last_name  = models.CharField(max_length=128, null=True)
+    gender = models.CharField(max_length=128, null=True)
+    date_of_birth = models.DateField(null=True)
+    identification_number = models.CharField(max_length=128, null=True)
+    position = models.CharField(max_length=128, null=True)
     user  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
