@@ -7,12 +7,21 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 # Create your models here.
 
 class Student(TimestampModel, UUIDModel, IsActiveModel):
+    GENDER_MALE = 'Male'
+    GENDER_FEMALE = 'Female'
+    GENDER_OTHER = 'Other'
+    GENDER_CHOICES = (
+        ('M',GENDER_MALE),
+        ('F',GENDER_FEMALE),
+        ('O',GENDER_OTHER),
+    )
+
     PREFIX = 'stdnt_'
     user  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
     first_name = models.CharField(max_length=64, null=True, blank=True)
     last_name = models.CharField(max_length=64, null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=128, null=True)
+    gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     age = models.IntegerField(max_length=3, null=True)
 
     level =  models.ManyToManyField(Level, on_delete=models.PROTECT, null=True, blank=True)
