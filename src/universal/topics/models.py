@@ -17,7 +17,6 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
         name  = models.CharField(max_length=128),
         slug = models.SlugField(editable=False)
     )
-    audience = models.ForeignKey(Audience, on_delete=models.PROTECT, null=True, blank=True)
     area_of_knowledge = models.ForeignKey(AreaOfKnowledge, on_delete=models.PROTECT, null=True, blank=True)
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True,)
     standard_code  = models.CharField(max_length=128, null=True, blank=True)

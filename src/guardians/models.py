@@ -9,20 +9,17 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 # Create your models here.
 
-class Parent(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
-    PREFIX = 'prnt_'
-    translations = TranslatedFields(
-        name  = models.CharField(max_length=128, null=True),
-        last_name  = models.CharField(max_length=128, null=True),
-        gender = models.CharField(max_length=128, null=True),
-        age = models.IntegerField(max_length=3, null=True)
-    )
+class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'grdn_'
+    name  = models.CharField(max_length=128, null=True),
+    last_name  = models.CharField(max_length=128, null=True),
+    gender = models.CharField(max_length=128, null=True),
     user  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name+' '+self.last_name
 
-class ParentStudent(TimestampModel, RandomSlugModel):
+class GuardianStudent(TimestampModel, RandomSlugModel):
 	PREFIX = "prnt_stnd_"
 	parent =  models.ForeignKey(Parent, on_delete=models.PROTECT, null=True, blank=True)
-	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
+	student =  models.ForeignKey(Student, on_delete=models.PROTECT, null=True, blank=True)

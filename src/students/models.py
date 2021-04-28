@@ -27,11 +27,6 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     level =  models.ManyToManyField(Level, on_delete=models.PROTECT, null=True, blank=True)
     group =  models.ManyToManyField(Group, on_delete=models.PROTECT, null=True, blank=True)
 
-    def get_completed_assessments_set(self):
-        return self.assessment_set.filter(is_completed=True)
-
-    def get_ongoin_assessments_set(self):
-        return self.assessment_set.filter(is_completed=False)
 
     @property
     def get_full_name(self):
@@ -39,3 +34,11 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
     def __str__(self):
         return self.get_full_name
+
+
+class StudentTopicMastery():
+    student
+    topic
+    block
+    timestamp mastery
+    # TODO: pensar bien com ohacer esto... quz'as valga la pena abstraer no solo el mastery sino toda la "transaccion" de los topics para un estudiante

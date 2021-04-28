@@ -21,12 +21,8 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     translations = TranslatedFields(
         name  = models.CharField(max_length=128, null=True),
         slug = models.SlugField(editable=False),
-        acronym = models.CharField(max_length=128, null=True),
-        foundation_date = models.DateTimeField(null=True),
-        population = models.IntegerField(max_length=20, null=True),
-        open_hour = models.TimeField(max_length=50, null=True),
-        close_hour = models.TimeField(max_length=50, null=True),
-        type = models.CharField(max_length=100, null=True)
+        internal_code = models.CharField(max_length=128, null=True),
+        type_of = models.CharField(max_length=100, null=True)
     )
 
     organization =  models.ForeignKey(Organization, on_delete=models.PROTECT, null=True, blank=True)
@@ -37,4 +33,41 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 
     def __str__(self):
         return self.name
-	
+
+
+class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+    PREFIX = 'grp_'
+    translations = TranslatedFields(
+        name  = models.CharField(max_length=128, null=True),
+        internal_code = models.CharField(max_length=128, null=True),
+        population = models.IntegerField(max_length=40, null=True)
+    )
+
+    grade = models.ForeignKey(Grade, on_delete=models.PROTECT, null=True, blank=True)
+    area_of_knowledges = models.ManyToManyField(AreaOfKnowledge, on_delete=models.PROTECT, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'prs_'
+    user  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
+    school  = models.ForeignKey(School, on_delete=models.SET_NULL, null=True)
+
+    name  = models.CharField(max_length=128, null=True)
+    last_name  = models.CharField(max_length=128, null=True)
+    gender = models.CharField(max_length=128, null=True)
+    date_of_birth = models.DateField(null=True)
+    identification_number = models.CharField(max_length=128, null=True)
+    position = models.CharField(max_length=128, null=True)
+
+    def __str__(self):
+        return self.name+' '+self.last_name
+
+
+class AdministrativePersonnel(SchoolPersonnel):
+    pass
+
+class Teacher(SchoolPersonnel):
+    pass

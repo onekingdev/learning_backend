@@ -24,7 +24,7 @@ class Topic(TimestampModel, RandomSlugModel, MPTTModel, TranslatableModel):
     universal_topic = models.ManyToManyField(UniversalTopic, on_delete=models.PROTECT, null=True, blank=True)
     
     # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
-    # prerequisites = models.ManyToManyField(
+    prerequisites = models.ManyToManyField('self', blank=True)
 
 
     objects = TopicManager()
