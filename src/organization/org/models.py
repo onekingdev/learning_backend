@@ -34,3 +34,4 @@ class OrganizationPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
 
     def __str__(self):
         return self.name+' '+self.last_name
+
