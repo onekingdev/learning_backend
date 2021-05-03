@@ -56,12 +56,12 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         ('practice',MODALITY_PRACTICE),
     )
 
-	type_of = models.ForeignKey(BlockType, on_delete=models.PROTECT, null=True)
-
 	modality = models.ChoiceField(choices=MODALITY_PENDING, default=MODALITY_PRACTICE)
+    first_presentation_timestamp = models.DateTimeField(null=True)
+    last_presentation_timestamp = models.DateTimeField(null=True)
+
+    type_of = models.ForeignKey(BlockType, on_delete=models.PROTECT, null=True)
 	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
-	first_presentation_timestamp = models.DateTimeField(null=True)
-	last_presentation_timestamp = models.DateTimeField(null=True)
     topics =  models.ManyToManyField(Topic, on_delete=models.PROTECT, null=True, blank=True)
 	questions = models.ManyToManyField(Question, through=BlockQuestion)
     # engangement points
@@ -126,6 +126,7 @@ class BlockQuestion(TimestampModel, RandomSlugModel):
     block = models.ForeignKey(Block, on_delete=models.PROTECT, null=True)
     question = models.ForeignKey(Question, on_delete=models.PROTECT, null=True)
     chosen_answer = models.ForeignKey(AnswerOption, on_delete=models.PROTECT, null=True)
+    
     is_correct = models.BooleanField(null=True)
     is_answered = models.BooleanField(null=True, default=False)
     status = models.ChoiceField(choices=STATUS_CHOICES, default=STATUS_PENDING)

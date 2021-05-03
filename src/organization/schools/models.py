@@ -1,12 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 
-from addresses.models import Address
-from people.students.models import Student
-from organization.groups.models import Group
-from organization.teachers.models import Teacher
+from students.models import Student
 from organization.org.models import Organization
-from organization.personnels.models import Personnel
 
 from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
@@ -15,25 +11,6 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 
 # Create your models here.
-
-class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
-    PREFIX = 'sch_'
-    translations = TranslatedFields(
-        name  = models.CharField(max_length=128, null=True),
-        slug = models.SlugField(editable=False),
-        internal_code = models.CharField(max_length=128, null=True),
-        type_of = models.CharField(max_length=100, null=True)
-    )
-
-    organization =  models.ForeignKey(Organization, on_delete=models.PROTECT, null=True, blank=True)
-	address =  models.ForeignKey(Address, on_delete=models.PROTECT, null=True, blank=True)
-	teacher =  models.ManyToManyField(Teacher, on_delete=models.PROTECT, null=True, blank=True)
-	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
-	group =  models.ManyToManyField(Group, on_delete=models.PROTECT, null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
 
 class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'grp_'
@@ -49,6 +26,22 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     def __str__(self):
         return self.name
 
+class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+    PREFIX = 'sch_'
+    translations = TranslatedFields(
+        name  = models.CharField(max_length=128, null=True),
+        slug = models.SlugField(editable=False),
+        internal_code = models.CharField(max_length=128, null=True),
+        type_of = models.CharField(max_length=100, null=True)
+    )
+
+    organization =  models.ForeignKey(Organization, on_delete=models.PROTECT, null=True, blank=True)
+	teacher =  models.ManyToManyField(Teacher, on_delete=models.PROTECT, null=True, blank=True)
+	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
+	group =  models.ManyToManyField(Group, on_delete=models.PROTECT, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'prs_'

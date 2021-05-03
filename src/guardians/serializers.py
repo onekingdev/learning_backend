@@ -1,8 +1,20 @@
 from rest_framework import serializers
-from .models import Parent
+from .models import Guardian, GuardianStudent
+from users.serializers import UserSerializer
+from students.serializers import StudentSerializer
 
-class ParentSerializer(serializers.ModelSerializer):
+class GuardianSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Parent
-        fields = ['id', 'name']
+        model = Guardian
+        user  = UserSerializer(read_only=True)
+        fields = ['id', 'name', 'last_name', 'gender', 'user']
+
+class GuardianStudentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GuardianStudent
+        guardian  = GuardianSerializer(read_only=True)
+        student  = StudentSerializer(read_only=True)
+
+        fields = ['id', 'guardian', 'student']

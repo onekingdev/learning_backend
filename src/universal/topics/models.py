@@ -4,7 +4,7 @@ from audiences.models import Audience
 from django.utils.text import slugify
 from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
-from kb.area_of_knowledges.models import AreaOfKnowledge
+from universal.area_of_knowledges.models import AreaOfKnowledge
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel, UUIDModel
 

@@ -21,5 +21,5 @@ class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class GuardianStudent(TimestampModel, RandomSlugModel):
 	PREFIX = "prnt_stnd_"
-	parent =  models.ForeignKey(Parent, on_delete=models.PROTECT, null=True, blank=True)
+	guardian =  models.ForeignKey(Guardian, on_delete=models.PROTECT, null=True, blank=True)
 	student =  models.ForeignKey(Student, on_delete=models.PROTECT, null=True, blank=True)

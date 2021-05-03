@@ -1,6 +1,5 @@
 from django.db import models
 from kb.grades.models import Grade
-from kb.levels.models import Level
 from organization.groups.models import Group
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
@@ -24,7 +23,6 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     age = models.IntegerField(max_length=3, null=True)
 
-    level =  models.ManyToManyField(Level, on_delete=models.PROTECT, null=True, blank=True)
     group =  models.ManyToManyField(Group, on_delete=models.PROTECT, null=True, blank=True)
 
 
@@ -35,10 +33,10 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     def __str__(self):
         return self.get_full_name
 
-
-class StudentTopicMastery():
-    student
-    topic
-    block
-    timestamp mastery
+##
+##class StudentTopicMastery():
+  ##  student
+    ##topic
+    ##block
+    ##timestamp mastery
     # TODO: pensar bien com ohacer esto... quz'as valga la pena abstraer no solo el mastery sino toda la "transaccion" de los topics para un estudiante
