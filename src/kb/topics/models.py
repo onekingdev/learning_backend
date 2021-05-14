@@ -38,6 +38,7 @@ class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         return self.name
 
     def get_topics(self):
+        # TODO: rehacer esto con Django ORM
         cursor = connection.cursor()
         cursor.execute(
             "SELECT COUNT(id) FROM tpic_std_pln WHERE student_plan_id = %s",

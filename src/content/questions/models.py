@@ -27,14 +27,38 @@ class Question(TimestampModel, UUIDModel, IsActiveModel, TranslatableModel):
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
 
+
 class QuestionAsset(TimestampModel, RandomSlugModel):
+
+    class Meta:
+        ordering = ['order']
+
+    # TODO: hacer este modelo como Djagno Polymorphic
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    order = models.SmallPositiveIntegerField(default=10)
+
 
 class QuestionImageAsset(QuestionAsset):
     image = models.ImageField()
 
+
 class QuestionAudioAsset(QuestionAsset):
     audio_file = models.FileField()
 
+
 class QuestionVideoAsset(QuestionAsset):
     url = models.URLField()
+
+
+
+class AnswerOption(TimestampModel, UUIDModel, TranslatableModel):
+    PREFIX = 'answopt_'
+    translations = TranslatedFields(
+        answer_text = models.CharField(max_length=256),
+        explanation = RichTextField(blank=True,)
+    )
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.answer_text
