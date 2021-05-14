@@ -1,35 +1,35 @@
-from cnt.answer_options.models import AnswerOption
-from cnt.answer_options.serializers import AnswerOptionSerializer
+from kb.grades.models import Grade
+from kb.grades.serializers import GradeSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 
-class AnswerOptionModule(APIView):
+class GradeModule(APIView):
     """
-    Retrieve, update or delete a AnswerOption instance.
+    Retrieve, update or delete a Topic instance.
     """
     def get_object(self, pk):
         try:
-            return AnswerOption.objects.get(pk=pk)
-        except AnswerOption.DoesNotExist:
+            return Grade.objects.get(pk=pk)
+        except Grade.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
-        answer_option = self.get_object(pk)
-        answer_option = AnswerOptionSerializer(answer_option)
+        grade = self.get_object(pk)
+        grade = GradeSerializer(grade)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
-        answer_option = self.get_object(pk)
-        serializer = AnswerOptionSerializer(answer_option, data=request.data)
+        grade = self.get_object(pk)
+        serializer = GradeSerializer(grade, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        answer_option = self.get_object(pk)
-        answer_option.delete()
+        grade = self.get_object(pk)
+        grade.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

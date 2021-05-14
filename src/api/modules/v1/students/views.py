@@ -1,5 +1,5 @@
-from peop.students.models import Student
-from peop.students.serializers import StudentSerializer
+from students.models import Student
+from students.serializers import StudentSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,7 +8,7 @@ from rest_framework import status
 
 class StudentModule(APIView):
     """
-    Retrieve, update or delete a Student instance.
+    Retrieve, update or delete a Topic instance.
     """
     def get_object(self, pk):
         try:

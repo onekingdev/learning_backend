@@ -56,7 +56,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         ('practice',MODALITY_PRACTICE),
     )
 
-	modality = models.ChoiceField(choices=MODALITY_PENDING, default=MODALITY_PRACTICE)
+	modality = models.ChoiceField(choices=MODALITY_CHOICES, default=MODALITY_PRACTICE)
     first_presentation_timestamp = models.DateTimeField(null=True)
     last_presentation_timestamp = models.DateTimeField(null=True)
 

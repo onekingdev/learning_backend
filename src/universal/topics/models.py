@@ -18,7 +18,7 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
         slug = models.SlugField(editable=False)
     )
     area_of_knowledge = models.ForeignKey(AreaOfKnowledge, on_delete=models.PROTECT, null=True, blank=True)
-    parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True,)
+    parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True)
     standard_code  = models.CharField(max_length=128, null=True, blank=True)
 
     objects = TopicManager()

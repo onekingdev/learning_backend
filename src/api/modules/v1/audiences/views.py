@@ -1,35 +1,35 @@
-from kb.grades.models import Grade
-from kb.grades.serializers import GradeSerializer
+from audiences.models import Audience
+from audiences.serializers import AudienceSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 
-class GradeModule(APIView):
+class AudienceModule(APIView):
     """
-    Retrieve, update or delete a Grade instance.
+    Retrieve, update or delete a Topic instance.
     """
     def get_object(self, pk):
         try:
-            return Grade.objects.get(pk=pk)
-        except Grade.DoesNotExist:
+            return Audience.objects.get(pk=pk)
+        except Audience.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
-        grade = self.get_object(pk)
-        grade = GradeSerializer(grade)
+        audience = self.get_object(pk)
+        audience = AudienceSerializer(audience)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
-        grade = self.get_object(pk)
-        serializer = GradeSerializer(grade, data=request.data)
+        audience = self.get_object(pk)
+        serializer = AudienceSerializer(audience, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        grade = self.get_object(pk)
-        grade.delete()
+        audience = self.get_object(pk)
+        audience.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

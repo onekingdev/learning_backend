@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import School, Group, SchoolPersonnel
+from .models import School, Group, SchoolPersonnel, AdministrativePersonnel, Teacher
 
 from users.serializers import UserSerializer
 from students.serializers import StudentSerializer
@@ -25,6 +25,25 @@ class SchoolPersonnelSerializer(serializers.ModelSerializer):
 
         fields = ['id', 'name', 'last_name', 'gender', 'date_of_birth', 'identification_number', 'position', 'user', 'school']
 
+
+class AdministrativePersonnelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AdministrativePersonnel
+        user = UserSerializer(read_only=True)
+        school = SchoolSerializer(read_only=True)
+
+        fields = ['id', 'name', 'last_name', 'gender', 'date_of_birth', 'identification_number', 'position', 'user', 'school']
+
+
+class TeacherSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Teacher
+        user = UserSerializer(read_only=True)
+        school = SchoolSerializer(read_only=True)
+
+        fields = ['id', 'name', 'last_name', 'gender', 'date_of_birth', 'identification_number', 'position', 'user', 'school']
 
 class SchoolSerializer(serializers.ModelSerializer):
 
