@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block, BlockConfiguration, BlockPresentation, BlockQuestion, BlockQuestionPresentation
-from content.questions.serializers import QuestionSerializer
-from content.answer_options.serializers import AnswerOptionSerializer
+from content.questions.serializers import QuestionSerializer, AnswerOptionSerializer
 from kb.topics.serializers import TopicSerializer
 from students.serializers import StudentSerializer
 

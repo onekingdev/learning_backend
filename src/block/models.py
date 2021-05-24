@@ -2,8 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from people.students.models import Student
 from kb.topics.models import Topic
-from content.questions.models import Question
-from content.answer_options.mdoels import AnswerOption
+from content.questions.models import Question, AnswerOption
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
@@ -50,22 +49,20 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 	PREFIX = 'blck_'
 
 	MODALITY_AI = 'AI'
-	MODALITY_PATH = 'PATH'
-    MODALITY_PRACTICE = 'PRACTICE'
+    MODALITY_PRACTICE = 'Practice'
     MODALITY_CHOICES = (
-        (MODALITY_AI, 'AI'),
-        (MODALITY_PATH, 'Choose your path'),
-        (MODALITY_PRACTICE, 'Practice'),
+        (MODALITY_AI, 'ai'),
+        (MODALITY_PRACTICE, 'practice')
     )
 
-	modality = models.ChoiceField(choices=MODALITY_CHOICES, default=MODALITY_AI)
+	modality = models.ChoiceField(choices=MODALITY_CHOICES, default=MODALITY_PRACTICE)
     first_presentation_timestamp = models.DateTimeField(null=True)
     last_presentation_timestamp = models.DateTimeField(null=True)
 
     type_of = models.ForeignKey(BlockType, on_delete=models.PROTECT, null=True)
 	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
     topics =  models.ManyToManyField(Topic, on_delete=models.PROTECT, null=True, blank=True)
-	questions = models.ManyToManyField(Question, through='block.BlockQuestion')
+	questions = models.ManyToManyField(Question, through=BlockQuestion)
     # engangement points
     # coins earned
 
@@ -79,14 +76,6 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         if is_new:
             # TODO: aqui falta hacer el copy paste de las configs, si es nuevo
             # TODO: por cada key-value del type of, hay que nutrir el hijo de esta tabla 
-            if self.type_of:
-                for item in self.type_of.blocktypeconfiguration_set.all():
-                    self.blockconfiguration_set.create(
-                        key=item.key,
-                        value=item.value,
-                        data_type=item.data_type
-                    )
-
 
         return sve
 
@@ -126,13 +115,10 @@ class BlockQuestion(TimestampModel, RandomSlugModel):
     STATUS_CORRECT = 'Correct'
     STATUS_INCORRECT = 'Incorrect'
     STATUS_CHOICES = (
-        ('Pending',STATUS_PENDING),
-        ('Correct',STATUS_CORRECT),
-        ('Incorrect',STATUS_INCORRECT),
+        (STATUS_PENDING,'Pending'),
+        (STATUS_CORRECT,'Correct'),
+        (STATUS_INCORRECT,'Incorrect'),
     )
-    # TODO: estos elementos de choices van al reves 
-
-
 
     block = models.ForeignKey(Block, on_delete=models.PROTECT, null=True)
     question = models.ForeignKey(Question, on_delete=models.PROTECT, null=True)

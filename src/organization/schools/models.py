@@ -3,7 +3,7 @@ from django.utils.text import slugify
 
 from students.models import Student
 from organization.org.models import Organization
-
+from kb.topics.models import StudentPlan
 from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
 from parler.models import TranslatableModel, TranslatedFields
@@ -35,6 +35,7 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         type_of = models.CharField(max_length=100, null=True)
     )
 
+    student_plan = models.ManyToManyField(StudentPlan, on_delete=models.PROTECT, null=True)
     organization =  models.ForeignKey(Organization, on_delete=models.PROTECT, null=True, blank=True)
 	teacher =  models.ManyToManyField(Teacher, on_delete=models.PROTECT, null=True, blank=True)
 	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)

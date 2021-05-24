@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Question, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset
+from .models import AnswerOption, Question, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset
 
 class QuestionImageAssetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,3 +40,10 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ['id', 'topic', 'question_text' , 'answeroption_set', 'image_assets', 'video_assets', 'audio_assets']
+
+class AnswerOptionSerializer(serializers.ModelSerializer):
+    question = QuestionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = AnswerOption
+        fields = ['id', 'answer_text', 'explanation', 'is_correct', 'question']

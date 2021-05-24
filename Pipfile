@@ -20,7 +20,6 @@ django-ckeditor = "*"
 django-cors-headers = "*"
 coreapi = "*"
 django-mailer = "*"
-graphene-django = "*"
 
 [dev-packages]
 

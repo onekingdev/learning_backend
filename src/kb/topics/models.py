@@ -6,7 +6,7 @@ from audiences.models import Audience
 from students.models import Student
 from organization.schools.models import School
 from organization.org.models import Organization
-
+from content.questions.models import Question
 
 from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
@@ -23,22 +23,15 @@ class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         name  = models.CharField(max_length=128)
     )
 
-    """
-    total_credits 
-    validity_date
-    """
-    audience = models.ManyToManyField(Audience, on_delete=models.PROTECT, null=True, blank=True)
-    student = models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
-    school = models.ManyToManyField(School, on_delete=models.PROTECT, null=True, blank=True)
-    organization = models.ManyToManyField(Organization, on_delete=models.PROTECT, null=True, blank=True)
-    
+    total_credits = models.IntegerField(max_length=20, null=True)
+    validity_date = models.DateTimeField(null=True)
+
     # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
    
     def __str__(self):
         return self.name
 
     def get_topics(self):
-        # TODO: rehacer esto con Django ORM
         cursor = connection.cursor()
         cursor.execute(
             "SELECT COUNT(id) FROM tpic_std_pln WHERE student_plan_id = %s",
@@ -82,27 +75,21 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
     def __str__(self):
     	return '{}/{}'.format(self.topic, self.grade)
 
-class StudentTopicGrade(TimestampModel, UUIDModel, IsActiveModel):
+class StudentPlanTopicGrade(TimestampModel, UUIDModel, IsActiveModel):
+    question = models.ManyToManyField(Question, on_delete=models.PROTECT, null=True)
     topic_grade =  models.ForeignKey(TopicGrade, on_delete=models.PROTECT, null=True, blank=True)
     student_plan =  models.ForeignKey(StudentPlan, on_delete=models.PROTECT, null=True, blank=True)
-
-    """
-    credit_value
-    is_aproved
-    is_failed
-    """
-
+    credit_value = models.IntegerField(max_length=20, null=True)
+    is_aproved = models.IntegerField(max_length=20, null=True)
+    is_failed = models.IntegerField(max_length=20, null=True)
 
 class Prerequisite(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'pre_'
     topic_grade = models.ManyToManyField(TopicGrade, on_delete=models.PROTECT)
     topic = models.ManyToManyField(Topic, on_delete=models.PROTECT)
-    """
-        information
-        advance_percentage
-        advance_minum
-        needed_choices
-    """
+    information = models.TextField(null=True, blank=True)
+    advance_percentage = models.FloatField(null=True,blank=True)
+    advance_minum = models.FloatField(null=True,blank=True)
 
     def __str__(self):
         return '{}/{}'.format(self.topic, self.grade)

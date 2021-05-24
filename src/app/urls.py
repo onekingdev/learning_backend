@@ -18,12 +18,10 @@ from django.urls import path, include
 from django.contrib.auth import urls as admin_urls
 from rest_framework.documentation import include_docs_urls
 from rest_framework.permissions import AllowAny
-from graphene_django.views import GraphQLView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
-    path('graphql/', GraphQLView.as_view(graphiql=True)),
     path('rest-auth/', include('dj_rest_auth.urls')),
     path('rest-auth/registration/', include('dj_rest_auth.registration.urls')),
     path('docs/', include_docs_urls(
