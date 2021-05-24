@@ -55,7 +55,13 @@ INSTALLED_APPS = [
 
 
     'kb',
-    'assessments',
+    'audiences',
+    'block',
+    'organization',
+    'content',
+    'guardians',
+    'universals',
+    'wallet',
     'students',
     'api',
     'users',

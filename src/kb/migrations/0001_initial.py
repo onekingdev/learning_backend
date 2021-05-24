@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                 ('random_slug', models.SlugField(editable=False, unique=True)),
                 ('create_timestamp', models.DateTimeField(auto_now_add=True, verbose_name='Timestamp de creación')),
                 ('update_timestamp', models.DateTimeField(auto_now=True, verbose_name='Timestamp de modificación')),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='kb.question')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='kb.question')),
             ],
             options={
                 'abstract': False,
@@ -98,7 +98,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='QuestionAudioAsset',
             fields=[
-                ('questionasset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='kb.questionasset')),
+                ('questionasset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.PROTECT, parent_link=True, primary_key=True, serialize=False, to='kb.questionasset')),
                 ('audio_file', models.FileField(upload_to='')),
             ],
             options={
@@ -109,7 +109,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='QuestionImageAsset',
             fields=[
-                ('questionasset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='kb.questionasset')),
+                ('questionasset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.PROTECT, parent_link=True, primary_key=True, serialize=False, to='kb.questionasset')),
                 ('image', models.ImageField(upload_to='')),
             ],
             options={
@@ -120,7 +120,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='QuestionVideoAsset',
             fields=[
-                ('questionasset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='kb.questionasset')),
+                ('questionasset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.PROTECT, parent_link=True, primary_key=True, serialize=False, to='kb.questionasset')),
                 ('url', models.URLField()),
             ],
             options={
@@ -142,7 +142,7 @@ class Migration(migrations.Migration):
                 ('create_timestamp', models.DateTimeField(auto_now_add=True, verbose_name='Timestamp de creación')),
                 ('update_timestamp', models.DateTimeField(auto_now=True, verbose_name='Timestamp de modificación')),
                 ('is_correct', models.BooleanField(default=False)),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='kb.question')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='kb.question')),
             ],
             options={
                 'abstract': False,
@@ -155,7 +155,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('language_code', models.CharField(db_index=True, max_length=15, verbose_name='Language')),
                 ('name', models.CharField(max_length=128)),
-                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='translations', to='kb.topic')),
+                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='translations', to='kb.topic')),
             ],
             options={
                 'verbose_name': 'topic Translation',
@@ -173,7 +173,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('language_code', models.CharField(db_index=True, max_length=15, verbose_name='Language')),
                 ('question_text', ckeditor.fields.RichTextField(blank=True)),
-                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='translations', to='kb.question')),
+                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='translations', to='kb.question')),
             ],
             options={
                 'verbose_name': 'question Translation',
@@ -191,7 +191,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('language_code', models.CharField(db_index=True, max_length=15, verbose_name='Language')),
                 ('name', models.CharField(max_length=128, null=True)),
-                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='translations', to='kb.grade')),
+                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='translations', to='kb.grade')),
             ],
             options={
                 'verbose_name': 'grade Translation',
@@ -210,7 +210,7 @@ class Migration(migrations.Migration):
                 ('language_code', models.CharField(db_index=True, max_length=15, verbose_name='Language')),
                 ('name', models.CharField(max_length=128, unique=True)),
                 ('slug', models.SlugField(editable=False)),
-                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='translations', to='kb.areaofknowledge')),
+                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='translations', to='kb.areaofknowledge')),
             ],
             options={
                 'verbose_name': 'area of knowledge Translation',
@@ -229,7 +229,7 @@ class Migration(migrations.Migration):
                 ('language_code', models.CharField(db_index=True, max_length=15, verbose_name='Language')),
                 ('answer_text', models.CharField(max_length=256)),
                 ('explanation', ckeditor.fields.RichTextField(blank=True)),
-                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='translations', to='kb.answeroption')),
+                ('master', parler.fields.TranslationsForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='translations', to='kb.answeroption')),
             ],
             options={
                 'verbose_name': 'answer option Translation',

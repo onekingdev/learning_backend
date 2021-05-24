@@ -1,9 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
-from addresses.models import Address
 from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
-from kb.topics.models import StudentPlan
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel
 
@@ -17,7 +15,7 @@ class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel, Tr
         slug = models.SlugField(editable=False)
     ),
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True)
-    student_plan = models.ManyToManyField(StudentPlan, on_delete=models.PROTECT, null=True)
+    student_plan = models.ManyToManyField('kb.topics.StudentPlan', null=True)
     
     def __str__(self):
         return self.name+' '+self.last_name
@@ -25,7 +23,7 @@ class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel, Tr
 class OrganizationPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'prs_'
     user  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
-    organization  = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
+    organization  = models.ForeignKey('organization.org.Organization', on_delete=models.SET_NULL, null=True)
 
     name  = models.CharField(max_length=128, null=True)
     last_name  = models.CharField(max_length=128, null=True)

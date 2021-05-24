@@ -1,5 +1,4 @@
 from django.db import models
-from kb.topics.models import StudentPlan
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 from parler.models import TranslatableModel, TranslatedFields
 from django.utils.text import slugify
@@ -12,7 +11,7 @@ class Audience(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel
         slug = models.SlugField(editable=False)
     )
 
-    student_plan = models.ManyToManyField(StudentPlan, on_delete=models.PROTECT, null=True)
+    student_plan = models.ManyToManyField('kb.topics.StudentPlan',  null=True)
     
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

@@ -63,7 +63,7 @@ class Wallet(TimestampModel, RandomSlugModel, IsActiveModel):
 class Transaction(TimestampModel, RandomSlugModel, UUIDModel, IsActiveModel, TranslatableModel):
     date = models.DateTimeField(default=now)
     amount = models.FloatField(max_digits=12, decimal_places=2)
-    type_transaction = models.ForeignKey(TypeTransaction, on_delete=models.CASCADE, null=True)
+    type_transaction = models.ForeignKey(TypeTransaction, on_delete=models.PROTECT, null=True)
     format_transaction = models.CharField(max_length=128, null=True)
     notes = models.TextField(null=True, blank=True)
 

@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
 from ckeditor.fields import RichTextField
-from people.students.models import Student
 from mptt.models import MPTTModel, TreeForeignKey
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
@@ -21,5 +20,5 @@ class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class GuardianStudent(TimestampModel, RandomSlugModel):
 	PREFIX = "prnt_stnd_"
-	guardian =  models.ForeignKey(Guardian, on_delete=models.PROTECT, null=True, blank=True)
-	student =  models.ForeignKey(Student, on_delete=models.PROTECT, null=True, blank=True)
+	guardian =  models.ForeignKey('guardians.Guardian', on_delete=models.PROTECT, null=True, blank=True)
+	student =  models.ForeignKey('students.Student', on_delete=models.PROTECT, null=True, blank=True)

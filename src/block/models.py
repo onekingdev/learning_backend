@@ -1,8 +1,5 @@
 from django.db import models
 from django.utils.text import slugify
-from people.students.models import Student
-from kb.topics.models import Topic
-from content.questions.models import Question, AnswerOption
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
@@ -40,8 +37,8 @@ class BlockTypeConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, Tra
         - Show Timer: True
     """
 	PREFIX = 'blck_typ_cnfg_'
-	block_type = models.ForeignKey(BlockType, on_delete=models.CASCADE, null=True)
-	key = models.ForeignKey(BlockConfigurationKeyword, on_delete=models.CASCADE, null=True)
+	block_type = models.ForeignKey('block.BlockType', on_delete=models.PROTECT, null=True)
+	key = models.ForeignKey('block.BlockConfigurationKeyword', on_delete=models.PROTECT, null=True)
 	data_type  = models.CharField(max_length=128, null=True)
 	value  = models.CharField(max_length=128, null=True)
 
@@ -49,20 +46,22 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 	PREFIX = 'blck_'
 
 	MODALITY_AI = 'AI'
-    MODALITY_PRACTICE = 'Practice'
+	MODALITY_PATH = 'PATH'
+    MODALITY_PRACTICE = 'PRACTICE'
     MODALITY_CHOICES = (
-        (MODALITY_AI, 'ai'),
-        (MODALITY_PRACTICE, 'practice')
+        (MODALITY_AI, 'AI'),
+        (MODALITY_PATH, 'Choose your path'),
+        (MODALITY_PRACTICE, 'Practice'),
     )
 
-	modality = models.ChoiceField(choices=MODALITY_CHOICES, default=MODALITY_PRACTICE)
+	modality = models.ChoiceField(choices=MODALITY_CHOICES, default=MODALITY_AI)
     first_presentation_timestamp = models.DateTimeField(null=True)
     last_presentation_timestamp = models.DateTimeField(null=True)
 
-    type_of = models.ForeignKey(BlockType, on_delete=models.PROTECT, null=True)
-	student =  models.ManyToManyField(Student, on_delete=models.PROTECT, null=True, blank=True)
-    topics =  models.ManyToManyField(Topic, on_delete=models.PROTECT, null=True, blank=True)
-	questions = models.ManyToManyField(Question, through=BlockQuestion)
+    type_of = models.ForeignKey('block.BlockType', on_delete=models.PROTECT, null=True)
+	student =  models.ManyToManyField('students.Student', null=True, blank=True)
+    topics =  models.ManyToManyField('kb.topics.Topic', null=True, blank=True)
+	questions = models.ManyToManyField('content.questions.Question', through='block.BlockQuestion')
     # engangement points
     # coins earned
 
@@ -76,6 +75,14 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         if is_new:
             # TODO: aqui falta hacer el copy paste de las configs, si es nuevo
             # TODO: por cada key-value del type of, hay que nutrir el hijo de esta tabla 
+            if self.type_of:
+                for item in self.type_of.blocktypeconfiguration_set.all():
+                    self.blockconfiguration_set.create(
+                        key=item.key,
+                        value=item.value,
+                        data_type=item.data_type
+                    )
+
 
         return sve
 
@@ -88,8 +95,8 @@ class BlockConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, Transla
     """
 	PREFIX = 'blck_cnfg_'
 	
-	block = models.ForeignKey(Block, on_delete=models.CASCADE, null=True)
-	key = models.ForeignKey(BlockConfigurationKeyword, on_delete=models.CASCADE, null=True)
+	block = models.ForeignKey('block.Block', on_delete=models.PROTECT, null=True)
+	key = models.ForeignKey('block.BlockConfigurationKeyword', on_delete=models.PROTECT, null=True)
 	data_type  = models.CharField(max_length=128, null=True)
 	value  = models.CharField(max_length=128, null=True)
 	
@@ -97,7 +104,7 @@ class BlockConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, Transla
 class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 	PREFIX = 'blck_pres_'
 
-    # TODO: borrar. block_configuration = models.ForeignKey(BlockConfiguration, on_delete=models.CASCADE, null=True)
+    # TODO: borrar. block_configuration = models.ForeignKey(BlockConfiguration, on_delete=models.PROTECT, null=True)
 	hits = models.IntegerField(max_length=20, null=True)
 	errors = models.IntegerField(max_length=20, null=True)
 	total = models.IntegerField(max_length=20, null=True)
@@ -119,10 +126,11 @@ class BlockQuestion(TimestampModel, RandomSlugModel):
         (STATUS_CORRECT,'Correct'),
         (STATUS_INCORRECT,'Incorrect'),
     )
+    # TODO: estos elementos de choices van al reves 
 
     block = models.ForeignKey(Block, on_delete=models.PROTECT, null=True)
-    question = models.ForeignKey(Question, on_delete=models.PROTECT, null=True)
-    chosen_answer = models.ForeignKey(AnswerOption, on_delete=models.PROTECT, null=True)
+    question = models.ForeignKey('content.questions.Question', on_delete=models.PROTECT, null=True)
+    chosen_answer = models.ForeignKey('content.questions.AnswerOption', on_delete=models.PROTECT, null=True)
     
     is_correct = models.BooleanField(null=True)
     is_answered = models.BooleanField(null=True, default=False)
@@ -136,8 +144,8 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
     """
     This model will have every presentation of question
     """
-    question = models.ForeignKey(Question, on_delete=models.PROTECT, null=True)
-    block_question = models.ForeignKey(BlockQuestion, on_delete=models.PROTECT, null=True)
+    question = models.ForeignKey('content.questions.Question', on_delete=models.PROTECT, null=True)
+    block_question = models.ForeignKey('block.BlockQuestion', on_delete=models.PROTECT, null=True)
 	presentation_timestamp = models.DateTimeField(null=True)
 	submission_timestamp = models.DateTimeField(null=True)
 

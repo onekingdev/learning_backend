@@ -11,21 +11,21 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     GENDER_FEMALE = 'Female'
     GENDER_OTHER = 'Other'
     GENDER_CHOICES = (
-        ('M',GENDER_MALE),
-        ('F',GENDER_FEMALE),
-        ('O',GENDER_OTHER),
+        (GENDER_MALE, 'M'),
+        (GENDER_FEMALE, 'F'),
+        (GENDER_OTHER, 'O'),
     )
 
     PREFIX = 'stdnt_'
-    user  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
+    user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
     first_name = models.CharField(max_length=64, null=True, blank=True)
     last_name = models.CharField(max_length=64, null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     age = models.IntegerField(max_length=3, null=True)
 
-    student_plan = models.ManyToManyField(StudentPlan, on_delete=models.PROTECT, null=True)
-    group =  models.ManyToManyField(Group, on_delete=models.PROTECT, null=True, blank=True)
+    student_plan = models.ManyToManyField('kb.topics.StudentPlan', null=True)
+    group =  models.ManyToManyField('kb.grades.Group',  null=True, blank=True)
 
 
     @property
