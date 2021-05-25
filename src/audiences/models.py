@@ -11,7 +11,7 @@ class Audience(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel
         slug = models.SlugField(editable=False)
     )
 
-    student_plan = models.ManyToManyField('kb.topics.StudentPlan',  null=True)
+    student_plan = models.ManyToManyField('kb.StudentPlan',  null=True)
     
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

@@ -17,8 +17,8 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         population = models.IntegerField(max_length=40, null=True)
     )
 
-    grade = models.ForeignKey('kb.grades.Grade', on_delete=models.PROTECT, null=True, blank=True)
-    area_of_knowledges = models.ManyToManyField('kb.area_of_knowledges.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
+    grade = models.ForeignKey('kb.Grade', on_delete=models.PROTECT, null=True, blank=True)
+    area_of_knowledges = models.ManyToManyField('kb.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -32,11 +32,11 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         type_of = models.CharField(max_length=100, null=True)
     )
 
-    student_plan = models.ManyToManyField('kb.topics.StudentPlan', null=True)
-    organization =  models.ForeignKey('organization.org.Organization', null=True, blank=True)
-	teacher =  models.ManyToManyField('organization.schools.Teacher', null=True, blank=True)
+    student_plan = models.ManyToManyField('kb.StudentPlan', null=True)
+    organization =  models.ForeignKey('organization.Organization', null=True, blank=True)
+	teacher =  models.ManyToManyField('organization.Teacher', null=True, blank=True)
 	student =  models.ManyToManyField('students.Student', null=True, blank=True)
-	group =  models.ManyToManyField('organization.schools.Group', null=True, blank=True)
+	group =  models.ManyToManyField('organization.Group', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -44,7 +44,7 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'prs_'
     user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
-    school  = models.ForeignKey('organization.schools.School', on_delete=models.PROTECT, null=True)
+    school  = models.ForeignKey('organization.School', on_delete=models.PROTECT, null=True)
 
     name  = models.CharField(max_length=128, null=True)
     last_name  = models.CharField(max_length=128, null=True)

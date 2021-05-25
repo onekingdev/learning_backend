@@ -1,7 +1,4 @@
 from django.db import models
-from kb.grades.models import Grade
-from kb.topics.models import StudentPlan
-from organization.groups.models import Group
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 # Create your models here.
@@ -24,8 +21,8 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     age = models.IntegerField(max_length=3, null=True)
 
-    student_plan = models.ManyToManyField('kb.topics.StudentPlan', null=True)
-    group =  models.ManyToManyField('kb.grades.Group',  null=True, blank=True)
+    student_plan = models.ManyToManyField('kb.StudentPlan', null=True)
+    group =  models.ManyToManyField('kb.Group',  null=True, blank=True)
 
 
     @property

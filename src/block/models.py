@@ -11,10 +11,10 @@ class BlockConfigurationKeyword(TimestampModel, RandomSlugModel, IsActiveModel, 
         - show timer
         - allow to pass on questions
     """
-	PREFIX = 'blck_cnfg_key_'
-	name  = models.CharField(max_length=128, null=True)
+    PREFIX = 'blck_cnfg_key_'
+    name  = models.CharField(max_length=128, null=True)
 
-	def __str__(self):
+    def __str__(self):
         return self.name
 
 class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
@@ -24,10 +24,10 @@ class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMode
         - Assessment
         - Beat The Clock
     """
-	PREFIX = 'blck_typ_'
-	name  = models.CharField(max_length=128, null=True)
-	
-	def __str__(self):
+    PREFIX = 'blck_typ_'
+    name  = models.CharField(max_length=128, null=True)
+    
+    def __str__(self):
         return self.name
 
 class BlockTypeConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
@@ -36,17 +36,17 @@ class BlockTypeConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, Tra
     Examples:
         - Show Timer: True
     """
-	PREFIX = 'blck_typ_cnfg_'
-	block_type = models.ForeignKey('block.BlockType', on_delete=models.PROTECT, null=True)
-	key = models.ForeignKey('block.BlockConfigurationKeyword', on_delete=models.PROTECT, null=True)
-	data_type  = models.CharField(max_length=128, null=True)
-	value  = models.CharField(max_length=128, null=True)
+    PREFIX = 'blck_typ_cnfg_'
+    block_type = models.ForeignKey('block.BlockType', on_delete=models.PROTECT, null=True)
+    key = models.ForeignKey('block.BlockConfigurationKeyword', on_delete=models.PROTECT, null=True)
+    data_type  = models.CharField(max_length=128, null=True)
+    value  = models.CharField(max_length=128, null=True)
 
 class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
-	PREFIX = 'blck_'
+    PREFIX = 'blck_'
 
-	MODALITY_AI = 'AI'
-	MODALITY_PATH = 'PATH'
+    MODALITY_AI = 'AI'
+    MODALITY_PATH = 'PATH'
     MODALITY_PRACTICE = 'PRACTICE'
     MODALITY_CHOICES = (
         (MODALITY_AI, 'AI'),
@@ -54,14 +54,14 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         (MODALITY_PRACTICE, 'Practice'),
     )
 
-	modality = models.ChoiceField(choices=MODALITY_CHOICES, default=MODALITY_AI)
+    modality = models.CharField(choices=MODALITY_CHOICES, default=MODALITY_AI)
     first_presentation_timestamp = models.DateTimeField(null=True)
     last_presentation_timestamp = models.DateTimeField(null=True)
 
     type_of = models.ForeignKey('block.BlockType', on_delete=models.PROTECT, null=True)
-	student =  models.ManyToManyField('students.Student', null=True, blank=True)
-    topics =  models.ManyToManyField('kb.topics.Topic', null=True, blank=True)
-	questions = models.ManyToManyField('content.questions.Question', through='block.BlockQuestion')
+    student =  models.ManyToManyField('students.Student', null=True, blank=True)
+    topics =  models.ManyToManyField('kb.Topic', null=True, blank=True)
+    questions = models.ManyToManyField('content.Question', through='block.BlockQuestion')
     # engangement points
     # coins earned
 
@@ -93,24 +93,24 @@ class BlockConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, Transla
     Examples:
         - Show Timer: True
     """
-	PREFIX = 'blck_cnfg_'
-	
-	block = models.ForeignKey('block.Block', on_delete=models.PROTECT, null=True)
-	key = models.ForeignKey('block.BlockConfigurationKeyword', on_delete=models.PROTECT, null=True)
-	data_type  = models.CharField(max_length=128, null=True)
-	value  = models.CharField(max_length=128, null=True)
-	
+    PREFIX = 'blck_cnfg_'
+    
+    block = models.ForeignKey('block.Block', on_delete=models.PROTECT, null=True)
+    key = models.ForeignKey('block.BlockConfigurationKeyword', on_delete=models.PROTECT, null=True)
+    data_type  = models.CharField(max_length=128, null=True)
+    value  = models.CharField(max_length=128, null=True)
+    
 
 class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
-	PREFIX = 'blck_pres_'
+    PREFIX = 'blck_pres_'
 
     # TODO: borrar. block_configuration = models.ForeignKey(BlockConfiguration, on_delete=models.PROTECT, null=True)
-	hits = models.IntegerField(max_length=20, null=True)
-	errors = models.IntegerField(max_length=20, null=True)
-	total = models.IntegerField(max_length=20, null=True)
-	points = models.IntegerField(max_length=20, null=True)
-	start_timestamp = models.DateTimeField(null=True)
-	end_timestamp = models.DateTimeField(null=True)	
+    hits = models.IntegerField(max_length=20, null=True)
+    errors = models.IntegerField(max_length=20, null=True)
+    total = models.IntegerField(max_length=20, null=True)
+    points = models.IntegerField(max_length=20, null=True)
+    start_timestamp = models.DateTimeField(null=True)
+    end_timestamp = models.DateTimeField(null=True) 
 
 
 
@@ -129,14 +129,14 @@ class BlockQuestion(TimestampModel, RandomSlugModel):
     # TODO: estos elementos de choices van al reves 
 
     block = models.ForeignKey(Block, on_delete=models.PROTECT, null=True)
-    question = models.ForeignKey('content.questions.Question', on_delete=models.PROTECT, null=True)
-    chosen_answer = models.ForeignKey('content.questions.AnswerOption', on_delete=models.PROTECT, null=True)
+    question = models.ForeignKey('content.Question', on_delete=models.PROTECT, null=True)
+    chosen_answer = models.ForeignKey('content.AnswerOption', on_delete=models.PROTECT, null=True)
     
     is_correct = models.BooleanField(null=True)
     is_answered = models.BooleanField(null=True, default=False)
-    status = models.ChoiceField(choices=STATUS_CHOICES, default=STATUS_PENDING)
+    status = models.CharField(choices=STATUS_CHOICES, default=STATUS_PENDING)
 
-    def save
+    #def save
         #save here the status according to business logic
 
 
@@ -144,10 +144,10 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
     """
     This model will have every presentation of question
     """
-    question = models.ForeignKey('content.questions.Question', on_delete=models.PROTECT, null=True)
+    question = models.ForeignKey('content.Question', on_delete=models.PROTECT, null=True)
     block_question = models.ForeignKey('block.BlockQuestion', on_delete=models.PROTECT, null=True)
-	presentation_timestamp = models.DateTimeField(null=True)
-	submission_timestamp = models.DateTimeField(null=True)
+    presentation_timestamp = models.DateTimeField(null=True)
+    submission_timestamp = models.DateTimeField(null=True)
 
     def save(self, *args, **kwargs):
         self.question = self.block_question.question

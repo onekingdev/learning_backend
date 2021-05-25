@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     'content',
     'guardians',
     'universals',
-    'wallet',
+    'wallets',
     'students',
     'api',
     'users',

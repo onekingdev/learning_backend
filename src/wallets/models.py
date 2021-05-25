@@ -9,16 +9,14 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 # Create your models here.
 class TypeTransaction(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
-	PREFIX = 'typ_trns_'
-    translations = TranslatedFields(
-        name  = models.CharField(max_length=128, null=True)
-    )
+    PREFIX = 'typ_trns_'
+    name  = models.CharField(max_length=128, null=True)
 
     def __str__(self):
         return self.name
 
 class Wallet(TimestampModel, RandomSlugModel, IsActiveModel):
-    user = models.ForeignKey(User, unique=True, related_name='wallets')
+    user = models.ForeignKey('users.User', on_delete=models.PROTECT, unique=True, related_name='wallets')
     
     #class Meta:
         #permissions = (('can_view_wallet_report', 'Can view wallet report'),)
@@ -61,9 +59,9 @@ class Wallet(TimestampModel, RandomSlugModel, IsActiveModel):
 
 
 class Transaction(TimestampModel, RandomSlugModel, UUIDModel, IsActiveModel, TranslatableModel):
-    date = models.DateTimeField(default=now)
-    amount = models.FloatField(max_digits=12, decimal_places=2)
-    type_transaction = models.ForeignKey(TypeTransaction, on_delete=models.PROTECT, null=True)
+    date = models.DateTimeField(blank=True)
+    amount = models.FloatField(max_length=20,blank=True)
+    type_transaction = models.ForeignKey('wallets.TypeTransaction', on_delete=models.PROTECT, null=True)
     format_transaction = models.CharField(max_length=128, null=True)
     notes = models.TextField(null=True, blank=True)
 
@@ -72,19 +70,20 @@ class Transaction(TimestampModel, RandomSlugModel, UUIDModel, IsActiveModel, Tra
 
 class PaymentOption(TimestampModel, RandomSlugModel, IsActiveModel):
     name = models.CharField(max_length=255)
-    dollar_amount = models.FloatField(max_digits=20, decimal_places=2)
-    wallet_amount = models.FloatField(max_digits=20, decimal_places=2)
+    dollar_amount = models.FloatField(max_length=20,blank=True)
+    wallet_amount = models.FloatField(max_length=20,blank=True)
     enabled = models.BooleanField(default=True)
     
     def __unicode__(self):
         return '%s ($%.2f)' % (self.name, self.dollar_amount)
 
 class Invoice(TimestampModel, RandomSlugModel, IsActiveModel):
-    user = models.ForeignKey(User, related_name='wallet_invoices')
-    option = models.ForeignKey(PaymentOption, related_name='invoices')
+    user = models.ForeignKey('users.User', on_delete=models.PROTECT, related_name='wallet_invoices')
+    option = models.ForeignKey('wallets.PaymentOption', on_delete=models.PROTECT, related_name='invoices')
     date_billed = models.DateTimeField()
     transaction = models.ForeignKey(
-        Transaction,
+        'wallets.Transaction',
+        on_delete=models.PROTECT,
         related_name='invoices',
         null=True,
         blank=True,

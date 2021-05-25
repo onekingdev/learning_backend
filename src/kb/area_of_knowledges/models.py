@@ -15,7 +15,7 @@ class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
     )
 
     audience = models.ForeignKey('audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
-    universal_area_knowledge = models.ForeignKey('universals.area_of_knowledges.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
+    universal_area_knowledge = models.ForeignKey('universals.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return self.name

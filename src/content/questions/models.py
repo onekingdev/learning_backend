@@ -12,7 +12,7 @@ class AnswerOption(TimestampModel, UUIDModel, TranslatableModel):
         answer_text = models.CharField(max_length=256),
         explanation = RichTextField(blank=True,)
     )
-    question = models.ForeignKey('content.questions.Question', on_delete=models.PROTECT)
+    question = models.ForeignKey('content.Question', on_delete=models.PROTECT)
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
@@ -23,8 +23,8 @@ class Question(TimestampModel, UUIDModel, IsActiveModel, TranslatableModel):
     translations = TranslatedFields(
         question_text = RichTextField(blank=True)
     )
-    topic = models.ForeignKey('universals.topics.Topic', on_delete=models.PROTECT)
-    topic_grade = models.ForeignKey('kb.topics.TopicGrade', on_delete=models.PROTECT)
+    topic = models.ForeignKey('universals.Topic', on_delete=models.PROTECT)
+    topic_grade = models.ForeignKey('kb.TopicGrade', on_delete=models.PROTECT)
 
     def __str__(self):
         return self.question_text
@@ -45,7 +45,7 @@ class QuestionAsset(TimestampModel, RandomSlugModel):
         ordering = ['order']
 
     # TODO: hacer este modelo como Djagno Polymorphic
-    question = models.ForeignKey('content.questions.Question', on_delete=models.PROTECT)
+    question = models.ForeignKey('content.Question', on_delete=models.PROTECT)
     order = models.SmallPositiveIntegerField(default=10)
 
 

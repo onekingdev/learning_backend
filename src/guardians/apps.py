@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class ParentConfig(AppConfig):
-    name = 'parents'
+class GuardianConfig(AppConfig):
+    name = 'guardians'
