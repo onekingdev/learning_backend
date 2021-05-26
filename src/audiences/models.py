@@ -11,7 +11,6 @@ class Audience(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel
         name  = models.CharField(max_length=128, unique=True),
         slug = models.SlugField(editable=False)
     )
-
     
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

@@ -1,6 +1,6 @@
 from django.db import models
 
-from ..managers.topics import TopicManager
+from .managers import TopicManager
 from django.utils.text import slugify
 
 from ckeditor.fields import RichTextField
