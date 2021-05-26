@@ -9,6 +9,7 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 class Grade(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'gde_'
+    id = models.AutoField(primary_key=True)
     translations = TranslatedFields(
         name  = models.CharField(max_length=128, null=True),
         slug = models.SlugField(editable=False)

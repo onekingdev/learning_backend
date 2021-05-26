@@ -8,6 +8,7 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel
 
 class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
     PREFIX = 'aok_'
+    id = models.AutoField(primary_key=True)
     hex_color = models.CharField(null=True, blank=True, max_length=16)
     translations = TranslatedFields(
         name  = models.CharField(max_length=128, unique=True),

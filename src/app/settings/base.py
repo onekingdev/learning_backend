@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
 
-
     'kb',
     'audiences',
     'block',
@@ -64,9 +63,10 @@ INSTALLED_APPS = [
     'wallets',
     'students',
     'api',
-    'users',
-
+    'users'
 ]
+
+
 INSTALLED_APPS += [app for app in ENV_INSTALLED_APPS if app not in INSTALLED_APPS]
 
 

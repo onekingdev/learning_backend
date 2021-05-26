@@ -11,6 +11,7 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'grp_'
+    id = models.AutoField(primary_key=True)
     translations = TranslatedFields(
         name  = models.CharField(max_length=128, null=True),
         internal_code = models.CharField(max_length=128, null=True),
@@ -18,13 +19,14 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     )
 
     grade = models.ForeignKey('kb.Grade', on_delete=models.PROTECT, null=True, blank=True)
-    area_of_knowledges = models.ManyToManyField('kb.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
+    area_of_knowledges = models.ManyToManyField('kb.AreaOfKnowledge', blank=True)
 
     def __str__(self):
         return self.name
 
 class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'sch_'
+    id = models.AutoField(primary_key=True)
     translations = TranslatedFields(
         name  = models.CharField(max_length=128, null=True),
         slug = models.SlugField(editable=False),
@@ -32,17 +34,18 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         type_of = models.CharField(max_length=100, null=True)
     )
 
-    student_plan = models.ManyToManyField('kb.StudentPlan', null=True)
-    organization =  models.ForeignKey('organization.Organization', null=True, blank=True)
-	teacher =  models.ManyToManyField('organization.Teacher', null=True, blank=True)
-	student =  models.ManyToManyField('students.Student', null=True, blank=True)
-	group =  models.ManyToManyField('organization.Group', null=True, blank=True)
+    student_plan = models.ManyToManyField('kb.StudentPlan', blank=True)
+    organization =  models.ForeignKey('organization.Organization', blank=True)
+    teacher =  models.ManyToManyField('organization.Teacher', blank=True)
+    student =  models.ManyToManyField('students.Student', blank=True)
+    group =  models.ManyToManyField('organization.Group', blank=True)
 
     def __str__(self):
         return self.name
 
 class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'prs_'
+    id = models.AutoField(primary_key=True)
     user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
     school  = models.ForeignKey('organization.School', on_delete=models.PROTECT, null=True)
 

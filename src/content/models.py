@@ -8,6 +8,7 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 class AnswerOption(TimestampModel, UUIDModel, TranslatableModel):
     PREFIX = 'answopt_'
+    id = models.AutoField(primary_key=True)
     translations = TranslatedFields(
         answer_text = models.CharField(max_length=256),
         explanation = RichTextField(blank=True,)
@@ -20,6 +21,7 @@ class AnswerOption(TimestampModel, UUIDModel, TranslatableModel):
 
 class Question(TimestampModel, UUIDModel, IsActiveModel, TranslatableModel):
     PREFIX = 'qwstn_'
+    id = models.AutoField(primary_key=True)
     translations = TranslatedFields(
         question_text = RichTextField(blank=True)
     )
@@ -45,8 +47,9 @@ class QuestionAsset(TimestampModel, RandomSlugModel):
         ordering = ['order']
 
     # TODO: hacer este modelo como Djagno Polymorphic
+    id = models.AutoField(primary_key=True)
     question = models.ForeignKey('content.Question', on_delete=models.PROTECT)
-    order = models.SmallPositiveIntegerField(default=10)
+    order = models.PositiveIntegerField(default=10)
 
 
 class QuestionImageAsset(QuestionAsset):

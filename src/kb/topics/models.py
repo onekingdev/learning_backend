@@ -11,11 +11,12 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'std_pln_'
+    id = models.AutoField(primary_key=True)
     translations = TranslatedFields(
         name  = models.CharField(max_length=128)
     )
 
-    total_credits = models.IntegerField(max_length=20, null=True)
+    total_credits = models.IntegerField(null=True)
     validity_date = models.DateTimeField(null=True)
 
     # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
@@ -37,6 +38,7 @@ class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
 
 class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, TranslatableModel):
     PREFIX = 'tpic_'
+    id = models.AutoField(primary_key=True)
     translations = TranslatedFields(
         name  = models.CharField(max_length=128)
     )
@@ -44,7 +46,7 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
     audience = models.ForeignKey('audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
     area_of_knowledge = models.ForeignKey('kb.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True)
-    universal_topic = models.ManyToManyField('universals.Topic',  null=True, blank=True)
+    universal_topic = models.ManyToManyField('universals.Topic', blank=True)
     
     # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
     objects = TopicManager()
@@ -61,6 +63,7 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
 
 class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'tpic_grde_'
+    id = models.AutoField(primary_key=True)
     grade = models.ForeignKey('kb.Grade', on_delete=models.PROTECT, null=True, blank=True)
     topic = models.ForeignKey('kb.Topic', on_delete=models.PROTECT, null=True, blank=True)
     standard_code  = models.CharField(max_length=128, null=True, blank=True)
@@ -69,15 +72,17 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
     	return '{}/{}'.format(self.topic, self.grade)
 
 class StudentPlanTopicGrade(TimestampModel, UUIDModel, IsActiveModel):
-    question = models.ManyToManyField('content.Question',  null=True)
+    id = models.AutoField(primary_key=True)
+    question = models.ManyToManyField('content.Question')
     topic_grade =  models.ForeignKey('kb.TopicGrade', on_delete=models.PROTECT, null=True, blank=True)
     student_plan =  models.ForeignKey('kb.StudentPlan', on_delete=models.PROTECT, null=True, blank=True)
-    credit_value = models.IntegerField(max_length=20, null=True)
-    is_aproved = models.IntegerField(max_length=20, null=True)
-    is_failed = models.IntegerField(max_length=20, null=True)
+    credit_value = models.IntegerField(null=True)
+    is_aproved = models.IntegerField(null=True)
+    is_failed = models.IntegerField(null=True)
 
 class Prerequisite(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'pre_'
+    id = models.AutoField(primary_key=True)
     topic_grade = models.ManyToManyField('kb.TopicGrade', blank=True)
     topic = models.ManyToManyField('kb.Topic', blank=True)
     information = models.TextField(null=True, blank=True)

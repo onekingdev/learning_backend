@@ -9,6 +9,7 @@ from app.models import RandomSlugModel, TimestampModel, IsActiveModel, UUIDModel
 
 class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, TranslatableModel):
     PREFIX = 'unv_tpic_'
+    id = models.AutoField(primary_key=True)
     translations = TranslatedFields(
         name  = models.CharField(max_length=128),
         slug = models.SlugField(editable=False)

@@ -14,15 +14,16 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     )
 
     PREFIX = 'stdnt_'
+    id = models.AutoField(primary_key=True)
     user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
     first_name = models.CharField(max_length=64, null=True, blank=True)
     last_name = models.CharField(max_length=64, null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
-    age = models.IntegerField(max_length=3, null=True)
+    age = models.IntegerField(null=True)
 
-    student_plan = models.ManyToManyField('kb.StudentPlan', null=True)
-    group =  models.ManyToManyField('kb.Group',  null=True, blank=True)
+    student_plan = models.ManyToManyField('kb.StudentPlan')
+    group =  models.ManyToManyField('organization.Group',blank=True)
 
 
     @property
