@@ -204,4 +204,4 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 
 EMAIL_BACKEND = "mailer.backend.DbBackend"
-
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

@@ -24,8 +24,8 @@ class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel, Tr
 class OrganizationPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'prs_'
     id = models.AutoField(primary_key=True)
-    user  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
-    organization  = models.ForeignKey('organization.Organization', on_delete=models.SET_NULL, null=True)
+    user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
+    organization  = models.ForeignKey('organization.Organization', on_delete=models.PROTECT, null=True)
 
     name  = models.CharField(max_length=128, null=True)
     last_name  = models.CharField(max_length=128, null=True)

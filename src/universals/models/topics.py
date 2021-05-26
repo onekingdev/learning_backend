@@ -1,5 +1,5 @@
 from django.db import models
-from .managers import TopicManager
+from ..managers.topics import TopicManager
 from django.utils.text import slugify
 from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
@@ -15,7 +15,7 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
         slug = models.SlugField(editable=False)
     )
     area_of_knowledge = models.ForeignKey('universals.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
-    parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True)
+    parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='sub_topics')
     standard_code  = models.CharField(max_length=128, null=True, blank=True)
 
     objects = TopicManager()

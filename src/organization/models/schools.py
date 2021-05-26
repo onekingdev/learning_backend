@@ -15,7 +15,7 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     translations = TranslatedFields(
         name  = models.CharField(max_length=128, null=True),
         internal_code = models.CharField(max_length=128, null=True),
-        population = models.IntegerField(max_length=40, null=True)
+        population = models.IntegerField(blank=True, null=True)
     )
 
     grade = models.ForeignKey('kb.Grade', on_delete=models.PROTECT, null=True, blank=True)
@@ -35,8 +35,8 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     )
 
     student_plan = models.ManyToManyField('kb.StudentPlan', blank=True)
-    organization =  models.ForeignKey('organization.Organization', blank=True)
-    teacher =  models.ManyToManyField('organization.Teacher', blank=True)
+    organization =  models.ForeignKey('organization.Organization', on_delete=models.PROTECT, blank=True)
+    teacher =  models.ManyToManyField('organization.Teacher', blank=True , related_name='teachers')
     student =  models.ManyToManyField('students.Student', blank=True)
     group =  models.ManyToManyField('organization.Group', blank=True)
 
