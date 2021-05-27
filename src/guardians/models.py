@@ -11,10 +11,13 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'grdn_'
     id = models.AutoField(primary_key=True)
-    name  = models.CharField(max_length=128, null=True),
-    last_name  = models.CharField(max_length=128, null=True),
-    gender = models.CharField(max_length=128, null=True),
+    name  = models.CharField(max_length=128, null=True)
+    last_name  = models.CharField(max_length=128, null=True)
+    gender = models.CharField(max_length=128, null=True)
     user  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        ordering = ['last_name']
 
     def __str__(self):
         return self.name+' '+self.last_name

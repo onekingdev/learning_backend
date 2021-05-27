@@ -7,11 +7,12 @@ class Audience(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel
     PREFIX = 'au_'
     id = models.AutoField(primary_key=True)
     hex_color = models.CharField(null=True, blank=True, max_length=16)
-    translations = TranslatedFields(
-        name  = models.CharField(max_length=128, unique=True),
-        slug = models.SlugField(editable=False)
-    )
-    
+    name  = models.CharField(max_length=128, unique=True)
+    slug = models.SlugField(editable=False)
+
+    class Meta:
+        ordering = ['name']
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)

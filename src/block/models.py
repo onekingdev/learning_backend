@@ -14,9 +14,17 @@ class BlockConfigurationKeyword(TimestampModel, RandomSlugModel, IsActiveModel, 
     PREFIX = 'blck_cnfg_key_'
     id = models.AutoField(primary_key=True)
     name  = models.CharField(max_length=128, null=True)
+    slug = models.SlugField(editable=False)
+
+    class Meta:
+        ordering = ['name']
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     """
@@ -28,9 +36,17 @@ class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMode
     PREFIX = 'blck_typ_'
     id = models.AutoField(primary_key=True)
     name  = models.CharField(max_length=128, null=True)
+    slug = models.SlugField(editable=False)
+
+    class Meta:
+        ordering = ['name']
     
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 class BlockTypeConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     """
@@ -65,8 +81,8 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     student =  models.ManyToManyField('students.Student', blank=True)
     topics =  models.ManyToManyField('kb.Topic', blank=True)
     questions = models.ManyToManyField('content.Question', through='block.BlockQuestion')
-    # engangement points
-    # coins earned
+    engangement_points = models.IntegerField(null=True)
+    coins_earned = models.IntegerField(null=True)
 
     def save(self, *args, **kwargs):
         is_new = False
@@ -76,8 +92,6 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         sve = super().save(*args, **kwargs)
 
         if is_new:
-            # TODO: aqui falta hacer el copy paste de las configs, si es nuevo
-            # TODO: por cada key-value del type of, hay que nutrir el hijo de esta tabla 
             if self.type_of:
                 for item in self.type_of.blocktypeconfiguration_set.all():
                     self.blockconfiguration_set.create(
@@ -85,8 +99,6 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
                         value=item.value,
                         data_type=item.data_type
                     )
-
-
         return sve
 
 
@@ -116,7 +128,8 @@ class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel, Translat
     start_timestamp = models.DateTimeField(null=True)
     end_timestamp = models.DateTimeField(null=True) 
 
-
+    class Meta:
+        ordering = ['create_timestamp']
 
 class BlockQuestion(TimestampModel, RandomSlugModel):
     """

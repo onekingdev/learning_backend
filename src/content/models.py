@@ -28,6 +28,9 @@ class Question(TimestampModel, UUIDModel, IsActiveModel, TranslatableModel):
     topic = models.ForeignKey('universals.Topic', on_delete=models.PROTECT)
     topic_grade = models.ForeignKey('kb.TopicGrade', on_delete=models.PROTECT)
 
+    class Meta:
+        ordering = ['-create_timestamp']
+    
     def __str__(self):
         return self.question_text
 

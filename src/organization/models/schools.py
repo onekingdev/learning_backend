@@ -12,27 +12,31 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'grp_'
     id = models.AutoField(primary_key=True)
-    translations = TranslatedFields(
-        name  = models.CharField(max_length=128, null=True),
-        internal_code = models.CharField(max_length=128, null=True),
-        population = models.IntegerField(blank=True, null=True)
-    )
+    name  = models.CharField(max_length=128, null=True)
+    internal_code = models.CharField(max_length=128, null=True)
+    population = models.IntegerField(blank=True, null=True)
+    slug = models.SlugField(editable=False)
 
     grade = models.ForeignKey('kb.Grade', on_delete=models.PROTECT, null=True, blank=True)
     area_of_knowledges = models.ManyToManyField('kb.AreaOfKnowledge', blank=True)
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'sch_'
     id = models.AutoField(primary_key=True)
-    translations = TranslatedFields(
-        name  = models.CharField(max_length=128, null=True),
-        slug = models.SlugField(editable=False),
-        internal_code = models.CharField(max_length=128, null=True),
-        type_of = models.CharField(max_length=100, null=True)
-    )
+    name  = models.CharField(max_length=128, null=True)
+    slug = models.SlugField(editable=False)
+    internal_code = models.CharField(max_length=128, null=True)
+    type_of = models.CharField(max_length=100, null=True)
 
     student_plan = models.ManyToManyField('kb.StudentPlan', blank=True)
     organization =  models.ForeignKey('organization.Organization', on_delete=models.PROTECT, blank=True)
@@ -40,8 +44,15 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     student =  models.ManyToManyField('students.Student', blank=True)
     group =  models.ManyToManyField('organization.Group', blank=True)
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'prs_'
@@ -55,6 +66,9 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     date_of_birth = models.DateField(null=True)
     identification_number = models.CharField(max_length=128, null=True)
     position = models.CharField(max_length=128, null=True)
+
+    class Meta:
+        ordering = ['last_name']
 
     def __str__(self):
         return self.name+' '+self.last_name

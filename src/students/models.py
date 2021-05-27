@@ -1,8 +1,6 @@
 from django.db import models
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
-# Create your models here.
-
 class Student(TimestampModel, UUIDModel, IsActiveModel):
     GENDER_MALE = 'Male'
     GENDER_FEMALE = 'Female'
@@ -25,6 +23,8 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     student_plan = models.ManyToManyField('kb.StudentPlan')
     group =  models.ManyToManyField('organization.Group',blank=True)
 
+    class Meta:
+        ordering = ['last_name']
 
     @property
     def get_full_name(self):
@@ -32,6 +32,31 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
     def __str__(self):
         return self.get_full_name
+
+# Create your models here.
+class Avatar(TimestampModel, UUIDModel, IsActiveModel):
+    TYPE_COMPLETE = 'Completo'
+    TYPE_TOP = 'Head'
+    TYPE_MIDDLE = 'Body'
+    TYPE_BOTTOM = 'Legs'
+    TYPE_CHOICES = (
+        (TYPE_COMPLETE, 'C'),
+        (TYPE_TOP, 'H'),
+        (TYPE_MIDDLE, 'B'),
+        (TYPE_BOTTOM, 'L')
+    )
+
+    PREFIX = 'avt_'
+    id = models.AutoField(primary_key=True)
+    type_of = models.CharField(max_length=25, null=True, choices=TYPE_CHOICES)
+    student  = models.ForeignKey('students.Student', on_delete=models.PROTECT, null=True)
+    name = models.CharField(max_length=64, null=True, blank=True)
+    path = models.TextField(null=True)
+    width = models.IntegerField(null=True)
+    height = models.IntegerField(null=True)
+
+    class Meta:
+        ordering = ['name']
 
 ##
 ##class StudentTopicMastery():

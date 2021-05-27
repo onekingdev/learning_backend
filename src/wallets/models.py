@@ -68,6 +68,9 @@ class Transaction(TimestampModel, RandomSlugModel,  IsActiveModel, TranslatableM
     format_transaction = models.CharField(max_length=128, null=True)
     notes = models.TextField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['create_timestamp']
+
     def __unicode__(self):
         return 'Transaction #%d (%.2f)' % (self.id, self.value)
 
@@ -77,6 +80,9 @@ class PaymentOption(TimestampModel, RandomSlugModel, IsActiveModel):
     dollar_amount = models.FloatField(blank=True)
     wallet_amount = models.FloatField(blank=True)
     enabled = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['create_timestamp']
     
     def __unicode__(self):
         return '%s ($%.2f)' % (self.name, self.dollar_amount)
@@ -93,3 +99,6 @@ class Invoice(TimestampModel, RandomSlugModel, IsActiveModel):
         null=True,
         blank=True
     )
+
+    class Meta:
+        ordering = ['create_timestamp']

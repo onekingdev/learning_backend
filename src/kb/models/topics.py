@@ -12,17 +12,21 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'std_pln_'
     id = models.AutoField(primary_key=True)
-    translations = TranslatedFields(
-        name  = models.CharField(max_length=128)
-    )
-
+    name  = models.CharField(max_length=128)
+    slug = models.SlugField(editable=False)
     total_credits = models.IntegerField(null=True)
     validity_date = models.DateTimeField(null=True)
-
-    # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
+    audience =  models.ForeignKey('audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
    
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
     def get_topics(self):
         # TODO: rehacer esto con Django ORM
@@ -39,10 +43,8 @@ class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
 class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, TranslatableModel):
     PREFIX = 'tpic_'
     id = models.AutoField(primary_key=True)
-    translations = TranslatedFields(
-        name  = models.CharField(max_length=128)
-    )
-
+    name  = models.CharField(max_length=128)
+    slug = models.SlugField(editable=False)
     audience = models.ForeignKey('audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
     area_of_knowledge = models.ForeignKey('kb.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='sub_topics')
@@ -51,10 +53,15 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
     # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
     objects = TopicManager()
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+
         if self.parent:
             self.area_of_knowledge = self.parent.area_of_knowledge
         sup = super().save(*args, **kwargs)
