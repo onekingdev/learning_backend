@@ -1,5 +1,5 @@
-from content.questions.models import AnswerOption
-from content.questions.serializers import AnswerOptionSerializer
+from content.answer_options.models import AnswerOption
+from content.answer_options.serializers import AnswerOptionSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
