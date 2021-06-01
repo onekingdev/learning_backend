@@ -38,7 +38,7 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-class IsActiveModel(BaseModel):
+class IsActiveModel(models.Model):
     is_active = models.BooleanField(default=True)
     objects = ActiveManager
 

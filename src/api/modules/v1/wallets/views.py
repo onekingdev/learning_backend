@@ -1,5 +1,5 @@
-from wallet.models import TypeTransaction, Wallet, Transaction, PaymentOption, Invoice
-from wallet.serializers import TypeTransactionSerializer, WalletSerializer, TransactionSerializer, PaymentOptionSerializer, InvoiceSerializer
+from wallets.models import TypeTransaction, Wallet, Transaction, PaymentOption, Invoice
+from wallets.serializers import TypeTransactionSerializer, WalletSerializer, TransactionSerializer, PaymentOptionSerializer, InvoiceSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response

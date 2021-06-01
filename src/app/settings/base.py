@@ -53,14 +53,23 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
 
-
     'kb',
-    'assessments',
+    'audiences',
+    'collectibles',
+    'block',
+    'organization',
+    'content',
+    'plans',
+    'guardians',
+    'universals',
+    'wallets',
+    'experiences',
     'students',
     'api',
-    'users',
-
+    'users'
 ]
+
+
 INSTALLED_APPS += [app for app in ENV_INSTALLED_APPS if app not in INSTALLED_APPS]
 
 
@@ -198,4 +207,4 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 
 EMAIL_BACKEND = "mailer.backend.DbBackend"
-
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
