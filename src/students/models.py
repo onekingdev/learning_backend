@@ -20,10 +20,8 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     age = models.IntegerField(null=True)
 
-    student_plan = models.ManyToManyField('plans.StudentPlan')
+    student_plan = models.ManyToManyField('kb.StudentPlan')
     group =  models.ManyToManyField('organization.Group',blank=True)
-    level = models.ForeignKey('experiences.Level', on_delete=models.PROTECT, null=True)
-    total_experience_points = models.IntegerField(null=True)
 
     class Meta:
         ordering = ['last_name']

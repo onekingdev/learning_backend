@@ -14,7 +14,7 @@ class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel, Tr
     type_of = models.CharField(max_length=128, null=True)
     slug = models.SlugField(editable=False)
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True)
-    student_plan = models.ManyToManyField('plans.StudentPlan')
+    student_plan = models.ManyToManyField('kb.StudentPlan')
     
     class Meta:
         ordering = ['name']
