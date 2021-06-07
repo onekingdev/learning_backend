@@ -9,12 +9,12 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'prs_'
-    id = models.AutoField(primary_key=True)
+    
     name  = models.CharField(max_length=128, null=True)
     type_of = models.CharField(max_length=128, null=True)
     slug = models.SlugField(editable=False)
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True)
-    student_plan = models.ManyToManyField('kb.StudentPlan')
+    student_plan = models.ManyToManyField('plans.StudentPlan')
     
     class Meta:
         ordering = ['name']
@@ -28,7 +28,7 @@ class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel, Tr
 
 class OrganizationPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'prs_'
-    id = models.AutoField(primary_key=True)
+    
     user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
     organization  = models.ForeignKey('organization.Organization', on_delete=models.PROTECT, null=True)
 

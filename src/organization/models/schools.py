@@ -11,7 +11,7 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'grp_'
-    id = models.AutoField(primary_key=True)
+    
     name  = models.CharField(max_length=128, null=True)
     internal_code = models.CharField(max_length=128, null=True)
     population = models.IntegerField(blank=True, null=True)
@@ -32,13 +32,13 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 
 class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'sch_'
-    id = models.AutoField(primary_key=True)
+    
     name  = models.CharField(max_length=128, null=True)
     slug = models.SlugField(editable=False)
     internal_code = models.CharField(max_length=128, null=True)
     type_of = models.CharField(max_length=100, null=True)
 
-    student_plan = models.ManyToManyField('kb.StudentPlan', blank=True)
+    student_plan = models.ManyToManyField('plans.StudentPlan', blank=True)
     organization =  models.ForeignKey('organization.Organization', on_delete=models.PROTECT, blank=True)
     teacher =  models.ManyToManyField('organization.Teacher', blank=True , related_name='teachers')
     student =  models.ManyToManyField('students.Student', blank=True)
@@ -56,7 +56,7 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 
 class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'prs_'
-    id = models.AutoField(primary_key=True)
+    
     user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
     school  = models.ForeignKey('organization.School', on_delete=models.PROTECT, null=True)
 

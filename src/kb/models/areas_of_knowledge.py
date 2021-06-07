@@ -8,11 +8,11 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel
 
 class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
     PREFIX = 'aok_'
-    id = models.AutoField(primary_key=True)
+    
     hex_color = models.CharField(null=True, blank=True, max_length=16)
     name  = models.CharField(max_length=128, unique=True)
     slug = models.SlugField(editable=False)
-    
+    image = models.TextField(null=True)
 
     audience = models.ForeignKey('audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
     universal_area_knowledge = models.ForeignKey('universals.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)

@@ -10,7 +10,7 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'grdn_'
-    id = models.AutoField(primary_key=True)
+    
     name  = models.CharField(max_length=128, null=True)
     last_name  = models.CharField(max_length=128, null=True)
     gender = models.CharField(max_length=128, null=True)
@@ -24,6 +24,6 @@ class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class GuardianStudent(TimestampModel, RandomSlugModel):
     PREFIX = "prnt_stnd_"
-    id = models.AutoField(primary_key=True)
+    
     guardian =  models.ForeignKey('guardians.Guardian', on_delete=models.PROTECT, null=True, blank=True)
     student =  models.ForeignKey('students.Student', on_delete=models.PROTECT, null=True, blank=True)
