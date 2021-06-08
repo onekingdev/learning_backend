@@ -25,7 +25,7 @@ class Question(TimestampModel, UUIDModel, IsActiveModel, TranslatableModel):
     translations = TranslatedFields(
         question_text = RichTextField(blank=True)
     )
-    topic = models.ForeignKey('universals.Topic', on_delete=models.PROTECT)
+    topic = models.ForeignKey('universals.UniversalTopic', on_delete=models.PROTECT)
     topic_grade = models.ForeignKey('kb.TopicGrade', on_delete=models.PROTECT)
 
     class Meta:

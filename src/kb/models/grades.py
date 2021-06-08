@@ -12,8 +12,6 @@ class Grade(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     
     name  = models.CharField(max_length=128, null=True)
     slug = models.SlugField(editable=False)
-    
-
     audience = models.ForeignKey('audiences.Audience', on_delete=models.PROTECT)
 
     class Meta:

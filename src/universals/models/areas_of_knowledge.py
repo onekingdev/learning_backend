@@ -5,7 +5,7 @@ from ckeditor.fields import RichTextField
 from parler.models import TranslatableModel, TranslatedFields
 from django.utils.text import slugify
 
-class AreaOfKnowledge(TimestampModel, RandomSlugModel, IsActiveModel,TranslatableModel):
+class UniversalAreaOfKnowledge(TimestampModel, RandomSlugModel, IsActiveModel,TranslatableModel):
     PREFIX = 'unv_aok_'
     
     hex_color = models.CharField(null=True, blank=True, max_length=16)

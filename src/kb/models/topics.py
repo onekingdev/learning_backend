@@ -16,7 +16,7 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
     audience = models.ForeignKey('audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
     area_of_knowledge = models.ForeignKey('kb.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='sub_topics')
-    universal_topic = models.ManyToManyField('universals.Topic', blank=True)
+    universal_topic = models.ManyToManyField('universals.UniversalTopic', blank=True)
     
     # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
     objects = TopicManager()

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'graphene_django',
 
     'kb',
     'audiences',
@@ -199,6 +200,11 @@ SIMPLE_JWT = {
 GRAPH_MODELS = {
   'all_applications': True,
   'group_models': True,
+}
+
+# Graphene
+GRAPHENE = {
+    "SCHEMA": "app.schema.schema"
 }
 
 

@@ -15,7 +15,7 @@ class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
     image = models.TextField(null=True)
 
     audience = models.ForeignKey('audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
-    universal_area_knowledge = models.ForeignKey('universals.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
+    universal_area_knowledge = models.ForeignKey('universals.UniversalAreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         ordering = ['name']
