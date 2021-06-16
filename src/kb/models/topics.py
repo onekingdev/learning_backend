@@ -14,6 +14,7 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
     translations = TranslatedFields(
         name  = models.CharField(max_length=128)
     )
+    
     slug = models.SlugField(editable=False)
     area_of_knowledge = models.ForeignKey('kb.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='sub_topics')
@@ -21,9 +22,6 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
     
     # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
     objects = TopicManager()
-
-    class Meta:
-        pass
 
     def __str__(self):
         return self.name

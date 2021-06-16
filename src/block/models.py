@@ -1,10 +1,13 @@
 from django.db import models
 from django.utils.text import slugify
-from parler.models import TranslatableModel, TranslatedFields
-from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
+from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
+from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel, ActiveManager
+
+class BlockTypeManager(ActiveManager, TranslatableManager):
+    pass
 
 
-class BlockConfigurationKeyword(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class BlockConfigurationKeyword(TimestampModel, RandomSlugModel, IsActiveModel):
     """
     Model for cofig keyword.
     Examples:
@@ -15,9 +18,6 @@ class BlockConfigurationKeyword(TimestampModel, RandomSlugModel, IsActiveModel, 
     
     name  = models.CharField(max_length=128, null=True)
     slug = models.SlugField(editable=False)
-
-    class Meta:
-        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -35,11 +35,11 @@ class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMode
     """
     PREFIX = 'blck_typ_'
     
-    name  = models.CharField(max_length=128, null=True)
-    slug = models.SlugField(editable=False)
+    translations = TranslatedFields(
+        name  = models.CharField(max_length=128, null=True)
+    )
 
-    class Meta:
-        ordering = ['name']
+    slug = models.SlugField(editable=False)
     
     def __str__(self):
         return self.name
@@ -48,7 +48,7 @@ class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMode
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
 
-class BlockTypeConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class BlockTypeConfiguration(TimestampModel, RandomSlugModel, IsActiveModel):
     """
     Model for key-value pairs for a block tpye
     Examples:
@@ -103,7 +103,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         return sve
 
 
-class BlockConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class BlockConfiguration(TimestampModel, RandomSlugModel, IsActiveModel):
     """
     Model for key-value pairs for a block tpye
     Examples:
@@ -117,7 +117,7 @@ class BlockConfiguration(TimestampModel, RandomSlugModel, IsActiveModel, Transla
     value  = models.CharField(max_length=128, null=True)
     
 
-class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'blck_pres_'
 
     # TODO: borrar. block_configuration = models.ForeignKey(BlockConfiguration, on_delete=models.PROTECT, null=True)

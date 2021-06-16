@@ -1,20 +1,25 @@
 from django.db import models
-from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
-from parler.models import TranslatableModel, TranslatedFields
+from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel, ActiveManager
+from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
 from django.utils.text import slugify
 
+class AchivementManager(ActiveManager, TranslatableManager):
+    pass
+
 class Achivement(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
-    hex_color = models.CharField(null=True, blank=True, max_length=16)
-    name  = models.CharField(max_length=128, unique=True)
+    
+    translations = TranslatedFields(
+        name  = models.CharField(max_length=128, unique=True)
+    )
+
     slug = models.SlugField(editable=False)
-    image = models.TextField(null=True)
+    image = models.ImageField(null=True, blank=True, help_text='The image of the achivement')
+    hex_color = models.CharField(null=True, blank=True, max_length=16, help_text='The color of the achivement')
     level_required = models.ForeignKey('experiences.Level', on_delete=models.PROTECT, null=True, blank=True)
     engangement_points = models.IntegerField(null=True)
     coins_earned = models.IntegerField(null=True)
 
-
-    class Meta:
-        ordering = ['name']
+    objects = AchivementManager()
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

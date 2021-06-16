@@ -7,7 +7,7 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 # Create your models here.
 
-class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'prs_'
     
     name  = models.CharField(max_length=128, null=True)
@@ -16,9 +16,6 @@ class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel, Tr
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True)
     student_plan = models.ManyToManyField('plans.StudentPlan')
     
-    class Meta:
-        ordering = ['name']
-
     def __str__(self):
         return self.name+' '+self.last_name
 
@@ -38,9 +35,6 @@ class OrganizationPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     date_of_birth = models.DateField(null=True)
     identification_number = models.CharField(max_length=128, null=True)
     position = models.CharField(max_length=128, null=True)
-
-    class Meta:
-        ordering = ['last_name']
 
     def __str__(self):
         return self.name+' '+self.last_name

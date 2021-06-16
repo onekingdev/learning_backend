@@ -8,7 +8,6 @@ from django.utils.text import slugify
 class UniversalAreaOfKnowledge(TimestampModel, RandomSlugModel, IsActiveModel,TranslatableModel):
     PREFIX = 'unv_aok_'
     
-    hex_color = models.CharField(null=True, blank=True, max_length=16)
     name  = models.CharField(max_length=128, unique=True)
     slug = models.SlugField(editable=False)
 

@@ -17,9 +17,6 @@ class Audience(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel
     
     objects = AudienceManager()
 
-    class Meta:
-        pass
-
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)

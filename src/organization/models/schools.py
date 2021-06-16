@@ -9,7 +9,7 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 # Create your models here.
 
-class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class Group(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'grp_'
     
     name  = models.CharField(max_length=128, null=True)
@@ -20,9 +20,6 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     grade = models.ForeignKey('kb.Grade', on_delete=models.PROTECT, null=True, blank=True)
     area_of_knowledges = models.ManyToManyField('kb.AreaOfKnowledge', blank=True)
 
-    class Meta:
-        ordering = ['name']
-
     def __str__(self):
         return self.name
 
@@ -30,7 +27,7 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
 
-class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class School(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'sch_'
     
     name  = models.CharField(max_length=128, null=True)
@@ -43,9 +40,6 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     teacher =  models.ManyToManyField('organization.Teacher', blank=True , related_name='teachers')
     student =  models.ManyToManyField('students.Student', blank=True)
     group =  models.ManyToManyField('organization.Group', blank=True)
-
-    class Meta:
-        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -66,9 +60,6 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     date_of_birth = models.DateField(null=True)
     identification_number = models.CharField(max_length=128, null=True)
     position = models.CharField(max_length=128, null=True)
-
-    class Meta:
-        ordering = ['last_name']
 
     def __str__(self):
         return self.name+' '+self.last_name

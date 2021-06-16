@@ -18,12 +18,9 @@ class Avatar(TimestampModel, UUIDModel, IsActiveModel):
     type_of = models.CharField(max_length=25, null=True, choices=TYPE_CHOICES)
     
     name = models.CharField(max_length=64, null=True, blank=True)
-    path = models.TextField(null=True)
+    image = models.ImageField(null=True, blank=True, help_text='The image of the avatar')
     width = models.IntegerField(null=True)
     height = models.IntegerField(null=True)
-
-    class Meta:
-        ordering = ['name']
 
 class Student(TimestampModel, UUIDModel, IsActiveModel):
     GENDER_MALE = 'Male'
@@ -49,9 +46,6 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     level = models.ForeignKey('experiences.Level', on_delete=models.PROTECT, null=True)
     avatar  = models.ForeignKey('students.Avatar', on_delete=models.PROTECT, null=True)
     total_experience_points = models.IntegerField(null=True)
-
-    class Meta:
-        ordering = ['last_name']
 
     @property
     def get_full_name(self):
