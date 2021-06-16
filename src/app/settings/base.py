@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'django_extensions',
     'mptt',
+    'polymorphic',
     'ckeditor',
     'parler',
     'import_export',

@@ -19,6 +19,7 @@ class BlockConfigurationKeyword(TimestampModel, IsActiveModel):
     def __str__(self):
         return self.name
 
+
 class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     """
     Model for types of blocks. These take some config values and are copy pasted to blocks upon block generation

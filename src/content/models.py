@@ -1,36 +1,21 @@
 from django.db import models
 from django.utils.text import slugify
 from ckeditor.fields import RichTextField
-from mptt.models import MPTTModel, TreeForeignKey
+from polymorphic.models import PolymorphicModel
+
 
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
-class AnswerOption(TimestampModel, UUIDModel, TranslatableModel):
-    PREFIX = 'answopt_'
-    
-    translations = TranslatedFields(
-        answer_text = models.CharField(max_length=256),
-        explanation = RichTextField(blank=True,)
-    )
-    question = models.ForeignKey('content.Question', on_delete=models.PROTECT)
-    is_correct = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.answer_text
-
-class Question(TimestampModel, UUIDModel, IsActiveModel, TranslatableModel):
-    PREFIX = 'qwstn_'
-    
+class Question(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+    PREFIX = 'question_'
     translations = TranslatedFields(
         question_text = RichTextField(blank=True)
     )
     topic = models.ForeignKey('universals.UniversalTopic', on_delete=models.PROTECT)
     topic_grade = models.ForeignKey('kb.TopicGrade', on_delete=models.PROTECT)
 
-    class Meta:
-        ordering = ['-create_timestamp']
-    
     def __str__(self):
         return self.question_text
 
@@ -44,14 +29,13 @@ class Question(TimestampModel, UUIDModel, IsActiveModel, TranslatableModel):
         return QuestionAudioAsset.objects.filter(question=self)
 
 
-class QuestionAsset(TimestampModel, RandomSlugModel):
+class QuestionAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
 
     class Meta:
         ordering = ['order']
 
-    # TODO: hacer este modelo como Djagno Polymorphic
-    
-    question = models.ForeignKey('content.Question', on_delete=models.PROTECT)
+    PREFIX = 'question_asset_'
+    question = models.ForeignKey('content.Question', on_delete=models.CASCADE)
     order = models.PositiveIntegerField(default=10)
 
 
@@ -65,3 +49,20 @@ class QuestionAudioAsset(QuestionAsset):
 
 class QuestionVideoAsset(QuestionAsset):
     url = models.URLField()
+
+
+class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
+    PREFIX = 'answer_option_'
+    question = models.ForeignKey('content.Question', on_delete=models.PROTECT)
+    translations = TranslatedFields(
+        answer_text = models.CharField(max_length=256),
+        explanation = RichTextField(null=True, blank=True), 
+        image = models.ImageField(null=True, blank=True), 
+        audio_file = models.FileField(null=True, blank=True), 
+        video = models.URLField(null=True, blank=True),
+    )
+    is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.answer_text
+
