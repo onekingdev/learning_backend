@@ -8,12 +8,12 @@ class AudienceManager(ActiveManager, TranslatableManager):
     pass
 
 class Audience(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
-    PREFIX = 'au_'
+    PREFIX = 'audience_'
     
     translations = TranslatedFields(
         name  = models.CharField(max_length=128, unique=True)
     )
-    slug = models.SlugField(editable=False)
+    slug = models.SlugField(editable=False, unique=True)
     
     objects = AudienceManager()
 

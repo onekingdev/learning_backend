@@ -37,22 +37,39 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
     first_name = models.CharField(max_length=64, null=True, blank=True)
     last_name = models.CharField(max_length=64, null=True, blank=True)
+    full_name = models.CharField(max_length=128, null=True, blank=True, editable=False)
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
-    age = models.IntegerField(null=True)
 
     student_plan = models.ManyToManyField('plans.StudentPlan')
     group =  models.ManyToManyField('organization.Group',blank=True)
     level = models.ForeignKey('experiences.Level', on_delete=models.PROTECT, null=True)
     avatar  = models.ForeignKey('students.Avatar', on_delete=models.PROTECT, null=True)
-    total_experience_points = models.IntegerField(null=True)
+
+    def current_age(self):
+        today = datetime.date.today()
+        birthDate = self.dob
+        try:
+            age = today.year - birthDate.year - ((today.month, today.day) < (birthDate.month, birthDate.day))
+        except:
+            age = None
+            return age
 
     @property
     def get_full_name(self):
         return (self.first_name if self.first_name else ' ') + (self.last_name if self.last_name else ' ')
 
     def __str__(self):
-        return self.get_full_name
+        return self.full_name
+
+    def save(self, *args, **kwargs):
+        self.full_name = self.get_full_name
+        if not self.pk:
+            from wallets.models import CoinWallet, EngagementWallet
+            coin_wallet, cw_new = CoinWallet.objects.get_or_create(student=self)
+            engagement_wallet, ew_new = EngagementWalletWallet.objects.get_or_create(student=self)
+
+        return super().save(*args, **kwargs)
 
 # Create your models here.
 class StudentTopicMastery(TimestampModel, UUIDModel, IsActiveModel):

@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 
     'kb',
     'audiences',
+    'accounting',
     'achivements',
     'collectibles',
     'block',

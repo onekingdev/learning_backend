@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.utils import timezone
+from parler.models import TranslatableManager, TranslatableModel
 
 
 class ActiveManager(models.Manager):
@@ -9,6 +10,10 @@ class ActiveManager(models.Manager):
 
     def inactive_objects(self):
         return super().get_queryset().filter(is_active=False)
+
+class ActiveManagerTranslated(ActiveManager, TranslatableManager):
+    pass
+
 
 
 
@@ -28,7 +33,7 @@ class BaseModel(models.Model):
     def __str__(self):
         valid_str_names = ('name',)
         for valid_str in valid_str_names:
-            if hasattr(self, valid_str):
+            if getattr(self, valid_str, None):
                 return getattr(self, valid_str)
         return super().__str__()
 

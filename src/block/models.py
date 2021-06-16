@@ -7,24 +7,17 @@ class BlockTypeManager(ActiveManager, TranslatableManager):
     pass
 
 
-class BlockConfigurationKeyword(TimestampModel, RandomSlugModel, IsActiveModel):
+class BlockConfigurationKeyword(TimestampModel, IsActiveModel):
     """
     Model for cofig keyword.
     Examples:
         - show timer
         - allow to pass on questions
     """
-    PREFIX = 'blck_cnfg_key_'
-    
     name  = models.CharField(max_length=128, null=True)
-    slug = models.SlugField(editable=False)
 
     def __str__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        return super().save(*args, **kwargs)
 
 class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     """
@@ -33,36 +26,28 @@ class BlockType(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMode
         - Assessment
         - Beat The Clock
     """
-    PREFIX = 'blck_typ_'
-    
+    PREFIX = 'block_type_'
     translations = TranslatedFields(
         name  = models.CharField(max_length=128, null=True)
     )
+    objects = BlockTypeManager()
 
-    slug = models.SlugField(editable=False)
-    
-    def __str__(self):
-        return self.name
 
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        return super().save(*args, **kwargs)
 
-class BlockTypeConfiguration(TimestampModel, RandomSlugModel, IsActiveModel):
+class BlockTypeConfiguration(TimestampModel, IsActiveModel):
     """
     Model for key-value pairs for a block tpye
     Examples:
         - Show Timer: True
     """
-    PREFIX = 'blck_typ_cnfg_'
-    
+
     block_type = models.ForeignKey('block.BlockType', on_delete=models.PROTECT, null=True)
     key = models.ForeignKey('block.BlockConfigurationKeyword', on_delete=models.PROTECT, null=True)
     data_type  = models.CharField(max_length=128, null=True)
     value  = models.CharField(max_length=128, null=True)
 
-class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
-    PREFIX = 'blck_'
+class Block(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'block_'
 
     MODALITY_AI = 'AI'
     MODALITY_PATH = 'PATH'
@@ -72,18 +57,27 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         (MODALITY_PATH, 'Choose your path'),
         (MODALITY_PRACTICE, 'Practice'),
     )
-    
+
+    # FK's
+    type_of = models.ForeignKey('block.BlockType', on_delete=models.PROTECT, null=True)
+    student =  models.ManyToManyField('students.Student', blank=True)
+    topics =  models.ManyToManyField('kb.Topic', blank=True, help_text='These are the topics covered in this block')
+
+    # Attributes
     modality = models.CharField(max_length=128, choices=MODALITY_CHOICES, default=MODALITY_AI)
     first_presentation_timestamp = models.DateTimeField(null=True)
     last_presentation_timestamp = models.DateTimeField(null=True)
 
-    type_of = models.ForeignKey('block.BlockType', on_delete=models.PROTECT, null=True)
-    student =  models.ManyToManyField('students.Student', blank=True)
-    topics =  models.ManyToManyField('kb.Topic', blank=True)
+
+    # Metrics
     questions = models.ManyToManyField('content.Question', through='block.BlockQuestion')
-    engangement_points = models.IntegerField(null=True)
-    coins_earned = models.IntegerField(null=True)
-    battery_points = models.IntegerField(null=True)
+    engangement_points_available = models.PositiveSmallIntegerField(null=True)
+    coins_available = models.PositiveSmallIntegerField(null=True)
+
+    battery_points_available = models.PositiveSmallIntegerField(null=True)
+    engangement_points_earned = models.PositiveSmallIntegerField(null=True)
+    coins_earned = models.PositiveSmallIntegerField(null=True)
+    battery_points_earned = models.PositiveSmallIntegerField(null=True)
 
     def save(self, *args, **kwargs):
         is_new = False
@@ -103,25 +97,24 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
         return sve
 
 
-class BlockConfiguration(TimestampModel, RandomSlugModel, IsActiveModel):
+class BlockConfiguration(TimestampModel):
     """
     Model for key-value pairs for a block tpye
     Examples:
         - Show Timer: True
     """
-    PREFIX = 'blck_cnfg_'
-    
     block = models.ForeignKey('block.Block', on_delete=models.PROTECT, null=True)
     key = models.ForeignKey('block.BlockConfigurationKeyword', on_delete=models.PROTECT, null=True)
     data_type  = models.CharField(max_length=128, null=True)
     value  = models.CharField(max_length=128, null=True)
-    
+
 
 class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'blck_pres_'
 
-    # TODO: borrar. block_configuration = models.ForeignKey(BlockConfiguration, on_delete=models.PROTECT, null=True)
-    
+    # FK's
+    block = models.ForeignKey('block.Block', on_delete=models.CASCADE, null=True)
+
     hits = models.IntegerField(null=True)
     errors = models.IntegerField(null=True)
     total = models.IntegerField(null=True)
@@ -129,33 +122,42 @@ class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel):
     start_timestamp = models.DateTimeField(null=True)
     end_timestamp = models.DateTimeField(null=True) 
 
-    class Meta:
-        ordering = ['create_timestamp']
 
 class BlockQuestion(TimestampModel, RandomSlugModel):
     """
     This model will contain ALL the questions of the block, independently of the presentation of them on block presentation.
     """
-    STATUS_PENDING = 'Pending'
-    STATUS_CORRECT = 'Correct'
-    STATUS_INCORRECT = 'Incorrect'
+    STATUS_PENDING = 'PENDING'
+    STATUS_CORRECT = 'CORRECT'
+    STATUS_INCORRECT = 'INCORRECT'
     STATUS_CHOICES = (
         (STATUS_PENDING,'Pending'),
         (STATUS_CORRECT,'Correct'),
         (STATUS_INCORRECT,'Incorrect'),
     )
-    # TODO: estos elementos de choices van al reves 
     
     block = models.ForeignKey(Block, on_delete=models.PROTECT, null=True)
     question = models.ForeignKey('content.Question', on_delete=models.PROTECT, null=True)
-    chosen_answer = models.ForeignKey('content.AnswerOption', on_delete=models.PROTECT, null=True)
+    chosen_answer = models.ForeignKey('content.AnswerOption', on_delete=models.SET_NULL, null=True)
     
     is_correct = models.BooleanField(null=True)
     is_answered = models.BooleanField(null=True, default=False)
     status = models.CharField(max_length=128, choices=STATUS_CHOICES, default=STATUS_PENDING)
 
-    #def save
-        #save here the status according to business logic
+    def save(self, *args, **kwargs):
+        if self.chosen_answer:
+            self.is_answered = True
+            if self.chosen_answer.is_correct:
+                self.is_correct = True
+                self.status = self.STATUS_CORRECT
+            else:
+                self.is_correct = False
+                self.status = self.STATUS_INCORRECT
+        else:
+            self.is_answered = False
+            self.status = self.STATUS_PENDING
+
+        return super().save(*args, **kwargs)
 
 
 class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
