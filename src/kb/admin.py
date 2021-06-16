@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import  Topic, AreaOfKnowledge
+from .models import  Topic, AreaOfKnowledge, Grade
 from parler import admin as parler_admin
 
 
@@ -14,3 +14,6 @@ class TopicAdmin(parler_admin.TranslatableAdmin):
 class AreaOfKnowledgeAdmin(parler_admin.TranslatableAdmin):
     pass
 
+@admin.register(Grade)
+class TopicAdmin(parler_admin.TranslatableAdmin):
+    pass

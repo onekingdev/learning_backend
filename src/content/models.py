@@ -2,11 +2,18 @@ from django.db import models
 from django.utils.text import slugify
 from ckeditor.fields import RichTextField
 from polymorphic.models import PolymorphicModel
+from app.models import ActiveManager
+from parler.models import TranslatableManager
+
+from django.utils.html import strip_tags
 
 
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
+
+class QuestionManager(ActiveManager, TranslatableManager):
+    pass
 
 class Question(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'question_'
@@ -15,9 +22,10 @@ class Question(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel
     )
     topic = models.ForeignKey('universals.UniversalTopic', on_delete=models.PROTECT)
     topic_grade = models.ForeignKey('kb.TopicGrade', on_delete=models.PROTECT)
+    objects = QuestionManager()
 
     def __str__(self):
-        return self.question_text
+        return '{}-{}'.format(self.random_slug, strip_tags(self.question_text)[:100])
 
     def get_questionimageasset_set(self):
         return QuestionImageAsset.objects.filter(question=self)
