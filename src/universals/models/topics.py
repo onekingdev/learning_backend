@@ -7,7 +7,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel, UUIDModel
 
-class UniversalTopic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, TranslatableModel):
+class UniversalTopic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel):
     PREFIX = 'unv_tpic_'
     
     name  = models.CharField(max_length=128)
@@ -16,10 +16,7 @@ class UniversalTopic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, 
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='sub_topics')
     standard_code  = models.CharField(max_length=128, null=True, blank=True)
 
-    objects = TopicManager()
 
-    class Meta:
-        ordering = ['name']
 
     def __str__(self):
         return self.name

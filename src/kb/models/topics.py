@@ -11,9 +11,10 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, TranslatableModel):
     PREFIX = 'tpic_'
     
-    name  = models.CharField(max_length=128)
+    translations = TranslatedFields(
+        name  = models.CharField(max_length=128)
+    )
     slug = models.SlugField(editable=False)
-    audience = models.ForeignKey('audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
     area_of_knowledge = models.ForeignKey('kb.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='sub_topics')
     universal_topic = models.ManyToManyField('universals.UniversalTopic', blank=True)
@@ -22,7 +23,7 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
     objects = TopicManager()
 
     class Meta:
-        ordering = ['name']
+        pass
 
     def __str__(self):
         return self.name

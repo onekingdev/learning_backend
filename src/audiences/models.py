@@ -1,17 +1,24 @@
 from django.db import models
-from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
-from parler.models import TranslatableModel, TranslatedFields
+from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel, ActiveManager
+from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
 from django.utils.text import slugify
+
+
+class AudienceManager(ActiveManager, TranslatableManager):
+    pass
 
 class Audience(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'au_'
     
-    hex_color = models.CharField(null=True, blank=True, max_length=16)
-    name  = models.CharField(max_length=128, unique=True)
+    translations = TranslatedFields(
+        name  = models.CharField(max_length=128, unique=True)
+    )
     slug = models.SlugField(editable=False)
+    
+    objects = AudienceManager()
 
     class Meta:
-        ordering = ['name']
+        pass
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

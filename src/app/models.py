@@ -40,7 +40,7 @@ class BaseModel(models.Model):
 
 class IsActiveModel(models.Model):
     is_active = models.BooleanField(default=True)
-    objects = ActiveManager
+    objects = ActiveManager()
 
     deleted_timestamp = models.DateTimeField('Deleted timestamp', null=True, editable=False)
 
