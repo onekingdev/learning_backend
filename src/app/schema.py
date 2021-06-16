@@ -1,3 +1,4 @@
+import graphene
 from graphene import relay, ObjectType
 from graphene_django import DjangoObjectType
 
@@ -220,7 +221,7 @@ class Query(graphene.ObjectType):
     #----------------- Block Type -----------------#
 
     blocks_type = graphene.List(BlockTypeSchema)
-    block_type_by_id = graphene.Field(BlockType, id=graphene.String())
+    block_type_by_id = graphene.Field(BlockTypeSchema, id=graphene.String())
 
     def resolve_blocks_type(root, info, **kwargs):
         # Querying a list
@@ -235,7 +236,7 @@ class Query(graphene.ObjectType):
     #----------------- BlockTypeConfiguration -----------------#
 
     blocks_type_configuration = graphene.List(BlockTypeConfigurationSchema)
-    block_type_configuration_by_id = graphene.Field(BlockTypeConfiguration, id=graphene.String())
+    block_type_configuration_by_id = graphene.Field(BlockTypeConfigurationSchema, id=graphene.String())
 
     def resolve_blocks_type_configuration(root, info, **kwargs):
         # Querying a list
@@ -250,7 +251,7 @@ class Query(graphene.ObjectType):
     #----------------- Block -----------------#
 
     blocks = graphene.List(BlockSchema)
-    block_by_id = graphene.Field(Block, id=graphene.String())
+    block_by_id = graphene.Field(BlockSchema, id=graphene.String())
 
     def resolve_blocks(root, info, **kwargs):
         # Querying a list
@@ -265,7 +266,7 @@ class Query(graphene.ObjectType):
     #----------------- BlockConfiguration -----------------#
 
     blocks_configuration_type = graphene.List(BlockConfigurationSchema)
-    block_configuration_type_by_id = graphene.Field(BlockConfiguration, id=graphene.String())
+    block_configuration_type_by_id = graphene.Field(BlockConfigurationSchema, id=graphene.String())
 
     def resolve_blocks_configuration(root, info, **kwargs):
         # Querying a list
@@ -280,7 +281,7 @@ class Query(graphene.ObjectType):
     #----------------- BlockPresentation -----------------#
 
     blocks_presentation = graphene.List(BlockPresentationSchema)
-    block_presentation_by_id = graphene.Field(BlockPresentation, id=graphene.String())
+    block_presentation_by_id = graphene.Field(BlockPresentationSchema, id=graphene.String())
 
     def resolve_blocks_presentation(root, info, **kwargs):
         # Querying a list
@@ -295,7 +296,7 @@ class Query(graphene.ObjectType):
     #----------------- BlockQuestion -----------------#
 
     blocks_question = graphene.List(BlockQuestionSchema)
-    block_question_by_id = graphene.Field(BlockQuestion, id=graphene.String())
+    block_question_by_id = graphene.Field(BlockQuestionSchema, id=graphene.String())
 
     def resolve_blocks_question(root, info, **kwargs):
         # Querying a list
@@ -310,7 +311,7 @@ class Query(graphene.ObjectType):
     #----------------- BlockQuestionPresentation -----------------#
 
     blocks_question_presentation = graphene.List(BlockQuestionPresentationSchema)
-    block_question_presentation_by_id = graphene.Field(BlockQuestionPresentation, id=graphene.String())
+    block_question_presentation_by_id = graphene.Field(BlockQuestionPresentationSchema, id=graphene.String())
 
     def resolve_blocks_question_presentation(root, info, **kwargs):
         # Querying a list
@@ -325,7 +326,7 @@ class Query(graphene.ObjectType):
     #----------------- Question -----------------#
 
     questions = graphene.List(QuestionTypeSchema)
-    question_by_id = graphene.Field(Question, id=graphene.String())
+    question_by_id = graphene.Field(QuestionTypeSchema, id=graphene.String())
 
     def resolve_questions(root, info, **kwargs):
         # Querying a list
@@ -340,7 +341,7 @@ class Query(graphene.ObjectType):
     #----------------- AnswerOption -----------------#
 
     answers_option = graphene.List(AnswerTypeSchema)
-    answers_option_by_id = graphene.Field(AnswerOption, id=graphene.String())
+    answers_option_by_id = graphene.Field(AnswerTypeSchema, id=graphene.String())
 
     def resolve_answers_option(root, info, **kwargs):
         # Querying a list
@@ -355,7 +356,7 @@ class Query(graphene.ObjectType):
     #----------------- Level -----------------#
 
     levels = graphene.List(LevelSchema)
-    level_by_id = graphene.Field(Level, id=graphene.String())
+    level_by_id = graphene.Field(LevelSchema, id=graphene.String())
 
     def resolve_levels(root, info, **kwargs):
         # Querying a list
@@ -370,7 +371,7 @@ class Query(graphene.ObjectType):
     #----------------- CollectibleCategory -----------------#
 
     collectibles_category = graphene.List(CollectibleCategorySchema)
-    collectible_category_by_id = graphene.Field(CollectibleCategory, id=graphene.String())
+    collectible_category_by_id = graphene.Field(CollectibleCategorySchema, id=graphene.String())
 
     def resolve_collectibles_category(root, info, **kwargs):
         # Querying a list
@@ -385,7 +386,7 @@ class Query(graphene.ObjectType):
     #----------------- Collectible -----------------#
 
     collectibles = graphene.List(CollectibleSchema)
-    collectible_by_id = graphene.Field(Collectible, id=graphene.String())
+    collectible_by_id = graphene.Field(CollectibleSchema, id=graphene.String())
 
     def resolve_collectibles(root, info, **kwargs):
         # Querying a list
@@ -400,7 +401,7 @@ class Query(graphene.ObjectType):
     #----------------- StudentTransactionCollectible -----------------#
 
     students_transaction_collectible = graphene.List(StudentTransactionCollectibleSchema)
-    student_transaction_collectible_by_id = graphene.Field(StudentTransactionCollectible, id=graphene.String())
+    student_transaction_collectible_by_id = graphene.Field(StudentTransactionCollectibleSchema, id=graphene.String())
 
     def resolve_students_transaction_collectible(root, info, **kwargs):
         # Querying a list
@@ -415,7 +416,7 @@ class Query(graphene.ObjectType):
     #----------------- Guardian -----------------#
 
     guardians = graphene.List(GuardianSchema)
-    guardian_by_id = graphene.Field(Guardian, id=graphene.String())
+    guardian_by_id = graphene.Field(GuardianSchema, id=graphene.String())
 
     def resolve_guardians(root, info, **kwargs):
         # Querying a list
@@ -430,7 +431,7 @@ class Query(graphene.ObjectType):
     #----------------- GuardianStudent -----------------#
 
     guardians_student = graphene.List(GuardianStudentSchema)
-    guardian_student_by_id = graphene.Field(GuardianStudent, id=graphene.String())
+    guardian_student_by_id = graphene.Field(GuardianStudentSchema, id=graphene.String())
 
     def resolve_guardians_student(root, info, **kwargs):
         # Querying a list
@@ -445,7 +446,7 @@ class Query(graphene.ObjectType):
     #----------------- Achivement  -----------------#
 
     achivements = graphene.List(AchivementSchema)
-    achivement_by_id = graphene.Field(Achivement, id=graphene.String())
+    achivement_by_id = graphene.Field(AchivementSchema, id=graphene.String())
 
     def resolve_achivements(root, info, **kwargs):
         # Querying a list
@@ -460,7 +461,7 @@ class Query(graphene.ObjectType):
     #----------------- Organization -----------------#
 
     organizations = graphene.List(OrganizationSchema)
-    organization_by_id = graphene.Field(Organization, id=graphene.String())
+    organization_by_id = graphene.Field(OrganizationSchema, id=graphene.String())
 
     def resolve_organizations(root, info, **kwargs):
         # Querying a list
@@ -475,7 +476,7 @@ class Query(graphene.ObjectType):
     #----------------- OrganizationPersonnel -----------------#
 
     organizations_personnel = graphene.List(OrganizationPersonnelSchema)
-    organization_personnel_by_id = graphene.Field(OrganizationPersonnel, id=graphene.String())
+    organization_personnel_by_id = graphene.Field(OrganizationPersonnelSchema, id=graphene.String())
 
     def resolve_organizations_personnel(root, info, **kwargs):
         # Querying a list
@@ -490,7 +491,7 @@ class Query(graphene.ObjectType):
     #----------------- Group -----------------#
 
     groups = graphene.List(GroupSchema)
-    group_by_id = graphene.Field(Group, id=graphene.String())
+    group_by_id = graphene.Field(GroupSchema, id=graphene.String())
 
     def resolve_groups(root, info, **kwargs):
         # Querying a list
@@ -505,7 +506,7 @@ class Query(graphene.ObjectType):
     #----------------- School -----------------#
 
     schools = graphene.List(SchoolSchema)
-    school_by_id = graphene.Field(School, id=graphene.String())
+    school_by_id = graphene.Field(SchoolSchema, id=graphene.String())
 
     def resolve_schools(root, info, **kwargs):
         # Querying a list
@@ -520,7 +521,7 @@ class Query(graphene.ObjectType):
     #----------------- SchoolPersonnel -----------------#
 
     schools_personnel = graphene.List(SchoolPersonnelSchema)
-    school_personnel_by_id = graphene.Field(SchoolPersonnel, id=graphene.String())
+    school_personnel_by_id = graphene.Field(SchoolPersonnelSchema, id=graphene.String())
 
     def resolve_schools_personnel(root, info, **kwargs):
         # Querying a list
@@ -535,7 +536,7 @@ class Query(graphene.ObjectType):
     #----------------- StudentPlan -----------------#
 
     students_plan = graphene.List(StudentPlanSchema)
-    student_by_id = graphene.Field(StudentPlan, id=graphene.String())
+    student_by_id = graphene.Field(StudentPlanSchema, id=graphene.String())
 
     def resolve_students_plan(root, info, **kwargs):
         # Querying a list
@@ -551,7 +552,7 @@ class Query(graphene.ObjectType):
     #----------------- StudentPlanTopicGrade -----------------#
 
     students_plan_topic_grade = graphene.List(StudentPlanTopicGradeSchema)
-    student_plan_topic_grade_by_id = graphene.Field(StudentPlanTopicGrade, id=graphene.String())
+    student_plan_topic_grade_by_id = graphene.Field(StudentPlanTopicGradeSchema, id=graphene.String())
 
     def resolve_students_plan_topic_grade(root, info, **kwargs):
         # Querying a list
@@ -566,7 +567,7 @@ class Query(graphene.ObjectType):
     #----------------- Audience -----------------#
 
     audiences = graphene.List(AudienceSchema)
-    audience_by_id = graphene.Field(Audience, id=graphene.String())
+    audience_by_id = graphene.Field(AudienceSchema, id=graphene.String())
 
     def resolve_audiences(root, info, **kwargs):
         # Querying a list
@@ -581,7 +582,7 @@ class Query(graphene.ObjectType):
     #----------------- Avatar -----------------#
 
     avatars = graphene.List(AvatarSchema)
-    avatar_by_id = graphene.Field(Avatar, id=graphene.String())
+    avatar_by_id = graphene.Field(AvatarSchema, id=graphene.String())
 
     def resolve_avatars(root, info, **kwargs):
         # Querying a list
@@ -596,7 +597,7 @@ class Query(graphene.ObjectType):
     #----------------- Student -----------------#
 
     students = graphene.List(StudentSchema)
-    student_by_id = graphene.Field(Student, id=graphene.String())
+    student_by_id = graphene.Field(StudentSchema, id=graphene.String())
 
     def resolve_students(root, info, **kwargs):
         # Querying a list
@@ -611,7 +612,7 @@ class Query(graphene.ObjectType):
     #----------------- StudentTopicMastery -----------------#
 
     students_topic_mastery = graphene.List(StudentTopicMasterySchema)
-    student_topic_mastery_by_id = graphene.Field(StudentTopicMastery, id=graphene.String())
+    student_topic_mastery_by_id = graphene.Field(StudentTopicMasterySchema, id=graphene.String())
 
     def resolve_students_topic_mastery(root, info, **kwargs):
         # Querying a list
@@ -626,7 +627,7 @@ class Query(graphene.ObjectType):
     #----------------- StudentGrade -----------------#
 
     students_grade = graphene.List(StudentGradeSchema)
-    student_grade_by_id = graphene.Field(StudentGrade, id=graphene.String())
+    student_grade_by_id = graphene.Field(StudentGradeSchema, id=graphene.String())
 
     def resolve_students_grade(root, info, **kwargs):
         # Querying a list
@@ -641,7 +642,7 @@ class Query(graphene.ObjectType):
     #----------------- StudentAchivement -----------------#
 
     students_achivement = graphene.List(StudentAchivementSchema)
-    student_achivement_by_id = graphene.Field(StudentAchivement, id=graphene.String())
+    student_achivement_by_id = graphene.Field(StudentAchivementSchema, id=graphene.String())
 
     def resolve_students_achivement(root, info, **kwargs):
         # Querying a list
@@ -656,7 +657,7 @@ class Query(graphene.ObjectType):
     #----------------- UniversalAreaOfKnowledge -----------------#
 
     universals_area_of_knowledge = graphene.List(UniversalAreaOfKnowledgeSchema)
-    universal_area_of_knowledge_by_id = graphene.Field(UniversalAreaOfKnowledge, id=graphene.String())
+    universal_area_of_knowledge_by_id = graphene.Field(UniversalAreaOfKnowledgeSchema, id=graphene.String())
 
     def resolve_universals_area_of_knowledge(root, info, **kwargs):
         # Querying a list
@@ -671,7 +672,7 @@ class Query(graphene.ObjectType):
     #----------------- UniversalTopic -----------------#
 
     universals_topic = graphene.List(UniversalTopicSchema)
-    universal_topic_by_id = graphene.Field(UniversalTopic, id=graphene.String())
+    universal_topic_by_id = graphene.Field(UniversalTopicSchema, id=graphene.String())
 
     def resolve_universals_topic(root, info, **kwargs):
         # Querying a list
@@ -686,7 +687,7 @@ class Query(graphene.ObjectType):
     #----------------- AreaOfKnowledge -----------------#
 
     areas_of_knowledge = graphene.List(AreaOfKnowledgeSchema)
-    area_of_knowledge_by_id = graphene.Field(AreaOfKnowledge, id=graphene.String())
+    area_of_knowledge_by_id = graphene.Field(AreaOfKnowledgeSchema, id=graphene.String())
 
     def resolve_areas_of_knowledge(root, info, **kwargs):
         # Querying a list
@@ -701,7 +702,7 @@ class Query(graphene.ObjectType):
     #----------------- Grade -----------------#
 
     grades = graphene.List(GradeSchema)
-    grade = graphene.Field(Grade, id=graphene.String())
+    grade = graphene.Field(GradeSchema, id=graphene.String())
 
     def resolve_grades(root, info, **kwargs):
         # Querying a list
@@ -716,7 +717,7 @@ class Query(graphene.ObjectType):
     #----------------- Topic -----------------#
 
     topics = graphene.List(TopicSchema)
-    topic_by_id = graphene.Field(Topic, id=graphene.String())
+    topic_by_id = graphene.Field(TopicSchema, id=graphene.String())
 
     def resolve_topics(root, info, **kwargs):
         # Querying a list
@@ -731,7 +732,7 @@ class Query(graphene.ObjectType):
     #----------------- TopicGrade -----------------#
 
     topics_grade = graphene.List(TopicGradeSchema)
-    topic_grade_by_id = graphene.Field(TopicGrade, id=graphene.String())
+    topic_grade_by_id = graphene.Field(TopicGradeSchema, id=graphene.String())
 
     def resolve_topics_grade(root, info, **kwargs):
         # Querying a list
@@ -746,7 +747,7 @@ class Query(graphene.ObjectType):
     #----------------- Prerequisite -----------------#
 
     prerequisites = graphene.List(PrerequisiteSchema)
-    prerequisite_by_id = graphene.Field(Prerequisite, id=graphene.String())
+    prerequisite_by_id = graphene.Field(PrerequisiteSchema, id=graphene.String())
 
     def resolve_prerequisites(root, info, **kwargs):
         # Querying a list
@@ -757,3 +758,5 @@ class Query(graphene.ObjectType):
         return Prerequisite.objects.get(pk=id)
 
     #----------------- End Code -----------------#
+
+schema = graphene.Schema(query=Query)
