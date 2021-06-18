@@ -3,10 +3,10 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
 from django.utils.text import slugify
 
-class AchivementManager(ActiveManager, TranslatableManager):
+class AchievementManager(ActiveManager, TranslatableManager):
     pass
 
-class Achivement(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class Achievement(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     
     translations = TranslatedFields(
         name  = models.CharField(max_length=128, unique=True)
@@ -19,11 +19,8 @@ class Achivement(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMod
     engangement_points = models.IntegerField(null=True)
     coins_earned = models.IntegerField(null=True)
 
-    objects = AchivementManager()
+    objects = AchievementManager()
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name

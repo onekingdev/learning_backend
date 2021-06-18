@@ -5,14 +5,11 @@ from ckeditor.fields import RichTextField
 from parler.models import TranslatableModel, TranslatedFields
 from django.utils.text import slugify
 
-class UniversalAreaOfKnowledge(TimestampModel, RandomSlugModel, IsActiveModel,TranslatableModel):
+class UniversalAreaOfKnowledge(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'unv_aok_'
     
     name  = models.CharField(max_length=128, unique=True)
     slug = models.SlugField(editable=False)
-
-    class Meta:
-        ordering = ['name']
 
     def __str__(self):
         return self.name

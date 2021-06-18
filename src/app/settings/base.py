@@ -55,22 +55,23 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'graphene_django',
 
-    'kb',
+    'api',
     'audiences',
     'accounting',
-    'achivements',
-    'collectibles',
+    'achievements',
     'block',
-    'organization',
     'content',
-    'plans',
-    'guardians',
-    'universals',
-    'wallets',
+    #'collectibles',
     'experiences',
+    'guardians',
+    'kb',
+    'organization',
+    'plans',
     'students',
-    'api',
-    'users'
+    'universals',
+    'users',
+    'wallets'
+    
 ]
 
 

@@ -2,34 +2,31 @@ from django.db import models
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 class Avatar(TimestampModel, UUIDModel, IsActiveModel):
-    TYPE_COMPLETE = 'Completo'
-    TYPE_TOP = 'Head'
-    TYPE_MIDDLE = 'Body'
-    TYPE_BOTTOM = 'Legs'
+    TYPE_COMPLETE = 'COMPLETE'
+    TYPE_TOP = 'HEAD'
+    TYPE_MIDDLE = 'BODY'
+    TYPE_BOTTOM = 'LEGS'
     TYPE_CHOICES = (
-        (TYPE_COMPLETE, 'C'),
-        (TYPE_TOP, 'H'),
-        (TYPE_MIDDLE, 'B'),
-        (TYPE_BOTTOM, 'L')
+        (TYPE_COMPLETE, 'Complete'),
+        (TYPE_TOP, 'Head'),
+        (TYPE_MIDDLE, 'Body'),
+        (TYPE_BOTTOM, 'Legs')
     )
 
     PREFIX = 'avt_'
     
     type_of = models.CharField(max_length=25, null=True, choices=TYPE_CHOICES)
-    
     name = models.CharField(max_length=64, null=True, blank=True)
     image = models.ImageField(null=True, blank=True, help_text='The image of the avatar')
-    width = models.IntegerField(null=True)
-    height = models.IntegerField(null=True)
 
 class Student(TimestampModel, UUIDModel, IsActiveModel):
-    GENDER_MALE = 'Male'
-    GENDER_FEMALE = 'Female'
-    GENDER_OTHER = 'Other'
+    GENDER_MALE = 'MALE'
+    GENDER_FEMALE = 'FEMALE'
+    GENDER_OTHER = 'OTHER'
     GENDER_CHOICES = (
-        (GENDER_MALE, 'M'),
-        (GENDER_FEMALE, 'F'),
-        (GENDER_OTHER, 'O'),
+        (GENDER_MALE, 'Male'),
+        (GENDER_FEMALE, 'Female'),
+        (GENDER_OTHER, 'Other'),
     )
 
     PREFIX = 'stdnt_'
@@ -57,19 +54,21 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
     @property
     def get_full_name(self):
-        return (self.first_name if self.first_name else ' ') + (self.last_name if self.last_name else ' ')
+        return (self.first_name if self.first_name else ' ') +' '+ (self.last_name if self.last_name else ' ')
 
     def __str__(self):
         return self.full_name
 
     def save(self, *args, **kwargs):
         self.full_name = self.get_full_name
-        if not self.pk:
+        super().save(*args, **kwargs)
+
+        if self.pk is None:
             from wallets.models import CoinWallet, EngagementWallet
             coin_wallet, cw_new = CoinWallet.objects.get_or_create(student=self)
             engagement_wallet, ew_new = EngagementWalletWallet.objects.get_or_create(student=self)
 
-        return super().save(*args, **kwargs)
+        return True
 
 # Create your models here.
 class StudentTopicMastery(TimestampModel, UUIDModel, IsActiveModel):
@@ -90,7 +89,7 @@ class StudentGrade(TimestampModel, UUIDModel, IsActiveModel):
 
 class StudentAchivement(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'stdn_tpc_mast_'
-    achivement = models.ForeignKey('achivements.Achivement', on_delete=models.PROTECT, null=True)
+    achivement = models.ForeignKey('achievements.Achievement', on_delete=models.PROTECT, null=True)
     student = models.ForeignKey('students.Student', on_delete=models.PROTECT, null=True)
     is_liberate = models.IntegerField(null=True)
     liberation_date = models.DateField(null=True, blank=True)

@@ -10,11 +10,11 @@ from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 # Create your models here.
 class CoinWallet(Account):
-    student = models.OneToOneField('students.Student', on_delete=models.PROTECT)
+    student = models.OneToOneField('students.Student', on_delete=models.PROTECT, null=True)
 
 
 class EngagementWallet(Account):
-    student = models.OneToOneField('students.Student', on_delete=models.PROTECT)
+    student = models.OneToOneField('students.Student', on_delete=models.PROTECT, null=True)
     current_level = models.PositiveSmallIntegerField(null=True, default=1)
 
 

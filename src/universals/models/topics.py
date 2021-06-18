@@ -16,8 +16,6 @@ class UniversalTopic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel):
     parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='sub_topics')
     standard_code  = models.CharField(max_length=128, null=True, blank=True)
 
-
-
     def __str__(self):
         return self.name
 

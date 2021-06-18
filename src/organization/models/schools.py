@@ -37,7 +37,7 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
 
     student_plan = models.ManyToManyField('plans.StudentPlan', blank=True)
     organization =  models.ForeignKey('organization.Organization', on_delete=models.PROTECT, blank=True)
-    teacher =  models.ManyToManyField('organization.Teacher', blank=True , related_name='teachers')
+    #teacher =  models.ManyToManyField('organization.Teacher', blank=True , related_name='teachers')
     student =  models.ManyToManyField('students.Student', blank=True)
     group =  models.ManyToManyField('organization.Group', blank=True)
 
@@ -49,14 +49,23 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
         return super().save(*args, **kwargs)
 
 class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
-    PREFIX = 'prs_'
+    GENDER_MALE = 'MALE'
+    GENDER_FEMALE = 'FEMALE'
+    GENDER_OTHER = 'OTHER'
+    GENDER_CHOICES = (
+        (GENDER_MALE, 'Male'),
+        (GENDER_FEMALE, 'Female'),
+        (GENDER_OTHER, 'Other'),
+    )
+    
+    PREFIX = 'sch_prs_'
     
     user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
     school  = models.ForeignKey('organization.School', on_delete=models.PROTECT, null=True)
 
     name  = models.CharField(max_length=128, null=True)
     last_name  = models.CharField(max_length=128, null=True)
-    gender = models.CharField(max_length=128, null=True)
+    gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     date_of_birth = models.DateField(null=True)
     identification_number = models.CharField(max_length=128, null=True)
     position = models.CharField(max_length=128, null=True)

@@ -20,6 +20,3 @@ class Level(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     points_required = models.IntegerField(null=True)
 
     objects = LevelManager()
-
-    def __str__(self):
-        return self.name
