@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     'achievements',
     'block',
     'content',
-    #'collectibles',
+    'collectibles',
     'experiences',
     'guardians',
     'kb',

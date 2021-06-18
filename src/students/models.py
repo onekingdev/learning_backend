@@ -87,7 +87,7 @@ class StudentGrade(TimestampModel, UUIDModel, IsActiveModel):
     percentage = models.FloatField(null=True)
     complete_date = models.DateField(null=True, blank=True)
 
-class StudentAchivement(TimestampModel, UUIDModel, IsActiveModel):
+class StudentAchievement(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'stdn_tpc_mast_'
     achivement = models.ForeignKey('achievements.Achievement', on_delete=models.PROTECT, null=True)
     student = models.ForeignKey('students.Student', on_delete=models.PROTECT, null=True)

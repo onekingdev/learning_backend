@@ -1,17 +1,16 @@
 import graphene
 from graphene import relay, ObjectType
 from graphene_django import DjangoObjectType
-
 from audiences.models import Audience
 from content.models import AnswerOption, Question, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset
 from experiences.models import Level
-from collectibles.models import CollectibleCategory, Collectible, StudentTransactionCollectible
+from collectibles.models import CollectibleCategory, Collectible, CollectiblePurchaseTransaction
 from guardians.models import Guardian, GuardianStudent
-from achivements.models import Achivement
+from achievements.models import Achievement
 from organization.models import Organization, OrganizationPersonnel, Group, School, SchoolPersonnel
 from plans.models import StudentPlan, StudentPlanTopicGrade
 from block.models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block, BlockConfiguration, BlockPresentation, BlockQuestion, BlockQuestionPresentation
-from students.models import Avatar, Student, StudentTopicMastery, StudentGrade, StudentAchivement
+from students.models import Avatar, Student, StudentTopicMastery, StudentGrade, StudentAchievement
 from universals.models import UniversalAreaOfKnowledge, UniversalTopic
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 
@@ -68,6 +67,7 @@ class AnswerTypeSchema(DjangoObjectType):
 class LevelSchema(DjangoObjectType):
     class Meta:
         model = Level
+        abstract = True
         fields = "__all__"
 
 class CollectibleCategorySchema(DjangoObjectType):
@@ -80,9 +80,9 @@ class CollectibleSchema(DjangoObjectType):
         model = Collectible
         fields = "__all__"
 
-class StudentTransactionCollectibleSchema(DjangoObjectType):
+class CollectiblePurchaseTransactionSchema(DjangoObjectType):
     class Meta:
-        model = StudentTransactionCollectible
+        model = CollectiblePurchaseTransaction
         fields = "__all__"
 
 class GuardianSchema(DjangoObjectType):
@@ -95,9 +95,9 @@ class GuardianStudentSchema(DjangoObjectType):
         model = GuardianStudent
         fields = "__all__"
 
-class AchivementSchema(DjangoObjectType):
+class AchievementSchema(DjangoObjectType):
     class Meta:
-        model = Achivement
+        model = Achievement
         fields = "__all__"
 
 class OrganizationSchema(DjangoObjectType):
@@ -160,9 +160,9 @@ class StudentGradeSchema(DjangoObjectType):
         model = StudentGrade
         fields = "__all__"
 
-class StudentAchivementSchema(DjangoObjectType):
+class StudentAchievementSchema(DjangoObjectType):
     class Meta:
-        model = StudentAchivement
+        model = StudentAchievement
         fields = "__all__"
 
 class UniversalAreaOfKnowledgeSchema(DjangoObjectType):
@@ -400,16 +400,16 @@ class Query(graphene.ObjectType):
 
     #----------------- StudentTransactionCollectible -----------------#
 
-    students_transaction_collectible = graphene.List(StudentTransactionCollectibleSchema)
-    student_transaction_collectible_by_id = graphene.Field(StudentTransactionCollectibleSchema, id=graphene.String())
+    students_transaction_collectible = graphene.List(CollectiblePurchaseTransactionSchema)
+    student_transaction_collectible_by_id = graphene.Field(CollectiblePurchaseTransactionSchema, id=graphene.String())
 
     def resolve_students_transaction_collectible(root, info, **kwargs):
         # Querying a list
-        return StudentTransactionCollectible.objects.all()
+        return CollectiblePurchaseTransaction.objects.all()
 
     def resolve_student_transaction_collectible_by_id(root, info, id):
         # Querying a single question
-        return StudentTransactionCollectible.objects.get(pk=id)
+        return CollectiblePurchaseTransaction.objects.get(pk=id)
 
     #----------------- End Code -----------------#
 
@@ -443,18 +443,18 @@ class Query(graphene.ObjectType):
 
     #----------------- End Code -----------------#
 
-    #----------------- Achivement  -----------------#
+    #----------------- Achievement  -----------------#
 
-    achivements = graphene.List(AchivementSchema)
-    achivement_by_id = graphene.Field(AchivementSchema, id=graphene.String())
+    Achievements = graphene.List(AchievementSchema)
+    Achievement_by_id = graphene.Field(AchievementSchema, id=graphene.String())
 
-    def resolve_achivements(root, info, **kwargs):
+    def resolve_achievements(root, info, **kwargs):
         # Querying a list
-        return Achivement.objects.all()
+        return Achievement.objects.all()
 
-    def resolve_achivement_category_by_id(root, info, id):
+    def resolve_achievement_category_by_id(root, info, id):
         # Querying a single question
-        return Achivement.objects.get(pk=id)
+        return Achievement.objects.get(pk=id)
 
     #----------------- End Code -----------------#
 
@@ -639,18 +639,18 @@ class Query(graphene.ObjectType):
 
     #----------------- End Code -----------------#
 
-    #----------------- StudentAchivement -----------------#
+    #----------------- StudentAchievement -----------------#
 
-    students_achivement = graphene.List(StudentAchivementSchema)
-    student_achivement_by_id = graphene.Field(StudentAchivementSchema, id=graphene.String())
+    students_achievement = graphene.List(StudentAchievementSchema)
+    student_achievement_by_id = graphene.Field(StudentAchievementSchema, id=graphene.String())
 
-    def resolve_students_achivement(root, info, **kwargs):
+    def resolve_students_achievement(root, info, **kwargs):
         # Querying a list
-        return StudentAchivement.objects.all()
+        return StudentAchievement.objects.all()
 
-    def resolve_student_achivement_by_id(root, info, id):
+    def resolve_student_achievement_by_id(root, info, id):
         # Querying a single question
-        return StudentAchivement.objects.get(pk=id)
+        return StudentAchievement.objects.get(pk=id)
 
     #----------------- End Code -----------------#
 
