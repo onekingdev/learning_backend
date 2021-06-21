@@ -10,9 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import os
-import json
-import configparser
 from .env import SECRET_KEY, ENV_INSTALLED_APPS
 
 
@@ -25,7 +22,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
 
 
 # Application definition
@@ -54,6 +50,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'graphene_django',
+    'graphene_django_optimizer',
 
     'api',
     'audiences',
@@ -71,7 +68,7 @@ INSTALLED_APPS = [
     'universals',
     'users',
     'wallets'
-    
+
 ]
 
 
@@ -170,8 +167,6 @@ JWT_AUTH_COOKIE = 'my-app-auth'
 JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
 
 
-
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -201,8 +196,8 @@ SIMPLE_JWT = {
 }
 
 GRAPH_MODELS = {
-  'all_applications': True,
-  'group_models': True,
+    'all_applications': True,
+    'group_models': True,
 }
 
 # Graphene
