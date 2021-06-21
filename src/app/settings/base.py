@@ -15,6 +15,7 @@ from .env import SECRET_KEY, ENV_INSTALLED_APPS
 
 from pathlib import Path
 from datetime import timedelta
+from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -213,3 +214,8 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 EMAIL_BACKEND = "mailer.backend.DbBackend"
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# Additional languages
+settings.LANGUAGES.append(
+    ('en-us', 'American English')
+)
