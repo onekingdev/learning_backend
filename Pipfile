@@ -21,6 +21,7 @@ django-cors-headers = "*"
 coreapi = "*"
 django-mailer = "*"
 graphene-django = "*"
+graphene-django-optimizer = "*"
 
 [dev-packages]
 

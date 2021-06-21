@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "07c9a9e4cecb52f1372d4c8bdc9e68d3e9d2eca07ea8877a435c50cfe7b97917"
+            "sha256": "45407d9381be7cfb4429f994ed4f03afdb4152e1cc17f788f5bc505ba0c6e9ed"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -288,6 +288,13 @@
             ],
             "index": "pypi",
             "version": "==2.15.0"
+        },
+        "graphene-django-optimizer": {
+            "hashes": [
+                "sha256:79269880d59d0a35d41751ddcb419220c4ad3871960416371119f447cb2e1a77"
+            ],
+            "index": "pypi",
+            "version": "==0.8.0"
         },
         "graphql-core": {
             "hashes": [
