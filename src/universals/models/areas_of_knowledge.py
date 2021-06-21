@@ -1,14 +1,12 @@
 from django.db import models
-from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
-from mptt.models import MPTTModel, TreeForeignKey
-from ckeditor.fields import RichTextField
-from parler.models import TranslatableModel, TranslatedFields
+from app.models import RandomSlugModel, TimestampModel, IsActiveModel
 from django.utils.text import slugify
 
+
 class UniversalAreaOfKnowledge(TimestampModel, RandomSlugModel, IsActiveModel):
-    PREFIX = 'unv_aok_'
-    
-    name  = models.CharField(max_length=128, unique=True)
+    PREFIX = 'universal_aok_'
+
+    name = models.CharField(max_length=128, unique=True)
     slug = models.SlugField(editable=False)
 
     def __str__(self):

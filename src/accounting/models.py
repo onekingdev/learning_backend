@@ -1,16 +1,9 @@
 from django.db import models
 from app.models import RandomSlugModel, TimestampModel
-import datetime
-
-
-# Create your models here.
-
-
 
 
 class Account(RandomSlugModel, TimestampModel):
     calculated_fields = ['balance']
-
 
     SIDE_CHOICE_LEFT = 'L'
     SIDE_CHOICE_RIGHT = 'R'
@@ -23,7 +16,6 @@ class Account(RandomSlugModel, TimestampModel):
     positive_side = models.CharField(default=SIDE_CHOICE_LEFT, choices=SIDE_CHOICE_SET,
                                      max_length=16, )
     balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-
 
     def save(self, *args, **kwargs):
         self.set_calculated_fields()
@@ -45,7 +37,8 @@ class Account(RandomSlugModel, TimestampModel):
         }[self.positive_side]
 
     def get_balance_aggregate(self):
-        positive_movements_aggregate = self.movement_set.filter(side=self.positive_side).aggregate(models.Sum('amount'))
+        positive_movements_aggregate = self.movement_set.filter(
+            side=self.positive_side).aggregate(models.Sum('amount'))
         negative_movements_aggregate = self.movement_set.filter(side=self.get_negative_side).aggregate(
             models.Sum('amount'))
 
@@ -70,22 +63,21 @@ class Account(RandomSlugModel, TimestampModel):
         return self.get_balance_aggregate().get('total_movements_balance')
 
 
-
-
 class Movement(RandomSlugModel, TimestampModel):
     class Meta:
         ordering = ['-date', '-pk']
 
-    account = models.ForeignKey('accounting.Account', on_delete=models.CASCADE, verbose_name='Cuenta')
+    account = models.ForeignKey(
+        'accounting.Account', on_delete=models.CASCADE, verbose_name='Cuenta')
     date = models.DateField('Fecha Movimiento')
-    side = models.CharField('Lado', max_length=1, choices=Account.SIDE_CHOICE_SET)
-    comment = models.CharField('Comentario', max_length=128, null=True, blank=True, )
+    side = models.CharField('Lado', max_length=1,
+                            choices=Account.SIDE_CHOICE_SET)
+    comment = models.CharField(
+        'Comentario', max_length=128, null=True, blank=True, )
     amount = models.DecimalField('Monto', decimal_places=2, max_digits=11)
-
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-
 
         account = self.account
         account.save()
@@ -94,6 +86,8 @@ class Movement(RandomSlugModel, TimestampModel):
         account = self.account
         super(Movement, self).delete(*args, **kwargs)
         account.save()
+
+
 class PositiveMovement(Movement):
     class Meta:
         proxy = True,
@@ -110,4 +104,3 @@ class NegativeMovement(Movement):
     def save(self, *args, **kwargs):
         self.side = self.account.get_negative_side
         return super().save(*args, **kwargs)
-

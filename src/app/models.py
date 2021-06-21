@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from django.utils import timezone
-from parler.models import TranslatableManager, TranslatableModel
+from parler.models import TranslatableManager
 
 
 class ActiveManager(models.Manager):
@@ -11,10 +11,9 @@ class ActiveManager(models.Manager):
     def inactive_objects(self):
         return super().get_queryset().filter(is_active=False)
 
+
 class ActiveManagerTranslated(ActiveManager, TranslatableManager):
     pass
-
-
 
 
 class BaseModel(models.Model):
@@ -43,11 +42,13 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
+
 class IsActiveModel(models.Model):
     is_active = models.BooleanField(default=True)
     objects = ActiveManager()
 
-    deleted_timestamp = models.DateTimeField('Deleted timestamp', null=True, editable=False)
+    deleted_timestamp = models.DateTimeField(
+        'Deleted timestamp', null=True, editable=False)
 
     def delete(self, *args, **kwargs):
         self.is_active = False
@@ -70,7 +71,8 @@ class RandomSlugModel(BaseModel):
         if not self.random_slug:
             while True:
                 random_slug = uuid.uuid4().hex[:self.SLUG_LENGTH].upper()
-                others = self._meta.model.objects.filter(random_slug=random_slug)
+                others = self._meta.model.objects.filter(
+                    random_slug=random_slug)
                 if others.count() == 0:
                     self.random_slug = random_slug
                     break
@@ -92,7 +94,8 @@ class UUIDModel(BaseModel):
         if not self.random_slug:
             while True:
                 random_slug = uuid.uuid4()
-                others = self._meta.model.objects.filter(random_slug=random_slug)
+                others = self._meta.model.objects.filter(
+                    random_slug=random_slug)
                 if others.count() == 0:
                     self.random_slug = random_slug
                     break
@@ -105,9 +108,10 @@ class UUIDModel(BaseModel):
 
 class TimestampModel(models.Model):
 
-    create_timestamp = models.DateTimeField('Created timestamp', auto_now_add=True, editable=False)
-    update_timestamp = models.DateTimeField('Updated timestamp', auto_now=True, editable=False)
+    create_timestamp = models.DateTimeField(
+        'Created timestamp', auto_now_add=True, editable=False)
+    update_timestamp = models.DateTimeField(
+        'Updated timestamp', auto_now=True, editable=False)
 
     class Meta:
         abstract = True
-

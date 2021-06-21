@@ -1,24 +1,23 @@
 from django.db import models
 from django.utils.text import slugify
-from ckeditor.fields import RichTextField
 from mptt.models import MPTTModel, TreeForeignKey
-from parler.models import TranslatableModel, TranslatedFields
-from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
+from app.models import RandomSlugModel, TimestampModel, IsActiveModel
 
-# Create your models here.
 
 class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'org_'
-    
-    name  = models.CharField(max_length=128, null=True)
+
+    name = models.CharField(max_length=128, null=True)
     type_of = models.CharField(max_length=128, null=True)
     slug = models.SlugField(editable=False)
-    parent = TreeForeignKey('self', on_delete=models.PROTECT, null=True, blank=True , related_name='sub_organizations')
+    parent = TreeForeignKey('self', on_delete=models.PROTECT,
+                            null=True, blank=True, related_name='sub_organizations')
     student_plan = models.ManyToManyField('plans.StudentPlan')
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
+
 
 class OrganizationPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     GENDER_MALE = 'MALE'
@@ -29,14 +28,15 @@ class OrganizationPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
         (GENDER_FEMALE, 'Female'),
         (GENDER_OTHER, 'Other'),
     )
-    
-    PREFIX = 'org_prs_'
-    
-    user  = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
-    organization  = models.ForeignKey('organization.Organization', on_delete=models.PROTECT, null=True)
 
-    name  = models.CharField(max_length=128, null=True)
-    last_name  = models.CharField(max_length=128, null=True)
+    PREFIX = 'org_personnel_'
+
+    user = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
+    organization = models.ForeignKey(
+        'organization.Organization', on_delete=models.PROTECT, null=True)
+
+    name = models.CharField(max_length=128, null=True)
+    last_name = models.CharField(max_length=128, null=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     date_of_birth = models.DateField(null=True)
     identification_number = models.CharField(max_length=128, null=True)
@@ -44,4 +44,3 @@ class OrganizationPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
 
     def __str__(self):
         return self.name+' '+self.last_name
-
