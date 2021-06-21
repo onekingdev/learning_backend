@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.exceptions import EmptyResultSet
 from graphene_django_optimizer.types import OptimizedDjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from universals.models import UniversalAreaOfKnowledge, UniversalTopic
@@ -24,24 +23,6 @@ LanguageCodeEnum = graphene.Enum(
 )
 
 
-def resolver(instance, _info, language_code):
-    try:
-        instance = instance.get_translation(language_code=language_code)
-    except EmptyResultSet:
-        instance = instance.get_translation(
-            language_code=settings.LANGUAGE_CODE)
-    return instance
-
-
-class TranslatedInstanceFields(graphene.Field):
-    def __init__(self, translated_model_type, resolver=resolver):
-        super().__init__(
-            translated_model_type,
-            language_code=graphene.Argument(LanguageCodeEnum, required=True),
-            resolver=resolver,
-        )
-
-
 class BlockConfigurationKeywordSchema(DjangoObjectType):
     class Meta:
         model = BlockConfigurationKeyword
@@ -56,7 +37,12 @@ class BlockTypeSchema(DjangoObjectType):
     name = graphene.String()
 
     def resolve_name(self, info, language_code=None):
-        return self.safe_translation_getter("name", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class BlockTypeConfigurationSchema(DjangoObjectType):
@@ -103,7 +89,12 @@ class QuestionSchema(DjangoObjectType):
     question_text = graphene.String()
 
     def resolve_question_text(self, info, language_code=None):
-        return self.safe_translation_getter("question_text", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("question_text", language_code=current_language)
 
 
 class AnswerOptionSchema(DjangoObjectType):
@@ -112,11 +103,50 @@ class AnswerOptionSchema(DjangoObjectType):
         fields = "__all__"
 
     answer_text = graphene.String()
+    explanation = graphene.String()
+    image = graphene.String()
+    audio_file = graphene.String()
+    video = graphene.String()
 
     def resolve_answer_text(self, info, language_code=None):
-        return self.safe_translation_getter("answer_text", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
 
-    # TODO: Non String resolvers
+        return self.safe_translation_getter("answer_text", language_code=current_language)
+
+    def resolve_image(self, info, language_code=None):
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("image", language_code=current_language)
+
+    def resolve_explanation(self, info, language_code=None):
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("explanation", language_code=current_language)
+
+    def resolve_audio_file(self, info, language_code=None):
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("audio_file", language_code=current_language)
+
+    def resolve_video(self, info, language_code=None):
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("video", language_code=current_language)
 
 
 class LevelSchema(DjangoObjectType):
@@ -127,7 +157,12 @@ class LevelSchema(DjangoObjectType):
     name = graphene.String()
 
     def resolve_name(self, info, language_code=None):
-        return self.safe_translation_getter("name", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class CollectibleCategorySchema(DjangoObjectType):
@@ -138,7 +173,12 @@ class CollectibleCategorySchema(DjangoObjectType):
     name = graphene.String()
 
     def resolve_name(self, info, language_code=None):
-        return self.safe_translation_getter("name", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class CollectibleSchema(DjangoObjectType):
@@ -149,7 +189,12 @@ class CollectibleSchema(DjangoObjectType):
     name = graphene.String()
 
     def resolve_name(self, info, language_code=None):
-        return self.safe_translation_getter("name", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class CollectiblePurchaseTransactionSchema(DjangoObjectType):
@@ -178,7 +223,12 @@ class AchievementSchema(DjangoObjectType):
     name = graphene.String()
 
     def resolve_name(self, info, language_code=None):
-        return self.safe_translation_getter("name", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class OrganizationSchema(DjangoObjectType):
@@ -231,7 +281,12 @@ class AudienceSchema(OptimizedDjangoObjectType):
     name = graphene.String()
 
     def resolve_name(self, info, language_code=None):
-        return self.safe_translation_getter("name", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class AvatarSchema(DjangoObjectType):
@@ -284,7 +339,12 @@ class AreaOfKnowledgeSchema(DjangoObjectType):
     name = graphene.String()
 
     def resolve_name(self, info, language_code=None):
-        return self.safe_translation_getter("name", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class GradeSchema(DjangoObjectType):
@@ -295,7 +355,12 @@ class GradeSchema(DjangoObjectType):
     name = graphene.String()
 
     def resolve_name(self, info, language_code=None):
-        return self.safe_translation_getter("name", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class TopicSchema(DjangoObjectType):
@@ -306,7 +371,12 @@ class TopicSchema(DjangoObjectType):
     name = graphene.String()
 
     def resolve_name(self, info, language_code=None):
-        return self.safe_translation_getter("name", language_code=language_code)
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class TopicGradeSchema(DjangoObjectType):
