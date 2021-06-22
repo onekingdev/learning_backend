@@ -22,6 +22,7 @@ coreapi = "*"
 django-mailer = "*"
 graphene-django = "*"
 graphene-django-optimizer = "*"
+django-graphql-jwt = "<0.3.2"
 
 [dev-packages]
 
