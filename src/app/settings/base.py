@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from .env import SECRET_KEY, ENV_INSTALLED_APPS
 
 
+import os
 from pathlib import Path
 from datetime import timedelta
 from django.conf import settings
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'graphene_django',
     'graphene_django_optimizer',
+    'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
 
     'api',
     'audiences',
@@ -203,8 +205,27 @@ GRAPH_MODELS = {
 
 # Graphene
 GRAPHENE = {
-    "SCHEMA": "app.schema.schema"
+    "SCHEMA": "app.schema.schema",
+    'MIDDLEWARE': [
+        'graphql_jwt.middleware.JSONWebTokenMiddleware',
+    ],
 }
+
+GRAPHQL_JWT = {
+    'JWT_PAYLOAD_HANDLER': 'app.utils.jwt_payload',
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_LONG_RUNNING_REFRESH_TOKEN': True,
+    'JWT_EXPIRATION_DELTA': timedelta(minutes=5),
+    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
+    # TODO: Change to environment variable
+    'JWT_SECRET_KEY': 'llave super secreta',
+    'JWT_ALGORITHM': 'HS256',
+}
+AUTHENTICATION_BACKENDS = [
+    'graphql_jwt.backends.JSONWebTokenBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 
 ACCOUNT_UNIQUE_EMAIL = False

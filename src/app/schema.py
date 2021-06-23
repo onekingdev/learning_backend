@@ -1,3 +1,6 @@
+import graphene
+import graphql_jwt
+import api.schema
 from django.conf import settings
 from graphene_django_optimizer.types import OptimizedDjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
@@ -9,7 +12,6 @@ from plans.models import StudentPlan, StudentPlanTopicGrade
 from organization.models import Organization, OrganizationPersonnel, Group, School, SchoolPersonnel
 from achievements.models import Achievement
 from guardians.models import Guardian, GuardianStudent
-import graphene
 from graphene_django import DjangoObjectType
 from audiences.models import Audience
 from content.models import AnswerOption, Question
@@ -901,4 +903,10 @@ class Query(graphene.ObjectType):
         return Prerequisite.objects.get(pk=id)
 
 
-schema = graphene.Schema(query=Query)
+class Mutation(api.schema.Mutation, graphene.ObjectType):
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
+    verify_token = graphql_jwt.Verify.Field()
+
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
