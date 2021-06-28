@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.apps import apps
 from django.contrib.auth.admin import UserAdmin
+from api.admin import AdminProfileInline
 from .models import User
 
 
@@ -17,11 +18,12 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active')}
+            'fields': ('username', 'email', 'password1', 'password2', 'is_staff', 'is_active')}
          ),
     )
     search_fields = ('email',)
     ordering = ('email',)
+    inlines = (AdminProfileInline,)
 
 
 class ListAdminMixin(object):
