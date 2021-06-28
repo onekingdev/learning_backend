@@ -24,9 +24,9 @@ class CreateUser(graphene.Mutation):
     class Arguments:
         username = graphene.String(required=True)
         password = graphene.String(required=True)
-        email = graphene.String()
+        email = graphene.String(required=False)
 
-    def mutate(self, info, username, password, email):
+    def mutate(self, info, username, password, email=''):
         user = get_user_model()(
             username=username,
             email=email,
@@ -39,6 +39,12 @@ class CreateUser(graphene.Mutation):
         refresh_token = create_refresh_token(user)
 
         return CreateUser(user=user, profile=profile_obj, token=token, refresh_token=refresh_token)
+
+
+# class CreateStudent(graphene.Mutation):
+#     student = graphene.Field('app.schema.StudentSchema')
+#     user = graphene.Field(UserSchema)
+#     profile = graphene.Field(UserProfileSchema)
 
 
 class Mutation(graphene.ObjectType):
