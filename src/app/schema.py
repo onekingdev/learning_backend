@@ -393,7 +393,13 @@ class PrerequisiteSchema(DjangoObjectType):
         fields = "__all__"
 
 
-class Query(graphene.ObjectType):
+class Mutation(api.schema.Mutation, graphene.ObjectType):
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
+    verify_token = graphql_jwt.Verify.Field()
+
+
+class Query(api.schema.Query, graphene.ObjectType):
 
     # ----------------- Block Configuration Keyword ----------------- #
 
@@ -901,12 +907,6 @@ class Query(graphene.ObjectType):
     def resolve_prerequisite_by_id(root, info, id):
         # Querying a single question
         return Prerequisite.objects.get(pk=id)
-
-
-class Mutation(api.schema.Mutation, graphene.ObjectType):
-    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
-    refresh_token = graphql_jwt.Refresh.Field()
-    verify_token = graphql_jwt.Verify.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
