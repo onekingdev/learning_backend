@@ -21,7 +21,7 @@ class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
         'users.User', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.name+' '+self.last_name
+        return self.user.username
 
 
 class GuardianStudent(TimestampModel, RandomSlugModel):
