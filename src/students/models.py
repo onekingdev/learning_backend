@@ -48,7 +48,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     level = models.ForeignKey(
         'experiences.Level', on_delete=models.PROTECT, null=True)
     avatar = models.ForeignKey(
-        'students.Avatar', on_delete=models.PROTECT, null=True)
+        'students.Avatar', on_delete=models.PROTECT, null=True, blank=True)
 
     def current_age(self):
         today = datetime.date.today()
