@@ -88,16 +88,18 @@ class CreateStudent(graphene.Mutation):
     refresh_token = graphene.String()
 
     class Arguments:
-        username = graphene.String(required=True)
         first_name = graphene.String(required=True)
         last_name = graphene.String(required=True)
+        gender = graphene.Enum(Student.GENDER_CHOICES, required=True)
+        username = graphene.String(required=True)
         password = graphene.String(required=True)
-        email = graphene.String(required=False)
+        school = graphene.ID(required=True)
+        grade = graphene.ID(required=True)
+        group = graphene.ID(required=True)
 
-    def mutate(self, info, username, first_name, last_name, password, email=''):
+    def mutate(self, info, first_name, last_name, gender, username, password, school, grade, group):
         user = get_user_model()(
             username=username,
-            email=email,
         )
         user.set_password(password)
         user.save()
@@ -106,6 +108,10 @@ class CreateStudent(graphene.Mutation):
             user=user,
             first_name=first_name,
             last_name=last_name,
+            gender=gender,
+            school=school,
+            grade=grade,
+            group=group,
         )
         student.save()
 
