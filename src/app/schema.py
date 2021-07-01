@@ -1,8 +1,10 @@
 import graphene
 import graphql_jwt
 import api.schema
+import audiences.schema
+import collectibles.schema
+import experiences.schema
 from django.conf import settings
-from graphene_django_optimizer.types import OptimizedDjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from universals.models import UniversalAreaOfKnowledge, UniversalTopic
 from students.models import Avatar, Student, StudentTopicMastery, StudentGrade, StudentAchievement
@@ -13,10 +15,7 @@ from organization.models import Organization, OrganizationPersonnel, Group, Scho
 from achievements.models import Achievement
 from guardians.models import Guardian, GuardianStudent
 from graphene_django import DjangoObjectType
-from audiences.models import Audience
 from content.models import AnswerOption, Question
-from experiences.models import Level
-from collectibles.models import CollectibleCategory, Collectible, CollectiblePurchaseTransaction, StudentCollectible
 
 LanguageCodeEnum = graphene.Enum(
     "LanguageCodeEnum",
@@ -151,75 +150,6 @@ class AnswerOptionSchema(DjangoObjectType):
         return self.safe_translation_getter("video", language_code=current_language)
 
 
-class LevelSchema(DjangoObjectType):
-    class Meta:
-        model = Level
-        fields = "__all__"
-
-    name = graphene.String()
-
-    def resolve_name(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter("name", language_code=current_language)
-
-
-class CollectibleCategorySchema(DjangoObjectType):
-    class Meta:
-        model = CollectibleCategory
-        fields = "__all__"
-
-    name = graphene.String()
-
-    def resolve_name(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter("name", language_code=current_language)
-
-
-class CollectibleSchema(DjangoObjectType):
-    class Meta:
-        model = Collectible
-        fields = "__all__"
-
-    name = graphene.String()
-    owned = graphene.Boolean()
-
-    def resolve_name(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter("name", language_code=current_language)
-
-    def resolve_owned(self, info):
-        student = Student.objects.get(user=info.context.user)
-        student_collectible = StudentCollectible.objects.filter(collectible=self, student=student)
-        if student_collectible.exists():
-            return True
-        else:
-            return False
-
-
-class CollectiblePurchaseTransactionSchema(DjangoObjectType):
-    class Meta:
-        model = CollectiblePurchaseTransaction
-        fields = "__all__"
-
-
-class StudentCollectilbeSchema(DjangoObjectType):
-    class Meta:
-        model = StudentCollectible
-        fields = "__all__"
-
-
 class GuardianSchema(DjangoObjectType):
     class Meta:
         model = Guardian
@@ -288,22 +218,6 @@ class StudentPlanTopicGradeSchema(DjangoObjectType):
     class Meta:
         model = StudentPlanTopicGrade
         fields = "__all__"
-
-
-class AudienceSchema(OptimizedDjangoObjectType):
-    class Meta:
-        model = Audience
-        fields = "__all__"
-
-    name = graphene.String()
-
-    def resolve_name(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class AvatarSchema(DjangoObjectType):
@@ -414,7 +328,12 @@ class Mutation(api.schema.Mutation, graphene.ObjectType):
     verify_token = graphql_jwt.Verify.Field()
 
 
-class Query(api.schema.Query, graphene.ObjectType):
+class Query(
+        api.schema.Query,
+        audiences.schema.Query,
+        collectibles.schema.Query,
+        experiences.schema.Query,
+        graphene.ObjectType):
 
     # ----------------- Block Configuration Keyword ----------------- #
 
@@ -554,76 +473,6 @@ class Query(api.schema.Query, graphene.ObjectType):
     def resolve_answers_option_by_id(root, info, id):
         # Querying a single question
         return AnswerOption.objects.get(pk=id)
-
-    # ----------------- Level ----------------- #
-
-    levels = graphene.List(LevelSchema)
-    level_by_id = graphene.Field(LevelSchema, id=graphene.String())
-
-    def resolve_levels(root, info, **kwargs):
-        # Querying a list
-        return Level.objects.all()
-
-    def resolve_level_by_id(root, info, id):
-        # Querying a single question
-        return Level.objects.get(pk=id)
-
-    # ----------------- CollectibleCategory ----------------- #
-
-    collectibles_category = graphene.List(CollectibleCategorySchema)
-    collectible_category_by_id = graphene.Field(
-        CollectibleCategorySchema, id=graphene.String())
-
-    def resolve_collectibles_category(root, info, **kwargs):
-        # Querying a list
-        return CollectibleCategory.objects.all()
-
-    def resolve_collectible_category_by_id(root, info, id):
-        # Querying a single question
-        return CollectibleCategory.objects.get(pk=id)
-
-    # ----------------- Collectible ----------------- #
-
-    collectibles = graphene.List(CollectibleSchema)
-    collectible_by_id = graphene.Field(CollectibleSchema, id=graphene.String())
-
-    def resolve_collectibles(root, info, **kwargs):
-        # Querying a list
-        return Collectible.objects.all()
-
-    def resolve_collectible_by_id(root, info, id):
-        # Querying a single question
-        return Collectible.objects.get(pk=id)
-
-    # ----------------- StudentTransactionCollectible ----------------- #
-
-    students_transaction_collectible = graphene.List(
-        CollectiblePurchaseTransactionSchema)
-    student_transaction_collectible_by_id = graphene.Field(
-        CollectiblePurchaseTransactionSchema, id=graphene.String())
-
-    def resolve_students_transaction_collectible(root, info, **kwargs):
-        # Querying a list
-        return CollectiblePurchaseTransaction.objects.all()
-
-    def resolve_student_transaction_collectible_by_id(root, info, id):
-        # Querying a single question
-        return CollectiblePurchaseTransaction.objects.get(pk=id)
-
-    # ----------------- StudentCollectible ----------------- #
-
-    students_collectible = graphene.List(
-        StudentCollectilbeSchema)
-    student_collectible_by_id = graphene.Field(
-        StudentCollectilbeSchema, id=graphene.String())
-
-    def resolve_students_collectible(root, info, **kwargs):
-        # Querying a list
-        return StudentCollectible.objects.all()
-
-    def resolve_student_collectible_by_id(root, info, id):
-        # Querying a single question
-        return StudentCollectible.objects.get(pk=id)
 
     # ----------------- Guardian ----------------- #
 
@@ -766,19 +615,6 @@ class Query(api.schema.Query, graphene.ObjectType):
     def resolve_student_plan_topic_grade_by_id(root, info, id):
         # Querying a single question
         return StudentPlanTopicGrade.objects.get(pk=id)
-
-    # ----------------- Audience ----------------- #
-
-    audiences = graphene.List(AudienceSchema)
-    audience_by_id = graphene.Field(AudienceSchema, id=graphene.String())
-
-    def resolve_audiences(root, info, **kwargs):
-        # Querying a list
-        return Audience.objects.all()
-
-    def resolve_audience_by_id(root, info, id):
-        # Querying a single question
-        return Audience.objects.get(pk=id)
 
     # ----------------- Avatar ----------------- #
 
