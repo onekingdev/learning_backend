@@ -90,7 +90,7 @@ class CreateStudent(graphene.Mutation):
         last_name = graphene.String(required=True)
         username = graphene.String(required=True)
         password = graphene.String(required=True)
-        school = graphene.ID(required=True)
+        school = graphene.ID(required=False)
         grade = graphene.ID(required=True)
         group = graphene.ID(required=True)
 
