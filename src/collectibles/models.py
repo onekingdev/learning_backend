@@ -24,14 +24,19 @@ class CollectibleManager(ActiveManager, TranslatableManager):
     pass
 
 
-class CollectibleCategory(TimestampModel, MPTTModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class CollectibleCategory(TimestampModel, MPTTModel, RandomSlugModel, TranslatableModel, IsActiveModel):
     translations = TranslatedFields(
         name=models.CharField(max_length=128, null=True),
         description=models.TextField(null=True)
     )
 
-    parent = TreeForeignKey('self', on_delete=models.CASCADE,
-                            null=True, blank=True, related_name='sub_categories')
+    parent = TreeForeignKey(
+        'self',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='sub_categories'
+    )
 
     objects = CollectibleCategoryManager()
 
@@ -57,7 +62,7 @@ class CollectiblePurchaseTransaction(Withdraw):
             self.amount = self.collectible.price
         super().save(*args, **kwargs)
         collectible, new = StudentCollectible.objects.get_or_create(
-            collectible=self, student=self.account.coinaccount.student)
+            collectible=self, student=self.account.CoinWallet.student)
         return super().save(*args, **kwargs)
 
 
