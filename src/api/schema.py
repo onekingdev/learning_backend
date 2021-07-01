@@ -28,10 +28,9 @@ class CreateUser(graphene.Mutation):
         password = graphene.String(required=True)
         email = graphene.String(required=False)
 
-    def mutate(self, info, username, password, email=''):
+    def mutate(self, info, username, password):
         user = get_user_model()(
             username=username,
-            email=email,
         )
         user.set_password(password)
         user.save()
@@ -55,10 +54,9 @@ class CreateGuardian(graphene.Mutation):
         password = graphene.String(required=True)
         email = graphene.String(required=False)
 
-    def mutate(self, info, username, password, email=''):
+    def mutate(self, info, username, password):
         user = get_user_model()(
             username=username,
-            email=email,
         )
         user.set_password(password)
         user.save()
@@ -107,9 +105,6 @@ class CreateStudent(graphene.Mutation):
             user=user,
             first_name=first_name,
             last_name=last_name,
-            school=school,
-            grade=grade,
-            group=group,
         )
         student.save()
 
