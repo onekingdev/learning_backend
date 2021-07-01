@@ -1,13 +1,23 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
+from mptt.managers import TreeManager, TreeQuerySet
 from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
+from parler.managers import TranslatableQuerySet
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel, ActiveManager
 from wallets.models import Withdraw
 
 
-# Create your models here.
-class CollectibleCategoryManager(ActiveManager, TranslatableManager):
-    pass
+class CollectibleCategoryQuerySet(TranslatableQuerySet, TreeQuerySet):
+    def as_manager(cls):
+        manager = CollectibleCategoryManager.from_queryset(cls)()
+        manager._built_with_as_manager = True
+        return manager
+    as_manager.queryset_only = True
+    as_manager = classmethod(as_manager)
+
+
+class CollectibleCategoryManager(ActiveManager, TreeManager, TranslatableManager):
+    _queryset_class = CollectibleCategoryQuerySet
 
 
 class CollectibleManager(ActiveManager, TranslatableManager):
@@ -20,7 +30,7 @@ class CollectibleCategory(TimestampModel, MPTTModel, RandomSlugModel, IsActiveMo
         description=models.TextField(null=True)
     )
 
-    parent = TreeForeignKey('self', on_delete=models.PROTECT,
+    parent = TreeForeignKey('self', on_delete=models.CASCADE,
                             null=True, blank=True, related_name='sub_categories')
 
     objects = CollectibleCategoryManager()
