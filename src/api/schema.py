@@ -43,7 +43,7 @@ class CreateUser(graphene.Mutation):
 
 
 class CreateGuardian(graphene.Mutation):
-    guardian = graphene.Field('app.schema.GuardianSchema')
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     user = graphene.Field(UserSchema)
     profile = graphene.Field(UserProfileSchema)
     token = graphene.String()
@@ -79,7 +79,7 @@ class CreateGuardian(graphene.Mutation):
 
 
 class CreateStudent(graphene.Mutation):
-    student = graphene.Field('app.schema.StudentSchema')
+    student = graphene.Field('students.schema.StudentSchema')
     user = graphene.Field(UserSchema)
     profile = graphene.Field(UserProfileSchema)
     token = graphene.String()
@@ -122,7 +122,7 @@ class CreateStudent(graphene.Mutation):
 
 
 class CreateGuardianStudent(graphene.Mutation):
-    guardian_student = graphene.List('app.schema.GuardianStudentSchema')
+    guardian_student = graphene.List('guardians.schema.GuardianStudentSchema')
 
     class Arguments:
         guardian = graphene.ID(required=True)
