@@ -46,6 +46,7 @@ class BaseModel(models.Model):
 class IsActiveModel(models.Model):
     is_active = models.BooleanField(default=True)
     objects = ActiveManager()
+    all_objects = models.Manager()
 
     deleted_timestamp = models.DateTimeField(
         'Deleted timestamp', null=True, editable=False)
@@ -54,6 +55,15 @@ class IsActiveModel(models.Model):
         self.is_active = False
         self.deleted_timestamp = timezone.now()
         self.save(*args, **kwargs)
+
+    def hard_delete(self, *args, **kwargs):
+        return super().delete()
+
+    def __str__(self, *args, **kwargs):
+        if not self.is_active:
+            return super().__str__() + '(SOFT_DELETE)'
+        else:
+            return super().__str__()
 
     class Meta:
         abstract = True

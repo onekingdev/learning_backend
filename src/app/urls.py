@@ -19,9 +19,11 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework.permissions import AllowAny
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
+from users.admin import hidden_admin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('hidden-admin/', hidden_admin.urls),
     path('api/', include('api.urls')),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path('rest-auth/', include('dj_rest_auth.urls')),
