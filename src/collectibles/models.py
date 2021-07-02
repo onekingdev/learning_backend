@@ -61,8 +61,8 @@ class CollectiblePurchaseTransaction(Withdraw):
         if not self.pk:
             self.amount = self.collectible.price
         super().save(*args, **kwargs)
-        collectible, new = StudentCollectible.objects.get_or_create(
-            collectible=self, student=self.account.CoinWallet.student)
+        student_collectible, new = StudentCollectible.objects.get_or_create(
+            collectible=self.collectible, student=self.account.student)
         return super().save(*args, **kwargs)
 
 

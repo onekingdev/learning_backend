@@ -2,7 +2,7 @@ from django.contrib import admin
 from parler.admin import TranslatableAdmin, TranslatableModelForm
 from mptt.admin import DraggableMPTTAdmin
 from mptt.forms import MPTTAdminForm
-from .models import CollectibleCategory, Collectible
+from .models import CollectibleCategory, Collectible, CollectiblePurchaseTransaction
 
 
 class CollectibleCategoryForm(MPTTAdminForm, TranslatableModelForm):
@@ -20,3 +20,8 @@ class CollectibleCategoryAdmin(TranslatableAdmin, DraggableMPTTAdmin):
 @admin.register(Collectible)
 class CollectibleAdmin(TranslatableAdmin):
     pass
+
+
+@admin.register(CollectiblePurchaseTransaction)
+class CollectiblePurchaseTransactionAdmin(admin.ModelAdmin):
+    exclude = ('amount',)

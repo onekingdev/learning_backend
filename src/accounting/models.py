@@ -13,7 +13,7 @@ class Account(RandomSlugModel, TimestampModel):
     )
 
     name = models.CharField(max_length=128)
-    positive_side = models.CharField(default=SIDE_CHOICE_LEFT, choices=SIDE_CHOICE_SET,
+    positive_side = models.CharField(default=SIDE_CHOICE_RIGHT, choices=SIDE_CHOICE_SET,
                                      max_length=16, )
     balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
@@ -68,7 +68,7 @@ class Movement(RandomSlugModel, TimestampModel):
         ordering = ['-date', '-pk']
 
     account = models.ForeignKey(
-        'accounting.Account', on_delete=models.CASCADE, verbose_name='Cuenta')
+        'wallets.CoinWallet', on_delete=models.CASCADE, verbose_name='Cuenta')
     date = models.DateField('Fecha Movimiento')
     side = models.CharField('Lado', max_length=1,
                             choices=Account.SIDE_CHOICE_SET)
