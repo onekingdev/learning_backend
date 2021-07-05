@@ -69,7 +69,7 @@ class Movement(RandomSlugModel, TimestampModel):
 
     account = models.ForeignKey(
         'wallets.CoinWallet', on_delete=models.CASCADE, verbose_name='Cuenta')
-    date = models.DateField('Fecha Movimiento')
+    date = models.DateField('Fecha Movimiento', auto_now_add=True)
     side = models.CharField('Lado', max_length=1,
                             choices=Account.SIDE_CHOICE_SET)
     comment = models.CharField(
