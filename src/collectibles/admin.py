@@ -25,3 +25,4 @@ class CollectibleAdmin(TranslatableAdmin):
 @admin.register(CollectiblePurchaseTransaction)
 class CollectiblePurchaseTransactionAdmin(admin.ModelAdmin):
     exclude = ('amount',)
+    list_display = ('collectible', 'account', 'amount', 'date')
