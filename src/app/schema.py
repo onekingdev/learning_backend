@@ -76,7 +76,11 @@ class BlockQuestionPresentationSchema(DjangoObjectType):
         fields = "__all__"
 
 
-class Mutation(api.schema.Mutation, graphene.ObjectType):
+class Mutation(
+        api.schema.Mutation,
+        collectibles.schema.Mutation,
+        graphene.ObjectType):
+
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
     refresh_token = graphql_jwt.Refresh.Field()
     verify_token = graphql_jwt.Verify.Field()
