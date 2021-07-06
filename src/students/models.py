@@ -49,14 +49,18 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         'experiences.Level', on_delete=models.PROTECT, null=True)
     avatar = models.ForeignKey(
         'students.Avatar', on_delete=models.PROTECT, null=True, blank=True)
+    avatar_favorites = models.ManyToManyField(
+        Avatar, related_name="Favoritos", blank=True)
 
     def current_age(self):
         today = datetime.date.today()
         birthDate = self.dob
-        try:
-            age = today.year - birthDate.year - \
-                ((today.month, today.day) < (birthDate.month, birthDate.day))
-        except:
+
+        if self.dob is not None:
+            age = (today.year
+                   - birthDate.year
+                   - ((today.month, today.day) < (birthDate.month, birthDate.day)))
+        else:
             age = None
             return age
 
@@ -79,8 +83,6 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                 student=self)
 
         return True
-
-# Create your models here.
 
 
 class StudentTopicMastery(TimestampModel, UUIDModel, IsActiveModel):
