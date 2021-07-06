@@ -45,7 +45,11 @@ class QuestionAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
 
     PREFIX = 'question_asset_'
     question = models.ForeignKey('content.Question', on_delete=models.CASCADE)
-    order = models.PositiveIntegerField(default=10)
+    order = models.PositiveIntegerField()
+
+    def save(self, *args, **kwargs):
+        if self.order is None:
+            self.order = AnswerOption.objects.filter(question=self.question).count() + 1
 
 
 class QuestionImageAsset(QuestionAsset):
