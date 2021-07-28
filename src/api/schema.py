@@ -1,9 +1,13 @@
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from django.conf import settings
 from graphene_django import DjangoObjectType
 from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from students.models import Student
 from guardians.models import Guardian, GuardianStudent
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 import graphene
 
 
@@ -15,6 +19,48 @@ class UserSchema(DjangoObjectType):
 class UserProfileSchema(DjangoObjectType):
     class Meta:
         model = profile
+
+
+# Send mail with django-mailer
+class SendMail(graphene.Mutation):
+    email = graphene.String()
+
+    class Arguments:
+        email = graphene.String(required=True)
+
+    def mutate(self, info, email):
+        send_mail(
+            'Subject',
+            'Message.',
+            settings.SENDGRID_DEFAULT_SENDER,
+            [email],
+            fail_silently=False,
+        )
+
+        return SendMail(email=email)
+
+
+class SendMailSendgrid(graphene.Mutation):
+    email = graphene.String()
+    message = graphene.String()
+
+    class Arguments:
+        email = graphene.String(required=True)
+
+    def mutate(self, info, email):
+        message = Mail(
+            from_email=settings.SENDGRID_DEFAULT_SENDER,
+            to_emails=[email],
+            subject='Subject',
+            plain_text_content='Message.',
+        )
+        try:
+            sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+            sg.send(message)
+        except Exception as e:
+            return str(e)
+
+        return SendMailSendgrid(email=email, message=message)
 
 
 class CreateUser(graphene.Mutation):
@@ -151,6 +197,8 @@ class Mutation(graphene.ObjectType):
     create_guardian = CreateGuardian.Field()
     create_student = CreateStudent.Field()
     create_guardian_student = CreateGuardianStudent.Field()
+    send_mail = SendMail.Field()
+    send_mail_sendgrid = SendMailSendgrid.Field()
 
 
 class Query(graphene.ObjectType):
