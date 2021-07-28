@@ -10,10 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from .env import SECRET_KEY, ENV_INSTALLED_APPS
+from .env import SECRET_KEY, ENV_INSTALLED_APPS, SENDGRID_API_KEY, SENDGRID_DEFAULT_SENDER
 
 
-import os
 from pathlib import Path
 from datetime import timedelta
 from django.conf import settings
@@ -54,6 +53,7 @@ INSTALLED_APPS = [
     'graphene_django',
     'graphene_django_optimizer',
     'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
+    'mailer',
 
     'api',
     'audiences',
@@ -235,6 +235,13 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 EMAIL_BACKEND = "mailer.backend.DbBackend"
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apikey'  # this is exactly the value 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+DEFAULT_FROM_EMAIL = SENDGRID_DEFAULT_SENDER
 
 # Additional languages
 settings.LANGUAGES.append(
