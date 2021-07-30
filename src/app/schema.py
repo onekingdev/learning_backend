@@ -5,6 +5,7 @@ import api.schema
 import audiences.schema
 import collectibles.schema
 import content.schema
+import emails.schema
 import experiences.schema
 import guardians.schema
 import kb.schema
@@ -79,6 +80,7 @@ class BlockQuestionPresentationSchema(DjangoObjectType):
 class Mutation(
         api.schema.Mutation,
         collectibles.schema.Mutation,
+        emails.schema.Mutation,
         graphene.ObjectType):
 
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
