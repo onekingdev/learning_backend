@@ -4,6 +4,10 @@ from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from students.models import Student
 from guardians.models import Guardian, GuardianStudent
+from plans.models import StudentPlan
+from organization.models import School, Group
+from kb.models.grades import Grade
+from audience.model import Audience
 import graphene
 
 
@@ -88,24 +92,82 @@ class CreateStudent(graphene.Mutation):
     class Arguments:
         first_name = graphene.String(required=True)
         last_name = graphene.String(required=True)
-        username = graphene.String(required=True)
-        password = graphene.String(required=True)
-        school = graphene.ID(required=False)
-        grade = graphene.ID(required=True)
-        group = graphene.ID(required=True)
-
-    def mutate(self, info, first_name, last_name, username, password, school, grade, group):
-        user = get_user_model()(
-            username=username,
+        username = graphene.String(required=False)
+        password = graphene.String(required=False)
+        gender = graphene.Enum(
+            'Gender',
+            [('MALE', 'Male'), ('FEMALE', 'Female'), ('OTHER', 'Other')],
+            required=False
         )
-        user.set_password(password)
-        user.save()
+        school = graphene.ID(required=False)
+        grade = graphene.ID(required=False)
+        group = graphene.ID(required=False)
+        dob = graphene.Date(requirded=False)
+        student_plan = graphene.ID(required=False)
 
+    def mutate(
+            self,
+            info,
+            first_name,
+            last_name,
+            username,
+            password,
+            school,
+            grade,
+            group,
+            gender,
+            dob,
+            student_plan):
+
+        user = get_user_model()()
         student = Student(
-            user=user,
             first_name=first_name,
             last_name=last_name,
+            full_name=first_name + ' ' + last_name
         )
+
+        if username:
+            user.username = username
+        else:
+            count = 1
+            while True:
+                if get_user_model().objects.get(username=username).exists():
+                    count += 1
+                else:
+                    break
+            user.username = first_name + last_name + count
+
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
+
+        user.save()
+
+        student.user = user
+
+        if gender:
+            student.gender = gender
+
+        if dob:
+            student.dob = dob
+
+        # Student Plan
+        if student_plan:
+            pass
+        elif school:
+            student_plan = School.objects.get(school).student_plan
+        elif group:
+            audience = Group.objects.get(group).audience
+            student_plan = Audience.objects.get(audience).student_plan
+        elif grade:
+            audience = Grade.objects.get(grade).audience
+            student_plan = Audience.objects.get(audience).student_plan
+        else:
+            student_plan = StudentPlan.objects.get_or_create(name='Default Plan')
+
+        student.student_plan = StudentPlan.objects.get(student_plan)
+
         student.save()
 
         profile_obj = profile.objects.get(user=user.id)
