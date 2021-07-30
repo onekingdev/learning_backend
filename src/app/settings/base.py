@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'block',
     'content',
     'collectibles',
+    'emails',
     'experiences',
     'guardians',
     'kb',
