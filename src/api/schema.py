@@ -7,7 +7,7 @@ from guardians.models import Guardian, GuardianStudent
 from plans.models import StudentPlan
 from organization.models import School, Group
 from kb.models.grades import Grade
-from audience.model import Audience
+from audiences.models import Audience
 import graphene
 
 
@@ -94,15 +94,10 @@ class CreateStudent(graphene.Mutation):
         last_name = graphene.String(required=True)
         username = graphene.String(required=False)
         password = graphene.String(required=False)
-        gender = graphene.Enum(
-            'Gender',
-            [('MALE', 'Male'), ('FEMALE', 'Female'), ('OTHER', 'Other')],
-            required=False
-        )
         school = graphene.ID(required=False)
         grade = graphene.ID(required=False)
         group = graphene.ID(required=False)
-        dob = graphene.Date(requirded=False)
+        dob = graphene.Date(required=False)
         student_plan = graphene.ID(required=False)
 
     def mutate(
@@ -115,7 +110,6 @@ class CreateStudent(graphene.Mutation):
             school,
             grade,
             group,
-            gender,
             dob,
             student_plan):
 
@@ -145,9 +139,6 @@ class CreateStudent(graphene.Mutation):
         user.save()
 
         student.user = user
-
-        if gender:
-            student.gender = gender
 
         if dob:
             student.dob = dob
