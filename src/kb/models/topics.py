@@ -6,7 +6,12 @@ from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 
-class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, TranslatableModel):
+class Topic(
+        TimestampModel,
+        RandomSlugModel,
+        IsActiveModel,
+        MPTTModel,
+        TranslatableModel):
     PREFIX = 'topic_'
 
     translations = TranslatedFields(
@@ -15,13 +20,25 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
 
     slug = models.SlugField(editable=False)
     area_of_knowledge = models.ForeignKey(
-        'kb.AreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
-    parent = TreeForeignKey('self', on_delete=models.PROTECT,
-                            null=True, blank=True, related_name='sub_topics')
+        'kb.AreaOfKnowledge',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
+    parent = TreeForeignKey(
+        'self',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='sub_topics'
+    )
     universal_topic = models.ManyToManyField(
-        'universals.UniversalTopic', blank=True)
+        'universals.UniversalTopic',
+        blank=True
+    )
 
-    # TODO: falta meter la audiencia de esto... quizas audienca debe ser un modelo abstracto
+    # TODO: falta meter la audiencia de esto... quizas audienca debe ser un
+    # modelo abstracto
     objects = TopicManager()
 
     def __str__(self):
@@ -40,9 +57,17 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'topic_grade_'
 
     grade = models.ForeignKey(
-        'kb.Grade', on_delete=models.PROTECT, null=True, blank=True)
+        'kb.Grade',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
     topic = models.ForeignKey(
-        'kb.Topic', on_delete=models.PROTECT, null=True, blank=True)
+        'kb.Topic',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
     standard_code = models.CharField(max_length=128, null=True, blank=True)
 
     def __str__(self):
