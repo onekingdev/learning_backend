@@ -19,10 +19,8 @@ class Avatar(TimestampModel, UUIDModel, IsActiveModel):
 
     type_of = models.CharField(max_length=25, null=True, choices=TYPE_CHOICES)
     name = models.CharField(max_length=64, null=True, blank=True)
-    image = models.ImageField(
-        null=True,
-        blank=True,
-        help_text='The image of the avatar')
+    image = models.ImageField(null=True, blank=True,
+                              help_text='The image of the avatar')
 
 
 class Student(TimestampModel, UUIDModel, IsActiveModel):
@@ -41,24 +39,16 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     first_name = models.CharField(max_length=64, null=True, blank=True)
     last_name = models.CharField(max_length=64, null=True, blank=True)
     full_name = models.CharField(
-        max_length=128,
-        null=True,
-        blank=True,
-        editable=False)
+        max_length=128, null=True, blank=True, editable=False)
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
 
     student_plan = models.ManyToManyField('plans.StudentPlan')
     group = models.ManyToManyField('organization.Group', blank=True)
     level = models.ForeignKey(
-        'experiences.Level',
-        on_delete=models.PROTECT,
-        null=True)
+        'experiences.Level', on_delete=models.PROTECT, null=True)
     avatar = models.ForeignKey(
-        'students.Avatar',
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True)
+        'students.Avatar', on_delete=models.PROTECT, null=True, blank=True)
     avatar_favorites = models.ManyToManyField(
         Avatar, related_name="Favoritos", blank=True)
 
@@ -67,16 +57,16 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         birthDate = self.dob
 
         if self.dob is not None:
-            age = (today.year - birthDate.year -
-                   ((today.month, today.day) < (birthDate.month, birthDate.day)))
+            age = (today.year
+                   - birthDate.year
+                   - ((today.month, today.day) < (birthDate.month, birthDate.day)))
         else:
             age = None
             return age
 
     @property
     def get_full_name(self):
-        return (self.first_name if self.first_name else ' ') + \
-            ' ' + (self.last_name if self.last_name else ' ')
+        return (self.first_name if self.first_name else ' ') + ' ' + (self.last_name if self.last_name else ' ')
 
     def __str__(self):
         return self.full_name

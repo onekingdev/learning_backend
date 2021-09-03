@@ -15,24 +15,18 @@ class QuestionManager(ActiveManager, TranslatableManager):
     pass
 
 
-class Question(
-        TimestampModel,
-        RandomSlugModel,
-        IsActiveModel,
-        TranslatableModel):
+class Question(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     PREFIX = 'question_'
     translations = TranslatedFields(
         question_text=RichTextField(blank=True)
     )
     topic = models.ForeignKey(
-        'universals.UniversalTopic',
-        on_delete=models.PROTECT)
+        'universals.UniversalTopic', on_delete=models.PROTECT)
     topic_grade = models.ForeignKey('kb.TopicGrade', on_delete=models.PROTECT)
     objects = QuestionManager()
 
     def __str__(self):
-        return '{}-{}'.format(self.random_slug,
-                              strip_tags(self.question_text)[:100])
+        return '{}-{}'.format(self.random_slug, strip_tags(self.question_text)[:100])
 
     def get_questionimageasset_set(self):
         return QuestionImageAsset.objects.filter(question=self)
@@ -55,8 +49,7 @@ class QuestionAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
 
     def save(self, *args, **kwargs):
         if self.order is None:
-            self.order = QuestionAsset.objects.filter(
-                question=self.question).count() + 1
+            self.order = QuestionAsset.objects.filter(question=self.question).count() + 1
         return super().save(*args, **kwargs)
 
 
