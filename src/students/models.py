@@ -19,8 +19,10 @@ class Avatar(TimestampModel, UUIDModel, IsActiveModel):
 
     type_of = models.CharField(max_length=25, null=True, choices=TYPE_CHOICES)
     name = models.CharField(max_length=64, null=True, blank=True)
-    image = models.ImageField(null=True, blank=True,
-                              help_text='The image of the avatar')
+    image = models.ImageField(
+        null=True,
+        blank=True,
+        help_text='The image of the avatar')
 
 
 class Student(TimestampModel, UUIDModel, IsActiveModel):
@@ -39,35 +41,26 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     first_name = models.CharField(max_length=64, null=True, blank=True)
     last_name = models.CharField(max_length=64, null=True, blank=True)
     full_name = models.CharField(
-        max_length=128, null=True, blank=True, editable=False)
+        max_length=128,
+        null=True,
+        blank=True,
+        editable=False)
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
 
     student_plan = models.ManyToManyField('plans.StudentPlan')
-
     group = models.ManyToManyField('organization.Group', blank=True)
-    active_group = models.ForeignKey(
-        'organization.Group',
-        related_name="ActiveGroup",
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True)
     level = models.ForeignKey(
         'experiences.Level',
         on_delete=models.PROTECT,
         null=True)
-
     avatar = models.ForeignKey(
         'students.Avatar',
         on_delete=models.PROTECT,
         null=True,
-        blank=True
-    )
+        blank=True)
     avatar_favorites = models.ManyToManyField(
-        Avatar,
-        related_name="Favoritos",
-        blank=True
-    )
+        Avatar, related_name="Favoritos", blank=True)
 
     def current_age(self):
         today = datetime.date.today()
