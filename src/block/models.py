@@ -13,7 +13,8 @@ class BlockType(
         IsActiveModel,
         TranslatableModel):
     """
-    Model for types of blocks. These take some config values and are copy pasted to blocks upon block generation
+    Model for types of blocks.
+    These take some config values and are copied to blocks upon block creation.
     Examples:
     - Assessment
     - Beat The Clock
@@ -30,7 +31,7 @@ class BlockType(
 
 class BlockTypeConfiguration(TimestampModel, IsActiveModel):
     """
-    Model for key-value pairs for a block type
+    Model for key-value pairs configurations for a block type
     Examples:
     - Show Timer: True
     """
@@ -69,8 +70,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
         on_delete=models.PROTECT,
         null=True
     )
-    # Why the need for students in the block?
-    student = models.ManyToManyField('students.Student', blank=True)
+    students = models.ManyToManyField('students.Student', blank=True)
     topics = models.ManyToManyField(
         'kb.Topic',
         blank=True,
@@ -93,7 +93,8 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     # Metrics
     engangement_points_available = models.PositiveSmallIntegerField(null=True)
     coins_available = models.PositiveSmallIntegerField(null=True)
-    battery_points_available = models.PositiveSmallIntegerField(default=1, null=True)
+    battery_points_available = models.PositiveSmallIntegerField(
+        default=1, null=True)
     # engangement_points_earned = models.PositiveSmallIntegerField(null=True)
     # coins_earned = models.PositiveSmallIntegerField(null=True)
     # battery_points_earned = models.PositiveSmallIntegerField(null=True)
@@ -117,7 +118,8 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class BlockConfiguration(TimestampModel):
     """
-    Model for key-value pairs for a block
+    Model for key-value pair configurations for a block.
+    These come from the block type configuration and are copied on block creation.
     Examples:
     - Show Timer: True
     """
@@ -140,10 +142,11 @@ class BlockConfiguration(TimestampModel):
 
 class BlockConfigurationKeyword(TimestampModel, IsActiveModel):
     """
-    Model for config keyword.
+    Model for configuration keyword.
+    These change the behavior of a block.
     Examples:
-    - show timer
-    - allow to pass on questions
+    - Show timer
+    - Allow to pass on questions
     """
 
     # Attributes
