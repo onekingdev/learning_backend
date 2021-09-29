@@ -24,6 +24,7 @@ graphene-django-optimizer = "*"
 django-graphql-jwt = "==0.3.0"
 PyJWT = "<2"
 sendgrid = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
