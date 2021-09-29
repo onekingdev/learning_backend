@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'ckeditor',
     'parler',
     'import_export',
-    'import_export_celery',
     'rest_framework',
     'corsheaders',
     'dj_rest_auth',
@@ -90,7 +89,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'author.middlewares.AuthorDefaultBackendMiddleware',
 ]
 
 
@@ -250,16 +248,3 @@ DEFAULT_FROM_EMAIL = SENDGRID_DEFAULT_SENDER
 settings.LANGUAGES.append(
     ('en-us', 'American English')
 )
-
-def topics_resource():  
-    from kb.resources import TopicAdminResource
-    return TopicAdminResource
-
-
-IMPORT_EXPORT_CELERY_MODELS = {
-    "Topics": {
-        'app_label': 'kb',
-        'model_name': 'Topic',
-        'resource': topics_resource,
-    }
-}

@@ -25,11 +25,10 @@ class Topic(TimestampModel, RandomSlugModel, IsActiveModel, MPTTModel, Translata
     objects = TopicManager()
 
     def __str__(self):
-        return super().__str__()
-        #return self.name
+        return self.name
 
     def save(self, *args, **kwargs):
-        #self.slug = slugify(self.name or '')
+        self.slug = slugify(self.name)
 
         if self.parent:
             self.area_of_knowledge = self.parent.area_of_knowledge
