@@ -18,9 +18,7 @@ class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
     last_name = models.CharField(max_length=128, null=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     user = models.ForeignKey(
-        'users.User',
-        on_delete=models.SET_NULL,
-        null=True)
+        'users.User', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.user.username
@@ -30,12 +28,6 @@ class GuardianStudent(TimestampModel, RandomSlugModel):
     PREFIX = "guardian_student_"
 
     guardian = models.ForeignKey(
-        'guardians.Guardian',
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True)
+        'guardians.Guardian', on_delete=models.PROTECT, null=True, blank=True)
     student = models.ForeignKey(
-        'students.Student',
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True)
+        'students.Student', on_delete=models.PROTECT, null=True, blank=True)
