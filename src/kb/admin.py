@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import  Topic, AreaOfKnowledge, Grade
+from .models import Topic, AreaOfKnowledge, Grade
 from . import resources
 from parler import admin as parler_admin
 from import_export import admin as import_export_admin
+
 
 @admin.register(Topic)
 class TopicAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):

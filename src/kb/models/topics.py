@@ -37,14 +37,11 @@ class Topic(
         blank=True
     )
 
-    # TODO: falta meter la audiencia de esto... quizas audienca debe ser un
-    # modelo abstracto
     objects = TopicManager()
 
     def __str__(self):
         return super().__str__()
 
-      
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name or '')
 
