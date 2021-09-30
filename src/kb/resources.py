@@ -10,7 +10,7 @@ class TopicAdminResource(ModelResource):
     )
 
     name = LangField(
-        name='name'
+        attribute='name'
     )
 
     class Meta:
