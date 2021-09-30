@@ -42,10 +42,10 @@ class Topic(
     objects = TopicManager()
 
     def __str__(self):
-        return self.name
+        return super().__str__()
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        self.slug = slugify(self.name or '')
 
         if self.parent:
             self.area_of_knowledge = self.parent.area_of_knowledge
