@@ -1,6 +1,5 @@
 import factory
-from.models import Student
-
+from .models import Student
 
 class StudentFactory(factory.django.DjangoModelFactory):
     class Meta:

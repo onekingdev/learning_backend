@@ -1,6 +1,8 @@
 from django.contrib import admin
 from .models import Question, AnswerOption, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset
 from parler import admin as parler_admin
+from import_export import admin as import_export_admin
+from . import resources
 
 
 class AnswerOptionInline(parler_admin.TranslatableStackedInline):
@@ -29,7 +31,8 @@ class AnswerOptionAdmin(parler_admin.TranslatableAdmin):
 
 
 @admin.register(Question)
-class QuestionAdmin(parler_admin.TranslatableAdmin):
+class QuestionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.QuestionAdminResource
     inlines = [AnswerOptionInline,
                QuestionImageAssetInline,
                QuestionVideoAssetInline,

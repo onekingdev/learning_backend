@@ -86,6 +86,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'author.middlewares.AuthorDefaultBackendMiddleware',
 ]
 
 
@@ -205,10 +206,8 @@ settings.LANGUAGES.append(
     ('en-us', 'American English')
 )
 
-IMPORT_EXPORT_CELERY_INIT_MODULE = "app.celery"
 
-
-def topics_resource():
+def topics_resource():  
     from kb.resources import TopicAdminResource
     return TopicAdminResource
 

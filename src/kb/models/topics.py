@@ -44,6 +44,7 @@ class Topic(
     def __str__(self):
         return super().__str__()
 
+      
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name or '')
 
