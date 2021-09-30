@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'parler',
     'import_export',
-    # 'import_export_celery',
+    'import_export_celery',
     'corsheaders',
     'allauth',
     'allauth.account',

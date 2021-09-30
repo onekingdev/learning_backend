@@ -22,6 +22,7 @@ django-graphql-jwt = "*"
 PyJWT = "*"
 sendgrid = "*"
 celery = "*"
+django-import-export-celery = "*"
 
 [dev-packages]
 

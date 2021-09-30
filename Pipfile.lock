@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "178a226de16780d3ddd2909a2e24fb1365838c3f6e69b41861ab1586a75bb53c"
+            "sha256": "ab262caf03aa4c0b7c0a23d2b8e1a764acf7e62f06ef17256c6f8553a5d65c91"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -213,6 +213,12 @@
             "index": "pypi",
             "version": "==0.45.0"
         },
+        "django-author": {
+            "hashes": [
+                "sha256:0238b6280f66a8ba6d1c730ab4acc52bc2bf37686940fd4db42e7af458c96635"
+            ],
+            "version": "==1.0.2"
+        },
         "django-ckeditor": {
             "hashes": [
                 "sha256:346b26b9d60dc8a88524d0eaaf406f4e91a4b3c22d208ae87aa032bf500b251c",
@@ -252,6 +258,13 @@
             ],
             "index": "pypi",
             "version": "==2.6.0"
+        },
+        "django-import-export-celery": {
+            "hashes": [
+                "sha256:241f7331990a4b0d029a814c1768384a81636841eab75f6276861e0c03e41af0"
+            ],
+            "index": "pypi",
+            "version": "==1.1.4"
         },
         "django-js-asset": {
             "hashes": [
@@ -633,6 +646,13 @@
             ],
             "index": "pypi",
             "version": "==6.8.2"
+        },
+        "setuptools-git": {
+            "hashes": [
+                "sha256:e7764dccce7d97b4b5a330d7b966aac6f9ac026385743fd6cedad553f2494cfa",
+                "sha256:ff64136da01aabba76ae88b050e7197918d8b2139ccbf6144e14d472b9c40445"
+            ],
+            "version": "==1.2"
         },
         "singledispatch": {
             "hashes": [
