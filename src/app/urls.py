@@ -14,9 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework.documentation import include_docs_urls
-from rest_framework.permissions import AllowAny
+from django.urls import path
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
 from users.admin import hidden_admin
@@ -24,12 +22,5 @@ from users.admin import hidden_admin
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hidden-admin/', hidden_admin.urls),
-    path('api/', include('api.urls')),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
-    path('rest-auth/', include('dj_rest_auth.urls')),
-    path('rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-    path('docs/', include_docs_urls(
-        title='Assessment Tool API Docs',
-        permission_classes=[AllowAny]
-    )),
 ]
