@@ -6,12 +6,16 @@ from import_export import admin as import_export_admin
 
 
 @admin.register(Topic)
-class TopicAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
-    resource_class = resources.TopicAdminResource
+class TopicAdmin(
+        parler_admin.TranslatableAdmin,
+        import_export_admin.ImportExportModelAdmin,
+):
+    resource_class = resources.TopicResource
+    list_display = ('name', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(AreaOfKnowledge)
-class AreaOfKnowledgeAdmin(parler_admin.TranslatableAdmin, ):
+class AreaOfKnowledgeAdmin(parler_admin.TranslatableAdmin):
     pass
 
 

@@ -32,7 +32,7 @@ class AnswerOptionAdmin(parler_admin.TranslatableAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
-    resource_class = resources.QuestionAdminResource
+    resource_class = resources.QuestionResource
     inlines = [AnswerOptionInline,
                QuestionImageAssetInline,
                QuestionVideoAssetInline,

@@ -4,7 +4,7 @@ from .models import Topic
 from app.resources import LangField
 
 
-class TopicAdminResource(ModelResource):
+class TopicResource(ModelResource):
     language_code = Field(
         attribute='get_current_language'
     )
@@ -19,3 +19,6 @@ class TopicAdminResource(ModelResource):
         skip_unchanged = True
         report_skipped = False
         exclude = ['parent']
+
+    def before_import_row(self, row, row_number=None, **kwargs):
+        pass
