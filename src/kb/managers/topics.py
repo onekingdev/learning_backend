@@ -1,3 +1,4 @@
+from app.models import ActiveManager
 from parler.managers import TranslatableManager, TranslatableQuerySet
 from mptt.managers import TreeManager
 from mptt.querysets import TreeQuerySet
@@ -14,5 +15,5 @@ class TopicQuerySet(TranslatableQuerySet, TreeQuerySet):
     as_manager = classmethod(as_manager)
 
 
-class TopicManager(TreeManager, TranslatableManager):
+class TopicManager(ActiveManager, TreeManager, TranslatableManager):
     _queryset_class = TopicQuerySet

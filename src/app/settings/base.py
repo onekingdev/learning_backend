@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from .env import SECRET_KEY, ENV_INSTALLED_APPS, SENDGRID_API_KEY, SENDGRID_DEFAULT_SENDER
 
-
 from pathlib import Path
 from datetime import timedelta
 from django.conf import settings
@@ -57,7 +56,6 @@ INSTALLED_APPS = [
     'accounting',
     'achievements',
     'block',
-    'content',
     'collectibles',
     'emails',
     'experiences',
@@ -207,7 +205,7 @@ settings.LANGUAGES.append(
 )
 
 
-def topics_resource():  
+def topics_resource():
     from kb.resources import TopicAdminResource
     return TopicAdminResource
 

@@ -26,7 +26,7 @@ class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class StudentPlanTopicGrade(TimestampModel, UUIDModel, IsActiveModel):
 
-    question = models.ManyToManyField('content.Question')
+    question = models.ManyToManyField('kb.Question')
     topic_grade = models.ForeignKey(
         'kb.TopicGrade',
         on_delete=models.PROTECT,

@@ -1,18 +1,12 @@
 from django.db import models
 from ckeditor.fields import RichTextField
 from polymorphic.models import PolymorphicModel
-from app.models import ActiveManager
-from parler.models import TranslatableManager
+from kb.managers.content import QuestionManager
 
 from django.utils.html import strip_tags
 
-
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
-
-
-class QuestionManager(ActiveManager, TranslatableManager):
-    pass
 
 
 class Question(
@@ -27,7 +21,8 @@ class Question(
     topic = models.ForeignKey(
         'universals.UniversalTopic',
         on_delete=models.PROTECT)
-    topic_grade = models.ForeignKey('kb.TopicGrade', on_delete=models.PROTECT)
+    topic_grade = models.ForeignKey(
+        'kb.TopicGrade', on_delete=models.PROTECT)
     objects = QuestionManager()
 
     def __str__(self):
@@ -50,7 +45,7 @@ class QuestionAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
         ordering = ['order']
 
     PREFIX = 'question_asset_'
-    question = models.ForeignKey('content.Question', on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     order = models.PositiveIntegerField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -74,7 +69,7 @@ class QuestionVideoAsset(QuestionAsset):
 
 class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
     PREFIX = 'answer_option_'
-    question = models.ForeignKey('content.Question', on_delete=models.PROTECT)
+    question = models.ForeignKey(Question, on_delete=models.PROTECT)
     translations = TranslatedFields(
         answer_text=models.CharField(max_length=256),
         explanation=RichTextField(null=True, blank=True),

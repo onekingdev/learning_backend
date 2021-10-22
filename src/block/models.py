@@ -86,7 +86,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     first_presentation_timestamp = models.DateTimeField(null=True)
     last_presentation_timestamp = models.DateTimeField(null=True)
     questions = models.ManyToManyField(
-        'content.Question',
+        'kb.Question',
         through='block.BlockQuestion'
     )
 
@@ -193,12 +193,12 @@ class BlockQuestion(TimestampModel, RandomSlugModel):
     # FK's
     block = models.ForeignKey(Block, on_delete=models.PROTECT, null=True)
     question = models.ForeignKey(
-        'content.Question',
+        'kb.Question',
         on_delete=models.PROTECT,
         null=True
     )
     chosen_answer = models.ForeignKey(
-        'content.AnswerOption',
+        'kb.AnswerOption',
         on_delete=models.SET_NULL,
         null=True
     )
@@ -235,7 +235,7 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
 
     # FK's
     question = models.ForeignKey(
-        'content.Question',
+        'kb.Question',
         on_delete=models.PROTECT,
         null=True
     )

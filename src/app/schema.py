@@ -5,7 +5,6 @@ import api.schema
 import audiences.schema
 import block.schema
 import collectibles.schema
-import content.schema
 import emails.schema
 import experiences.schema
 import guardians.schema
@@ -33,7 +32,6 @@ class Query(
         audiences.schema.Query,
         block.schema.Query,
         collectibles.schema.Query,
-        content.schema.Query,
         experiences.schema.Query,
         guardians.schema.Query,
         kb.schema.Query,
