@@ -205,6 +205,9 @@ settings.LANGUAGES.append(
 )
 
 
+PARLER_ENABLE_CACHING = False
+
+
 def topics_resource():
     from kb.resources import TopicAdminResource
     return TopicAdminResource

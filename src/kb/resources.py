@@ -8,10 +8,10 @@ from app.resources import LangField
 
 class TopicResource(TranslatableModelResource):
     language_code = Field(
-        attribute='get_current_language'
+        attribute='_current_language'
     )
 
-    name = LangField(
+    name = Field(
         attribute='name'
     )
 
@@ -31,7 +31,7 @@ class TopicResource(TranslatableModelResource):
 
 class QuestionResource(TranslatableModelResource):
     language_code = Field(
-        attribute='get_current_language'
+        attribute='_current_language'
     )
 
     class Meta:
