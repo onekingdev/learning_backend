@@ -41,8 +41,13 @@ class TopicAdmin(
         DraggableMPTTAdmin,
 ):
     resource_class = resources.TopicResource
-    list_display = ('tree_actions', 'indented_title',
-                    'create_timestamp', 'update_timestamp')
+    list_display = (
+        'tree_actions',
+        'indented_title',
+        'area_of_knowledge',
+        'create_timestamp',
+        'update_timestamp'
+    )
     actions = [hard_delete_selected]
 
 
@@ -62,7 +67,8 @@ class AnswerOptionAdmin(parler_admin.TranslatableAdmin):
 
 
 @admin.register(Question)
-class QuestionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
+class QuestionAdmin(parler_admin.TranslatableAdmin,
+                    import_export_admin.ImportExportModelAdmin):
     resource_class = resources.QuestionResource
     inlines = [AnswerOptionInline,
                QuestionImageAssetInline,
