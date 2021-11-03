@@ -1,9 +1,7 @@
-from import_export.resources import ModelResource
 from app.resources import TranslatableModelResource
 from import_export.fields import Field
 from .models import Topic
 from .models.content import Question
-from app.resources import LangField
 
 
 class TopicResource(TranslatableModelResource):

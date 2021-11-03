@@ -24,7 +24,7 @@ class TranslatableModelResource(ModelResource):
                     data.append(self.export_resource(obj))
 
         # This is useful for a generalized version
-        #
+
         # for obj in self.iter_queryset(queryset):
         #     try:
         #         for language in obj.get_available_languages():
@@ -36,10 +36,6 @@ class TranslatableModelResource(ModelResource):
         self.after_export(queryset, data, *args, **kwargs)
 
         return data
-
-    # def after_import_instance(self, instance, new, row_number=None, **kwargs):
-    #     if not new:
-    #         instance.save_translations()
 
 
 class LangField(Field):
