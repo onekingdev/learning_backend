@@ -23,6 +23,8 @@ PyJWT = "*"
 sendgrid = "*"
 celery = "*"
 django-import-export-celery = "*"
+gunicorn = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
