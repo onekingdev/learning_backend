@@ -1,4 +1,5 @@
 from app.resources import TranslatableModelResource
+from app.widgets import TranslatableForeignKeyWidget
 from import_export.fields import Field
 from .models import Topic
 from .models.content import Question
@@ -13,6 +14,12 @@ class TopicResource(TranslatableModelResource):
         attribute='name'
     )
 
+    parent = Field(
+        column_name='parent',
+        attribute='parent',
+        widget=TranslatableForeignKeyWidget(Topic, 'name')
+    )
+
     class Meta:
         model = Topic
         skip_unchanged = True
@@ -22,6 +29,7 @@ class TopicResource(TranslatableModelResource):
             'language_code',
             'name',
             'is_active',
+            'parent',
             'area_of_knowledge',
             'universal_topic',
         )

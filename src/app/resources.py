@@ -1,7 +1,5 @@
 import tablib
-from import_export.fields import Field
 from import_export.resources import ModelResource
-from django.conf import settings
 from parler.utils.context import switch_language
 
 
@@ -23,7 +21,7 @@ class TranslatableModelResource(ModelResource):
                 with switch_language(obj, language):
                     data.append(self.export_resource(obj))
 
-        # This is useful for a generalized version
+        # This might be useful for a generalized version
 
         # for obj in self.iter_queryset(queryset):
         #     try:
@@ -36,12 +34,3 @@ class TranslatableModelResource(ModelResource):
         self.after_export(queryset, data, *args, **kwargs)
 
         return data
-
-
-class LangField(Field):
-    def save(self, obj, data, is_m2m=False, **kwargs):
-        language = data['language_code'] or settings.PARLER_DEFAULT_LANGUAGE_CODE
-        attrs = self.attribute.split('__')
-        cleaned = self.clean(data, **kwargs)
-        obj.set_current_language(language)
-        setattr(obj, attrs[-1], cleaned)
