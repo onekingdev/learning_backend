@@ -53,7 +53,11 @@ class TopicAdmin(
 
 @admin.register(AreaOfKnowledge)
 class AreaOfKnowledgeAdmin(parler_admin.TranslatableAdmin):
-    pass
+    list_display = (
+        'name',
+        'audience',
+        'universal_area_knowledge',
+    )
 
 
 @admin.register(Grade)
