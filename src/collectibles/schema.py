@@ -28,6 +28,7 @@ class CollectibleSchema(DjangoObjectType):
         fields = "__all__"
 
     name = graphene.String()
+    description = graphene.String()
     owned = graphene.Boolean()
 
     def resolve_name(self, info, language_code=None):
