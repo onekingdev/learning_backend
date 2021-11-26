@@ -52,6 +52,9 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         'collectibles.CollectibleCategory', on_delete=models.PROTECT, null=True, blank=True)
     objects = CollectibleManager()
 
+    # TODO: - Collectible tiers (rarity)
+    #       - Collectible type (cards, etc)
+
 
 class CollectiblePurchaseTransaction(Withdraw):
     collectible = models.ForeignKey(
