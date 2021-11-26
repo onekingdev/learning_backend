@@ -38,6 +38,14 @@ class CollectibleSchema(DjangoObjectType):
 
         return self.safe_translation_getter("name", language_code=current_language)
 
+    def resolve_description(self, info, language_code=None):
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter("description", language_code=current_language)
+
     def resolve_owned(self, info):
         student = Student.objects.get(user=info.context.user)
         student_collectible = StudentCollectible.objects.filter(
@@ -61,7 +69,8 @@ class StudentCollectilbeSchema(DjangoObjectType):
 
 
 class PurchaseCollectible(graphene.Mutation):
-    collectible_purchase_transaction = graphene.Field(CollectiblePurchaseTransactionSchema)
+    collectible_purchase_transaction = graphene.Field(
+        CollectiblePurchaseTransactionSchema)
     student = graphene.Field('students.schema.StudentSchema')
     collectible = graphene.Field(CollectibleSchema)
 
