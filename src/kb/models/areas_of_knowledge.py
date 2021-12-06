@@ -14,7 +14,9 @@ class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
     hex_color = models.CharField(null=True, blank=True, max_length=16)
     slug = models.SlugField(editable=False)
     image = models.ImageField(null=True, blank=True,
-                              help_text='The image of the island')
+                              help_text='Image for practice selection')
+    island_image = models.ImageField(null=True, blank=True,
+                                     help_text='The image of the island')
 
     audience = models.ForeignKey(
         'audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
