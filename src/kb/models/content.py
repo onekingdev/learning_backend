@@ -26,8 +26,7 @@ class Question(
     objects = QuestionManager()
 
     def __str__(self):
-        return '{}-{}'.format(self.random_slug,
-                              strip_tags(self.question_text)[:100])
+        return strip_tags(self.question_text)[:100]
 
     def get_questionimageasset_set(self):
         return QuestionImageAsset.objects.filter(question=self)

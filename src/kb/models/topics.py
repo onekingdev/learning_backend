@@ -37,6 +37,8 @@ class Topic(
         blank=True
     )
 
+    video_assitor = models.URLField(null=True, blank=True)
+
     objects = TopicManager()
 
     def __str__(self):
