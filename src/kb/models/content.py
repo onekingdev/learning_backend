@@ -26,7 +26,7 @@ class Question(
     objects = QuestionManager()
 
     def __str__(self):
-        return strip_tags(self.question_text)[:100]
+        return strip_tags(self.safe_translation_getter("question_text", any_language=True))[:100]
 
     def get_questionimageasset_set(self):
         return QuestionImageAsset.objects.filter(question=self)
@@ -79,4 +79,4 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.answer_text
+        return self.safe_translation_getter("answer_text", any_language=True)
