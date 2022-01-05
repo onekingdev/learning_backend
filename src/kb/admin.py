@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Topic, AreaOfKnowledge, Grade
-from .models.content import Question, AnswerOption, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset
+from .models.content import Question, AnswerOption, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset, QuestionTTSAsset
 
 from . import resources
 from parler import admin as parler_admin
@@ -25,6 +25,11 @@ class QuestionVideoAssetInline(admin.TabularInline):
 
 class QuestionAudioAssetInline(admin.TabularInline):
     model = QuestionAudioAsset
+    extra = 0
+
+
+class QuestionTTSAssetInline(admin.TabularInline):
+    model = QuestionTTSAsset
     extra = 0
 
 
@@ -77,4 +82,5 @@ class QuestionAdmin(parler_admin.TranslatableAdmin,
     inlines = [AnswerOptionInline,
                QuestionImageAssetInline,
                QuestionVideoAssetInline,
+               QuestionTTSAssetInline,
                QuestionAudioAssetInline]
