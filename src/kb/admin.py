@@ -66,8 +66,8 @@ class GradeAdmin(parler_admin.TranslatableAdmin):
 
 
 @admin.register(AnswerOption)
-class AnswerOptionAdmin(parler_admin.TranslatableAdmin):
-    pass
+class AnswerOptionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.AnswerOptionResource
 
 
 @admin.register(Question)
