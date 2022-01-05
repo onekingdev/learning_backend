@@ -24,7 +24,8 @@ sendgrid = "*"
 celery = "*"
 django-import-export-celery = "*"
 gunicorn = "*"
-psycopg2-binary = "*"
+psycopg2 = "*"
+gtts = "*"
 
 [dev-packages]
 
