@@ -2,6 +2,7 @@ from django.db import models
 from ckeditor.fields import RichTextField
 from polymorphic.models import PolymorphicModel
 from kb.managers.content import QuestionManager
+from gtts import gTTS
 
 from django.utils.html import strip_tags
 
@@ -18,16 +19,12 @@ class Question(
     translations = TranslatedFields(
         question_text=RichTextField(blank=True)
     )
-    topic = models.ForeignKey(
-        'kb.Topic',
-        on_delete=models.PROTECT)
     topic_grade = models.ForeignKey(
         'kb.TopicGrade', on_delete=models.PROTECT)
     objects = QuestionManager()
 
     def __str__(self):
-        return '{}-{}'.format(self.random_slug,
-                              strip_tags(self.question_text)[:100])
+        return strip_tags(self.question_text)[:100]
 
     def get_questionimageasset_set(self):
         return QuestionImageAsset.objects.filter(question=self)
@@ -61,6 +58,14 @@ class QuestionImageAsset(QuestionAsset):
 
 class QuestionAudioAsset(QuestionAsset):
     audio_file = models.FileField()
+
+
+class QuestionTTSAsset(QuestionAsset):
+    tts_file = models.FileField()
+
+    def save(self, *args, **kwargs):
+        tts = gTTS(self.question.question_text)
+        tts.write_to_fp(self.tts_file)
 
 
 class QuestionVideoAsset(QuestionAsset):

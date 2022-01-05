@@ -32,10 +32,10 @@ class Topic(
         blank=True,
         related_name='sub_topics'
     )
-    universal_topic = models.ManyToManyField(
-        'universals.UniversalTopic',
-        blank=True
-    )
+    # universal_topic = models.ManyToManyField(
+    #     'universals.UniversalTopic',
+    #     blank=True
+    # )
 
     objects = TopicManager()
 
@@ -75,11 +75,10 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
 class Prerequisite(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'prerequisite_'
 
-    topic_grade = models.ManyToManyField('kb.TopicGrade', blank=True)
-    topic = models.ManyToManyField('kb.Topic', blank=True)
+    topic_grade = models.ForeignKey(
+        TopicGrade, on_delete=models.PROTECT, related_name="Topic_grade", null=True)
+    prerequisites = models.ManyToManyField(TopicGrade, blank=True)
     information = models.TextField(null=True, blank=True)
-    advance_percentage = models.FloatField(null=True, blank=True)
-    advance_minum = models.FloatField(null=True, blank=True)
 
     def __str__(self):
-        return '{}/{}'.format(self.topic, self.grade)
+        return '{}/{}'.format(self.topic_grade, self.prerequisite)
