@@ -108,12 +108,33 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
 class StudentTopicMastery(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'student_topic_mastery_'
-    topic = models.ForeignKey('kb.Topic', on_delete=models.PROTECT, null=True)
+
+    MASTERY_LEVEL_NOT_PRACTICED = 0
+    MASTERY_LEVEL_NOVICE = 1
+    MASTERY_LEVEL_COMPETENT = 2
+    MASTERY_LEVEL_MASTER = 3
+
+    MASTERY_LEVEL_CHOICES = (
+        (MASTERY_LEVEL_NOT_PRACTICED, 'Not practiced'),
+        (MASTERY_LEVEL_NOVICE, 'Novice'),
+        (MASTERY_LEVEL_COMPETENT, 'Competent'),
+        (MASTERY_LEVEL_MASTER, 'Master')
+    )
+
+    # FK's
+    topic_grade = models.ForeignKey(
+        'kb.TopicGrade',
+        on_delete=models.PROTECT,
+        null=True)
     student = models.ForeignKey(
         'students.Student', on_delete=models.PROTECT, null=True)
-    is_mastery = models.IntegerField(null=True)
-    is_block = models.IntegerField(null=True)
-    date_mastery = models.DateField(null=True, blank=True)
+
+    # Attributes
+    mastery_level = models.CharField(
+        max_length=32,
+        choices=MASTERY_LEVEL_CHOICES,
+        default=0
+    )
 
 
 class StudentGrade(TimestampModel, UUIDModel, IsActiveModel):
@@ -121,7 +142,7 @@ class StudentGrade(TimestampModel, UUIDModel, IsActiveModel):
     grade = models.ForeignKey('kb.Grade', on_delete=models.PROTECT, null=True)
     student = models.ForeignKey(
         'students.Student', on_delete=models.PROTECT, null=True)
-    is_finish = models.IntegerField(null=True)
+    is_finished = models.IntegerField(null=True)
     percentage = models.FloatField(null=True)
     complete_date = models.DateField(null=True, blank=True)
 
