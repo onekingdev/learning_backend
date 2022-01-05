@@ -8,13 +8,13 @@ class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
 
     name = models.CharField(max_length=128)
     slug = models.SlugField(editable=False)
-    total_credits = models.IntegerField(null=True)
-    validity_date = models.DateTimeField(null=True)
     audience = models.ForeignKey(
         'audiences.Audience',
         on_delete=models.PROTECT,
-        null=True,
-        blank=True)
+    )
+    topic_grade = models.ManyToManyField(
+        'kb.TopicGrade',
+    )
 
     def __str__(self):
         return self.name
@@ -22,21 +22,3 @@ class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
-
-
-class StudentPlanTopicGrade(TimestampModel, UUIDModel, IsActiveModel):
-
-    question = models.ManyToManyField('kb.Question')
-    topic_grade = models.ForeignKey(
-        'kb.TopicGrade',
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True)
-    student_plan = models.ForeignKey(
-        'plans.StudentPlan',
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True)
-    credit_value = models.IntegerField(null=True)
-    is_aproved = models.IntegerField(null=True)
-    is_failed = models.IntegerField(null=True)
