@@ -59,14 +59,10 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
     grade = models.ForeignKey(
         'kb.Grade',
         on_delete=models.PROTECT,
-        null=True,
-        blank=True
     )
     topic = models.ForeignKey(
         'kb.Topic',
         on_delete=models.PROTECT,
-        null=True,
-        blank=True
     )
     standard_code = models.CharField(max_length=128, null=True, blank=True)
 
@@ -78,7 +74,7 @@ class Prerequisite(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'prerequisite_'
 
     topic_grade = models.ForeignKey(
-        TopicGrade, on_delete=models.PROTECT, related_name="Topic_grade", null=True)
+        TopicGrade, on_delete=models.PROTECT, related_name="Topic_grade")
     prerequisites = models.ManyToManyField(TopicGrade, blank=True)
     information = models.TextField(null=True, blank=True)
 
