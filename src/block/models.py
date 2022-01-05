@@ -21,12 +21,10 @@ class BlockConfiguration(TimestampModel):
     block = models.ForeignKey(
         'block.Block',
         on_delete=models.PROTECT,
-        null=True
     )
     key = models.ForeignKey(
         'block.BlockConfigurationKeyword',
         on_delete=models.PROTECT,
-        null=True
     )
 
     # Attributes
@@ -43,7 +41,7 @@ class BlockConfigurationKeyword(TimestampModel, IsActiveModel):
     """
 
     # Attributes
-    name = models.CharField(max_length=128, null=True)
+    name = models.CharField(max_length=128)
 
     def __str__(self):
         return self.name
@@ -66,7 +64,7 @@ class BlockType(
 
     # Attributes
     translations = TranslatedFields(
-        name=models.CharField(max_length=128, null=True)
+        name=models.CharField(max_length=128)
     )
     objects = BlockTypeManager()
 
@@ -82,16 +80,14 @@ class BlockTypeConfiguration(TimestampModel, IsActiveModel):
     block_type = models.ForeignKey(
         'block.BlockType',
         on_delete=models.PROTECT,
-        null=True
     )
     key = models.ForeignKey(
         'block.BlockConfigurationKeyword',
         on_delete=models.PROTECT,
-        null=True
     )
 
     # Attributes
-    value = models.CharField(max_length=128, null=True)
+    value = models.CharField(max_length=128)
 
 
 class Block(TimestampModel, RandomSlugModel, IsActiveModel):
@@ -121,7 +117,6 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     topic_grade = models.ForeignKey(
         'kb.TopicGrade',
         on_delete=models.PROTECT,
-        null=True,
         help_text='This is the topic covered in this block'
     )
     questions = models.ManyToManyField(
@@ -176,7 +171,6 @@ class BlockPresentation(TimestampModel, RandomSlugModel):
     student = models.ForeignKey(
         'students.Student',
         on_delete=models.CASCADE,
-        null=True
     )
 
     # Metrics
@@ -205,7 +199,6 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
     block_presentation = models.ForeignKey(
         BlockPresentation,
         on_delete=models.CASCADE,
-        null=True
     )
     question = models.ForeignKey(
         'kb.Question',
@@ -219,7 +212,6 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
     topic_grade = models.ForeignKey(
         'kb.TopicGrade',
         on_delete=models.PROTECT,
-        null=True
     )
 
     # Attributes
