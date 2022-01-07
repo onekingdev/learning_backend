@@ -236,3 +236,31 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
                 self.status = self.STATUS_INCORRECT
         else:
             self.status = self.STATUS_PENDING
+
+
+class BlockAssignment(TimestampModel):
+    PREFIX = 'block_assignment'
+
+    # FK's
+    block = models.ForeignKey(
+        Block,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False
+    )
+    student = models.ForeignKey(
+        'students.Student',
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False
+    )
+
+    # Attributes
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        blank=False,
+        null=False
+    )
+
+    class Meta:
+        ordering = ['order']
