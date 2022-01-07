@@ -49,11 +49,18 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
 
     student_plan = models.ManyToManyField('plans.StudentPlan')
+    active_student_plan = models.ForeignKey(
+        'plans.StudentPlan',
+        related_name="active_student_plan",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True
+    )
 
     group = models.ManyToManyField('organization.Group', blank=True)
     active_group = models.ForeignKey(
         'organization.Group',
-        related_name="ActiveGroup",
+        related_name="active_group",
         on_delete=models.PROTECT,
         blank=True,
         null=True)
