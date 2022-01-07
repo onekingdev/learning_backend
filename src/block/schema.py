@@ -3,6 +3,8 @@ from django.conf import settings
 from graphene_django import DjangoObjectType
 from block.models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block
 from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPresentation
+from students.models import Student
+from kb.models.areas_of_knowledge import AreaOfKnowledge
 
 
 class BlockConfigurationKeywordSchema(DjangoObjectType):
@@ -138,6 +140,10 @@ class Query(graphene.ObjectType):
     blocks_presentation = graphene.List(BlockPresentationSchema)
     block_presentation_by_id = graphene.Field(
         BlockPresentationSchema, id=graphene.String())
+    ai_block_presentation = graphene.Field(
+        BlockPresentationSchema,
+        student=graphene.ID(),
+        area_of_knowledge=graphene.ID())
 
     def resolve_blocks_presentation(root, info, **kwargs):
         # Querying a list
@@ -146,6 +152,11 @@ class Query(graphene.ObjectType):
     def resolve_block_presentation_by_id(root, info, id):
         # Querying a single question
         return BlockPresentation.objects.get(pk=id)
+
+    def resolve_ai_block_presentation(root, info, student_id, area_of_knowledge_id):
+        student = Student.objects.get(id=student_id)
+        audience = student.active_student_plan.audience
+        block = Block.objects.filter()
 
     # # ----------------- BlockQuestion ----------------- #
 
