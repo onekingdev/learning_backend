@@ -2,7 +2,7 @@ import graphene
 from django.conf import settings
 from graphene_django import DjangoObjectType
 from block.models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block
-from block.models import BlockConfiguration, BlockPresentation, BlockQuestion, BlockQuestionPresentation
+from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPresentation
 
 
 class BlockConfigurationKeywordSchema(DjangoObjectType):
@@ -51,10 +51,10 @@ class BlockPresentationSchema(DjangoObjectType):
         fields = "__all__"
 
 
-class BlockQuestionSchema(DjangoObjectType):
-    class Meta:
-        model = BlockQuestion
-        fields = "__all__"
+# class BlockQuestionSchema(DjangoObjectType):
+#     class Meta:
+#         model = BlockQuestion
+#         fields = "__all__"
 
 
 class BlockQuestionPresentationSchema(DjangoObjectType):
@@ -147,19 +147,19 @@ class Query(graphene.ObjectType):
         # Querying a single question
         return BlockPresentation.objects.get(pk=id)
 
-    # ----------------- BlockQuestion ----------------- #
+    # # ----------------- BlockQuestion ----------------- #
 
-    blocks_question = graphene.List(BlockQuestionSchema)
-    block_question_by_id = graphene.Field(
-        BlockQuestionSchema, id=graphene.String())
+    # blocks_question = graphene.List(BlockQuestionSchema)
+    # block_question_by_id = graphene.Field(
+    #     BlockQuestionSchema, id=graphene.String())
 
-    def resolve_blocks_question(root, info, **kwargs):
-        # Querying a list
-        return BlockQuestion.objects.all()
+    # def resolve_blocks_question(root, info, **kwargs):
+    #     # Querying a list
+    #     return BlockQuestion.objects.all()
 
-    def resolve_block_question_by_id(root, info, id):
-        # Querying a single question
-        return BlockQuestion.objects.get(pk=id)
+    # def resolve_block_question_by_id(root, info, id):
+    #     # Querying a single question
+    #     return BlockQuestion.objects.get(pk=id)
 
     # ----------------- BlockQuestionPresentation ----------------- #
 

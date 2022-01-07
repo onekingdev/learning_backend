@@ -61,7 +61,11 @@ class QuestionAudioAsset(QuestionAsset):
 
 
 class QuestionTTSAsset(QuestionAsset):
-    tts_file = models.FileField(null=True, blank=True)
+    tts_file = models.FileField()
+
+    def save(self, *args, **kwargs):
+        tts = gTTS(self.question.question_text)
+        tts.write_to_fp(self.tts_file)
 
 
 class QuestionVideoAsset(QuestionAsset):
