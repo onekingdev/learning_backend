@@ -26,6 +26,7 @@ django-import-export-celery = "*"
 gunicorn = "*"
 psycopg2 = "*"
 gtts = "*"
+django-admin-sortable2 = "*"
 
 [dev-packages]
 
