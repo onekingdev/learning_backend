@@ -108,6 +108,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     type_of = models.ForeignKey(
         'block.BlockType',
         on_delete=models.PROTECT,
+        blank=True,
         null=True
     )
     students = models.ManyToManyField(
@@ -121,6 +122,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     )
     questions = models.ManyToManyField(
         'kb.Question',
+        blank=True,
     )
 
     # Attributes
@@ -138,11 +140,10 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
         default=1, null=True)
 
     def save(self, *args, **kwargs):
+        print("Saving")
         is_new = False
         if not self.pk:
             is_new = True
-
-        save = super().save(*args, **kwargs)
 
         if is_new:
             if self.type_of:
@@ -151,13 +152,8 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
                         key=item.key,
                         value=item.value,
                     )
-            available_questions = list(
-                Question.objects.filter(topic_grade=self.topic_grade))
-            random_questions = random.sample(
-                available_questions, self.block_size)
-            for question in random_questions:
-                self.questions.add(question)
-        return save
+
+        return super().save(*args, **kwargs)
 
 
 class BlockPresentation(TimestampModel, RandomSlugModel):
