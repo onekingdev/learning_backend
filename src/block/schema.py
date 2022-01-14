@@ -153,11 +153,6 @@ class Query(graphene.ObjectType):
         # Querying a single question
         return BlockPresentation.objects.get(pk=id)
 
-    def resolve_ai_block_presentation(root, info, student_id, area_of_knowledge_id):
-        student = Student.objects.get(id=student_id)
-        audience = student.active_student_plan.audience
-        block = Block.objects.filter()
-
     # # ----------------- BlockQuestion ----------------- #
 
     # blocks_question = graphene.List(BlockQuestionSchema)
