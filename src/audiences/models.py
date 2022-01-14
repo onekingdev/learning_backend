@@ -17,6 +17,8 @@ class Audience(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel
     )
     slug = models.SlugField(editable=False, unique=True)
 
+    standard_code = models.CharField(max_length=4, unique=True)
+
     objects = AudienceManager()
 
     def save(self, *args, **kwargs):
