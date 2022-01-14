@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Topic, AreaOfKnowledge, Grade
-from .models.content import Question, AnswerOption, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset, QuestionTTSAsset
+from .models import Topic, AreaOfKnowledge, Grade, TopicGrade
+from .models.content import Question, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset, QuestionTTSAsset
+from .models.content import AnswerOption
 
 from . import resources
 from parler import admin as parler_admin
@@ -66,12 +67,31 @@ class AreaOfKnowledgeAdmin(parler_admin.TranslatableAdmin):
 
 
 @admin.register(Grade)
-class GradeAdmin(parler_admin.TranslatableAdmin):
-    pass
+class GradeAdmin(
+        parler_admin.TranslatableAdmin,
+        import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.GradeResource
+
+
+@admin.register(TopicGrade)
+class TopicGradeAdmin(
+        parler_admin.TranslatableAdmin,
+        import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.TopicGradeResource
+    list_display = (
+        'topic',
+        'grade',
+        'grade_audience'
+    )
+    list_filter = (
+        'grade__audience',
+    )
 
 
 @admin.register(AnswerOption)
-class AnswerOptionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
+class AnswerOptionAdmin(
+        parler_admin.TranslatableAdmin,
+        import_export_admin.ImportExportModelAdmin):
     resource_class = resources.AnswerOptionResource
 
 
@@ -84,3 +104,17 @@ class QuestionAdmin(parler_admin.TranslatableAdmin,
                QuestionVideoAssetInline,
                QuestionTTSAssetInline,
                QuestionAudioAssetInline]
+    list_display = (
+        'question_text',
+        'topic',
+        'grade',
+        'grade_audience',
+    )
+    list_filter = (
+        'grade__audience',
+    )
+
+
+@admin.register(QuestionImageAsset)
+class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.QuestionImageAssetResource
