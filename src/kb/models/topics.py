@@ -16,7 +16,7 @@ class Topic(
     PREFIX = 'topic_'
 
     translations = TranslatedFields(
-        name=models.CharField(max_length=128)
+        name=models.CharField(max_length=256)
     )
 
     slug = models.SlugField(editable=False)
