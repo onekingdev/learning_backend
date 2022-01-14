@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib import admin
 from ..managers.topics import TopicManager
 from django.utils.text import slugify
 from mptt.models import MPTTModel, TreeForeignKey
@@ -65,6 +66,10 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
         on_delete=models.PROTECT,
     )
     standard_code = models.CharField(max_length=128, null=True, blank=True)
+
+    @admin.display(description='Audience')
+    def grade_audience(self):
+        return self.grade.audience
 
     def __str__(self):
         return '{}/{}'.format(self.topic, self.grade)
