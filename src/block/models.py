@@ -140,7 +140,6 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
         default=1, null=True)
 
     def save(self, *args, **kwargs):
-        print("Saving")
         is_new = False
         if not self.pk:
             is_new = True
@@ -154,6 +153,9 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
                     )
 
         return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.topic_grade} / {self.modality}"
 
 
 class BlockPresentation(TimestampModel, RandomSlugModel):
@@ -260,3 +262,6 @@ class BlockAssignment(TimestampModel):
 
     class Meta:
         ordering = ['order']
+
+    def __str__(self):
+        return f"{self.block} / {self.student}"

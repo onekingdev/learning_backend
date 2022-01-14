@@ -14,17 +14,46 @@ class BlockTypeAdmin(parler_admin.TranslatableAdmin):
 
 @admin.register(BlockAssignment)
 class BlockAssignmentAdmin(SortableAdminMixin, admin.ModelAdmin):
-    pass
+    list_display = (
+        'order_number',
+        'student',
+        'block_identifier',
+        'block_topic_grade',
+        'block_modality',
+        'order'
+    )
+
+    list_filter = ('block__modality',)
+
+    @admin.display(description='Block identifier')
+    def block_identifier(self, obj):
+        return ("%s" % (obj.block.random_slug))
+
+    @admin.display(description='Block topic grade')
+    def block_topic_grade(self, obj):
+        return ("%s" % (obj.block.topic_grade))
+
+    @admin.display(description='Block modality')
+    def block_modality(self, obj):
+        return ("%s" % (obj.block.modality))
+
+    @admin.display(description='Order')
+    def order_number(self, obj):
+        return ("%s" % (obj.order))
 
 
 @admin.register(Block)
 class BlockAdmin(admin.ModelAdmin):
+    list_display = (
+        'topic_grade',
+        'modality',
+        'random_slug',
+    )
+
     def save_related(self, request, form, formsets, change):
-        print("Saving related")
         super(BlockAdmin, self).save_related(request, form, formsets, change)
 
         if form.instance.questions.name is None:
-            print("Questions are NOne")
             available_questions = list(
                 Question.objects.filter(topic_grade=form.instance.topic_grade))
             if len(available_questions) < form.instance.block_size:
@@ -32,6 +61,10 @@ class BlockAdmin(admin.ModelAdmin):
                     form.instance.questions.add(question)
             else:
                 random_questions = random.sample(
-                    available_questions, self.block_size)
+                    available_questions, form.instance.block_size)
                 for question in random_questions:
                     form.instance.questions.add(question)
+
+        for student in form.instance.students.all():
+            BlockAssignment.objects.get_or_create(
+                block=form.instance, student=student)
