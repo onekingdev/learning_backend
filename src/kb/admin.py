@@ -58,7 +58,7 @@ class TopicAdmin(
 
 
 @admin.register(AreaOfKnowledge)
-class AreaOfKnowledgeAdmin(parler_admin.TranslatableAdmin):
+class AreaOfKnowledgeAdmin(import_export_admin.ImportExportModelAdmin, parler_admin.TranslatableAdmin):
     list_display = (
         'name',
         'audience',
