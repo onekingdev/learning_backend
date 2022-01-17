@@ -55,7 +55,9 @@ class BlockAdmin(admin.ModelAdmin):
 
         if form.instance.questions.name is None:
             available_questions = list(
-                Question.objects.filter(topic_grade=form.instance.topic_grade))
+                Question.objects.filter(
+                    topic=form.instance.topic_grade.topic).filter(
+                    grade=form.instance.topic_grade.grade))
             if len(available_questions) < form.instance.block_size:
                 for question in available_questions:
                     form.instance.questions.add(question)
