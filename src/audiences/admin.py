@@ -7,4 +7,4 @@ from .resources import AudienceResource
 
 @admin.register(Audience)
 class AudienceAdmin(ImportExportModelAdmin, parler_admin.TranslatableAdmin):
-    resource = AudienceResource
+    resource_class = AudienceResource
