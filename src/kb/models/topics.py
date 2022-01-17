@@ -19,7 +19,6 @@ class Topic(
         name=models.CharField(max_length=256)
     )
 
-    slug = models.SlugField(editable=False)
     area_of_knowledge = models.ForeignKey(
         'kb.AreaOfKnowledge',
         on_delete=models.PROTECT,
