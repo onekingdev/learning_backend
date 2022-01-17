@@ -1,7 +1,5 @@
 from app.resources import TranslatableModelResource
-from app.widgets import TranslatableForeignKeyWidget
 from import_export.fields import Field
-from import_export.resources import ModelResource
 from .models import Audience
 
 
@@ -18,3 +16,10 @@ class AudienceResource(TranslatableModelResource):
         model = Audience
         skip_unchanged = True
         report_skipped = False
+        fields = (
+            'id',
+            'language_code',
+            'name',
+            'standard_code',
+            'is_active',
+        )
