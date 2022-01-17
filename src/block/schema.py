@@ -3,6 +3,7 @@ from django.conf import settings
 from graphene_django import DjangoObjectType
 from block.models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block
 from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPresentation
+from block.models import BlockAssignment
 from students.models import Student
 from kb.models.areas_of_knowledge import AreaOfKnowledge
 
@@ -50,6 +51,12 @@ class BlockConfigurationSchema(DjangoObjectType):
 class BlockPresentationSchema(DjangoObjectType):
     class Meta:
         model = BlockPresentation
+        fields = "__all__"
+
+
+class BlockAssignmentSchema(DjangoObjectType):
+    class Meta:
+        model = BlockAssignment
         fields = "__all__"
 
 
@@ -181,3 +188,18 @@ class Query(graphene.ObjectType):
     def resolve_block_question_presentation_by_id(root, info, id):
         # Querying a single question
         return BlockQuestionPresentation.objects.get(pk=id)
+
+    # ----------------- BlockAssignment ----------------- #
+
+    block_assignments = graphene.List(
+        BlockAssignmentSchema)
+    block_assignment_by_student = graphene.Field(
+        BlockAssignmentSchema, id=graphene.String())
+
+    def resolve_block_assignment(root, info, **kwargs):
+        # Querying a list
+        return BlockAssignment.objects.all()
+
+    def resolve_block_assignment_by_student(root, info, id):
+        # Querying a single question
+        return BlockAssignment.objects.filter(student=id)
