@@ -42,7 +42,7 @@ class Topic(
     objects = TopicManager()
 
     def __str__(self):
-        return self.safe_translation_getter("name")
+        return self.name
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name or '')
