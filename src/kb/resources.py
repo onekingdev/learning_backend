@@ -166,18 +166,18 @@ class AnswerOptionResource(TranslatableModelResource):
         report_skipped = False
         fields = (
             'id',
-            'identifier',
+            # 'identifier',
             'language_code',
             'answer_text',
-            'question__identifier',
+            'question',
             'is_correct',
         )
         export_order = (
             'id',
-            'identifier',
+            # 'identifier',
             'language_code',
             'answer_text',
-            'question__identifier',
+            'question',
             'is_correct',
         )
         exclude = (
