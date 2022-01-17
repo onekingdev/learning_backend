@@ -76,7 +76,6 @@ class GradeAdmin(
 
 @admin.register(TopicGrade)
 class TopicGradeAdmin(
-        parler_admin.TranslatableAdmin,
         import_export_admin.ImportExportModelAdmin):
     resource_class = resources.TopicGradeResource
     list_display = (
