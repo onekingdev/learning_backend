@@ -75,9 +75,6 @@ class GradeResource(TranslatableModelResource):
 
 
 class TopicGradeResource(ModelResource):
-    topic = Field(attribute='topic__name')
-    grade = Field(attribute='grade__name')
-
     class Meta:
         model = TopicGrade
         skip_unchanged = True
