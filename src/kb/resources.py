@@ -4,6 +4,22 @@ from import_export.fields import Field
 from import_export.resources import ModelResource
 from .models import Topic, Grade, TopicGrade
 from .models.content import Question, AnswerOption, QuestionImageAsset
+from .models.areas_of_knowledge import AreaOfKnowledge
+
+
+class AreaOfKnowledgeResource(TranslatableModelResource):
+    language_code = Field(
+        attribute='_current_language'
+    )
+
+    name = Field(
+        attribute='name'
+    )
+
+    class Meta:
+        model = AreaOfKnowledge
+        skip_unchanged = True
+        report_skipped = False
 
 
 class TopicResource(TranslatableModelResource):
