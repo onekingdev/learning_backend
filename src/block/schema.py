@@ -130,8 +130,7 @@ class Query(graphene.ObjectType):
 
     def resolve_block_by_topic(root, info, id):
         # Querying a list of blocks by topic id
-        topic_grades = TopicGrade.objects.filter(topic=id)
-        return Block.objects.filter(topic_grade=topic_grades)
+        return Block.objects.filter(topic_grade__topic=id)
 
     # ----------------- BlockConfiguration ----------------- #
 
