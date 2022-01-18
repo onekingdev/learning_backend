@@ -4,7 +4,6 @@ from graphene_django import DjangoObjectType
 from block.models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block
 from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPresentation
 from block.models import BlockAssignment
-from kb.models import TopicGrade
 
 
 class BlockConfigurationKeywordSchema(DjangoObjectType):
