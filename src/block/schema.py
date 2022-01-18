@@ -128,7 +128,7 @@ class Query(graphene.ObjectType):
         # Querying a single question
         return Block.objects.get(pk=id)
 
-    def resolve_block_by_topic(root, info, id):
+    def resolve_blocks_by_topic(root, info, id):
         # Querying a list of blocks by topic id
         return Block.objects.filter(topic_grade__topic=id)
 
