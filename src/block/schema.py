@@ -4,6 +4,7 @@ from graphene_django import DjangoObjectType
 from block.models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block
 from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPresentation
 from block.models import BlockAssignment
+from kb.models import TopicGrade
 
 
 class BlockConfigurationKeywordSchema(DjangoObjectType):
@@ -116,7 +117,8 @@ class Query(graphene.ObjectType):
     # ----------------- Block ----------------- #
 
     blocks = graphene.List(BlockSchema)
-    block_by_id = graphene.Field(BlockSchema, id=graphene.String())
+    block_by_id = graphene.Field(BlockSchema, id=graphene.ID())
+    blocks_by_topic = graphene.List(BlockSchema, id=graphene.ID())
 
     def resolve_blocks(root, info, **kwargs):
         # Querying a list
@@ -125,6 +127,11 @@ class Query(graphene.ObjectType):
     def resolve_block_by_id(root, info, id):
         # Querying a single question
         return Block.objects.get(pk=id)
+
+    def resolve_block_by_topic(root, info, id):
+        # Querying a list of blocks by topic id
+        topic_grades = TopicGrade.objects.filter(topic=id)
+        return Block.objects.filter(topic_grade=topic_grades)
 
     # ----------------- BlockConfiguration ----------------- #
 
