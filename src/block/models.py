@@ -158,7 +158,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
         return f"{self.topic_grade} / {self.modality}"
 
 
-class BlockPresentation(TimestampModel, RandomSlugModel):
+class BlockPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     PREFIX = 'block_presentation_'
 
     # FK's
