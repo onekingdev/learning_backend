@@ -46,6 +46,7 @@ class BlockAssignmentAdmin(SortableAdminMixin, admin.ModelAdmin):
 class BlockAdmin(admin.ModelAdmin):
     list_display = (
         'topic_grade',
+        'id',
         'modality',
         'random_slug',
     )
