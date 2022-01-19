@@ -19,7 +19,7 @@ class Avatar(TimestampModel, UUIDModel, IsActiveModel):
 
     type_of = models.CharField(max_length=25, null=True, choices=TYPE_CHOICES)
     name = models.CharField(max_length=64, null=True, blank=True)
-    image = models.URLField()
+    image = models.URLField(null=True)
 
 
 class Student(TimestampModel, UUIDModel, IsActiveModel):
