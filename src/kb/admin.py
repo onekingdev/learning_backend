@@ -105,6 +105,8 @@ class QuestionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportEx
                QuestionAudioAssetInline]
     fields = (
         'question_text',
+        'topic',
+        'grade',
     )
     list_display = (
         'question',
