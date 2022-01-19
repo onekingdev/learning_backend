@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib import admin
 from ..managers.topics import TopicManager
 from django.utils.text import slugify
 from mptt.models import MPTTModel, TreeForeignKey
@@ -16,9 +15,10 @@ class Topic(
     PREFIX = 'topic_'
 
     translations = TranslatedFields(
-        name=models.CharField(max_length=256)
+        name=models.CharField(max_length=128)
     )
 
+    slug = models.SlugField(editable=False)
     area_of_knowledge = models.ForeignKey(
         'kb.AreaOfKnowledge',
         on_delete=models.PROTECT,
@@ -32,17 +32,15 @@ class Topic(
         blank=True,
         related_name='sub_topics'
     )
-    # universal_topic = models.ManyToManyField(
-    #     'universals.UniversalTopic',
-    #     blank=True
-    # )
-
-    video_assitor = models.URLField(null=True, blank=True)
+    universal_topic = models.ManyToManyField(
+        'universals.UniversalTopic',
+        blank=True
+    )
 
     objects = TopicManager()
 
     def __str__(self):
-        return self.name
+        return super().__str__()
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name or '')
@@ -59,16 +57,16 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
     grade = models.ForeignKey(
         'kb.Grade',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True
     )
     topic = models.ForeignKey(
         'kb.Topic',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True
     )
     standard_code = models.CharField(max_length=128, null=True, blank=True)
-
-    @admin.display(description='Audience')
-    def grade_audience(self):
-        return self.grade.audience
 
     def __str__(self):
         return '{}/{}'.format(self.topic, self.grade)
@@ -77,10 +75,11 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
 class Prerequisite(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'prerequisite_'
 
-    topic_grade = models.ForeignKey(
-        TopicGrade, on_delete=models.PROTECT, related_name="Topic_grade")
-    prerequisites = models.ManyToManyField(TopicGrade, blank=True)
+    topic_grade = models.ManyToManyField('kb.TopicGrade', blank=True)
+    topic = models.ManyToManyField('kb.Topic', blank=True)
     information = models.TextField(null=True, blank=True)
+    advance_percentage = models.FloatField(null=True, blank=True)
+    advance_minum = models.FloatField(null=True, blank=True)
 
     def __str__(self):
-        return '{}/{}'.format(self.topic_grade, self.prerequisite)
+        return '{}/{}'.format(self.topic, self.grade)

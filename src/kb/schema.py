@@ -218,7 +218,7 @@ class Query(graphene.ObjectType):
 
     answers_option = graphene.List(AnswerOptionSchema)
     answers_option_by_id = graphene.Field(
-        AnswerOptionSchema, id=graphene.ID())
+        AnswerOptionSchema, id=graphene.String())
 
     def resolve_answers_option(root, info, **kwargs):
         # Querying a list

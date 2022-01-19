@@ -1,9 +1,7 @@
 from django.db import models
-from django.contrib import admin
 from ckeditor.fields import RichTextField
 from polymorphic.models import PolymorphicModel
 from kb.managers.content import QuestionManager
-from gtts import gTTS
 
 from django.utils.html import strip_tags
 
@@ -21,13 +19,15 @@ class Question(
         question_text=RichTextField(blank=True)
     )
     topic = models.ForeignKey(
-        'kb.Topic', on_delete=models.PROTECT)
-    grade = models.ForeignKey(
-        'kb.Grade', on_delete=models.PROTECT)
+        'universals.UniversalTopic',
+        on_delete=models.PROTECT)
+    topic_grade = models.ForeignKey(
+        'kb.TopicGrade', on_delete=models.PROTECT)
     objects = QuestionManager()
 
     def __str__(self):
-        return strip_tags(self.safe_translation_getter("question_text", any_language=True))[:100]
+        return '{}-{}'.format(self.random_slug,
+                              strip_tags(self.question_text)[:100])
 
     def get_questionimageasset_set(self):
         return QuestionImageAsset.objects.filter(question=self)
@@ -38,20 +38,13 @@ class Question(
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
 
-    @admin.display(description='Audience')
-    def grade_audience(self):
-        return self.grade.audience
-
-    @admin.display(description='Topic identifier')
-    def topic_identifier(self):
-        return self.topic.identifier
-
 
 class QuestionAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
 
     class Meta:
         ordering = ['order']
 
+    PREFIX = 'question_asset_'
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     order = models.PositiveIntegerField(blank=True, null=True)
 
@@ -63,22 +56,14 @@ class QuestionAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
 
 
 class QuestionImageAsset(QuestionAsset):
-    PREFIX = 'question_image_asset_'
     image = models.ImageField()
 
 
 class QuestionAudioAsset(QuestionAsset):
-    PREFIX = 'question_audio_asset_'
     audio_file = models.FileField()
 
 
-class QuestionTTSAsset(QuestionAsset):
-    PREFIX = 'question_tts_asset_'
-    tts_file = models.FileField(null=True, blank=True)
-
-
 class QuestionVideoAsset(QuestionAsset):
-    PREFIX = 'question_video_asset_'
     url = models.URLField()
 
 
@@ -95,4 +80,4 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.safe_translation_getter("answer_text", any_language=True)
+        return self.answer_text
