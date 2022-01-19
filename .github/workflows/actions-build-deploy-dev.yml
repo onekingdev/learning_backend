@@ -12,6 +12,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
       - uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{secrets.SSH_HOST}} # IP address of the server you wish to ssh into
