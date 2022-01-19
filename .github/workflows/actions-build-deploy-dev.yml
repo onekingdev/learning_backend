@@ -33,6 +33,6 @@ jobs:
           
       - name: Migrate Schema and Run Django server     
         run: |
-          cp -a /etc/env/env.py ./src/app/settings/
+          cp -a root@${{ secrets.SSH_HOST }}:/etc/env/env.py ./src/app/settings/
           pipenv run python ./src/manage.py migrate
           pipenv run python ./src/manage.py runserver
