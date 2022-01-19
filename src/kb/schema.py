@@ -3,6 +3,7 @@ from django.conf import settings
 from graphene_django import DjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from kb.models.content import Question, AnswerOption
+from django.utils.html import strip_tags
 
 
 class AreaOfKnowledgeSchema(DjangoObjectType):
@@ -73,12 +74,7 @@ class QuestionSchema(DjangoObjectType):
     question_text = graphene.String()
 
     def resolve_question_text(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter("question_text", any_language=True)
+        return strip_tags(self.safe_translation_getter("question_text", any_language=True))
 
 
 class AnswerOptionSchema(DjangoObjectType):
@@ -93,12 +89,7 @@ class AnswerOptionSchema(DjangoObjectType):
     video = graphene.String()
 
     def resolve_answer_text(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter("answer_text", language_code=current_language)
+        return self.safe_translation_getter("answer_text", any_language=True)
 
     def resolve_image(self, info, language_code=None):
         try:
