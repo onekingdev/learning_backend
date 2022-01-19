@@ -78,7 +78,7 @@ class QuestionSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("question_text", language_code=current_language)
+        return self.safe_translation_getter("question_text", any_language=True)
 
 
 class AnswerOptionSchema(DjangoObjectType):
@@ -218,7 +218,7 @@ class Query(graphene.ObjectType):
 
     answers_option = graphene.List(AnswerOptionSchema)
     answers_option_by_id = graphene.Field(
-        AnswerOptionSchema, id=graphene.String())
+        AnswerOptionSchema, id=graphene.ID())
 
     def resolve_answers_option(root, info, **kwargs):
         # Querying a list

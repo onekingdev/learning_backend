@@ -1,10 +1,50 @@
+import random
 from django.db import models
 from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel, ActiveManager
+from kb.models.content import Question
 
 
 class BlockTypeManager(ActiveManager, TranslatableManager):
     pass
+
+
+class BlockConfiguration(TimestampModel):
+    """
+    Model for key-value pair configurations for a block.
+    These come from the block type configuration and are copied on block creation.
+    Examples:
+    - Show Timer: True
+    """
+
+    # FK's
+    block = models.ForeignKey(
+        'block.Block',
+        on_delete=models.PROTECT,
+    )
+    key = models.ForeignKey(
+        'block.BlockConfigurationKeyword',
+        on_delete=models.PROTECT,
+    )
+
+    # Attributes
+    value = models.CharField(max_length=128, null=True)
+
+
+class BlockConfigurationKeyword(TimestampModel, IsActiveModel):
+    """
+    Model for configuration keyword.
+    These change the behavior of a block.
+    Examples:
+    - Show timer
+    - Allow to pass on questions
+    """
+
+    # Attributes
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
 
 
 class BlockType(
@@ -24,7 +64,7 @@ class BlockType(
 
     # Attributes
     translations = TranslatedFields(
-        name=models.CharField(max_length=128, null=True)
+        name=models.CharField(max_length=128)
     )
     objects = BlockTypeManager()
 
@@ -40,41 +80,49 @@ class BlockTypeConfiguration(TimestampModel, IsActiveModel):
     block_type = models.ForeignKey(
         'block.BlockType',
         on_delete=models.PROTECT,
-        null=True
     )
     key = models.ForeignKey(
         'block.BlockConfigurationKeyword',
         on_delete=models.PROTECT,
-        null=True
     )
 
     # Attributes
-    value = models.CharField(max_length=128, null=True)
+    value = models.CharField(max_length=128)
 
 
 class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'block_'
 
+    BLOCK_SIZE = 10
+
     MODALITY_AI = 'AI'
     MODALITY_PATH = 'PATH'
-    MODALITY_PRACTICE = 'PRACTICE'
+    MODALITY_PRACTICE = 'HOMEWORK'
     MODALITY_CHOICES = (
         (MODALITY_AI, 'AI'),
         (MODALITY_PATH, 'Choose your path'),
-        (MODALITY_PRACTICE, 'Practice'),
+        (MODALITY_PRACTICE, 'Homework'),
     )
 
     # FK's
     type_of = models.ForeignKey(
         'block.BlockType',
         on_delete=models.PROTECT,
+        blank=True,
         null=True
     )
-    students = models.ManyToManyField('students.Student', blank=True)
-    topics = models.ManyToManyField(
-        'kb.Topic',
+    students = models.ManyToManyField(
+        'students.Student',
+        blank=True
+    )
+    topic_grade = models.ForeignKey(
+        'kb.TopicGrade',
+        on_delete=models.PROTECT,
+        help_text='This is the topic covered in this block'
+    )
+    questions = models.ManyToManyField(
+        'kb.Question',
         blank=True,
-        help_text='These are the topics covered in this block'
     )
 
     # Attributes
@@ -83,28 +131,18 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
         choices=MODALITY_CHOICES,
         default=MODALITY_AI
     )
-    first_presentation_timestamp = models.DateTimeField(null=True)
-    last_presentation_timestamp = models.DateTimeField(null=True)
-    questions = models.ManyToManyField(
-        'kb.Question',
-        through='block.BlockQuestion'
-    )
+    block_size = models.IntegerField(default=BLOCK_SIZE)
 
     # Metrics
     engangement_points_available = models.PositiveSmallIntegerField(null=True)
     coins_available = models.PositiveSmallIntegerField(null=True)
     battery_points_available = models.PositiveSmallIntegerField(
         default=1, null=True)
-    # engangement_points_earned = models.PositiveSmallIntegerField(null=True)
-    # coins_earned = models.PositiveSmallIntegerField(null=True)
-    # battery_points_earned = models.PositiveSmallIntegerField(null=True)
 
     def save(self, *args, **kwargs):
         is_new = False
         if not self.pk:
             is_new = True
-
-        sve = super().save(*args, **kwargs)
 
         if is_new:
             if self.type_of:
@@ -113,57 +151,24 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
                         key=item.key,
                         value=item.value,
                     )
-        return sve
 
-
-class BlockConfiguration(TimestampModel):
-    """
-    Model for key-value pair configurations for a block.
-    These come from the block type configuration and are copied on block creation.
-    Examples:
-    - Show Timer: True
-    """
-
-    # FK's
-    block = models.ForeignKey(
-        'block.Block',
-        on_delete=models.PROTECT,
-        null=True
-    )
-    key = models.ForeignKey(
-        'block.BlockConfigurationKeyword',
-        on_delete=models.PROTECT,
-        null=True
-    )
-
-    # Attributes
-    value = models.CharField(max_length=128, null=True)
-
-
-class BlockConfigurationKeyword(TimestampModel, IsActiveModel):
-    """
-    Model for configuration keyword.
-    These change the behavior of a block.
-    Examples:
-    - Show timer
-    - Allow to pass on questions
-    """
-
-    # Attributes
-    name = models.CharField(max_length=128, null=True)
+        return super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return f"{self.topic_grade} / {self.modality}"
 
 
-class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel):
+class BlockPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     PREFIX = 'block_presentation_'
 
     # FK's
     block = models.ForeignKey(
-        'block.Block',
+        Block,
         on_delete=models.CASCADE,
-        null=True
+    )
+    student = models.ForeignKey(
+        'students.Student',
+        on_delete=models.CASCADE,
     )
 
     # Metrics
@@ -175,15 +180,13 @@ class BlockPresentation(TimestampModel, RandomSlugModel, IsActiveModel):
     end_timestamp = models.DateTimeField(null=True)
 
 
-class BlockQuestion(TimestampModel, RandomSlugModel):
-    """
-    This model contains ALL the questions of the block, independently of the presentation of them on BlockPresentation.
-    Used for M2M relation between block and question.
-    """
+class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
+    PREFIX = 'block_question_presentation'
 
     STATUS_PENDING = 'PENDING'
     STATUS_CORRECT = 'CORRECT'
     STATUS_INCORRECT = 'INCORRECT'
+
     STATUS_CHOICES = (
         (STATUS_PENDING, 'Pending'),
         (STATUS_CORRECT, 'Correct'),
@@ -191,62 +194,74 @@ class BlockQuestion(TimestampModel, RandomSlugModel):
     )
 
     # FK's
-    block = models.ForeignKey(Block, on_delete=models.PROTECT, null=True)
+    block_presentation = models.ForeignKey(
+        BlockPresentation,
+        on_delete=models.CASCADE,
+    )
     question = models.ForeignKey(
         'kb.Question',
-        on_delete=models.PROTECT,
-        null=True
+        on_delete=models.PROTECT
     )
     chosen_answer = models.ForeignKey(
         'kb.AnswerOption',
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         null=True
     )
+    topic_grade = models.ForeignKey(
+        'kb.TopicGrade',
+        on_delete=models.PROTECT,
+    )
 
-    # Metrics
-    is_correct = models.BooleanField(null=True)
-    is_answered = models.BooleanField(null=True, default=False)
+    # Attributes
     status = models.CharField(
-        max_length=128,
+        max_length=32,
         choices=STATUS_CHOICES,
         default=STATUS_PENDING
     )
 
+    def is_answered(self):
+        if self.status != self.STATUS_PENDING:
+            return True
+        else:
+            return False
+
     def save(self, *args, **kwargs):
+        self.topic_grade = self.block_presentation.block.topic_grade
         if self.chosen_answer:
-            self.is_answered = True
             if self.chosen_answer.is_correct:
-                self.is_correct = True
                 self.status = self.STATUS_CORRECT
             else:
-                self.is_correct = False
                 self.status = self.STATUS_INCORRECT
         else:
-            self.is_answered = False
             self.status = self.STATUS_PENDING
 
-        return super().save(*args, **kwargs)
 
-
-class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
-    """
-    This model is used for registering when questions are presented and submitted
-    """
+class BlockAssignment(TimestampModel):
+    PREFIX = 'block_assignment'
 
     # FK's
-    question = models.ForeignKey(
-        'kb.Question',
+    block = models.ForeignKey(
+        Block,
         on_delete=models.PROTECT,
-        null=True
+        blank=False,
+        null=False
     )
-    block_question = models.ForeignKey(
-        'block.BlockQuestion',
-        on_delete=models.PROTECT,
-        null=True
+    student = models.ForeignKey(
+        'students.Student',
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False
     )
-    presentation_timestamp = models.DateTimeField(null=True)
-    submission_timestamp = models.DateTimeField(null=True)
 
-    def save(self, *args, **kwargs):
-        self.question = self.block_question.question
-        return super().save(*args, **kwargs)
+    # Attributes
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        blank=False,
+        null=False
+    )
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.block} / {self.student}"

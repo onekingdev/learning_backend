@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Topic, AreaOfKnowledge, Grade
-from .models.content import Question, AnswerOption, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset
+from .models import Topic, AreaOfKnowledge, Grade, TopicGrade
+from .models.content import Question, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset, QuestionTTSAsset
+from .models.content import AnswerOption
 
 from . import resources
 from parler import admin as parler_admin
@@ -28,6 +29,11 @@ class QuestionAudioAssetInline(admin.TabularInline):
     extra = 0
 
 
+class QuestionTTSAssetInline(admin.TabularInline):
+    model = QuestionTTSAsset
+    extra = 0
+
+
 @admin.action(description='Hard delete objects')
 def hard_delete_selected(modeladmin, request, queryset):
     for obj in queryset:
@@ -52,7 +58,8 @@ class TopicAdmin(
 
 
 @admin.register(AreaOfKnowledge)
-class AreaOfKnowledgeAdmin(parler_admin.TranslatableAdmin):
+class AreaOfKnowledgeAdmin(import_export_admin.ImportExportModelAdmin, parler_admin.TranslatableAdmin):
+    resource_class = resources.AreaOfKnowledgeResource
     list_display = (
         'name',
         'audience',
@@ -61,20 +68,55 @@ class AreaOfKnowledgeAdmin(parler_admin.TranslatableAdmin):
 
 
 @admin.register(Grade)
-class GradeAdmin(parler_admin.TranslatableAdmin):
-    pass
+class GradeAdmin(
+        parler_admin.TranslatableAdmin,
+        import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.GradeResource
+
+
+@admin.register(TopicGrade)
+class TopicGradeAdmin(
+        import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.TopicGradeResource
+    list_display = (
+        'topic',
+        'grade',
+        'grade_audience'
+    )
+    list_filter = (
+        'grade__audience',
+    )
 
 
 @admin.register(AnswerOption)
-class AnswerOptionAdmin(parler_admin.TranslatableAdmin):
-    pass
+class AnswerOptionAdmin(
+        parler_admin.TranslatableAdmin,
+        import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.AnswerOptionResource
 
 
 @admin.register(Question)
-class QuestionAdmin(parler_admin.TranslatableAdmin,
-                    import_export_admin.ImportExportModelAdmin):
+class QuestionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
     resource_class = resources.QuestionResource
     inlines = [AnswerOptionInline,
                QuestionImageAssetInline,
                QuestionVideoAssetInline,
+               QuestionTTSAssetInline,
                QuestionAudioAssetInline]
+    fields = (
+        'question_text',
+    )
+    list_display = (
+        'question',
+        'topic',
+        'grade',
+        'grade_audience',
+    )
+    list_filter = (
+        'grade__audience',
+    )
+
+
+@admin.register(QuestionImageAsset)
+class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.QuestionImageAssetResource

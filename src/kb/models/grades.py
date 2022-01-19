@@ -22,7 +22,7 @@ class Grade(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     objects = GradeManager()
 
     def __str__(self):
-        return self.name
+        return self.safe_translation_getter("name", any_language=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
