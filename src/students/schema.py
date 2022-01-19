@@ -33,50 +33,6 @@ class StudentAchievementSchema(DjangoObjectType):
         fields = "__all__"
 
 
-class SetStudentAvatar(graphene.Mutation):
-    avatar_url = graphene.String()
-    student_id = graphene.ID()
-    avatar_type_of = graphene.Enum(
-        'TypeOf',
-        [
-            ('Accesories', 1),
-            ('Head/Hair', 2),
-            ('Clothes', 3),
-            ('Pants', 4)]
-    )
-
-    class Arguments:
-        avatar_url = graphene.String()
-        student_id = graphene.ID()
-        avatar_type_of = graphene.Enum(
-            'TypeOf',
-            [
-                ('Accesories', 1),
-                ('Head/Hair', 2),
-                ('Clothes', 3),
-                ('Pants', 4)]
-        )
-
-    def mutate(self, info, avatar_url, student_id, avatar_type_of):
-        student = Student.objects.get(id=student_id)
-        avatar = Avatar.objects.get_or_create(
-            image=avatar_url,
-            type_of=avatar_type_of)
-
-        avatar.save()
-
-        if avatar_type_of == 1:
-            student.avatar_accessories = avatar
-        elif avatar_type_of == 2:
-            student.avatar_head = avatar
-        elif avatar_type_of == 3:
-            student.avatar_clothes = avatar
-        else:
-            student.avatar_pants = avatar
-
-        student.save()
-
-
 class Query(graphene.ObjectType):
     # ----------------- Avatar ----------------- #
 

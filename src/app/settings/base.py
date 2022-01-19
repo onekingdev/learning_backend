@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'graphene_django',
     'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
     'mailer',
-    'adminsortable2',
 
     'api',
     'audiences',

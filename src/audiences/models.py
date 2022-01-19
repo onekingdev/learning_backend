@@ -12,16 +12,12 @@ class Audience(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel
     PREFIX = 'audience_'
 
     translations = TranslatedFields(
-        name=models.CharField(max_length=128, unique=True)
+        name=models.CharField(max_length=128, unique=True),
+        any_language=True
     )
     slug = models.SlugField(editable=False, unique=True)
 
-    standard_code = models.CharField(max_length=4, null=True)
-
     objects = AudienceManager()
-
-    def __str__(self):
-        return self.safe_translation_getter("name", any_language=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from plans.models import StudentPlan
+from plans.models import StudentPlan, StudentPlanTopicGrade
 
 
 class StudentPlanSchema(DjangoObjectType):
@@ -9,10 +9,10 @@ class StudentPlanSchema(DjangoObjectType):
         fields = "__all__"
 
 
-# class StudentPlanTopicGradeSchema(DjangoObjectType):
-#     class Meta:
-#         model = StudentPlanTopicGrade
-#         fields = "__all__"
+class StudentPlanTopicGradeSchema(DjangoObjectType):
+    class Meta:
+        model = StudentPlanTopicGrade
+        fields = "__all__"
 
 
 class Query(graphene.ObjectType):
@@ -30,16 +30,16 @@ class Query(graphene.ObjectType):
         # Querying a single question
         return StudentPlan.objects.get(pk=id)
 
-    # # ----------------- StudentPlanTopicGrade ----------------- #
+    # ----------------- StudentPlanTopicGrade ----------------- #
 
-    # students_plan_topic_grade = graphene.List(StudentPlanTopicGradeSchema)
-    # student_plan_topic_grade_by_id = graphene.Field(
-    #     StudentPlanTopicGradeSchema, id=graphene.String())
+    students_plan_topic_grade = graphene.List(StudentPlanTopicGradeSchema)
+    student_plan_topic_grade_by_id = graphene.Field(
+        StudentPlanTopicGradeSchema, id=graphene.String())
 
-    # def resolve_students_plan_topic_grade(root, info, **kwargs):
-    #     # Querying a list
-    #     return StudentPlanTopicGrade.objects.all()
+    def resolve_students_plan_topic_grade(root, info, **kwargs):
+        # Querying a list
+        return StudentPlanTopicGrade.objects.all()
 
-    # def resolve_student_plan_topic_grade_by_id(root, info, id):
-    #     # Querying a single question
-    #     return StudentPlanTopicGrade.objects.get(pk=id)
+    def resolve_student_plan_topic_grade_by_id(root, info, id):
+        # Querying a single question
+        return StudentPlanTopicGrade.objects.get(pk=id)
