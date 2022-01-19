@@ -33,6 +33,5 @@ jobs:
           
       - name: Migrate Schema and Run Django server     
         run: |
-          pipenv run
-          python ./src/manage.py migrate
-          python ./src/manage.py runserver
+          pipenv run python ./src/manage.py migrate
+          pipenv run python ./src/manage.py runserver
