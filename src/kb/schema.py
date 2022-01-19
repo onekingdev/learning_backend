@@ -74,7 +74,7 @@ class QuestionSchema(DjangoObjectType):
     question_text = graphene.String()
 
     def resolve_question_text(self, info, language_code=None):
-        return strip_tags(self.safe_translation_getter("question_text", any_language=True))
+        return self.safe_translation_getter("question_text", any_language=True)
 
 
 class AnswerOptionSchema(DjangoObjectType):
@@ -195,7 +195,7 @@ class Query(graphene.ObjectType):
     # ----------------- Question ----------------- #
 
     questions = graphene.List(QuestionSchema)
-    question_by_id = graphene.Field(QuestionSchema, id=graphene.String())
+    question_by_id = graphene.Field(QuestionSchema, id=graphene.ID())
 
     def resolve_questions(root, info, **kwargs):
         # Querying a list
