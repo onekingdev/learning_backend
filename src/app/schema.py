@@ -19,7 +19,7 @@ class Mutation(
         api.schema.Mutation,
         collectibles.schema.Mutation,
         emails.schema.Mutation,
-        block.schema.Mutation
+        block.schema.Mutation,
         graphene.ObjectType):
 
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
