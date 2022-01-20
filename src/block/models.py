@@ -1,8 +1,6 @@
-import random
 from django.db import models
 from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel, ActiveManager
-from kb.models.content import Question
 
 
 class BlockTypeManager(ActiveManager, TranslatableManager):
