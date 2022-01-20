@@ -34,16 +34,7 @@ class StudentAchievementSchema(DjangoObjectType):
 
 
 class SetStudentAvatar(graphene.Mutation):
-    avatar_url = graphene.String()
-    student_id = graphene.ID()
-    avatar_type_of = graphene.Enum(
-        'TypeOf',
-        [
-            ('Accesories', 1),
-            ('Head/Hair', 2),
-            ('Clothes', 3),
-            ('Pants', 4)]
-    )
+    student = graphene.Field(StudentSchema)
 
     class Arguments:
         avatar_url = graphene.String()
@@ -68,6 +59,8 @@ class SetStudentAvatar(graphene.Mutation):
             student.avatar_pants = avatar
 
         student.save()
+
+        return SetStudentAvatar(student=student)
 
 
 class Mutation(graphene.ObjectType):
