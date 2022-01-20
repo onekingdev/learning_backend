@@ -49,11 +49,12 @@ class SetStudentAvatar(graphene.Mutation):
         avatar_url = graphene.String()
         student_id = graphene.ID()
         avatar_type_of = graphene.Int()
+
     def mutate(self, info, avatar_url, student_id, avatar_type_of):
         student = Student.objects.get(id=student_id)
         avatar = Avatar.objects.get_or_create(
             image=avatar_url,
-            type_of=avatar_type_of)
+            type_of=avatar_type_of)[0]
 
         avatar.save()
 
