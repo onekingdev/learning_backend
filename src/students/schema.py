@@ -48,15 +48,7 @@ class SetStudentAvatar(graphene.Mutation):
     class Arguments:
         avatar_url = graphene.String()
         student_id = graphene.ID()
-        avatar_type_of = graphene.Enum(
-            'TypeOf',
-            [
-                ('Accesories', 1),
-                ('Head/Hair', 2),
-                ('Clothes', 3),
-                ('Pants', 4)]
-        )
-
+        avatar_type_of = graphene.Int()
     def mutate(self, info, avatar_url, student_id, avatar_type_of):
         student = Student.objects.get(id=student_id)
         avatar = Avatar.objects.get_or_create(
