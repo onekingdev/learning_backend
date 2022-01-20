@@ -77,6 +77,10 @@ class SetStudentAvatar(graphene.Mutation):
         student.save()
 
 
+class Mutation(graphene.ObjectType):
+    set_student_avatar = SetStudentAvatar.Field()
+
+
 class Query(graphene.ObjectType):
     # ----------------- Avatar ----------------- #
 
