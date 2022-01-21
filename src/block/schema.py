@@ -147,35 +147,28 @@ class Query(graphene.ObjectType):
 
     # ----------------- BlockPresentation ----------------- #
 
-    blocks_presentation = graphene.List(BlockPresentationSchema)
+    block_presentations = graphene.List(BlockPresentationSchema)
     block_presentation_by_id = graphene.Field(
         BlockPresentationSchema, id=graphene.ID())
-    ai_block_presentation = graphene.Field(
-        BlockPresentationSchema,
-        student=graphene.ID(),
-        area_of_knowledge=graphene.ID())
+    inactive_block_presentations = graphene.List(BlockPresentationSchema)
+    inactive_block_presentation_by_id = graphene.Field(
+        BlockPresentationSchema, id=graphene.ID())
 
-    def resolve_blocks_presentation(root, info, **kwargs):
+    def resolve_block_presentations(root, info, **kwargs):
         # Querying a list
         return BlockPresentation.objects.all()
 
-    def resolve_block_presentation_by_id(root, info, id):
+    def resolve_block_presentations_by_id(root, info, id):
         # Querying a single question
         return BlockPresentation.objects.get(pk=id)
 
-    # # ----------------- BlockQuestion ----------------- #
+    def resolve_inactive_block_presentations(root, info, **kwargs):
+        # Querying a list
+        return BlockPresentation.objects.inactive_objects()
 
-    # blocks_question = graphene.List(BlockQuestionSchema)
-    # block_question_by_id = graphene.Field(
-    #     BlockQuestionSchema, id=graphene.ID())
-
-    # def resolve_blocks_question(root, info, **kwargs):
-    #     # Querying a list
-    #     return BlockQuestion.objects.all()
-
-    # def resolve_block_question_by_id(root, info, id):
-    #     # Querying a single question
-    #     return BlockQuestion.objects.get(pk=id)
+    def resolve_inactive_block_presentations_by_id(root, info, id):
+        # Querying a single question
+        return BlockPresentation.objects.inactive_objects.get(pk=id)
 
     # ----------------- BlockQuestionPresentation ----------------- #
 
