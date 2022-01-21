@@ -158,7 +158,7 @@ class Query(graphene.ObjectType):
         # Querying a list
         return BlockPresentation.objects.all()
 
-    def resolve_block_presentations_by_id(root, info, id):
+    def resolve_block_presentation_by_id(root, info, id):
         # Querying a single question
         return BlockPresentation.objects.get(pk=id)
 
