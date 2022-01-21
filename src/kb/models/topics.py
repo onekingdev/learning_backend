@@ -37,7 +37,7 @@ class Topic(
     #     blank=True
     # )
 
-    video_assitor = models.URLField(null=True, blank=True)
+    video_assistor = models.URLField(null=True, blank=True)
 
     objects = TopicManager()
 
