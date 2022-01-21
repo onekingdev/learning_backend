@@ -4,10 +4,10 @@ import datetime
 
 
 class Avatar(TimestampModel, UUIDModel, IsActiveModel):
-    TYPE_ACCESSORIES = 1
-    TYPE_HEAD = 2
-    TYPE_CLOTHES = 3
-    TYPE_PANTS = 4
+    TYPE_ACCESSORIES = 'ACCESSORIES'
+    TYPE_HEAD = 'HEAD'
+    TYPE_CLOTHES = 'CLOTHES'
+    TYPE_PANTS = 'PANTS'
     TYPE_CHOICES = (
         (TYPE_ACCESSORIES, 'Accessories'),
         (TYPE_HEAD, 'Head/Hair'),
@@ -17,7 +17,7 @@ class Avatar(TimestampModel, UUIDModel, IsActiveModel):
 
     PREFIX = 'avatar_'
 
-    type_of = models.IntegerField(null=True, choices=TYPE_CHOICES)
+    type_of = models.CharField(max_length=25, null=True, choices=TYPE_CHOICES)
     name = models.CharField(max_length=64, null=True, blank=True)
     image = models.URLField(null=True)
 
