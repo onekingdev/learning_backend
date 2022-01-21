@@ -47,6 +47,7 @@ class TopicResource(TranslatableModelResource):
             'name',
             'is_active',
             'parent',
+            'video_assistor',
             'area_of_knowledge',
             'universal_topic',
         )
