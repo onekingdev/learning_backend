@@ -2,12 +2,13 @@ from django.db import models
 from app.models import TimestampModel, UUIDModel, IsActiveModel
 import datetime
 
+TYPE_ACCESSORIES = 'ACCESSORIES'
+TYPE_HEAD = 'HEAD'
+TYPE_CLOTHES = 'CLOTHES'
+TYPE_PANTS = 'PANTS'
+
 
 class Avatar(TimestampModel, UUIDModel, IsActiveModel):
-    TYPE_ACCESSORIES = 'ACCESSORIES'
-    TYPE_HEAD = 'HEAD'
-    TYPE_CLOTHES = 'CLOTHES'
-    TYPE_PANTS = 'PANTS'
     TYPE_CHOICES = (
         (TYPE_ACCESSORIES, 'Accessories'),
         (TYPE_HEAD, 'Head/Hair'),
@@ -57,28 +58,28 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     avatar_accessories = models.ForeignKey(
         Avatar,
         on_delete=models.PROTECT,
-        limit_choices_to={'type_of': 1},
+        limit_choices_to={'type_of': TYPE_ACCESSORIES},
         related_name='+',
         null=True
     )
     avatar_head = models.ForeignKey(
         Avatar,
         on_delete=models.PROTECT,
-        limit_choices_to={'type_of': 2},
+        limit_choices_to={'type_of': TYPE_HEAD},
         related_name='+',
         null=True
     )
     avatar_clothes = models.ForeignKey(
         Avatar,
         on_delete=models.PROTECT,
-        limit_choices_to={'type_of': 3},
+        limit_choices_to={'type_of': TYPE_CLOTHES},
         related_name='+',
         null=True
     )
     avatar_pants = models.ForeignKey(
         Avatar,
         on_delete=models.PROTECT,
-        limit_choices_to={'type_of': 4},
+        limit_choices_to={'type_of': TYPE_PANTS},
         related_name='+',
         null=True
     )
