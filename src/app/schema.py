@@ -4,6 +4,7 @@ import achievements.schema
 import api.schema
 import audiences.schema
 import block.schema
+import block.mutations
 import collectibles.schema
 import emails.schema
 import experiences.schema
@@ -17,6 +18,7 @@ import universals.schema
 
 class Mutation(
         api.schema.Mutation,
+        block.mutations.Mutation,
         collectibles.schema.Mutation,
         emails.schema.Mutation,
         students.schema.Mutation,
