@@ -60,6 +60,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         on_delete=models.PROTECT,
         limit_choices_to={'type_of': TYPE_ACCESSORIES},
         related_name='+',
+        blank=True,
         null=True
     )
     avatar_head = models.ForeignKey(
@@ -67,6 +68,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         on_delete=models.PROTECT,
         limit_choices_to={'type_of': TYPE_HEAD},
         related_name='+',
+        blank=True,
         null=True
     )
     avatar_clothes = models.ForeignKey(
@@ -74,6 +76,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         on_delete=models.PROTECT,
         limit_choices_to={'type_of': TYPE_CLOTHES},
         related_name='+',
+        blank=True,
         null=True
     )
     avatar_pants = models.ForeignKey(
@@ -81,6 +84,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         on_delete=models.PROTECT,
         limit_choices_to={'type_of': TYPE_PANTS},
         related_name='+',
+        blank=True,
         null=True
     )
 
