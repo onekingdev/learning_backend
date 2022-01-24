@@ -16,11 +16,11 @@ class CreatePathBlockPresentation(graphene.Mutation):
     def mutate(self, info, student_id, topic_id):
         student = Student.objects.get(id=student_id)
         topic = Topic.objects.get(id=topic_id)
-        block = Block.objects.filter(topic_grade__topic=topic).filter(students=student).first()
+        block = Block.objects.filter(
+            topic_grade__topic=topic).filter(students=student).first()
 
         block_presentation, new = BlockPresentation.objects.get_or_create(
             student=student, block=block)
-        block_presentation.start_timestamp = timezone.now()
         block_presentation.save()
 
         return CreatePathBlockPresentation(block_presentation=block_presentation)
