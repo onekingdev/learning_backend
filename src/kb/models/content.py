@@ -71,7 +71,7 @@ class QuestionAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
 
 class QuestionImageAsset(QuestionAsset):
     PREFIX = 'question_image_asset_'
-    image = models.ImageField()
+    image = models.URLField()
 
 
 class QuestionAudioAsset(QuestionAsset):
