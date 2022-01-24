@@ -170,11 +170,11 @@ class BlockPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     )
 
     # Metrics
-    hits = models.IntegerField(null=True)
-    errors = models.IntegerField(null=True)
-    total = models.IntegerField(null=True)
+    hits = models.IntegerField(default=0, null=True)
+    errors = models.IntegerField(default=0, null=True)
+    total = models.IntegerField(default=0, null=True)
     points = models.IntegerField(null=True)
-    start_timestamp = models.DateTimeField(null=True)
+    start_timestamp = models.DateTimeField(auto_now_add=True, null=True)
     end_timestamp = models.DateTimeField(null=True)
 
 
