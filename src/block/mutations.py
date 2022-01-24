@@ -1,20 +1,25 @@
 import graphene
 from django.utils import timezone
 from .models import BlockPresentation, Block
-from students.models import Student
 from .schema import BlockPresentationSchema
+from students.models import Student
+from kb.models import Topic
 
 
 class CreatePathBlockPresentation(graphene.Mutation):
     block_presentation = graphene.Field(BlockPresentationSchema)
 
     class Arguments:
-        block_id = graphene.ID(required=True)
         student_id = graphene.ID(required=True)
+        topic_id = graphene.ID(required=True)
 
-    def mutate(self, info, student_id, block_id):
+    def mutate(self, info, student_id, topic_id):
         student = Student.objects.get(id=student_id)
-        block = Block.objects.get(id=block_id)
+        topic = Topic.objects.get(id=topic_id)
+        block = Block.objects.filter(
+            topic_grade__topic=topic,
+            students__contains=student
+        )
 
         block_presentation, new = BlockPresentation.objects.get_or_create(
             student=student, block=block)
