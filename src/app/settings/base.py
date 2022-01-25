@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'mailer',
     'adminsortable2',
     'djmoney',
+    'djstripe',
 
     'api',
     'audiences',
