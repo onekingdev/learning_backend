@@ -66,21 +66,25 @@ class PrerequisiteSchema(DjangoObjectType):
         fields = "__all__"
 
 
+class QuestionImageAssetSchema(DjangoObjectType):
+    class Meta:
+        model = QuestionImageAsset
+        fields = "__all__"
+
+
 class QuestionSchema(DjangoObjectType):
     class Meta:
         model = Question
         fields = "__all__"
 
     question_text = graphene.String()
+    question_image_assets = graphene.List(QuestionImageAssetSchema)
 
     def resolve_question_text(self, info, language_code=None):
         return self.safe_translation_getter("question_text", any_language=True)
 
-
-class QuestionImageAssetSchema(DjangoObjectType):
-    class Meta:
-        model = QuestionImageAsset
-        fields = "__all__"
+    def resolve_question_image_assets(self, info):
+        return QuestionImageAsset.get_questionimageasset_set()
 
 
 class AnswerOptionSchema(DjangoObjectType):
