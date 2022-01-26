@@ -4,6 +4,7 @@ from graphene_django import DjangoObjectType
 from block.models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block
 from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPresentation
 from block.models import BlockAssignment
+from kb.schema import QuestionSchema
 
 
 class BlockConfigurationKeywordSchema(DjangoObjectType):
@@ -38,6 +39,11 @@ class BlockSchema(DjangoObjectType):
     class Meta:
         model = Block
         fields = "__all__"
+
+    questions = graphene.List(QuestionSchema)
+
+    def resolve_questions(self, info):
+        return self.questions()
 
 
 class BlockConfigurationSchema(DjangoObjectType):
