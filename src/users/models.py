@@ -11,6 +11,12 @@ class User(AbstractUser):
         blank=True,
         null=True,
     )
+    stripe_customer = models.ForeignKey(
+        'djstripe.Customer',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+    )
 
     def save(self, *args, **kwargs):
         current_site = Site.objects.get_current()
