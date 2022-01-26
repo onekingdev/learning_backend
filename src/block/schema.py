@@ -43,7 +43,7 @@ class BlockSchema(DjangoObjectType):
     questions = graphene.List(QuestionSchema)
 
     def resolve_questions(self, info):
-        return self.questions()
+        return self.questions.all()
 
 
 class BlockConfigurationSchema(DjangoObjectType):
