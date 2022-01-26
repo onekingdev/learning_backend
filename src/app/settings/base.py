@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
     'mailer',
     'adminsortable2',
+    'djmoney',
+    'djstripe',
 
     'api',
     'audiences',

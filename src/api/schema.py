@@ -58,13 +58,11 @@ class CreateGuardian(graphene.Mutation):
         password = graphene.String(required=True)
         email = graphene.String(required=False)
 
-    def mutate(self, info, username, password, email):
+    def mutate(self, info, username, password):
         user = get_user_model()(
             username=username,
         )
         user.set_password(password)
-        if email is not None:
-            user.email = email
         user.save()
 
         guardian = Guardian(
@@ -157,8 +155,7 @@ class CreateStudent(graphene.Mutation):
             audience = Grade.objects.get(grade).audience
             student_plan = Audience.objects.get(audience).student_plan
         else:
-            student_plan = StudentPlan.objects.get_or_create(
-                name='Default Plan')
+            student_plan = StudentPlan.objects.get_or_create(name='Default Plan')
 
         student.student_plan = StudentPlan.objects.get(student_plan)
 

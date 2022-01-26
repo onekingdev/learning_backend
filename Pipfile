@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-Django = "*"
+Django = "<4"
 django-reversion = "*"
 django-polymorphic = "*"
 easy-thumbnails = "*"
@@ -27,6 +27,8 @@ gunicorn = "*"
 psycopg2 = "*"
 gtts = "*"
 django-admin-sortable2 = "*"
+django-money = "*"
+dj-stripe = "*"
 
 [dev-packages]
 
