@@ -3,7 +3,7 @@ from django.conf import settings
 from graphene_django import DjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from kb.models.content import Question, AnswerOption
-from django.utils.html import strip_tags
+from kb.models.content import QuestionImageAsset
 
 
 class AreaOfKnowledgeSchema(DjangoObjectType):
@@ -75,6 +75,12 @@ class QuestionSchema(DjangoObjectType):
 
     def resolve_question_text(self, info, language_code=None):
         return self.safe_translation_getter("question_text", any_language=True)
+
+
+class QuestionImageAssetSchema(DjangoObjectType):
+    class Meta:
+        model = QuestionImageAsset
+        fields = "__all__"
 
 
 class AnswerOptionSchema(DjangoObjectType):
@@ -204,6 +210,20 @@ class Query(graphene.ObjectType):
     def resolve_question_by_id(root, info, id):
         # Querying a single question
         return Question.objects.get(pk=id)
+
+    # ----------------- QuestionImageAsset ----------------- #
+
+    question_image_assets = graphene.List(QuestionImageAssetSchema)
+    question_image_asset_by_id = graphene.Field(
+        QuestionImageAssetSchema, id=graphene.ID())
+
+    def resolve_question_image_assets(root, info, **kwargs):
+        # Querying a list
+        return QuestionImageAsset.objects.all()
+
+    def resolve_question_image_asset_by_id(root, info, id):
+        # Querying a single question
+        return QuestionImageAsset.objects.get(pk=id)
 
     # ----------------- AnswerOption ----------------- #
 
