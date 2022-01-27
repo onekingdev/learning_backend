@@ -62,6 +62,11 @@ class QuestionAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     order = models.PositiveIntegerField(blank=True, null=True)
 
+
+    @admin.display(description='Question identifier')
+    def question_slug(self):
+        return self.question.random_slug
+
     def save(self, *args, **kwargs):
         if self.order is None:
             self.order = QuestionAsset.objects.filter(
