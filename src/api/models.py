@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
 from students.models import Student
+from guardians.models import Guardian
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -8,6 +9,7 @@ from django.dispatch import receiver
 active_roles = (
     ("user", "user"),
     ("manager", "manager"),
+    ("guardian", "guardian"),
     ("student", "student")
 )
 
@@ -30,6 +32,14 @@ def create_user_profile(sender, instance, created, **kwargs):
             role = "manager"
 
         profile.objects.create(user=instance, role=role)
+
+
+@receiver(post_save, sender=Guardian)
+def create_guardian_profile(sender, instance, created, **kwargs):
+    if created:
+        student_profile = profile.objects.get(user=instance.user)
+        student_profile.role = "guardian"
+        student_profile.save()
 
 
 @receiver(post_save, sender=Student)
