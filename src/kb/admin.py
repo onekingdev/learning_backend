@@ -127,8 +127,3 @@ class QuestionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportEx
 @admin.register(QuestionImageAsset)
 class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
     resource_class = resources.QuestionImageAssetResource
-    list_display = (
-        'question_slug',
-        'identifier',
-        'image',
-    )

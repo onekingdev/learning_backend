@@ -138,14 +138,14 @@ class QuestionImageAssetResource(ModelResource):
         fields = (
             'id',
             'identifier',
-            'question',
+            'question__identifier',
             'order',
             'image'
         )
         export_order = (
             'id',
             'identifier',
-            'question',
+            'question__identifier',
             'order',
             'image'
         )
