@@ -84,7 +84,7 @@ class QuestionSchema(DjangoObjectType):
         return self.safe_translation_getter("question_text", any_language=True)
 
     def resolve_question_image_assets(self, info):
-        return QuestionImageAsset.get_questionimageasset_set()
+        return Question.get_questionimageasset_set()
 
 
 class AnswerOptionSchema(DjangoObjectType):
