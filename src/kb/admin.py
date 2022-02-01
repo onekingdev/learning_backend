@@ -64,6 +64,7 @@ class AreaOfKnowledgeAdmin(import_export_admin.ImportExportModelAdmin, parler_ad
         'name',
         'audience',
         'universal_area_knowledge',
+        'is_active',
     )
 
 
