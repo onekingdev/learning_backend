@@ -140,6 +140,7 @@ class Query(graphene.ObjectType):
     areas_of_knowledge = graphene.List(AreaOfKnowledgeSchema)
     area_of_knowledge_by_id = graphene.Field(
         AreaOfKnowledgeSchema, id=graphene.String())
+    areas_of_knowledge_by_audience = graphene.List(AreaOfKnowledgeSchema)
 
     def resolve_areas_of_knowledge(root, info, **kwargs):
         # Querying a list
@@ -148,6 +149,10 @@ class Query(graphene.ObjectType):
     def resolve_area_of_knowledge_by_id(root, info, id):
         # Querying a single question
         return AreaOfKnowledge.objects.get(pk=id)
+
+    def resolve_area_of_knowledge_by_audience(root, info, audience_id):
+        # Querying a single question
+        return AreaOfKnowledge.objects.filter(audience=audience_id)
 
     # ----------------- Grade ----------------- #
 

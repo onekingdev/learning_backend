@@ -68,6 +68,7 @@ class AreaOfKnowledgeAdmin(import_export_admin.ImportExportModelAdmin, parler_ad
     )
     list_filter = (
         'is_active',
+        'audience',
     )
 
 
