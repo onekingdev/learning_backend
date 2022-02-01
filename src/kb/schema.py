@@ -145,7 +145,7 @@ class Query(graphene.ObjectType):
 
     def resolve_areas_of_knowledge(root, info, **kwargs):
         # Querying a list
-        return AreaOfKnowledge.all()
+        return AreaOfKnowledge.objects.all()
 
     def resolve_area_of_knowledge_by_id(root, info, id):
         # Querying a single AoK
