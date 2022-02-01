@@ -1,10 +1,10 @@
 from django.db import models
 from django.utils.text import slugify
 from parler.models import TranslatableModel, TranslatedFields
-from app.models import RandomSlugModel, TimestampModel
+from app.models import RandomSlugModel, TimestampModel, IsActiveModel
 
 
-class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
+class AreaOfKnowledge(IsActiveModel, TimestampModel, RandomSlugModel, TranslatableModel):
     PREFIX = 'aok_'
 
     translations = TranslatedFields(
