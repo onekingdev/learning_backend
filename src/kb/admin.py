@@ -66,6 +66,9 @@ class AreaOfKnowledgeAdmin(import_export_admin.ImportExportModelAdmin, parler_ad
         'universal_area_knowledge',
         'is_active',
     )
+    list_filter = (
+        'is_active',
+    )
 
 
 @admin.register(Grade)
