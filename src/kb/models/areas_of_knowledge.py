@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
+from ..managers.areas_of_knowledge import AreaOfKnowledgeManager
 
 
 class AreaOfKnowledge(IsActiveModel, TimestampModel, RandomSlugModel, TranslatableModel):
@@ -22,6 +23,8 @@ class AreaOfKnowledge(IsActiveModel, TimestampModel, RandomSlugModel, Translatab
         'audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
     universal_area_knowledge = models.ForeignKey(
         'universals.UniversalAreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
+
+    objects = AreaOfKnowledgeManager()
 
     def __str__(self):
         return self.name
