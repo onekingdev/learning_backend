@@ -18,7 +18,7 @@ class StudentSchema(DjangoObjectType):
     audience = graphene.Field(AudienceSchema)
 
     def resolve_audience(self, info):
-        return self.get_active_audience()
+        return self.get_active_audience
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
