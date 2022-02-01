@@ -116,6 +116,10 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         return (self.first_name if self.first_name else ' ') + \
             ' ' + (self.last_name if self.last_name else ' ')
 
+    @property
+    def get_active_audience(self):
+        return self.active_group.grade.audience
+
     def __str__(self):
         return self.full_name
 
