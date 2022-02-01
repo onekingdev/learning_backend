@@ -139,8 +139,9 @@ class Query(graphene.ObjectType):
 
     areas_of_knowledge = graphene.List(AreaOfKnowledgeSchema)
     area_of_knowledge_by_id = graphene.Field(
-        AreaOfKnowledgeSchema, id=graphene.String())
-    areas_of_knowledge_by_audience = graphene.List(AreaOfKnowledgeSchema)
+        AreaOfKnowledgeSchema, id=graphene.ID())
+    areas_of_knowledge_by_audience = graphene.Field(
+        AreaOfKnowledgeSchema, audience_id=graphene.ID())
 
     def resolve_areas_of_knowledge(root, info, **kwargs):
         # Querying a list
