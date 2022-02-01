@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from students.models import Avatar, Student, StudentTopicMastery, StudentGrade, StudentAchievement
-from audience.schema import AudienceSchema
+from audiences.schema import AudienceSchema
 
 
 class AvatarSchema(DjangoObjectType):
