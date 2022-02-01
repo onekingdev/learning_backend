@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from parler.models import TranslatableModel, TranslatedFields
-from app.models import RandomSlugModel, TimestampModel, IsActiveModel
+from app.models import RandomSlugModel, TimestampModel
 
 
 class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
@@ -22,6 +22,8 @@ class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
         'audiences.Audience', on_delete=models.PROTECT, null=True, blank=True)
     universal_area_knowledge = models.ForeignKey(
         'universals.UniversalAreaOfKnowledge', on_delete=models.PROTECT, null=True, blank=True)
+
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
