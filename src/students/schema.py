@@ -77,7 +77,7 @@ class Query(graphene.ObjectType):
     # ----------------- Avatar ----------------- #
 
     avatars = graphene.List(AvatarSchema)
-    avatar_by_id = graphene.Field(AvatarSchema, id=graphene.String())
+    avatar_by_id = graphene.Field(AvatarSchema, id=graphene.ID())
 
     def resolve_avatars(root, info, **kwargs):
         # Querying a list
@@ -90,7 +90,7 @@ class Query(graphene.ObjectType):
     # ----------------- Student ----------------- #
 
     students = graphene.List(StudentSchema)
-    student_by_id = graphene.Field(StudentSchema, id=graphene.String())
+    student_by_id = graphene.Field(StudentSchema, id=graphene.ID())
 
     def resolve_students(root, info, **kwargs):
         # Querying a list
@@ -104,7 +104,7 @@ class Query(graphene.ObjectType):
 
     students_topic_mastery = graphene.List(StudentTopicMasterySchema)
     student_topic_mastery_by_id = graphene.Field(
-        StudentTopicMasterySchema, id=graphene.String())
+        StudentTopicMasterySchema, id=graphene.ID())
 
     def resolve_students_topic_mastery(root, info, **kwargs):
         # Querying a list
@@ -118,7 +118,7 @@ class Query(graphene.ObjectType):
 
     students_grade = graphene.List(StudentGradeSchema)
     student_grade_by_id = graphene.Field(
-        StudentGradeSchema, id=graphene.String())
+        StudentGradeSchema, id=graphene.ID())
 
     def resolve_students_grade(root, info, **kwargs):
         # Querying a list
@@ -132,7 +132,7 @@ class Query(graphene.ObjectType):
 
     students_achievement = graphene.List(StudentAchievementSchema)
     student_achievement_by_id = graphene.Field(
-        StudentAchievementSchema, id=graphene.String())
+        StudentAchievementSchema, id=graphene.ID())
 
     def resolve_students_achievement(root, info, **kwargs):
         # Querying a list
