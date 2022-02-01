@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from students.models import Avatar, Student, StudentTopicMastery, StudentGrade, StudentAchievement
+from audience.schema import AudienceSchema
 
 
 class AvatarSchema(DjangoObjectType):
@@ -13,6 +14,11 @@ class StudentSchema(DjangoObjectType):
     class Meta:
         model = Student
         fields = "__all__"
+
+    audience = graphene.Field(AudienceSchema)
+
+    def resolve_audience(self, info):
+        return self.get_active_audience()
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
