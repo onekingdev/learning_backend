@@ -44,6 +44,17 @@ class CollectibleCategory(TimestampModel, MPTTModel, RandomSlugModel, Translatab
 
 
 class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+    COMMON = 'Common'
+    RARE = 'Rare'
+    LEGENDARY = 'Legendary'
+    EPIC = 'Epic'
+    TIER_CHOICES = [
+        (COMMON, 'Common'),
+        (RARE, 'Rare'),
+        (LEGENDARY, 'Legendary'),
+        (EPIC, 'Epic'),
+    ]
+
     translations = TranslatedFields(
         name=models.CharField(max_length=128, null=True),
         description=models.TextField(null=True)
@@ -54,14 +65,28 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
     category = models.ForeignKey(
         'collectibles.CollectibleCategory', on_delete=models.PROTECT, null=True, blank=True)
     objects = CollectibleManager()
+    tier = models.CharField(
+        choices=TIER_CHOICES,
+        max_length=32,
+    )
 
     # TODO: - Collectible tiers (rarity)
     #       - Collectible type (cards, etc)
 
 
+class CollectiblePackPurchaseTransaction(Withdraw):
+    collectibles = models.ManyToManyField(Collectible, blank=True)
+
+    def assign_collectibles(self):
+        for collectible in self.collectibles.all():
+            student_collectible = StudentCollectible(
+                collectible=collectible, student=self.account.student)
+            student_collectible.save()
+
+
 class CollectiblePurchaseTransaction(Withdraw):
     collectible = models.ForeignKey(
-        'collectibles.Collectible', on_delete=models.PROTECT, null=True)
+        Collectible, on_delete=models.PROTECT, null=True)
 
     def save(self, *args, **kwargs):
         if not self.pk:
