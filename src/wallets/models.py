@@ -4,7 +4,10 @@ from accounting.models import Account, PositiveMovement, NegativeMovement
 
 class CoinWallet(Account):
     student = models.OneToOneField(
-        'students.Student', on_delete=models.PROTECT, null=True)
+        'students.Student',
+        on_delete=models.PROTECT,
+        related_name="coinWallet",
+        null=True)
 
 
 class EngagementWallet(Account):
