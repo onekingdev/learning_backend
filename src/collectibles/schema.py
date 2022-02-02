@@ -1,7 +1,8 @@
 import graphene
 from django.conf import settings
 from graphene_django import DjangoObjectType
-from collectibles.models import CollectibleCategory, Collectible, CollectiblePurchaseTransaction, StudentCollectible
+from collectibles.models import CollectibleCategory, Collectible, StudentCollectible
+from .models import CollectiblePurchaseTransaction, CollectiblePackPurchaseTransaction
 from students.models import Student
 from wallets.models import CoinWallet
 
@@ -60,6 +61,12 @@ class CollectibleSchema(DjangoObjectType):
 class CollectiblePurchaseTransactionSchema(DjangoObjectType):
     class Meta:
         model = CollectiblePurchaseTransaction
+        fields = "__all__"
+
+
+class CollectiblePackPurchaseTransactionSchema(DjangoObjectType):
+    class Meta:
+        model = CollectiblePackPurchaseTransaction
         fields = "__all__"
 
 
