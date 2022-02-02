@@ -2,6 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from students.models import Avatar, Student, StudentTopicMastery, StudentGrade, StudentAchievement
 from audiences.schema import AudienceSchema
+from wallets.schema import CoinWalletSchema
 
 
 class AvatarSchema(DjangoObjectType):
@@ -16,9 +17,13 @@ class StudentSchema(DjangoObjectType):
         fields = "__all__"
 
     audience = graphene.Field(AudienceSchema)
+    coin_wallet = graphene.Field(CoinWalletSchema)
 
     def resolve_audience(self, info):
         return self.get_active_audience
+
+    def resolve_coin_wallet(self, info):
+        return self.coinWallet
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
