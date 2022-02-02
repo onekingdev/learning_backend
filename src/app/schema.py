@@ -15,6 +15,7 @@ import organization.schema
 import plans.schema
 import students.schema
 import universals.schema
+import wallets.schema
 
 
 class Mutation(
@@ -43,6 +44,7 @@ class Query(
         plans.schema.Query,
         students.schema.Query,
         universals.schema.Query,
+        wallets.schema.Query,
         graphene.ObjectType):
     pass
 
