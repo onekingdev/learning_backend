@@ -6,6 +6,7 @@ import audiences.schema
 import block.schema
 import block.mutations
 import collectibles.schema
+import collectibles.mutation
 import emails.schema
 import experiences.schema
 import guardians.schema
@@ -19,7 +20,7 @@ import universals.schema
 class Mutation(
         api.schema.Mutation,
         block.mutations.Mutation,
-        collectibles.schema.Mutation,
+        collectibles.mutations.Mutation,
         emails.schema.Mutation,
         students.schema.Mutation,
         graphene.ObjectType):
