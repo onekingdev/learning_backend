@@ -116,7 +116,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     topic_grade = models.ForeignKey(
         'kb.TopicGrade',
         on_delete=models.PROTECT,
-        help_text='This is the topic covered in this block'
+        help_text='This are the topics covered in this block'
     )
     questions = models.ManyToManyField(
         'kb.Question',
