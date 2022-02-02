@@ -6,7 +6,7 @@ import audiences.schema
 import block.schema
 import block.mutations
 import collectibles.schema
-import collectibles.mutation
+import collectibles.mutations
 import emails.schema
 import experiences.schema
 import guardians.schema
