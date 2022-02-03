@@ -13,7 +13,7 @@ from mptt.admin import DraggableMPTTAdmin
 class CustomUserAdmin(UserAdmin):
     model = User
     list_display = ('username', 'email', 'is_staff', 'is_active', 'language',)
-    list_filter = ('username', 'email', 'is_staff', 'is_active', 'language',)
+    list_filter = ('is_staff', 'is_active',)
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password', 'language')}),
         ('Permissions', {'fields': ('is_staff', 'is_active',
