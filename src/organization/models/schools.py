@@ -59,9 +59,16 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
 
     PREFIX = 'school_personnel_'
 
-    user = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
+    user = models.OneToOneField(
+        'users.User',
+        on_delete=models.PROTECT,
+        null=True
+    )
     school = models.ForeignKey(
-        'organization.School', on_delete=models.PROTECT, null=True)
+        'organization.School',
+        on_delete=models.PROTECT,
+        null=True
+    )
 
     name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)

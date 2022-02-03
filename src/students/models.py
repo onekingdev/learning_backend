@@ -35,7 +35,11 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
     PREFIX = 'student_'
 
-    user = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
+    user = models.OneToOneField(
+        'users.User',
+        on_delete=models.PROTECT,
+        null=True
+    )
     first_name = models.CharField(max_length=64, null=True, blank=True)
     last_name = models.CharField(max_length=64, null=True, blank=True)
     full_name = models.CharField(
