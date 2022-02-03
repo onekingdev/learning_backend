@@ -31,9 +31,16 @@ class OrganizationPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
 
     PREFIX = 'org_personnel_'
 
-    user = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True)
+    user = models.OneToOneField(
+        'users.User',
+        on_delete=models.PROTECT,
+        null=True
+    )
     organization = models.ForeignKey(
-        'organization.Organization', on_delete=models.PROTECT, null=True)
+        'organization.Organization',
+        on_delete=models.PROTECT,
+        null=True
+    )
 
     name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)
