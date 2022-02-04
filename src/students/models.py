@@ -129,16 +129,17 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
     def save(self, *args, **kwargs):
         self.full_name = self.get_full_name
-        super().save(*args, **kwargs)
 
         if self.pk is None:
-            from wallets.models import CoinWallet, EngagementWallet
+            from wallets.models import CoinWallet
+            super().save(*args, **kwargs)
             coin_wallet, cw_new = CoinWallet.objects.get_or_create(
-                student=self)
-            engagement_wallet, ew_new = EngagementWallet.objects.get_or_create(
-                student=self)
+                student=self,
+                name=self.user.username
+            )
+            coin_wallet.save()
 
-        return True
+        return super().save(*args, **kwargs)
 
 
 class StudentTopicMastery(TimestampModel, UUIDModel, IsActiveModel):
