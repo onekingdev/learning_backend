@@ -70,9 +70,6 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         max_length=32,
     )
 
-    # TODO: - Collectible tiers (rarity)
-    #       - Collectible type (cards, etc)
-
 
 class CollectiblePackPurchaseTransaction(Withdraw):
     collectibles = models.ManyToManyField(Collectible, blank=True)

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from .env import SECRET_KEY, ENV_INSTALLED_APPS, SENDGRID_API_KEY, SENDGRID_DEFAULT_SENDER
+from .env import GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_CLIENT_SECRET, GOOGLE_AUTH_API_KEY
 
 from pathlib import Path
 from datetime import timedelta
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'graphene_django',
     'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
     'mailer',
@@ -70,7 +72,6 @@ INSTALLED_APPS = [
     'universals',
     'users',
     'wallets'
-
 ]
 
 
@@ -184,6 +185,7 @@ GRAPHQL_JWT = {
 AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backend.AuthenticationBackends',
 ]
 
 
@@ -221,5 +223,15 @@ IMPORT_EXPORT_CELERY_MODELS = {
         'app_label': 'kb',
         'model_name': 'Topic',
         'resource': topics_resource,
+    }
+}
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': GOOGLE_AUTH_CLIENT_ID,
+            'secret': GOOGLE_AUTH_CLIENT_SECRET,
+            'key': GOOGLE_AUTH_API_KEY,
+        }
     }
 }
