@@ -38,22 +38,20 @@ class PurchaseCollectiblePack(graphene.Mutation):
 
     class Arguments:
         student = graphene.ID(required=True)
+        collectible_category = graphene.ID(required=True)
         pack_size = graphene.Int(required=False)
 
     def mutate(
             self,
             info,
             student,
+            collectible_category,
             pack_size=PACK_SIZE,
             pack_price=PACK_PRICE,
             collectible_tiers=COLLECTIBLE_TIERS,
             collectible_tiers_probabilities=COLLECTIBLE_TIERS_PROBABILITIES):
         # Select student
         student = Student.objects.get(id=student)
-        # Filter collectibles owned by student
-        student_collectibles = Collectible.objects.filter(
-            studentcollectible__student=student
-        )
         # Get or create student coin wallet account
         account, new = CoinWallet.objects.get_or_create(student=student)
         if account.balance > pack_price:
@@ -78,12 +76,7 @@ class PurchaseCollectiblePack(graphene.Mutation):
 
             for tier, amount in selection.items():
                 available_collectibles = list(
-                    Collectible.objects.filter(
-                        tier=tier).difference(student_collectibles)
-                )
-                if len(available_collectibles) > pack_size:
-                    available_collectibles = random.sample(
-                        available_collectibles, pack_size)
+                    Collectible.objects.filter(category=collectible_category))
                 collectible_pack_purchase_transaction.collectibles.add(
                     *available_collectibles)
 

@@ -60,6 +60,7 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         description=models.TextField(null=True)
     )
     image = models.ImageField(null=True)
+    # TODO: back_image
     price = models.DecimalField(
         blank=True, null=True, decimal_places=2, max_digits=15)
     category = models.ForeignKey(
