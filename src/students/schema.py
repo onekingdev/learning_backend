@@ -1,14 +1,8 @@
 import graphene
 from graphene_django import DjangoObjectType
-from students.models import Avatar, Student, StudentTopicMastery, StudentGrade, StudentAchievement
+from students.models import Student, StudentTopicMastery, StudentGrade, StudentAchievement
 from audiences.schema import AudienceSchema
 from wallets.schema import CoinWalletSchema
-
-
-class AvatarSchema(DjangoObjectType):
-    class Meta:
-        model = Avatar
-        fields = "__all__"
 
 
 class StudentSchema(DjangoObjectType):
@@ -44,53 +38,8 @@ class StudentAchievementSchema(DjangoObjectType):
         fields = "__all__"
 
 
-class SetStudentAvatar(graphene.Mutation):
-    student = graphene.Field(StudentSchema)
-
-    class Arguments:
-        avatar_url = graphene.String()
-        student_id = graphene.ID()
-        avatar_type_of = graphene.Int()
-
-    def mutate(self, info, avatar_url, student_id, avatar_type_of):
-        student = Student.objects.get(id=student_id)
-        avatar, new = Avatar.objects.get_or_create(
-            image=avatar_url,
-            type_of=avatar_type_of)
-
-        avatar.save()
-
-        if avatar_type_of == 1:
-            student.avatar_accessories = avatar
-        elif avatar_type_of == 2:
-            student.avatar_head = avatar
-        elif avatar_type_of == 3:
-            student.avatar_clothes = avatar
-        else:
-            student.avatar_pants = avatar
-
-        student.save()
-
-        return SetStudentAvatar(student=student)
-
-
-class Mutation(graphene.ObjectType):
-    set_student_avatar = SetStudentAvatar.Field()
-
 
 class Query(graphene.ObjectType):
-    # ----------------- Avatar ----------------- #
-
-    avatars = graphene.List(AvatarSchema)
-    avatar_by_id = graphene.Field(AvatarSchema, id=graphene.ID())
-
-    def resolve_avatars(root, info, **kwargs):
-        # Querying a list
-        return Avatar.objects.all()
-
-    def resolve_avatar_by_id(root, info, id):
-        # Querying a single question
-        return Avatar.objects.get(pk=id)
 
     # ----------------- Student ----------------- #
 
