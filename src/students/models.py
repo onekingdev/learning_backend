@@ -8,21 +8,6 @@ TYPE_CLOTHES = 'CLOTHES'
 TYPE_PANTS = 'PANTS'
 
 
-class Avatar(TimestampModel, UUIDModel, IsActiveModel):
-    TYPE_CHOICES = (
-        (TYPE_ACCESSORIES, 'Accessories'),
-        (TYPE_HEAD, 'Head/Hair'),
-        (TYPE_CLOTHES, 'Clothes'),
-        (TYPE_PANTS, 'Pants'),
-    )
-
-    PREFIX = 'avatar_'
-
-    type_of = models.CharField(max_length=25, null=True, choices=TYPE_CHOICES)
-    name = models.CharField(max_length=64, null=True, blank=True)
-    image = models.URLField(null=True)
-
-
 class Student(TimestampModel, UUIDModel, IsActiveModel):
     GENDER_MALE = 'MALE'
     GENDER_FEMALE = 'FEMALE'
@@ -60,7 +45,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     )
 
     avatar_accessories = models.ForeignKey(
-        Avatar,
+        'avatars.Avatar',
         on_delete=models.PROTECT,
         limit_choices_to={'type_of': TYPE_ACCESSORIES},
         related_name='+',
@@ -68,7 +53,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         null=True
     )
     avatar_head = models.ForeignKey(
-        Avatar,
+        'avatars.Avatar',
         on_delete=models.PROTECT,
         limit_choices_to={'type_of': TYPE_HEAD},
         related_name='+',
@@ -76,7 +61,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         null=True
     )
     avatar_clothes = models.ForeignKey(
-        Avatar,
+        'avatars.Avatar',
         on_delete=models.PROTECT,
         limit_choices_to={'type_of': TYPE_CLOTHES},
         related_name='+',
@@ -84,7 +69,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         null=True
     )
     avatar_pants = models.ForeignKey(
-        Avatar,
+        'avatars.Avatar',
         on_delete=models.PROTECT,
         limit_choices_to={'type_of': TYPE_PANTS},
         related_name='+',
