@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'djstripe',
 
     'api',
+    'avatars',
     'audiences',
     'accounting',
     'achievements',
