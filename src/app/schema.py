@@ -14,7 +14,9 @@ import kb.schema
 import organization.schema
 import plans.schema
 import students.schema
+import students.mutations
 import universals.schema
+import users.schema
 import wallets.schema
 import avatars.schema
 import avatars.mutations
@@ -26,6 +28,7 @@ class Mutation(
         collectibles.mutations.Mutation,
         emails.schema.Mutation,
         avatars.mutations.Mutation,
+        students.mutations.Mutation,
         graphene.ObjectType):
 
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
@@ -47,6 +50,7 @@ class Query(
         students.schema.Query,
         avatars.schema.Query,
         universals.schema.Query,
+        users.schema.Query,
         wallets.schema.Query,
         graphene.ObjectType):
     pass
