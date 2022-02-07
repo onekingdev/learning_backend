@@ -7,6 +7,7 @@ from user.schema import UserSchema, UserProfileSchema
 import graphene
 
 
+# TODO: move to user mutations
 class CreateUser(graphene.Mutation):
     user = graphene.Field(UserSchema)
     profile = graphene.Field(UserProfileSchema)
@@ -32,6 +33,7 @@ class CreateUser(graphene.Mutation):
         return CreateUser(user=user, profile=profile_obj, token=token, refresh_token=refresh_token)
 
 
+# TODO: move to guardian mutations
 class CreateGuardian(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
     user = graphene.Field(UserSchema)
@@ -70,6 +72,7 @@ class CreateGuardian(graphene.Mutation):
         )
 
 
+# TODO: move to guardian student mutations
 class CreateGuardianStudent(graphene.Mutation):
     guardian_student = graphene.List('guardians.schema.GuardianStudentSchema')
 
