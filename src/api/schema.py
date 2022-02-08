@@ -3,7 +3,7 @@ from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from students.models import Student
 from guardians.models import Guardian, GuardianStudent
-from user.schema import UserSchema, UserProfileSchema
+from users.schema import UserSchema, UserProfileSchema
 import graphene
 
 
