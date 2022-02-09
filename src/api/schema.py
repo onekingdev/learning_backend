@@ -4,6 +4,7 @@ from graphql_jwt.shortcuts import create_refresh_token, get_token
 from students.models import Student
 from guardians.models import Guardian, GuardianStudent
 from users.schema import UserSchema, UserProfileSchema
+from users.models import User
 import graphene
 
 
@@ -98,10 +99,46 @@ class CreateGuardianStudent(graphene.Mutation):
         )
 
 
+# TODO: move to guardian mutations
+class ChangeGuardianEmailPassword(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
+    user = graphene.Field(UserSchema)
+    profile = graphene.Field(UserProfileSchema)
+    token = graphene.String()
+    refresh_token = graphene.String()
+
+    class Arguments:
+        username = graphene.String(required=True)
+        password = graphene.String(required=False)
+        email = graphene.String(required=False)
+
+    def mutate(self, info, username, password, email):
+        user = User.objects.get(username=username)
+        if password is not None and password != "":
+            user.set_password(password)
+        if email is not None and email != "":
+            user.email = email
+        user.save()
+
+        guardian = Guardian.objects.get(user_id=user.id)
+
+        profile_obj = profile.objects.get(user=user.id)
+        token = get_token(user)
+        refresh_token = create_refresh_token(user)
+
+        return ChangeGuardianEmailPassword(
+            guardian=guardian,
+            user=user, profile=profile_obj,
+            token=token,
+            refresh_token=refresh_token
+        )
+
+
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
     create_guardian = CreateGuardian.Field()
     create_guardian_student = CreateGuardianStudent.Field()
+    change_guardian_email_password = ChangeGuardianEmailPassword.Field()
 
 
 class Query(graphene.ObjectType):

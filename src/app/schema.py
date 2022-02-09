@@ -25,10 +25,10 @@ import avatars.mutations
 class Mutation(
         api.schema.Mutation,
         block.mutations.Mutation,
+        students.mutations.Mutation,
         collectibles.mutations.Mutation,
         emails.schema.Mutation,
         avatars.mutations.Mutation,
-        students.mutations.Mutation,
         graphene.ObjectType):
 
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
@@ -47,10 +47,10 @@ class Query(
         kb.schema.Query,
         organization.schema.Query,
         plans.schema.Query,
+        users.schema.Query,
         students.schema.Query,
         avatars.schema.Query,
         universals.schema.Query,
-        # users.schema.Query,
         wallets.schema.Query,
         graphene.ObjectType):
     pass
