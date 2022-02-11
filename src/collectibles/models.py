@@ -38,8 +38,7 @@ class CollectibleCategory(TimestampModel, MPTTModel, RandomSlugModel, Translatab
         related_name='sub_categories'
     )
 
-    image = models.ImageField(null=True)
-
+    image = image = models.URLField(null=True)
     objects = CollectibleCategoryManager()
 
 
@@ -59,7 +58,7 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         name=models.CharField(max_length=128, null=True),
         description=models.TextField(null=True)
     )
-    image = models.ImageField(null=True)
+    image = models.URLField(null=True)
     # TODO: back_image
     price = models.DecimalField(
         blank=True, null=True, decimal_places=2, max_digits=15)
