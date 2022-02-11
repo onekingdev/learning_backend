@@ -3,7 +3,7 @@ from parler.admin import TranslatableAdmin, TranslatableModelForm
 from mptt.admin import DraggableMPTTAdmin
 from mptt.forms import MPTTAdminForm
 from .models import CollectibleCategory, Collectible, CollectiblePurchaseTransaction
-
+from import_export import admin as import_export_admin
 
 class CollectibleCategoryForm(MPTTAdminForm, TranslatableModelForm):
     pass
@@ -18,7 +18,7 @@ class CollectibleCategoryAdmin(TranslatableAdmin, DraggableMPTTAdmin):
 
 
 @admin.register(Collectible)
-class CollectibleAdmin(TranslatableAdmin):
+class CollectibleAdmin(TranslatableAdmin,import_export_admin.ImportExportModelAdmin):
     pass
 
 
