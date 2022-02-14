@@ -34,6 +34,44 @@ class StudentAvatar(TimestampModel, RandomSlugModel, IsActiveModel):
     in_use = models.BooleanField(default=False)
 
 
+class FavoriteAvatarCollection(TimestampModel):
+    student = models.ForeignKey(
+        'students.Student',
+        on_delete=models.CASCADE
+    )
+    avatar_accessorie = models.ForeignKey(
+        'avatars.Avatar',
+        on_delete=models.PROTECT,
+        limit_choices_to={'type_of': TYPE_ACCESSORIES},
+        related_name='+',
+        blank=True,
+        null=True
+    )
+    avatar_head = models.ForeignKey(
+        'avatars.Avatar',
+        on_delete=models.PROTECT,
+        limit_choices_to={'type_of': TYPE_HEAD},
+        related_name='+',
+    )
+    avatar_clothes = models.ForeignKey(
+        'avatars.Avatar',
+        on_delete=models.PROTECT,
+        limit_choices_to={'type_of': TYPE_CLOTHES},
+        related_name='+',
+    )
+    avatar_pants = models.ForeignKey(
+        'avatars.Avatar',
+        on_delete=models.PROTECT,
+        limit_choices_to={'type_of': TYPE_PANTS},
+        related_name='+',
+    )
+    skin_tone = models.CharField(
+        max_length=7,
+        blank=True,
+        null=True,
+    )
+
+
 class AvatarPurchaseTransaction(Withdraw):
     avatar = models.ForeignKey(
         Avatar, on_delete=models.PROTECT, null=True)

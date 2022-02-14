@@ -21,7 +21,6 @@ class StudentAvatarSchema(DjangoObjectType):
         fields = "__all__"
 
 
-
 class Query(graphene.ObjectType):
     # ----------------- Avatar ----------------- #
 
@@ -57,7 +56,7 @@ class Query(graphene.ObjectType):
         StudentAvatarSchema)
     student_avatar_by_id = graphene.Field(
         StudentAvatarSchema, id=graphene.ID())
-    
+
     avatars_by_student_id = graphene.List(
         StudentAvatarSchema, student_id=graphene.ID())
 
@@ -68,7 +67,7 @@ class Query(graphene.ObjectType):
     def resolve_student_avatar_by_id(root, info, id):
         # Querying a student avatar
         return StudentAvatar.objects.get(pk=id)
-    
+
     def resolve_avatars_by_student_id(root, info, student_id):
         # Querying all student avatars
         return StudentAvatar.objects.filter(student=student_id)

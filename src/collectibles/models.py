@@ -99,3 +99,4 @@ class StudentCollectible(TimestampModel, RandomSlugModel, IsActiveModel):
         'collectibles.Collectible', on_delete=models.PROTECT, null=True)
     student = models.ForeignKey(
         'students.Student', on_delete=models.PROTECT, null=True)
+    amount = models.IntegerField(default=1)

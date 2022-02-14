@@ -132,10 +132,8 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     block_size = models.IntegerField(default=BLOCK_SIZE)
 
     # Metrics
-    engangement_points_available = models.PositiveSmallIntegerField(null=True)
+    experience_points_available = models.PositiveSmallIntegerField(null=True)
     coins_available = models.PositiveSmallIntegerField(null=True)
-    battery_points_available = models.PositiveSmallIntegerField(
-        default=1, null=True)
 
     def save(self, *args, **kwargs):
         is_new = False
