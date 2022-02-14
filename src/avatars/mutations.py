@@ -95,14 +95,14 @@ class SetFavoriteAvatarCollection(graphene.Mutation):
         return SetFavoriteAvatarCollection(favorite_avatar_collection=new_favorite)
 
 
-class SetAvatarSkinTone(graphene.Mutation):
-    favorite_avatar_collection = graphene.Field(
-        FavoriteAvatarCollection
-    )
+# class SetAvatarSkinTone(graphene.Mutation):
+#     favorite_avatar_collection = graphene.Field(
+#         FavoriteAvatarCollection
+#     )
 
-    class Argument:
-        skin_tone = graphene.String(required=True)
-        favorite_avatar_collection = graphene.ID()
+#     class Argument:
+#         skin_tone = graphene.String(required=True)
+#         favorite_avatar_collection = graphene.ID()
 
 
 class Mutation(graphene.ObjectType):
