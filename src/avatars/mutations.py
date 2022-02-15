@@ -108,3 +108,4 @@ class SetFavoriteAvatarCollection(graphene.Mutation):
 class Mutation(graphene.ObjectType):
     purchase_avatar = PurchaseAvatar.Field()
     current_avatar = SetCurrentAvatar.Field()
+    set_favorite_avatar_collection = SetFavoriteAvatarCollection.Field()
