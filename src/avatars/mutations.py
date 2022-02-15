@@ -1,5 +1,5 @@
 import graphene
-from .schema import AvatarSchema, AvatarPurchaseTransactionSchema, StudentAvatarSchema
+from .schema import AvatarSchema, AvatarPurchaseTransactionSchema, StudentAvatarSchema, FavoriteAvatarCollectionSchema
 from .models import Avatar, StudentAvatar, AvatarPurchaseTransaction, FavoriteAvatarCollection
 from students.models import Student
 from students.schema import StudentSchema
@@ -64,9 +64,9 @@ class SetCurrentAvatar(graphene.Mutation):
         )
 
 
-class SelectFavoriteAvatarCollection(graphene.Mutation):
+class SetFavoriteAvatarCollection(graphene.Mutation):
     favorite_avatar_collection = graphene.Field(
-        FavoriteAvatarCollection
+        FavoriteAvatarCollectionSchema
     )
 
     class Arguments:
@@ -92,7 +92,7 @@ class SelectFavoriteAvatarCollection(graphene.Mutation):
             avatar_pants=avatar_pants_id,
         )
 
-        return SelectFavoriteAvatarCollection(favorite_avatar_collection=new_favorite)
+        return SetFavoriteAvatarCollection(favorite_avatar_collection=new_favorite)
 
 
 # class SetAvatarSkinTone(graphene.Mutation):
@@ -108,4 +108,4 @@ class SelectFavoriteAvatarCollection(graphene.Mutation):
 class Mutation(graphene.ObjectType):
     purchase_avatar = PurchaseAvatar.Field()
     current_avatar = SetCurrentAvatar.Field()
-    set_favorite_avatar_collection = SelectFavoriteAvatarCollection.Field()
+    set_favorite_avatar_collection = SetFavoriteAvatarCollection.Field()

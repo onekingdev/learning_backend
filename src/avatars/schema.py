@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from avatars.models import Avatar, StudentAvatar, AvatarPurchaseTransaction
+from avatars.models import Avatar, StudentAvatar, AvatarPurchaseTransaction, FavoriteAvatarCollection
 
 
 class AvatarSchema(DjangoObjectType):
@@ -18,6 +18,12 @@ class AvatarPurchaseTransactionSchema(DjangoObjectType):
 class StudentAvatarSchema(DjangoObjectType):
     class Meta:
         model = StudentAvatar
+        fields = "__all__"
+
+
+class FavoriteAvatarCollectionSchema(DjangoObjectType):
+    class Meta:
+        model = FavoriteAvatarCollection
         fields = "__all__"
 
 
@@ -71,3 +77,18 @@ class Query(graphene.ObjectType):
     def resolve_avatars_by_student_id(root, info, student_id):
         # Querying all student avatars
         return StudentAvatar.objects.filter(student=student_id)
+
+    # ----------------- FavoriteAvatarCollection ----------------- #
+
+    favorite_avatar_collections = graphene.List(
+        FavoriteAvatarCollectionSchema)
+    favorite_avatar_collection_by_id = graphene.Field(
+        FavoriteAvatarCollectionSchema, id=graphene.String())
+
+    def resolve_favorite_avatar_collections(root, info, **kwargs):
+        # Querying a list
+        return FavoriteAvatarCollection.objects.all()
+
+    def resolve_favorite_avatar_collection_by_id(root, info, id):
+        # Querying a single question
+        return FavoriteAvatarCollection.objects.get(pk=id)
