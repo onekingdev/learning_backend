@@ -117,3 +117,4 @@ class Mutation(graphene.ObjectType):
     purchase_avatar = PurchaseAvatar.Field()
     current_avatar = SetCurrentAvatar.Field()
     set_favorite_avatar_collection = SetFavoriteAvatarCollection.Field()
+    set_avatar_skin_tone = SetAvatarSkinTone.Field()
