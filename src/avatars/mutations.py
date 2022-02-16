@@ -102,7 +102,7 @@ class SetAvatarSkinTone(graphene.Mutation):
 
     class Arguments:
         skin_tone = graphene.String(required=True)
-        favorite_avatar_collection_id = graphene.ID()
+        favorite_avatar_collection_id = graphene.ID(required=True)
 
     def mutate(self, info, skin_tone, favorite_avatar_collection):
         avatar_collection = FavoriteAvatarCollection.objects.get(

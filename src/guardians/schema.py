@@ -1,22 +1,12 @@
 import graphene
 from graphene_django import DjangoObjectType
 from guardians.models import Guardian, GuardianStudent
-from payments.models import PaymentMethod
 
 
 class GuardianSchema(DjangoObjectType):
-
     class Meta:
         model = Guardian
         fields = "__all__"
-
-    payment_method = graphene.Field('payments.schema.PaymentMethodSchema')
-
-    def resolve_payment_method(self, info):
-        payment_method = PaymentMethod.objects.filter(is_default=True, guardian_id=self.id)
-        if payment_method.count() != 0:
-            return payment_method[0]
-        return
 
 
 class GuardianStudentSchema(DjangoObjectType):
@@ -44,7 +34,7 @@ class Query(graphene.ObjectType):
     guardians_student = graphene.List(GuardianStudentSchema)
     guardian_student_by_id = graphene.Field(
         GuardianStudentSchema, id=graphene.String())
-    guardian_student_by_guardian_id = graphene.List(
+    guardian_student_by_guardian = graphene.List(
         GuardianStudentSchema, id=graphene.ID())
 
     def resolve_guardians_student(root, info, **kwargs):
@@ -55,6 +45,6 @@ class Query(graphene.ObjectType):
         # Querying a single question
         return GuardianStudent.objects.get(pk=id)
 
-    def resolve_guardian_student_by_guardian_id(root, info, id):
+    def resolve_guardian_student_by_guardian(root, info, id):
         # Querying a single question
         return GuardianStudent.objects.filter(guardian=id)

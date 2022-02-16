@@ -12,19 +12,12 @@ class StudentSchema(DjangoObjectType):
 
     audience = graphene.Field(AudienceSchema)
     coin_wallet = graphene.Field(CoinWalletSchema)
-    grade = graphene.Field('students.schema.StudentGradeSchema')
 
     def resolve_audience(self, info):
         return self.get_active_audience
 
     def resolve_coin_wallet(self, info):
         return self.coinWallet
-
-    def resolve_grade(self, info):
-        student_grade = StudentGrade.objects.filter(student_id=self.id, is_active=True)
-        if student_grade.count() != 0:
-            return student_grade[0]
-        return
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
