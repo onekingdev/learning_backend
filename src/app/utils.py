@@ -1,3 +1,5 @@
+import calendar
+
 import jwt
 import api.models
 from datetime import datetime
@@ -14,3 +16,11 @@ def jwt_payload(user, context=None):
     payload['sub_email'] = user.email
     payload['exp'] = jwt_expires
     return payload
+
+
+def add_months(sourcedate, months):
+    month = sourcedate.month - 1 + months
+    year = sourcedate.year + month // 12
+    month = month % 12 + 1
+    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
+    return datetime(year, month, day, sourcedate.hour, sourcedate.minute, sourcedate.second, sourcedate.microsecond, sourcedate.tzinfo)
