@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from .env import SECRET_KEY, ENV_INSTALLED_APPS, SENDGRID_API_KEY, SENDGRID_DEFAULT_SENDER
+from .env import CORS_ORIGIN_WHITELIST as ENV_CORS_ORIGIN_WHITELIST
+from .env import ALLOWED_HOSTS as ENV_ALLOWED_HOSTS
 # from .env import GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_CLIENT_SECRET, GOOGLE_AUTH_API_KEY
 
 from pathlib import Path
@@ -26,6 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Application definition
+
+CORS_ORIGIN_WHITELIST = ENV_CORS_ORIGIN_WHITELIST
+ALLOWED_HOSTS = ENV_ALLOWED_HOSTS
 
 INSTALLED_APPS = [
     'django.contrib.admin',
