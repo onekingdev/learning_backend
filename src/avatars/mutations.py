@@ -97,7 +97,7 @@ class SetFavoriteAvatarCollection(graphene.Mutation):
 
 class SetAvatarSkinTone(graphene.Mutation):
     favorite_avatar_collection = graphene.Field(
-        FavoriteAvatarCollection
+        FavoriteAvatarCollectionSchema
     )
 
     class Argument:
