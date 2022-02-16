@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from .env import SECRET_KEY, ENV_INSTALLED_APPS, SENDGRID_API_KEY, SENDGRID_DEFAULT_SENDER
-from .env import GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_CLIENT_SECRET, GOOGLE_AUTH_API_KEY
+# from .env import GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_CLIENT_SECRET, GOOGLE_AUTH_API_KEY
 
 from pathlib import Path
 from datetime import timedelta
@@ -72,7 +72,8 @@ INSTALLED_APPS = [
     'students',
     'universals',
     'users',
-    'wallets'
+    'wallets',
+    'payments'
 ]
 
 
@@ -227,12 +228,12 @@ IMPORT_EXPORT_CELERY_MODELS = {
     }
 }
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': GOOGLE_AUTH_CLIENT_ID,
-            'secret': GOOGLE_AUTH_CLIENT_SECRET,
-            'key': GOOGLE_AUTH_API_KEY,
-        }
-    }
-}
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'APP': {
+#             'client_id': GOOGLE_AUTH_CLIENT_ID,
+#             'secret': GOOGLE_AUTH_CLIENT_SECRET,
+#             'key': GOOGLE_AUTH_API_KEY,
+#         }
+#     }
+# }
