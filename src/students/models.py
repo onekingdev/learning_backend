@@ -34,6 +34,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         editable=False)
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
+    points = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
     student_plan = models.ManyToManyField('plans.StudentPlan')
     active_student_plan = models.ForeignKey(
@@ -108,6 +109,10 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     @property
     def get_active_audience(self):
         return self.active_group.grade.audience
+
+    @property
+    def get_level_number(self):
+        return int(self.level.name.split("_")[1]) if(self.level.name) else 0
 
     def __str__(self):
         return self.full_name

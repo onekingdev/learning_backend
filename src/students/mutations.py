@@ -1,21 +1,18 @@
+
 import os
 import sys
 import graphene
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
-from graphene import ID
-
 from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from .models import Student, StudentGrade
 from plans.models import StudentPlan
 from organization.models import School, Group
 from kb.models.grades import Grade
-from kb.models import AreaOfKnowledge
 from audiences.models import Audience
 from users.schema import UserSchema, UserProfileSchema
 from .schema import StudentGradeSchema
-from plans.models import GuardianStudentPlan
 
 
 class CreateStudent(graphene.Mutation):
@@ -35,24 +32,19 @@ class CreateStudent(graphene.Mutation):
         group = graphene.ID(required=False)
         dob = graphene.Date(required=False)
         student_plan = graphene.ID(required=False)
-        guardian_student_plan_id = graphene.ID(required=True)
-        list_subject_id = graphene.List(ID)
 
     def mutate(
             self,
             info,
             first_name,
             last_name,
-            guardian_student_plan_id,
-            list_subject_id,
             username,
             password,
-            school=None,
-            grade=None,
-            group=None,
-            dob=None,
-            student_plan=None,
-    ):
+            school,
+            grade,
+            group,
+            dob,
+            student_plan):
 
         try:
             with transaction.atomic():
@@ -107,15 +99,6 @@ class CreateStudent(graphene.Mutation):
                 student.student_plan.add(student_plan)
 
                 student.save()
-
-                guardian_student_plan = GuardianStudentPlan.objects.get(pk=guardian_student_plan_id)
-
-                guardian_student_plan.student_id = student.id
-                for subject_id in list_subject_id:
-                    subject = AreaOfKnowledge.objects.get(pk=subject_id)
-                    guardian_student_plan.subject.add(subject)
-
-                guardian_student_plan.save()
 
                 profile_obj = profile.objects.get(user=user.id)
                 token = get_token(user)
@@ -233,8 +216,65 @@ class CreateChangeStudentGrade(graphene.Mutation):
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
 
+# Increase Student's level by one
+# Student's info comes from logined user info
+#   Input: None
+#   Output: {
+#               studentSchema,
+#               userSchema
+#   }
+class LevelUp(graphene.Mutation):
+    student = graphene.Field('students.schema.StudentSchema')
+    user = graphene.Field(UserSchema)
+    # class Arguments:
+    #     pass
+    def mutate(self, info):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        if not user.student:
+            raise Exception("Not found student")
+
+        level_amount = user.student.level.amount
+        next_level = user.student.level.__class__.objects.get(amount=level_amount + 1);
+        user.student.level = next_level;
+        user.student.level.save();
+
+        return LevelUp(user= user, student= user.student)
+
+# Set Student's point
+# Student's info comes from logined user info
+#   Input: Point to set( int )
+#   Output: {
+#               studentSchema,
+#               userSchema
+#   }
+class setPoint(graphene.Mutation):
+    student = graphene.Field('students.schema.StudentSchema')
+    user = graphene.Field(UserSchema)
+
+    class Arguments:
+        point_to_set = graphene.Int(required=False)
+
+    def mutate(self, info, point_to_set):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        if not user.student:
+            raise Exception("Not found student")
+
+        student = user.student
+        student.points = point_to_set
+        student.save()
+
+        return setPoint()
+    pass
 
 class Mutation(graphene.ObjectType):
     create_student = CreateStudent.Field()
     change_student_password = ChangeStudentPassword.Field()
     create_change_student_grade = CreateChangeStudentGrade.Field()
+    level_up = LevelUp.Field()
+    set_point = setPoint.Field()

@@ -15,5 +15,6 @@ class Level(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     )
 
     points_required = models.IntegerField(null=True)
+    amount = models.IntegerField(null=False)
 
     objects = LevelManager()
