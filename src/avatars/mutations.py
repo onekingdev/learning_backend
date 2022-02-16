@@ -100,7 +100,7 @@ class SetAvatarSkinTone(graphene.Mutation):
         FavoriteAvatarCollectionSchema
     )
 
-    class Argument:
+    class Arguments:
         skin_tone = graphene.String(required=True)
         favorite_avatar_collection_id = graphene.ID()
 
