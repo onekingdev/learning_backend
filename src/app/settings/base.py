@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'audiences',
     'accounting',
     'achievements',
+    'bank',
     'block',
     'collectibles',
     'emails',
