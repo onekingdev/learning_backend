@@ -70,8 +70,8 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         max_length=32,
     )
 
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+        # return self.safe_translation_getter("name", any_language=True)
 
 
 class CollectiblePackPurchaseTransaction(Withdraw):
