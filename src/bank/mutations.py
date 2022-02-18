@@ -28,9 +28,9 @@ class BankAccountDeposit(graphene.Mutation):
 
     def mutate(self, info, student, amount):
         student = Student.objects.get(id=student)
-        coin_wallet, wc_new = CoinWallet.objects.get_or_create(student=student,name=student.user.username)
+        coin_wallet, wc_new = CoinWallet.objects.get_or_create(student=student)
         if coin_wallet.balance > amount:
-            bank_account, ba_new = BankWallet.objects.get_or_create(student=student,name=student.user.username)
+            bank_account, ba_new = BankWallet.objects.get_or_create(student=student)
             bank_deposit = BankDeposit.objects.create(amount=amount, account=bank_account)
             bank_deposit_transaction = BankDepositTransaction(
                 bank_deposit=bank_deposit,amount=amount,
