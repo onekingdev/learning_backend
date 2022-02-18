@@ -1,7 +1,7 @@
 import graphene
 import random
 from .schema import CollectibleSchema, CollectiblePurchaseTransactionSchema, CollectiblePackPurchaseTransactionSchema
-from .models import Collectible
+from .models import Collectible, CollectibleCategory
 from .models import CollectiblePurchaseTransaction, CollectiblePackPurchaseTransaction
 from students.models import Student
 from students.schema import StudentSchema
@@ -11,7 +11,6 @@ from wallets.models import CoinWallet
 class PurchaseCollectiblePack(graphene.Mutation):
     """ Purchase a collectible pack """
     PACK_SIZE = 3
-    PACK_PRICE = 100
 
     COMMON_PROBABILITY = 40
     RARE_PROBABILITY = 30
@@ -47,13 +46,15 @@ class PurchaseCollectiblePack(graphene.Mutation):
             student,
             collectible_category,
             pack_size=PACK_SIZE,
-            pack_price=PACK_PRICE,
             collectible_tiers=COLLECTIBLE_TIERS,
             collectible_tiers_probabilities=COLLECTIBLE_TIERS_PROBABILITIES):
         # Select student
         student = Student.objects.get(id=student)
         # Get or create student coin wallet account
         account, new = CoinWallet.objects.get_or_create(student=student)
+        # Select price from category
+        pack_price = CollectibleCategory.objects.get(
+            id=collectible_category).price
         if account.balance > pack_price:
             # Create collectible purchase transaction
             collectible_pack_purchase_transaction = CollectiblePackPurchaseTransaction(

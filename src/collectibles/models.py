@@ -41,6 +41,7 @@ class CollectibleCategory(TimestampModel, MPTTModel, RandomSlugModel, Translatab
     front_image = models.URLField(null=True)
     back_image = models.URLField(null=True)
     objects = CollectibleCategoryManager()
+    price = models.IntegerField(default=100)
 
 
 class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
@@ -60,8 +61,6 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         description=models.TextField(null=True)
     )
     image = models.URLField(null=True)
-    price = models.DecimalField(
-        blank=True, null=True, decimal_places=2, max_digits=15)
     category = models.ForeignKey(
         'collectibles.CollectibleCategory', on_delete=models.PROTECT, null=True, blank=True)
     objects = CollectibleManager()
@@ -70,12 +69,14 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         max_length=32,
     )
 
-    # def __str__(self):
-        # return self.safe_translation_getter("name", any_language=True)
+    def __str__(self):
+        return self.safe_translation_getter("name", any_language=True)
 
 
 class CollectiblePackPurchaseTransaction(Withdraw):
     collectibles = models.ManyToManyField(Collectible, blank=True)
+    collectible_category = models.ForeignKey(
+        CollectibleCategory, on_delete=models.PROTECT)
 
     def assign_collectibles(self):
         for collectible in self.collectibles.all():
