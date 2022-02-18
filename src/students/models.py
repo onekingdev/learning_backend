@@ -129,14 +129,6 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             )
             coin_wallet.save()
 
-            from bank.models import BankAccount
-            bank_account, ba_new = BankAccount.objects.get_or_create(
-                student=self,
-                name=self.user.username
-            )
-            bank_account.save()
-
-
         return super().save(*args, **kwargs)
 
 
