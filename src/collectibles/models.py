@@ -70,6 +70,9 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
         max_length=32,
     )
 
+    def __str__(self):
+        return self.name
+
 
 class CollectiblePackPurchaseTransaction(Withdraw):
     collectibles = models.ManyToManyField(Collectible, blank=True)
