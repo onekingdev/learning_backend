@@ -1,45 +1,36 @@
 import graphene
 from graphene_django import DjangoObjectType
 from bank.models import (
-    BankDepositTransaction,
-    BankWithdrawTransaction, 
-    BankWallet
+    BankWallet,
+    Interest
 )
 from accounting.models import BankMovement
-
-
-class BankDepositTransactionSchema(DjangoObjectType):
-    class Meta:
-        model = BankDepositTransaction
-        fields = "__all__"
-
-
-class BankWithdrawTransactionSchema(DjangoObjectType):
-    class Meta:
-        model = BankWithdrawTransaction
-        fields = "__all__"
-
 
 class BankWalletSchema(DjangoObjectType):
     class Meta:
         model = BankWallet
-        fields = ("balance",)
+        fields = "__all__"
 
 
-class BankTransactionSchema(DjangoObjectType):
+class BankMovementSchema(DjangoObjectType):
     class Meta:
         model = BankMovement
-        fields = ("amount","date")
+        # fields = ("amount","date")
+        fields = "__all__"
 
-    transaction_type = graphene.String()
+    # transaction_type = graphene.String()
 
-    def resolve_transaction_type(self,info):
-        if self.side == 'L':
-            return "withdraw"
-        elif self.side == 'R':
-            return "deposit"
-        return ""
+    # def resolve_transaction_type(self,info):
+    #     if self.side == 'L':
+    #         return "withdraw"
+    #     elif self.side == 'R':
+    #         return "deposit"
+    #     return ""
 
+class InterestSchema(DjangoObjectType):
+    class Meta:
+        model = Interest
+        fields= ("id", "period", "requireCoin", "amount")
 
 class Query(graphene.ObjectType):
     # ----------------- Student Bank Balance ----------------- #
@@ -54,9 +45,17 @@ class Query(graphene.ObjectType):
     # ----------------- Student Bank Transactions ----------------- #
 
     student_bank_transactions_by_id = graphene.List(
-        BankTransactionSchema, student=graphene.ID())
+        BankMovementSchema, student=graphene.ID())
 
     def resolve_student_bank_transactions_by_id(root, info, student):
         # Querying a student's transaction
         return BankMovement.objects.filter(account__student=student)
 
+    # ----------------- Interest -------------------------------- #
+
+    interests = graphene.List(
+        InterestSchema
+    )
+    def resolve_interests(root, info, **kwargs):
+        # Querying a list
+        return Interest.objects.all()

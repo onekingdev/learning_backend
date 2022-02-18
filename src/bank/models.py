@@ -1,7 +1,7 @@
 from django.db import models
-from accounting.models import Account, BankPositiveMovement, BankNegativeMovement
-from wallets.models import Deposit, Withdraw
-
+from accounting.models import Account
+from app.models import TimestampModel, RandomSlugModel, IsActiveModel
+from django.db.models import Q
 
 class BankWallet(Account):
     student = models.OneToOneField(
@@ -13,7 +13,7 @@ class BankWallet(Account):
     #override balance method
     def get_balance_aggregate(self):
         positive_movements_aggregate = self.bankmovement_set.filter(
-            side=self.positive_side).aggregate(models.Sum('amount'))
+            Q(side=self.positive_side) | Q(side=self.SIDE_CHOICE_RIGHT_INTEREST)).aggregate(models.Sum('amount'))
         negative_movements_aggregate = self.bankmovement_set.filter(side=self.get_negative_side).aggregate(
             models.Sum('amount'))
 
@@ -30,32 +30,8 @@ class BankWallet(Account):
         dict['total_movements_balance'] = balance
         return dict
 
-
-class BankDeposit(BankPositiveMovement):
-    pass
-
-
-class BankWithdraw(BankNegativeMovement):
-    pass
-
-
-class BankDepositTransaction(Withdraw):
-    bank_deposit = models.OneToOneField(
-        'bank.BankDeposit',
-        on_delete=models.PROTECT,
-        related_name="bankAccountDeposit",
-        null=True)
-
-    def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
-
-
-class BankWithdrawTransaction(Deposit):
-    bank_withdraw = models.OneToOneField(
-        'bank.BankWithdraw',
-        on_delete=models.PROTECT,
-        related_name="bankAccountWithdraw",
-        null=True)
-
-    def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
+class Interest(TimestampModel, RandomSlugModel, IsActiveModel):
+    name = models.CharField(max_length=64, null=False)
+    period = models.IntegerField(null=False, default=0)
+    requireCoin = models.IntegerField(null=False, default=0)
+    amount = models.DecimalField(max_digits=15, decimal_places=2, default=0)

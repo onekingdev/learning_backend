@@ -1,15 +1,17 @@
 from django.db import models
 from app.models import RandomSlugModel, TimestampModel
-
+import datetime
 
 class Account(RandomSlugModel, TimestampModel):
     calculated_fields = ['balance']
 
     SIDE_CHOICE_LEFT = 'L'
     SIDE_CHOICE_RIGHT = 'R'
+    SIDE_CHOICE_RIGHT_INTEREST = 'I'
     SIDE_CHOICE_SET = (
         (SIDE_CHOICE_LEFT, 'Left'),
         (SIDE_CHOICE_RIGHT, 'Right'),
+        (SIDE_CHOICE_RIGHT_INTEREST, "I")
     )
 
     name = models.CharField(max_length=128)
@@ -33,7 +35,8 @@ class Account(RandomSlugModel, TimestampModel):
     def get_negative_side(self):
         return {
             self.SIDE_CHOICE_LEFT: self.SIDE_CHOICE_RIGHT,
-            self.SIDE_CHOICE_RIGHT: self.SIDE_CHOICE_LEFT
+            self.SIDE_CHOICE_RIGHT: self.SIDE_CHOICE_LEFT,
+            self.SIDE_CHOICE_RIGHT_INTEREST: self.SIDE_CHOICE_LEFT
         }[self.positive_side]
 
     def get_balance_aggregate(self):
@@ -110,6 +113,16 @@ class NegativeMovement(Movement):
 Bank Wallet Implementation
 
 '''
+class BankManager(models.Manager):
+    def create(self, *args, **kwargs):
+        account = kwargs['account']
+        student = account.student
+        student.int_period_start_at = datetime.datetime.now().date()
+        student.save()
+        return super().create(*args, **kwargs)
+
+    def inactive_objects(self):
+        return super().get_queryset().filter(is_active=False)
 
 class BankMovement(RandomSlugModel, TimestampModel):
     class Meta:
@@ -123,7 +136,7 @@ class BankMovement(RandomSlugModel, TimestampModel):
     comment = models.CharField(
         'Comentario', max_length=128, null=True, blank=True, )
     amount = models.DecimalField('Monto', decimal_places=2, max_digits=11)
-
+    objects = BankManager()
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 

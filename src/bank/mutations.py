@@ -3,75 +3,64 @@ import graphene
 from wallets.models import CoinWallet
 from students.models import Student
 from students.schema import StudentSchema
-from bank.schema import (
-    BankDepositTransactionSchema,
-    BankWithdrawTransactionSchema
-)
 from bank.models import (
     BankWallet,
-    BankDepositTransaction,
-    BankDeposit,BankWithdraw,
-    BankWithdrawTransaction
 )
+from accounting.models import BankMovement
+from .schema import BankMovementSchema
 from graphql import GraphQLError
 
+SIDE_CHOICE_DEPOSIT = 'R'
+SIDE_CHOICE_WITHDRAW = 'L'
 
 class BankAccountDeposit(graphene.Mutation):
     """ Bank Transaction """
     student = graphene.Field(StudentSchema)
-    bank_deposit_transaction = graphene.Field(
-        BankDepositTransactionSchema)
-
+    bankMovement = graphene.Field(BankMovementSchema)
     class Arguments:
-        student = graphene.ID(required=True)
         amount = graphene.Float(required=True)
 
-    def mutate(self, info, student, amount):
-        student = Student.objects.get(id=student)
-        coin_wallet, wc_new = CoinWallet.objects.get_or_create(student=student)
-        if coin_wallet.balance > amount:
-            bank_account, ba_new = BankWallet.objects.get_or_create(student=student)
-            bank_deposit = BankDeposit.objects.create(amount=amount, account=bank_account)
-            bank_deposit_transaction = BankDepositTransaction(
-                bank_deposit=bank_deposit,amount=amount,
-                account=coin_wallet
-            )
-            bank_deposit_transaction.save()
-
-            return BankAccountDeposit(
-                bank_deposit_transaction=bank_deposit_transaction,
-                student=student
-            )
+    def mutate(self, info, amount):
+        # student = Student.objects.get(id=student)
+        student = info.context.user.student
+        bank_balance = student.bankWallet.balance
+        wallet_balance = student.coinWallet.balance
+        print(bank_balance, wallet_balance)
+        # coin_wallet, wc_new = CoinWallet.objects.get_or_create(student=student,name=student.user.username)
+        # if coin_wallet.balance > amount:
+        if wallet_balance > amount:
+            bank_account, ba_new = BankWallet.objects.get_or_create(student=student,name=student.user.username)
+            bank_deposit = BankMovement.objects.create(amount=amount, account=bank_account, side=SIDE_CHOICE_DEPOSIT)
+            print(bank_deposit.date, bank_deposit.amount, bank_account)
+            return BankAccountDeposit(student=student, bankMovement=bank_deposit)
         raise GraphQLError('Insufficient balance')
 
 
 class BankAccountWithdraw(graphene.Mutation):
     """ Bank Transaction """
     student = graphene.Field(StudentSchema)
-    bank_withdraw_transaction = graphene.Field(
-        BankWithdrawTransactionSchema)
+    bankMovement = graphene.Field(
+        BankMovementSchema)
 
     class Arguments:
-        student = graphene.ID(required=True)
         amount = graphene.Float(required=True)
 
-    def mutate(self, info, student, amount):
-        student = Student.objects.get(id=student)
-        coin_wallet, wc_new = CoinWallet.objects.get_or_create(student=student)
-        bank_account, ba_new = BankWallet.objects.get_or_create(student=student)
-        if bank_account.balance > amount:
-            bank_withdraw = BankWithdraw.objects.create(amount=amount, account=bank_account)
-            bank_withdraw_transaction = BankWithdrawTransaction(
-                bank_withdraw=bank_withdraw,amount=amount,
-                account=coin_wallet
-            )
-            bank_withdraw_transaction.save()
-
+    def mutate(self, info, amount):
+        # student = Student.objects.get(id=student)
+        student = info.context.user.student
+        bank_balance = student.bankWallet.balance
+        wallet_balance = student.coinWallet.balance
+        # coin_wallet, wc_new = CoinWallet.objects.get_or_create(student=student,name=student.user.username)
+        # print("123",coin_wallet, coin_wallet.balance)
+        # if coin_wallet.balance > amount:
+        if bank_balance > amount:
+            bank_account, ba_new = BankWallet.objects.get_or_create(student=student,name=student.user.username)
+            bank_withdraw = BankMovement.objects.create(amount=amount, account=bank_account, side=SIDE_CHOICE_WITHDRAW)
             return BankAccountWithdraw(
-                bank_withdraw_transaction=bank_withdraw_transaction,
+                bankMovement=bank_withdraw,
                 student=student
             )
-        raise GraphQLError('Insufficient bank balance')
+        raise GraphQLError('Insufficient balance')
 
 
 class Mutation(graphene.ObjectType):

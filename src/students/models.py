@@ -35,7 +35,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     points = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-
+    int_period_start_at = models.DateField(auto_now_add=True)
     student_plan = models.ManyToManyField('plans.StudentPlan')
     active_student_plan = models.ForeignKey(
         'plans.StudentPlan',
@@ -129,8 +129,8 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             )
             coin_wallet.save()
 
-            from bank.models import BankAccount
-            bank_account, ba_new = BankAccount.objects.get_or_create(
+            from bank.models import BankWallet
+            bank_account, ba_new = BankWallet.objects.get_or_create(
                 student=self,
                 name=self.user.username
             )
