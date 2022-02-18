@@ -20,6 +20,8 @@ import users.schema
 import wallets.schema
 import avatars.schema
 import avatars.mutations
+import bank.mutations
+import bank.schema
 import plans.mutations
 import payments.mutations
 import payments.schema
@@ -28,6 +30,7 @@ import payments.schema
 class Mutation(
         api.schema.Mutation,
         block.mutations.Mutation,
+        bank.mutations.Mutation,
         students.mutations.Mutation,
         collectibles.mutations.Mutation,
         emails.schema.Mutation,
@@ -47,6 +50,7 @@ class Query(
         api.schema.Query,
         audiences.schema.Query,
         block.schema.Query,
+        bank.schema.Query,
         collectibles.schema.Query,
         experiences.schema.Query,
         guardians.schema.Query,
