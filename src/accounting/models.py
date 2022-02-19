@@ -148,7 +148,6 @@ class BankMovement(RandomSlugModel, TimestampModel):
         super(BankMovement, self).delete(*args, **kwargs)
         account.save()
 
-
 class BankPositiveMovement(BankMovement):
     def save(self, *args, **kwargs):
         self.side = self.account.get_positive_side

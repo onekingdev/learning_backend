@@ -2,6 +2,7 @@ from django.db import models
 from accounting.models import Account
 from app.models import TimestampModel, RandomSlugModel, IsActiveModel
 from django.db.models import Q
+from datetime import datetime
 
 class BankWallet(Account):
     student = models.OneToOneField(
@@ -29,6 +30,7 @@ class BankWallet(Account):
         dict['negative_movements_balance'] = negative_movements_balance
         dict['total_movements_balance'] = balance
         return dict
+
 
 class Interest(TimestampModel, RandomSlugModel, IsActiveModel):
     name = models.CharField(max_length=64, null=False)

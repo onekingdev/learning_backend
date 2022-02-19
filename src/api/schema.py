@@ -154,12 +154,12 @@ class Query(graphene.ObjectType):
             now = datetime.now().date()
             delta =( now - student.int_period_start_at ).total_seconds() / 3600 / 24
             bankBallance = student.bankWallet.balance
-            interests = Interest.objects.filter(period__lte=delta
+            interests = Interest.objects.filter(period__lte=delta, requireCoin__lte=bankBallance
             ).order_by('-requireCoin')
             print(student.int_period_start_at, interests)
             if(len(interests) > 0) :
                 amount = interests[0].amount
-                user.student.bankWallet.balance += amount
+                # user.student.bankWallet.balance += amount
                 BankMovement.objects.create(amount=amount, account=student.bankWallet, side=Account.SIDE_CHOICE_RIGHT_INTEREST)
         if user.is_anonymous:
             raise Exception('Authentication Failure')
