@@ -30,7 +30,7 @@ class BankMovementSchema(DjangoObjectType):
 class InterestSchema(DjangoObjectType):
     class Meta:
         model = Interest
-        fields= ("id", "period", "requireCoin", "amount")
+        fields= "__all__"
 
 class Query(graphene.ObjectType):
     # ----------------- Student Bank Balance ----------------- #

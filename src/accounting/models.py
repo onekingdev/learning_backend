@@ -135,7 +135,7 @@ class BankMovement(RandomSlugModel, TimestampModel):
                             choices=Account.SIDE_CHOICE_SET)
     comment = models.CharField(
         'Comentario', max_length=128, null=True, blank=True, )
-    amount = models.DecimalField('Monto', decimal_places=2, max_digits=11)
+    amount = models.FloatField(null=False)
     objects = BankManager()
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

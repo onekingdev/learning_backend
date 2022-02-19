@@ -9,6 +9,7 @@ from bank.models import (
 from accounting.models import BankMovement
 from .schema import BankMovementSchema
 from graphql import GraphQLError
+from wallets.models import (Withdraw, Deposit)
 
 SIDE_CHOICE_DEPOSIT = 'R'
 SIDE_CHOICE_WITHDRAW = 'L'
@@ -22,17 +23,29 @@ class BankAccountDeposit(graphene.Mutation):
 
     def mutate(self, info, amount):
         # student = Student.objects.get(id=student)
+        user = info.context.user
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
         student = info.context.user.student
         bank_balance = student.bankWallet.balance
         wallet_balance = student.coinWallet.balance
-        print(bank_balance, wallet_balance)
-        # coin_wallet, wc_new = CoinWallet.objects.get_or_create(student=student,name=student.user.username)
-        # if coin_wallet.balance > amount:
+        print(bank_balance,amount, wallet_balance, type(amount))
         if wallet_balance > amount:
-            bank_account, ba_new = BankWallet.objects.get_or_create(student=student,name=student.user.username)
+            #----------------- Deposit coins to bank by create bank deposit transaction -S-----------------------#
+            bank_account, ba_new = BankWallet.objects.get_or_create(student=student)
             bank_deposit = BankMovement.objects.create(amount=amount, account=bank_account, side=SIDE_CHOICE_DEPOSIT)
-            print(bank_deposit.date, bank_deposit.amount, bank_account)
+            #----------------- Deposit coins to bank by create bank deposit transaction -E-----------------------#
+
+            #----------------- Withdraw coins from wallet by create wallet withdraw transaction -S---------------#
+            coinWalletTransaction = Withdraw(
+                amount=amount,
+                account = student.coinWallet
+            )
+            coinWalletTransaction.save()
+            #----------------- Withdraw coins from wallet by create wallet withdraw transaction -E---------------#
+
             return BankAccountDeposit(student=student, bankMovement=bank_deposit)
+        
         raise GraphQLError('Insufficient balance')
 
 
@@ -47,15 +60,26 @@ class BankAccountWithdraw(graphene.Mutation):
 
     def mutate(self, info, amount):
         # student = Student.objects.get(id=student)
+        user = info.context.user
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
         student = info.context.user.student
         bank_balance = student.bankWallet.balance
-        wallet_balance = student.coinWallet.balance
-        # coin_wallet, wc_new = CoinWallet.objects.get_or_create(student=student,name=student.user.username)
-        # print("123",coin_wallet, coin_wallet.balance)
-        # if coin_wallet.balance > amount:
+
         if bank_balance > amount:
-            bank_account, ba_new = BankWallet.objects.get_or_create(student=student,name=student.user.username)
+            #----------------- Withdraw coins from bank by create bank deposit transaction -S-----------------------#
+            bank_account, ba_new = BankWallet.objects.get_or_create(student=student)
             bank_withdraw = BankMovement.objects.create(amount=amount, account=bank_account, side=SIDE_CHOICE_WITHDRAW)
+            #----------------- Withdraw coins from bank by create bank deposit transaction -E-----------------------#
+
+            #----------------- Deposit coins to wallet by create wallet withdraw transaction -S---------------#
+            coinWalletTransaction = Deposit(
+                amount=amount,
+                account = student.coinWallet
+            )
+            coinWalletTransaction.save()
+            #----------------- Deposit coins to wallet by create wallet withdraw transaction -E---------------#
+
             return BankAccountWithdraw(
                 bankMovement=bank_withdraw,
                 student=student
