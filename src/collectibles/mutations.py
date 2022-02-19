@@ -80,7 +80,7 @@ class PurchaseCollectiblePack(graphene.Mutation):
                     Collectible.objects.filter(category=collectible_category))
                 collectible_pack_purchase_transaction.collectibles.add(
                     *available_collectibles)
-
+            print(collectible_pack_purchase_transaction.collectibles)
             collectible_pack_purchase_transaction.save()
             collectible_pack_purchase_transaction.assign_collectibles()
 
@@ -88,7 +88,8 @@ class PurchaseCollectiblePack(graphene.Mutation):
                 collectible_pack_purchase_transaction=collectible_pack_purchase_transaction,
                 student=student,
             )
-
+        raise Exception('Your coin is not enough')
+        
 
 class PurchaseCollectible(graphene.Mutation):
     """ Purchase a single collectible """

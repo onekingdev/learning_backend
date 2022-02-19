@@ -76,7 +76,7 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
 class CollectiblePackPurchaseTransaction(Withdraw):
     collectibles = models.ManyToManyField(Collectible, blank=True)
     collectible_category = models.ForeignKey(
-        CollectibleCategory, on_delete=models.PROTECT)
+        CollectibleCategory, on_delete=models.PROTECT, null=True)
 
     def assign_collectibles(self):
         for collectible in self.collectibles.all():
