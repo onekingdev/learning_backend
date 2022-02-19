@@ -4,19 +4,15 @@ import sys
 import graphene
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
-from graphene import ID
-
 from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from .models import Student, StudentGrade
 from plans.models import StudentPlan
 from organization.models import School, Group
 from kb.models.grades import Grade
-from kb.models import AreaOfKnowledge
 from audiences.models import Audience
 from users.schema import UserSchema, UserProfileSchema
 from .schema import StudentGradeSchema
-from plans.models import GuardianStudentPlan
 
 
 class CreateStudent(graphene.Mutation):
@@ -36,24 +32,19 @@ class CreateStudent(graphene.Mutation):
         group = graphene.ID(required=False)
         dob = graphene.Date(required=False)
         student_plan = graphene.ID(required=False)
-        guardian_student_plan_id = graphene.ID(required=True)
-        list_subject_id = graphene.List(ID)
 
     def mutate(
             self,
             info,
             first_name,
             last_name,
-            guardian_student_plan_id,
-            list_subject_id,
             username,
             password,
-            school=None,
-            grade=None,
-            group=None,
-            dob=None,
-            student_plan=None,
-    ):
+            school,
+            grade,
+            group,
+            dob,
+            student_plan):
 
         try:
             with transaction.atomic():
@@ -108,15 +99,6 @@ class CreateStudent(graphene.Mutation):
                 student.student_plan.add(student_plan)
 
                 student.save()
-
-                guardian_student_plan = GuardianStudentPlan.objects.get(pk=guardian_student_plan_id)
-
-                guardian_student_plan.student_id = student.id
-                for subject_id in list_subject_id:
-                    subject = AreaOfKnowledge.objects.get(pk=subject_id)
-                    guardian_student_plan.subject.add(subject)
-
-                guardian_student_plan.save()
 
                 profile_obj = profile.objects.get(user=user.id)
                 token = get_token(user)
