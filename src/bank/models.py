@@ -31,7 +31,6 @@ class BankWallet(Account):
         dict['total_movements_balance'] = balance
         return dict
 
-
 class Interest(TimestampModel, RandomSlugModel, IsActiveModel):
     name = models.CharField(max_length=64, null=False)
     period = models.IntegerField(null=False, default=0)
