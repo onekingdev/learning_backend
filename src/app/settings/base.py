@@ -184,7 +184,7 @@ GRAPHQL_JWT = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
     'JWT_VERIFY_EXPIRATION': True,
     'JWT_LONG_RUNNING_REFRESH_TOKEN': True,
-    'JWT_EXPIRATION_DELTA': timedelta(minutes=5),
+    'JWT_EXPIRATION_DELTA': timedelta(days=2),
     'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
     # TODO: Change to environment variable
     'JWT_SECRET_KEY': 'llave super secreta',
