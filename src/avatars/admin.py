@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Avatar
 from .resources import AvatarResource
-
+from import_export import admin as import_export_admin
 
 @admin.register(Avatar)
 class AvatarAdmin(
