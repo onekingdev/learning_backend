@@ -60,7 +60,6 @@ class BankAccountWithdraw(graphene.Mutation):
 
     def mutate(self, info, amount):
         # student = Student.objects.get(id=student)
-<<<<<<< HEAD
         user = info.context.user
         if not user.is_authenticated:
             raise Exception("Authentication credentials were not provided")
@@ -81,17 +80,6 @@ class BankAccountWithdraw(graphene.Mutation):
             coinWalletTransaction.save()
             #----------------- Deposit coins to wallet by create wallet withdraw transaction -E---------------#
 
-=======
-        student = info.context.user.student
-        bank_balance = student.bankWallet.balance
-        wallet_balance = student.coinWallet.balance
-        # coin_wallet, wc_new = CoinWallet.objects.get_or_create(student=student,name=student.user.username)
-        # print("123",coin_wallet, coin_wallet.balance)
-        # if coin_wallet.balance > amount:
-        if bank_balance > amount:
-            bank_account, ba_new = BankWallet.objects.get_or_create(student=student,name=student.user.username)
-            bank_withdraw = BankMovement.objects.create(amount=amount, account=bank_account, side=SIDE_CHOICE_WITHDRAW)
->>>>>>> dev
             return BankAccountWithdraw(
                 bankMovement=bank_withdraw,
                 student=student
