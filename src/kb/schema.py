@@ -92,7 +92,6 @@ class QuestionSchema(DjangoObjectType):
         url = "media/gtts/question_" + self.random_slug + "_" + language + ".mp3"
         if not os.path.isfile(url) :
             self.save_gtts()
-        print (os.path.isfile(url))
         return url
 
 class AnswerOptionSchema(DjangoObjectType):
@@ -146,7 +145,6 @@ class AnswerOptionSchema(DjangoObjectType):
         url = "media/gtts/answer_" + self.random_slug + "_" + language + ".mp3"
         if not os.path.isfile(url) :
             self.save_gtts()
-        print (os.path.isfile(url))
         return url
 
 class Query(graphene.ObjectType):
