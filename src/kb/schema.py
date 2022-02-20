@@ -4,8 +4,8 @@ from graphene_django import DjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from kb.models.content import Question, AnswerOption
 from kb.models.content import QuestionImageAsset
-
-
+from gtts import gTTS
+import os
 class AreaOfKnowledgeSchema(DjangoObjectType):
     class Meta:
         model = AreaOfKnowledge
@@ -80,6 +80,7 @@ class QuestionSchema(DjangoObjectType):
     question_text = graphene.String()
     question_image_assets = graphene.List(QuestionImageAssetSchema)
     question_audio_url = graphene.String()
+
     def resolve_question_text(self, info, language_code=None):
         return self.safe_translation_getter("question_text", any_language=True)
 
@@ -87,8 +88,12 @@ class QuestionSchema(DjangoObjectType):
         return self.get_questionimageasset_set()
 
     def resolve_question_audio_url(self, info):
-        return "hey~~~"
-
+        language = self.get_current_language()
+        url = "media/gtts/question_" + self.random_slug + "_" + language + ".mp3"
+        if not os.path.isfile(url) :
+            self.save_gtts()
+        print (os.path.isfile(url))
+        return url
 
 class AnswerOptionSchema(DjangoObjectType):
     class Meta:
@@ -100,7 +105,7 @@ class AnswerOptionSchema(DjangoObjectType):
     image = graphene.String()
     audio_file = graphene.String()
     video = graphene.String()
-
+    answer_audio_url = graphene.String()
     def resolve_answer_text(self, info, language_code=None):
         return self.safe_translation_getter("answer_text", any_language=True)
 
@@ -135,7 +140,14 @@ class AnswerOptionSchema(DjangoObjectType):
             current_language = settings.LANGUAGE_CODE
 
         return self.safe_translation_getter("video", language_code=current_language)
-
+        
+    def resolve_answer_audio_url(self, info):
+        language = self.get_current_language()
+        url = "media/gtts/answer_" + self.random_slug + "_" + language + ".mp3"
+        if not os.path.isfile(url) :
+            self.save_gtts()
+        print (os.path.isfile(url))
+        return url
 
 class Query(graphene.ObjectType):
     # ----------------- AreaOfKnowledge ----------------- #

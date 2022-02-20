@@ -25,7 +25,6 @@ class Question(
     grade = models.ForeignKey(
         'kb.Grade', on_delete=models.PROTECT)
     objects = QuestionManager()
-
     def __str__(self):
         return strip_tags(self.safe_translation_getter("question_text", any_language=True))[:100]
 
@@ -40,6 +39,18 @@ class Question(
 
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
+    
+    def save_gtts(self):
+        Text = self.safe_translation_getter("question_text", any_language=True)
+        language = self.get_current_language()
+        TTS = gTTS(text=Text, lang=language)
+        TTS.save("media/gtts/question_" + self.random_slug + "_" + language + ".mp3")
+    def save(self, *args, **kwargs):
+        # self.set_calculated_fields()
+        # ---------------- save gtts audio file -S-------------------#
+        super().save(*args, **kwargs)
+        self.save_gtts()
+        # ---------------- save gtts audio file -E-------------------#
 
     @admin.display(description='Question')
     def question(self):
@@ -104,6 +115,15 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
         video=models.URLField(null=True, blank=True),
     )
     is_correct = models.BooleanField(default=False)
-
+    def save_gtts(self):
+        Text = self.safe_translation_getter("answer_text", any_language=True)
+        language = self.get_current_language()
+        TTS = gTTS(text=Text, lang=language)
+        TTS.save("media/gtts/answer_" + self.random_slug + "_" + language + ".mp3")
+    def save(self, *args, **kwargs):
+        # ---------------- save gtts audio file -S-------------------#
+        super().save(*args, **kwargs)
+        self.save_gtts()
+        # ---------------- save gtts audio file -E-------------------#
     def __str__(self):
         return self.safe_translation_getter("answer_text", any_language=True)
