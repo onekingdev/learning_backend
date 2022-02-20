@@ -79,12 +79,15 @@ class QuestionSchema(DjangoObjectType):
 
     question_text = graphene.String()
     question_image_assets = graphene.List(QuestionImageAssetSchema)
-
+    question_audio_url = graphene.String()
     def resolve_question_text(self, info, language_code=None):
         return self.safe_translation_getter("question_text", any_language=True)
 
     def resolve_question_image_assets(self, info):
         return self.get_questionimageasset_set()
+
+    def resolve_question_audio_url(self, info):
+        return "hey~~~"
 
 
 class AnswerOptionSchema(DjangoObjectType):

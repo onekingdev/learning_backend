@@ -256,8 +256,9 @@ class LevelUp(graphene.Mutation):
 
         level_amount = user.student.level.amount
         next_level = user.student.level.__class__.objects.get(amount=level_amount + 1);
-        user.student.level = next_level;
-        user.student.level.save();
+        if next_level :
+            user.student.level = next_level;
+            user.student.level.save();
 
         return LevelUp(user= user, student= user.student)
 
