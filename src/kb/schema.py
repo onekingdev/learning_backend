@@ -89,8 +89,7 @@ class QuestionSchema(DjangoObjectType):
 
     def resolve_question_audio_url(self, info):
         language = self.get_current_language()
-        url = "media/gtts/" + self.identifier + "/" + language + "/question" + ".mp3"
-
+        url = "media/gtts/question/" + self.random_slug + "_" + language + ".mp3"
         if not os.path.isfile(url) :
             self.save_gtts()
         return url
@@ -143,13 +142,10 @@ class AnswerOptionSchema(DjangoObjectType):
         
     def resolve_answer_audio_url(self, info):
         language = self.get_current_language()
-        if self.question :
-            url = "media/gtts/" + self.question.identifier + "/" + language +"/answer_" + self.random_slug + ".mp3"
-            if not os.path.isfile(url) :
-                self.save_gtts()
-            return url
-        else :
-            return "null"
+        url = "media/gtts/answer/" + self.random_slug + "_" + language + ".mp3"
+        if not os.path.isfile(url) :
+            self.save_gtts()
+        return url
 
 class Query(graphene.ObjectType):
     # ----------------- AreaOfKnowledge ----------------- #
