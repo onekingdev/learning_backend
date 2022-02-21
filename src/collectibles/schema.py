@@ -4,7 +4,6 @@ from graphene_django import DjangoObjectType
 from collectibles.models import CollectibleCategory, Collectible, StudentCollectible
 from .models import CollectiblePurchaseTransaction, CollectiblePackPurchaseTransaction
 from students.models import Student
-from wallets.models import CoinWallet
 
 
 class CollectibleCategorySchema(DjangoObjectType):
@@ -20,7 +19,8 @@ class CollectibleCategorySchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("name", language_code=current_language)
+        return self.safe_translation_getter(
+            "name", language_code=current_language)
 
 
 class CollectibleSchema(DjangoObjectType):
@@ -38,7 +38,8 @@ class CollectibleSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("name", language_code=current_language)
+        return self.safe_translation_getter(
+            "name", language_code=current_language)
 
     def resolve_description(self, info, language_code=None):
         try:
@@ -46,7 +47,8 @@ class CollectibleSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("description", language_code=current_language)
+        return self.safe_translation_getter(
+            "description", language_code=current_language)
 
     def resolve_owned(self, info):
         student = Student.objects.get(user=info.context.user)
@@ -103,6 +105,24 @@ class Query(graphene.ObjectType):
     def resolve_collectible_by_id(root, info, id):
         # Querying a single question
         return Collectible.objects.get(pk=id)
+
+    def resolve_collectibles_not_owned(root, info):
+        user = info.context.user
+
+        if user.is_anonymous:
+            raise Exception("User not authenticated")
+        if user.student is None:
+            raise Exception("User has no student")
+
+        student = user.student
+
+        owned_collectibles = Collectible.objects.filter(
+            studentcollectible__student=student
+        )
+        all_collectibles = Collectible.objects.all()
+        not_owned = all_collectibles.difference(owned_collectibles)
+
+        return not_owned
 
     # ----------------- StudentTransactionCollectible ----------------- #
 
