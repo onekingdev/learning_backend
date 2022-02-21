@@ -31,6 +31,7 @@ class CollectibleSchema(DjangoObjectType):
     name = graphene.String()
     description = graphene.String()
     owned = graphene.Boolean()
+    amount = graphene.Int()
 
     def resolve_name(self, info, language_code=None):
         try:
