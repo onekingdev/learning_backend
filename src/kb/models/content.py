@@ -4,7 +4,7 @@ from ckeditor.fields import RichTextField
 from polymorphic.models import PolymorphicModel
 from kb.managers.content import QuestionManager
 from gtts import gTTS
-
+import os
 from django.utils.html import strip_tags
 
 from parler.models import TranslatableModel, TranslatedFields
@@ -41,10 +41,15 @@ class Question(
         return QuestionAudioAsset.objects.filter(question=self)
     
     def save_gtts(self):
-        Text = self.safe_translation_getter("question_text", any_language=True)
+        text = self.safe_translation_getter("question_text", any_language=True)
         language = self.get_current_language()
-        TTS = gTTS(text=Text, lang=language)
-        TTS.save("media/gtts/question/" + self.random_slug + "_" + language + ".mp3")
+        path = "media/gtts/" + self.identifier + "/" + language
+        isPathExist = os.path.exists(path)
+        if not isPathExist:
+            os.makedirs(path)
+        TTS = gTTS(text=text, lang=language)
+        TTS.save(path + "/question" + ".mp3")
+
     def save(self, *args, **kwargs):
         # self.set_calculated_fields()
         # ---------------- save gtts audio file -S-------------------#
@@ -115,11 +120,18 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
         video=models.URLField(null=True, blank=True),
     )
     is_correct = models.BooleanField(default=False)
+
     def save_gtts(self):
-        Text = self.safe_translation_getter("answer_text", any_language=True)
+        text = self.safe_translation_getter("answer_text", any_language=True)
         language = self.get_current_language()
-        TTS = gTTS(text=Text, lang=language)
-        TTS.save("media/gtts/answer/" + self.random_slug + "_" + language + ".mp3")
+        if self.question :
+            path = "media/gtts/" + self.question.identifier + "/" + language
+            isPathExist = os.path.exists(path)
+            if not isPathExist:
+                os.makedirs(path)
+            TTS = gTTS(text=text, lang=language)
+            TTS.save(path +"/answer_" + self.random_slug + ".mp3")
+
     def save(self, *args, **kwargs):
         # ---------------- save gtts audio file -S-------------------#
         super().save(*args, **kwargs)
