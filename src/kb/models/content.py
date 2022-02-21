@@ -44,7 +44,7 @@ class Question(
         Text = self.safe_translation_getter("question_text", any_language=True)
         language = self.get_current_language()
         TTS = gTTS(text=Text, lang=language)
-        TTS.save("media/gtts/question_" + self.random_slug + "_" + language + ".mp3")
+        TTS.save("media/gtts/question/" + self.random_slug + "_" + language + ".mp3")
     def save(self, *args, **kwargs):
         # self.set_calculated_fields()
         # ---------------- save gtts audio file -S-------------------#
@@ -119,7 +119,7 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
         Text = self.safe_translation_getter("answer_text", any_language=True)
         language = self.get_current_language()
         TTS = gTTS(text=Text, lang=language)
-        TTS.save("media/gtts/answer_" + self.random_slug + "_" + language + ".mp3")
+        TTS.save("media/gtts/answer/" + self.random_slug + "_" + language + ".mp3")
     def save(self, *args, **kwargs):
         # ---------------- save gtts audio file -S-------------------#
         super().save(*args, **kwargs)
