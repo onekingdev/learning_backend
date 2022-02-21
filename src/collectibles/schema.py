@@ -66,7 +66,7 @@ class CollectibleSchema(DjangoObjectType):
             raise Exception("User is not authenticated")
         if user.student is None:
             raise Exception("User is not a student")
-        student = Student.objects.get(user=info.content.user)
+        student = Student.objects.get(user=info.context.user)
         student_collectible = StudentCollectible.objects.filter(
             collectible=self, student=student)
         if student_collectible.exists():
