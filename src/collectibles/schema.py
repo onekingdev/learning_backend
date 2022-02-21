@@ -69,7 +69,7 @@ class CollectibleSchema(DjangoObjectType):
         student = Student.objects.get(user=info.context.user)
         student_collectible = StudentCollectible.objects.get(
             collectible=self, student=student)
-        if student_collectible.exists():
+        if student_collectible:
             return student_collectible.amount
         else:
             return 0
