@@ -97,6 +97,7 @@ class Query(graphene.ObjectType):
 
     collectibles = graphene.List(CollectibleSchema)
     collectible_by_id = graphene.Field(CollectibleSchema, id=graphene.String())
+    collectibles_not_owned = graphene.Field(CollectibleSchema)
 
     def resolve_collectibles(root, info, **kwargs):
         # Querying a list
