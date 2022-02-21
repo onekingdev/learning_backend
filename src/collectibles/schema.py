@@ -115,6 +115,8 @@ class Query(graphene.ObjectType):
     collectible_by_id = graphene.Field(CollectibleSchema, id=graphene.String())
     collectibles_not_owned = graphene.Field(CollectibleSchema)
     collectible_count_by_category = graphene.Int(category_id=graphene.ID())
+    purchased_collectible_count_by_category = graphene.Int(
+        category_id=graphene.ID())
 
     def resolve_collectibles(root, info, **kwargs):
         # Querying a list
@@ -144,6 +146,17 @@ class Query(graphene.ObjectType):
 
     def resolve_collectible_count_by_category(root, info, category_id):
         return Collectible.objects.filter(category=category_id).count()
+
+    def resolve_purchased_collectible_count_by_category(root, info, category_id):
+        user = info.context.user
+
+        if user.is_anonymous:
+            raise Exception("User not authenticated")
+        if user.student is None:
+            raise Exception("User has no student")
+
+        student = user.student
+        return StudentCollectible.objects.filter(student=student, collectible__category=category_id).count()
 
     # ----------------- StudentTransactionCollectible ----------------- #
 
