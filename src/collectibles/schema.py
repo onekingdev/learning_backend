@@ -1,5 +1,6 @@
 import graphene
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType
 from collectibles.models import CollectibleCategory, Collectible, StudentCollectible
 from .models import CollectiblePurchaseTransaction, CollectiblePackPurchaseTransaction
@@ -67,11 +68,12 @@ class CollectibleSchema(DjangoObjectType):
         if user.student is None:
             raise Exception("User is not a student")
         student = Student.objects.get(user=info.context.user)
-        student_collectible = StudentCollectible.objects.get(
-            collectible=self, student=student)
-        if student_collectible:
+        try:
+            student_collectible = StudentCollectible.objects.get(
+                collectible=self, student=student)
             return student_collectible.amount
-        else:
+        except ObjectDoesNotExist:
+            raise Exception("Object does not exist")
             return 0
 
 
