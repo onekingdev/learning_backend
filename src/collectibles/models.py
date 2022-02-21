@@ -82,7 +82,7 @@ class CollectiblePackPurchaseTransaction(Withdraw):
         for collectible in self.collectibles.all():
             student_collectible, new = StudentCollectible.objects.get_or_create(
                 collectible=collectible, student=self.account.student)
-            if new is None:
+            if new == False:
                 student_collectible.amount += 1
             student_collectible.save()
 
