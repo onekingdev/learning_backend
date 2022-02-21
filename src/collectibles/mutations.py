@@ -77,7 +77,6 @@ class PurchaseCollectiblePack(graphene.Mutation):
             for tier, amount in selection.items():
                 available_collectibles = list(
                     Collectible.objects.filter(category=collectible_category, tier=tier))
-                # print("will add ", available_collectibles)
                 selected_collectibles = random.sample(available_collectibles, amount)
                 collectible_pack_purchase_transaction.collectibles.add(
                     *selected_collectibles)
