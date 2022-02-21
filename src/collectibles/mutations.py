@@ -58,7 +58,9 @@ class PurchaseCollectiblePack(graphene.Mutation):
         if account.balance > pack_price:
             # Create collectible purchase transaction
             collectible_pack_purchase_transaction = CollectiblePackPurchaseTransaction(
-                account=account, amount=pack_price)
+                account=account,
+                amount=pack_price
+            )
             collectible_pack_purchase_transaction.save()
 
             # Initialize selection dict with values in 0
@@ -74,10 +76,8 @@ class PurchaseCollectiblePack(graphene.Mutation):
                 selection[choice] += 1
             for tier, amount in selection.items():
                 available_collectibles = list(
-                    Collectible.objects.filter(
-                        category=collectible_category, tier=tier))
-                selected_collectibles = random.sample(
-                    available_collectibles, amount)
+                    Collectible.objects.filter(category=collectible_category, tier=tier))
+                selected_collectibles = random.sample(available_collectibles, amount)
                 collectible_pack_purchase_transaction.collectibles.add(
                     *selected_collectibles)
             collectible_pack_purchase_transaction.save()
@@ -88,7 +88,7 @@ class PurchaseCollectiblePack(graphene.Mutation):
                 student=student,
             )
         raise Exception('Your coin is not enough')
-
+        
 
 class PurchaseCollectible(graphene.Mutation):
     """ Purchase a single collectible """

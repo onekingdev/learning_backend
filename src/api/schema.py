@@ -11,8 +11,6 @@ from datetime import datetime
 from accounting.models import BankMovement
 from accounting.models import Account
 # TODO: move to user mutations
-
-
 class CreateUser(graphene.Mutation):
     user = graphene.Field(UserSchema)
     profile = graphene.Field(UserProfileSchema)
@@ -35,11 +33,7 @@ class CreateUser(graphene.Mutation):
         token = get_token(user)
         refresh_token = create_refresh_token(user)
 
-        return CreateUser(
-            user=user,
-            profile=profile_obj,
-            token=token,
-            refresh_token=refresh_token)
+        return CreateUser(user=user, profile=profile_obj, token=token, refresh_token=refresh_token)
 
 
 # TODO: move to guardian mutations
@@ -158,19 +152,15 @@ class Query(graphene.ObjectType):
         if user.student:
             student = user.student
             now = datetime.now().date()
-            delta = (
-                now - student.int_period_start_at).total_seconds() / 3600 / 24
+            delta =( now - student.int_period_start_at ).total_seconds() / 3600 / 24
             bankBallance = student.bankWallet.balance
-            interests = Interest.objects.filter(
-                period__lte=delta, requireCoin__lte=bankBallance).order_by('-requireCoin')
+            interests = Interest.objects.filter(period__lte=delta, requireCoin__lte=bankBallance
+            ).order_by('-requireCoin')
             print(student.int_period_start_at, interests)
-            if(len(interests) > 0):
+            if(len(interests) > 0) :
                 amount = interests[0].amount
                 # user.student.bankWallet.balance += amount
-                BankMovement.objects.create(
-                    amount=amount,
-                    account=student.bankWallet,
-                    side=Account.SIDE_CHOICE_RIGHT_INTEREST)
+                BankMovement.objects.create(amount=amount, account=student.bankWallet, side=Account.SIDE_CHOICE_RIGHT_INTEREST)
         if user.is_anonymous:
             raise Exception('Authentication Failure')
         return user

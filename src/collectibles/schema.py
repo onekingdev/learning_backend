@@ -1,10 +1,10 @@
 import graphene
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType
 from collectibles.models import CollectibleCategory, Collectible, StudentCollectible
 from .models import CollectiblePurchaseTransaction, CollectiblePackPurchaseTransaction
 from students.models import Student
+from wallets.models import CoinWallet
 
 
 class CollectibleCategorySchema(DjangoObjectType):
@@ -20,8 +20,7 @@ class CollectibleCategorySchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter(
-            "name", language_code=current_language)
+        return self.safe_translation_getter("name", language_code=current_language)
 
 
 class CollectibleSchema(DjangoObjectType):
@@ -32,7 +31,6 @@ class CollectibleSchema(DjangoObjectType):
     name = graphene.String()
     description = graphene.String()
     owned = graphene.Boolean()
-    amount = graphene.Int()
 
     def resolve_name(self, info, language_code=None):
         try:
@@ -40,8 +38,7 @@ class CollectibleSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter(
-            "name", language_code=current_language)
+        return self.safe_translation_getter("name", language_code=current_language)
 
     def resolve_description(self, info, language_code=None):
         try:
@@ -49,8 +46,7 @@ class CollectibleSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter(
-            "description", language_code=current_language)
+        return self.safe_translation_getter("description", language_code=current_language)
 
     def resolve_owned(self, info):
         student = Student.objects.get(user=info.context.user)
@@ -60,20 +56,6 @@ class CollectibleSchema(DjangoObjectType):
             return True
         else:
             return False
-
-    def resolve_amount(self, info):
-        user = info.context.user
-        if user.is_anonymous:
-            raise Exception("User is not authenticated")
-        if user.student is None:
-            raise Exception("User is not a student")
-        student = Student.objects.get(user=info.context.user)
-        try:
-            student_collectible = StudentCollectible.objects.get(
-                collectible=self, student=student)
-            return student_collectible.amount
-        except ObjectDoesNotExist:
-            return 0
 
 
 class CollectiblePurchaseTransactionSchema(DjangoObjectType):
@@ -113,10 +95,6 @@ class Query(graphene.ObjectType):
 
     collectibles = graphene.List(CollectibleSchema)
     collectible_by_id = graphene.Field(CollectibleSchema, id=graphene.String())
-    collectibles_not_owned = graphene.Field(CollectibleSchema)
-    collectible_count_by_category = graphene.Int(category_id=graphene.ID())
-    purchased_collectible_count_by_category = graphene.Int(
-        category_id=graphene.ID())
 
     def resolve_collectibles(root, info, **kwargs):
         # Querying a list
@@ -125,38 +103,6 @@ class Query(graphene.ObjectType):
     def resolve_collectible_by_id(root, info, id):
         # Querying a single question
         return Collectible.objects.get(pk=id)
-
-    def resolve_collectibles_not_owned(root, info):
-        user = info.context.user
-
-        if user.is_anonymous:
-            raise Exception("User not authenticated")
-        if user.student is None:
-            raise Exception("User has no student")
-
-        student = user.student
-
-        owned_collectibles = Collectible.objects.filter(
-            studentcollectible__student=student
-        )
-        all_collectibles = Collectible.objects.all()
-        not_owned = all_collectibles.difference(owned_collectibles)
-
-        return not_owned
-
-    def resolve_collectible_count_by_category(root, info, category_id):
-        return Collectible.objects.filter(category=category_id).count()
-
-    def resolve_purchased_collectible_count_by_category(root, info, category_id):
-        user = info.context.user
-
-        if user.is_anonymous:
-            raise Exception("User not authenticated")
-        if user.student is None:
-            raise Exception("User has no student")
-
-        student = user.student
-        return StudentCollectible.objects.filter(student=student, collectible__category=category_id).count()
 
     # ----------------- StudentTransactionCollectible ----------------- #
 
