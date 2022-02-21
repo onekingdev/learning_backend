@@ -67,7 +67,7 @@ class CollectibleSchema(DjangoObjectType):
         if user.student is None:
             raise Exception("User is not a student")
         student = Student.objects.get(user=info.context.user)
-        student_collectible = StudentCollectible.objects.filter(
+        student_collectible = StudentCollectible.objects.get(
             collectible=self, student=student)
         if student_collectible.exists():
             return student_collectible.amount
