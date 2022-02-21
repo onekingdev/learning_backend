@@ -80,8 +80,10 @@ class CollectiblePackPurchaseTransaction(Withdraw):
 
     def assign_collectibles(self):
         for collectible in self.collectibles.all():
-            student_collectible = StudentCollectible(
+            student_collectible, new = StudentCollectible.objects.get_or_create(
                 collectible=collectible, student=self.account.student)
+            if new is None:
+                student_collectible.amount += 1
             student_collectible.save()
 
 
