@@ -114,7 +114,7 @@ class Query(graphene.ObjectType):
     collectibles = graphene.List(CollectibleSchema)
     collectible_by_id = graphene.Field(CollectibleSchema, id=graphene.String())
     collectibles_not_owned = graphene.Field(CollectibleSchema)
-    total_collectibles = graphene.Int()
+    total_collectibles = graphene.Field(graphene.Int())
 
     def resolve_collectibles(root, info, **kwargs):
         # Querying a list
