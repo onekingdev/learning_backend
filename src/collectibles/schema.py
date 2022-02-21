@@ -73,7 +73,6 @@ class CollectibleSchema(DjangoObjectType):
                 collectible=self, student=student)
             return student_collectible.amount
         except ObjectDoesNotExist:
-            raise Exception("Object does not exist")
             return 0
 
 
