@@ -59,6 +59,20 @@ class CollectibleSchema(DjangoObjectType):
         else:
             return False
 
+    def resolve_amount(self, info):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception("User is not authenticated")
+        if user.student is None:
+            raise Exception("User is not a student")
+        student = Student.objects.get(user=info.content.user)
+        student_collectible = StudentCollectible.objects.filter(
+            collectible=self, student=student)
+        if student_collectible.exists():
+            return student_collectible.amount
+        else:
+            return 0
+
 
 class CollectiblePurchaseTransactionSchema(DjangoObjectType):
     class Meta:
