@@ -1,6 +1,7 @@
 from django.db import models
 from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel, ActiveManager
+from wallets.models import Deposit
 
 
 class BlockTypeManager(ActiveManager, TranslatableManager):
@@ -172,8 +173,21 @@ class BlockPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     errors = models.IntegerField(default=0, null=True)
     total = models.IntegerField(default=0, null=True)
     points = models.IntegerField(null=True)
+    bonusCoins = models.IntegerField(default=0, null=True)
+    coins = models.IntegerField(default=0, null=True)
     start_timestamp = models.DateTimeField(auto_now_add=True, null=True)
     end_timestamp = models.DateTimeField(null=True)
+
+class BlockTransaction(Deposit):
+    blockPresentation = models.ForeignKey(
+        BlockPresentation, on_delete=models.PROTECT, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.amount = self.blockPresentation.coins + self.blockPresentation.bonusCoins
+            self.comment = "Answer the questions."
+        super().save(*args, **kwargs)
+    #     return super().save(*args, **kwargs)
 
 
 class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
