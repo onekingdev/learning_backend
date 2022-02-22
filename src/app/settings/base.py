@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'emails',
     'experiences',
     'guardians',
+    'games',
     'kb',
     'organization',
     'plans',

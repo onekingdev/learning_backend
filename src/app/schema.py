@@ -25,6 +25,8 @@ import bank.schema
 import plans.mutations
 import payments.mutations
 import payments.schema
+import games.mutations
+import games.schema
 
 
 class Mutation(
@@ -37,6 +39,7 @@ class Mutation(
         avatars.mutations.Mutation,
         plans.mutations.Mutation,
         payments.mutations.Mutation,
+        games.mutations.Mutation,
         graphene.ObjectType):
 
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
@@ -62,6 +65,7 @@ class Query(
         avatars.schema.Query,
         universals.schema.Query,
         wallets.schema.Query,
+        games.schema.Query,
         graphene.ObjectType):
     pass
 
