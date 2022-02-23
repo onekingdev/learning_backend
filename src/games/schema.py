@@ -64,7 +64,7 @@ class Query(graphene.ObjectType):
         # Querying a game list by category
         return Game.objects.filter(category=category)
 
-    def resolve_game_by_category_name(root, info, name):
-        print(name)
-        return Game.objects.filter(name=name)
+    def resolve_games_by_category_name(root, info, categoryName):
+        print(categoryName)
+        return Game.objects.filter(name=categoryName)
 
