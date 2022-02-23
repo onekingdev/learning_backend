@@ -23,6 +23,7 @@ class LevelSchema(DjangoObjectType):
 class Query(graphene.ObjectType):
     levels = graphene.List(LevelSchema)
     level_by_id = graphene.Field(LevelSchema, id=graphene.String())
+    next_level = graphene.Field(LevelSchema, amount=graphene.Int())
 
     def resolve_levels(root, info, **kwargs):
         # Querying a list
@@ -31,3 +32,10 @@ class Query(graphene.ObjectType):
     def resolve_level_by_id(root, info, id):
         # Querying a single question
         return Level.objects.get(pk=id)
+
+    def resolve_next_level(root, info, amount) :
+        next_levels = Level.objects.filter(amount=amount + 1);
+        if(len(next_levels) > 0):
+            return next_levels[0]
+        else :
+            return  Level.objects.filter(amount=amount)[0];

@@ -53,7 +53,12 @@ class Query(graphene.ObjectType):
     # ----------------- Games by Category ID ----------------- #
 
     games_by_category_id = graphene.List(GameSchema, category=graphene.ID())
+    games_by_category_name = graphene.List(GameSchema, category=graphene.String())
 
     def resolve_games_by_category_id(root, info, category):
         # Querying a game list by category
         return Game.objects.filter(category=category)
+
+    def resolve_game_by_category_name(root, info, name):
+        return Game.objects.filter(name=name)
+

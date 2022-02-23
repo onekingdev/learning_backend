@@ -3,7 +3,7 @@ from graphene_django import DjangoObjectType
 from students.models import Student, StudentTopicMastery, StudentGrade, StudentAchievement
 from audiences.schema import AudienceSchema
 from wallets.schema import CoinWalletSchema
-
+from experiences.schema import LevelSchema
 
 class StudentSchema(DjangoObjectType):
     class Meta:
@@ -13,6 +13,7 @@ class StudentSchema(DjangoObjectType):
     audience = graphene.Field(AudienceSchema)
     coin_wallet = graphene.Field(CoinWalletSchema)
     grade = graphene.Field('students.schema.StudentGradeSchema')
+    next_level = graphene.Field(LevelSchema)
 
     def resolve_audience(self, info):
         return self.get_active_audience
@@ -25,6 +26,13 @@ class StudentSchema(DjangoObjectType):
         if student_grade.count() != 0:
             return student_grade[0]
         return
+    
+    def resolve_next_level(self, info):
+        next_level = self.level;
+        next_levels = self.level.__class__.objects.filter(amount=self.level.amount + 1);
+        if(len(next_levels) > 0):
+            next_level = next_levels[0]
+        return next_level
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
