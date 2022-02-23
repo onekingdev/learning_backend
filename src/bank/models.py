@@ -32,6 +32,8 @@ class BankWallet(Account):
         return dict
 
 class Interest(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'interest_'
+
     name = models.CharField(max_length=64, null=False)
     period = models.IntegerField(null=False, default=0)
     requireCoin = models.IntegerField(null=False, default=0)

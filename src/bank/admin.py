@@ -6,4 +6,4 @@ from django.contrib import admin
 from adminsortable2.admin import SortableAdminMixin
 from parler import admin as parler_admin
 
-admin.site.register(Interest)
+# admin.site.register(Interest)
