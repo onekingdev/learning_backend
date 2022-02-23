@@ -30,11 +30,14 @@ class Query(graphene.ObjectType):
         return Level.objects.all()
 
     def resolve_level_by_id(root, info, id):
-        # Querying a single question
+        # Querying a single level
         return Level.objects.get(pk=id)
 
     def resolve_next_level(root, info, amount) :
+        # Querying a single level
+        # Get next level from db
         next_levels = Level.objects.filter(amount=amount + 1);
+        # If next level not exits, return current level
         if(len(next_levels) > 0):
             return next_levels[0]
         else :
