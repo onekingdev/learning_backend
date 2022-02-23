@@ -28,8 +28,11 @@ class StudentSchema(DjangoObjectType):
         return
     
     def resolve_next_level(self, info):
+        # Querying a single next level
         next_level = self.level;
+        # Get next level
         next_levels = self.level.__class__.objects.filter(amount=self.level.amount + 1);
+        # If next level not exits, return current level
         if(len(next_levels) > 0):
             next_level = next_levels[0]
         return next_level
