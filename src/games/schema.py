@@ -1,7 +1,7 @@
 from unicodedata import category
 import graphene
 from graphene_django import DjangoObjectType
-from .models import Game, GameCategoryMap, PlayGameTransaction, GameCategory, GameCategoryMap
+from .models import Game, GameCategoryMap, PlayGameTransaction, GameCategory
 
 class GameSchema(DjangoObjectType):
     class Meta:
@@ -47,7 +47,6 @@ class Query(graphene.ObjectType):
 
     games = graphene.List(GameSchema)
     game_by_id = graphene.Field(GameSchema, id=graphene.ID())
-
     def resolve_games(root, info, **kwargs):
         # Querying a list
         return Game.objects.all()
@@ -59,12 +58,13 @@ class Query(graphene.ObjectType):
     # ----------------- Games by Category ID ----------------- #
 
     games_by_category_id = graphene.List(GameSchema, category=graphene.ID())
-    games_by_category_name = graphene.List(GameSchema, category=graphene.String())
+    games_by_category_name = graphene.List(GameSchema, categoryName=graphene.String())
 
     def resolve_games_by_category_id(root, info, category):
         # Querying a game list by category
         return Game.objects.filter(category=category)
 
     def resolve_game_by_category_name(root, info, name):
+        print(name)
         return Game.objects.filter(name=name)
 
