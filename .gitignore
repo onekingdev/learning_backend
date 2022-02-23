@@ -43,6 +43,7 @@ src/subscriptions/migrations
 src/universals/migrations
 src/users/migrations
 src/wallets/migrations
+src/games/migrations
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
