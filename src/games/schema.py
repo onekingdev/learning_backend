@@ -1,7 +1,7 @@
 from unicodedata import category
 import graphene
 from graphene_django import DjangoObjectType
-from .models import Game, PlayGameTransaction, GameCategory
+from .models import Game, GameCategoryMap, PlayGameTransaction, GameCategory, GameCategoryMap
 
 class GameSchema(DjangoObjectType):
     class Meta:
@@ -18,6 +18,12 @@ class PlayGameTransactionSchema(DjangoObjectType):
 class GameCategorySchema(DjangoObjectType):
     class Meta:
         model = GameCategory
+        fields = "__all__"
+
+
+class GameCategoryMapSchema(DjangoObjectType):
+    class Meta:
+        model = GameCategoryMap
         fields = "__all__"
 
 
