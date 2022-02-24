@@ -80,9 +80,6 @@ class BankAccountWithdraw(graphene.Mutation):
             coinWalletTransaction.save()
             #----------------- Deposit coins to wallet by create wallet withdraw transaction -E---------------#
 
-            # student.bankWallet = bank_withdraw.account
-            # student.coinWallet = coinWalletTransaction.account
-
             return BankAccountWithdraw(
                 bankMovement=bank_withdraw,
                 student=student
