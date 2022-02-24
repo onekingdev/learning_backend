@@ -1,45 +1,35 @@
 from unicodedata import category
 from django.db import models
-from app.models import RandomSlugModel, TimestampModel, IsActiveModel, ActiveManager
+from app.models import RandomSlugModel, TimestampModel,IsActiveModel
 from wallets.models import Withdraw
-from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
 
 
-class GameCategoryManager(ActiveManager, TranslatableManager):
-    pass
-
-
-class GameManager(ActiveManager, TranslatableManager):
-    pass
-
-
-class Game(TimestampModel, TranslatableModel, RandomSlugModel, IsActiveModel):
+class Game(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'game_'
 
-    translations = TranslatedFields(
-        name=models.CharField(max_length=128, null=True)
-    )
+    name = models.CharField(max_length=64, null=True, blank=True)
     image = models.URLField(null=True)
     cost = models.DecimalField(
         blank=True, null=True, decimal_places=2, max_digits=15)
     play_stats = models.BigIntegerField(default=0, null=True)
-    category = models.ManyToManyField('games.GameCategory')
-    objects = GameManager()
-
-    def __str__(self):
-        return self.safe_translation_getter("name", any_language=True)
     
 
-class GameCategory(TimestampModel, TranslatableModel, RandomSlugModel, IsActiveModel):
-    translations = TranslatedFields(
-        name=models.CharField(max_length=25, null=True)
-    )
+class GameCategory(TimestampModel, RandomSlugModel, IsActiveModel):
+    name = models.CharField(max_length=25, null=True)
     image = models.URLField(null=True)
-    bg_color = models.CharField(null=True, blank=True, max_length=16)
-    objects = GameCategoryManager()
 
-    def __str__(self):
-        return self.safe_translation_getter("name", any_language=True)
+
+class GameCategoryMap(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'game_category_map_'
+
+    game = models.ForeignKey(
+        'games.Game',
+        on_delete=models.PROTECT,
+    )
+    category = models.ForeignKey(
+        'games.GameCategory',
+        on_delete=models.PROTECT,
+    )
 
 
 class PlayGameTransaction(Withdraw):

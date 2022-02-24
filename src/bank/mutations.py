@@ -42,6 +42,8 @@ class BankAccountDeposit(graphene.Mutation):
                 account = student.coinWallet
             )
             coinWalletTransaction.save()
+            student.bankWallet = bank_deposit.account
+            student.coinWallet = coinWalletTransaction.account
             #----------------- Withdraw coins from wallet by create wallet withdraw transaction -E---------------#
 
             return BankAccountDeposit(student=student, bankMovement=bank_deposit)
@@ -79,6 +81,9 @@ class BankAccountWithdraw(graphene.Mutation):
             )
             coinWalletTransaction.save()
             #----------------- Deposit coins to wallet by create wallet withdraw transaction -E---------------#
+            print(bank_account.get_balance_aggregate())
+            student.bankWallet = bank_withdraw.account
+            student.coinWallet = coinWalletTransaction.account
 
             return BankAccountWithdraw(
                 bankMovement=bank_withdraw,

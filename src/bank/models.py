@@ -3,6 +3,7 @@ from accounting.models import Account
 from app.models import TimestampModel, RandomSlugModel, IsActiveModel
 from django.db.models import Q
 from datetime import datetime
+from decimal import Decimal
 
 class BankWallet(Account):
     student = models.OneToOneField(
@@ -13,6 +14,7 @@ class BankWallet(Account):
 
     #override balance method
     def get_balance_aggregate(self):
+        print("get balance")
         positive_movements_aggregate = self.bankmovement_set.filter(
             Q(side=self.positive_side) | Q(side=self.SIDE_CHOICE_RIGHT_INTEREST)).aggregate(models.Sum('amount'))
         negative_movements_aggregate = self.bankmovement_set.filter(side=self.get_negative_side).aggregate(
@@ -28,7 +30,7 @@ class BankWallet(Account):
         balance = positive_movements_balance - negative_movements_balance
         dict['positive_movements_balance'] = positive_movements_balance
         dict['negative_movements_balance'] = negative_movements_balance
-        dict['total_movements_balance'] = balance
+        dict['total_movements_balance'] = Decimal(balance)
         return dict
 
 class Interest(TimestampModel, RandomSlugModel, IsActiveModel):
