@@ -35,6 +35,7 @@ class Query(graphene.ObjectType):
         return Level.objects.get(pk=id)
 
     def resolve_next_level(root, info) :
+        """ Get current user's next level"""
         # Get user from token
         user = info.context.user
         if not user.is_authenticated:
@@ -46,6 +47,7 @@ class Query(graphene.ObjectType):
         return next_level
     
     def resolve_next_level_by_amount(root, info, amount) :
+        """ Get next level from specific level's amount"""
         current_level = Level.objects.get(amount = amount)
         next_level = current_level.get_next_level()
         return next_level
