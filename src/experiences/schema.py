@@ -24,6 +24,7 @@ class Query(graphene.ObjectType):
     levels = graphene.List(LevelSchema)
     level_by_id = graphene.Field(LevelSchema, id=graphene.String())
     next_level = graphene.Field(LevelSchema)
+    next_level_by_amount = graphene.Field(LevelSchema,  amount=graphene.Int())
 
     def resolve_levels(root, info, **kwargs):
         # Querying a list
@@ -41,5 +42,10 @@ class Query(graphene.ObjectType):
         # Get current level of user
         current_level = user.student.level
         # Get next level of user
+        next_level = current_level.get_next_level()
+        return next_level
+    
+    def resolve_next_level_by_amount(root, info, amount) :
+        current_level = Level.objects.get(amount = amount)
         next_level = current_level.get_next_level()
         return next_level
