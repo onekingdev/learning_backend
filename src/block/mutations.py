@@ -48,7 +48,7 @@ class FinishBlockPresentation(graphene.Mutation):
         if not user.student:
             raise Exception("Not found student")
 
-        exp_unit = 1
+        exp_unit = 5
         coin_unit = 10;
         exp = exp_unit * (hits + errors) + user.student.points
 
