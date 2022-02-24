@@ -31,12 +31,7 @@ class StudentSchema(DjangoObjectType):
         # Querying a single next level
         current_level = self.level;
         # Get next level
-        next_levels = self.level.__class__.objects.filter(amount=self.level.amount + 1);
-        # If next level not exits, return current level
-        if(len(next_levels) > 0):
-            next_level = next_levels[0]
-        else : next_level = None
-        
+        next_level = self.level.get_next_level()
         return next_level
 
 

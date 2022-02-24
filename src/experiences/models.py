@@ -18,3 +18,14 @@ class Level(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     amount = models.IntegerField(null=False)
 
     objects = LevelManager()
+
+    def get_next_level(self):
+        next_level, new = self.__class__.objects.get_or_create(amount = self.amount + 1)
+        if(new) :
+            for language in self.get_available_languages():
+                self.set_current_language(language)
+                next_level.set_current_language(language)
+                next_level.name = self.name
+            next_level.points_required = 100 * (pow(next_level.amount, 1.3))
+            next_level.save()
+        return next_level

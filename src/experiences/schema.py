@@ -23,7 +23,7 @@ class LevelSchema(DjangoObjectType):
 class Query(graphene.ObjectType):
     levels = graphene.List(LevelSchema)
     level_by_id = graphene.Field(LevelSchema, id=graphene.String())
-    next_level = graphene.Field(LevelSchema, amount=graphene.Int())
+    next_level = graphene.Field(LevelSchema)
 
     def resolve_levels(root, info, **kwargs):
         # Querying a list
@@ -33,13 +33,13 @@ class Query(graphene.ObjectType):
         # Querying a single level
         return Level.objects.get(pk=id)
 
-    def resolve_next_level(root, info, amount) :
-        # Querying a single level
-        # Get next level from db
-
-        next_levels = Level.objects.filter(amount=amount + 1);
-        # If next level not exits, return Null
-        if(len(next_levels) > 0):
-            return next_levels[0]
-        else :
-            return  None
+    def resolve_next_level(root, info) :
+        # Get user from token
+        user = info.context.user
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        # Get current level of user
+        current_level = user.student.level
+        # Get next level of user
+        next_level = current_level.get_next_level()
+        return next_level
