@@ -54,7 +54,7 @@ class CollectibleCategory(
 
 class Description(TranslatableModel):
     translations = TranslatedFields(
-        key=models.CharField(max_length=16, null=True, blank=True),
+        key=models.CharField(max_length=32, null=True, blank=True),
         value=models.TextField()
     )
 
