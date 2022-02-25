@@ -1,7 +1,6 @@
 from django.db import models
-from django.utils import timezone
 from django.utils.text import slugify
-from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
+from app.models import RandomSlugModel, TimestampModel, IsActiveModel
 
 
 class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
@@ -9,10 +8,13 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
 
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255, blank=True)
-    area_of_knowledge = models.CharField(max_length=255, choices=(("ALL", "ALL"), ("ONE", "ONE"), ("TWO", "TWO")), default="ALL")
+    area_of_knowledge = models.CharField(max_length=255, choices=(
+        ("ALL", "ALL"), ("ONE", "ONE"), ("TWO", "TWO")), default="ALL")
     slug = models.SlugField(editable=False)
-    price_month = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    price_year = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    price_month = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0)
+    price_year = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0)
     currency = models.CharField(max_length=4)
     is_cancel = models.BooleanField(default=False)
 
@@ -27,8 +29,14 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
 class GuardianStudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'guardian_plan_'
 
-    guardian = models.ForeignKey('guardians.Guardian', on_delete=models.PROTECT)
-    student = models.ForeignKey('students.Student', on_delete=models.PROTECT, blank=True, null=True)
+    guardian = models.ForeignKey(
+        'guardians.Guardian',
+        on_delete=models.PROTECT)
+    student = models.ForeignKey(
+        'students.Student',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True)
     slug = models.SlugField(editable=False)
     plan = models.ForeignKey('Plan', on_delete=models.PROTECT, blank=True)
     subject = models.ManyToManyField(
