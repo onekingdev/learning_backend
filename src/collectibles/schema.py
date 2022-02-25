@@ -4,7 +4,35 @@ from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType
 from collectibles.models import CollectibleCategory, Collectible, StudentCollectible
 from .models import CollectiblePurchaseTransaction, CollectiblePackPurchaseTransaction
+from .models import Description, CollectibleDescription
 from students.models import Student
+
+
+class DescriptionSchema(DjangoObjectType):
+    class Meta:
+        model = Description
+        fields = "__all__"
+
+    key = graphene.String()
+    value = graphene.String()
+
+    def resolve_key(self, info, language_code=None):
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter(
+            "key", language_code=current_language)
+
+    def resolve_value(self, info, language_code=None):
+        try:
+            current_language = info.context.user.language
+        except AttributeError:
+            current_language = settings.LANGUAGE_CODE
+
+        return self.safe_translation_getter(
+            "value", language_code=current_language)
 
 
 class CollectibleCategorySchema(DjangoObjectType):
@@ -30,7 +58,7 @@ class CollectibleSchema(DjangoObjectType):
         fields = "__all__"
 
     name = graphene.String()
-    description = graphene.String()
+    description = graphene.List(DescriptionSchema)
     owned = graphene.Boolean()
     amount = graphene.Int()
 
@@ -43,14 +71,8 @@ class CollectibleSchema(DjangoObjectType):
         return self.safe_translation_getter(
             "name", language_code=current_language)
 
-    def resolve_description(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "description", language_code=current_language)
+    def resolve_description(self, info):
+        return self.description.all()
 
     def resolve_owned(self, info):
         student = Student.objects.get(user=info.context.user)
