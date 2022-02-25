@@ -1,8 +1,7 @@
 from app.resources import TranslatableModelResource
-from app.widgets import TranslatableForeignKeyWidget
 from import_export.fields import Field
 from import_export.resources import ModelResource
-from .models import Collectible
+from .models import Collectible, Description, CollectibleDescription
 
 
 class CollectibleResource(TranslatableModelResource):
@@ -14,11 +13,6 @@ class CollectibleResource(TranslatableModelResource):
         attribute='name'
     )
 
-
-    description = Field(
-        attribute='description'
-    )
-
     class Meta:
         model = Collectible
         skip_unchanged = True
@@ -27,8 +21,43 @@ class CollectibleResource(TranslatableModelResource):
             'id',
             'language_code',
             'name',
-            'description',
             'category',
             'image',
             'tier',
+        )
+
+
+class DescriptionResource(TranslatableModelResource):
+    language_code = Field(
+        attribute='_current_language'
+    )
+
+    key = Field(
+        attribute='key'
+    )
+
+    value = Field(
+        attribute='value'
+    )
+
+    class Meta:
+        model = Description
+        skip_unchanged = True
+        report_skipped = False
+        fields = (
+            'id',
+            'key',
+            'value',
+        )
+
+
+class CollectibleDescriptionResource(ModelResource):
+    class Meta:
+        model = CollectibleDescription
+        skip_unchanged = True
+        report_skipped = False
+        fields = (
+            'id',
+            'collectible',
+            'description',
         )
