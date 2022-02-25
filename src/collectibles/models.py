@@ -16,7 +16,10 @@ class CollectibleCategoryQuerySet(TranslatableQuerySet, TreeQuerySet):
     as_manager = classmethod(as_manager)
 
 
-class CollectibleCategoryManager(ActiveManager, TreeManager, TranslatableManager):
+class CollectibleCategoryManager(
+        ActiveManager,
+        TreeManager,
+        TranslatableManager):
     _queryset_class = CollectibleCategoryQuerySet
 
 
@@ -24,7 +27,12 @@ class CollectibleManager(ActiveManager, TranslatableManager):
     pass
 
 
-class CollectibleCategory(TimestampModel, MPTTModel, RandomSlugModel, TranslatableModel, IsActiveModel):
+class CollectibleCategory(
+        TimestampModel,
+        MPTTModel,
+        RandomSlugModel,
+        TranslatableModel,
+        IsActiveModel):
     translations = TranslatedFields(
         name=models.CharField(max_length=128, null=True),
         description=models.TextField(null=True)
@@ -44,7 +52,18 @@ class CollectibleCategory(TimestampModel, MPTTModel, RandomSlugModel, Translatab
     price = models.IntegerField(default=100)
 
 
-class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
+class Description(TranslatableModel):
+    translations = TranslatedFields(
+        key=models.CharField(max_length=16, null=True, blank=True),
+        value=models.TextField()
+    )
+
+
+class Collectible(
+        TimestampModel,
+        RandomSlugModel,
+        IsActiveModel,
+        TranslatableModel):
     COMMON = 'Common'
     RARE = 'Rare'
     LEGENDARY = 'Legendary'
@@ -58,11 +77,18 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
 
     translations = TranslatedFields(
         name=models.CharField(max_length=128, null=True),
-        description=models.TextField(null=True)
+    )
+    description = models.ManyToManyField(
+        Description,
+        through='CollectibleDescription',
+        through_fields=('collectible', 'description'),
     )
     image = models.URLField(null=True)
     category = models.ForeignKey(
-        'collectibles.CollectibleCategory', on_delete=models.PROTECT, null=True, blank=True)
+        'collectibles.CollectibleCategory',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True)
     objects = CollectibleManager()
     tier = models.CharField(
         choices=TIER_CHOICES,
@@ -71,6 +97,11 @@ class Collectible(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableMo
 
     def __str__(self):
         return self.safe_translation_getter("name", any_language=True)
+
+
+class CollectibleDescription(models.Model):
+    collectible = models.ForeignKey(Collectible, on_delete=models.CASCADE)
+    description = models.ForeignKey(Description, on_delete=models.PROTECT)
 
 
 class CollectiblePackPurchaseTransaction(Withdraw):
