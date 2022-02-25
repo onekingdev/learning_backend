@@ -50,7 +50,9 @@ class FinishBlockPresentation(graphene.Mutation):
 
         exp_unit = 5
         coin_unit = 10;
+        print("user point is", user.student.points)
         exp = exp_unit * (hits + errors) + user.student.points
+        print("exp is", exp)
 
         block_presentation = BlockPresentation.objects.get(
             id=block_presentation_id)
@@ -64,22 +66,15 @@ class FinishBlockPresentation(graphene.Mutation):
         # block_presentation.is_active = False
         block_presentation.save()
 
-        
+        student = user.student
         #--------------------- level up -S--------------------------------------#
-        current_level_amount = user.student.level.amount
-        while exp > current_level_amount : 
-            next_levels = user.student.level.__class__.objects.filter(amount=current_level_amount + 1);
-            if(len(next_levels) < 1): break;
-            next_level = next_levels[0]
-            if next_level :
-                user.student.level = next_level;
-                user.student.level.save();
-                exp -= current_level_amount
-                current_level_amount = next_level.amount
+        while exp > student.level.points_required : 
+            exp -= student.level.points_required
+            next_level = student.level.get_next_level()
+            student.level = next_level
         #--------------------- level up -S--------------------------------------#
 
         # -------------------- set earned points to student -S------------------#
-        student = user.student
         student.points = Decimal(exp)
         student.save()
         # -------------------- set earned points to student -E------------------#
