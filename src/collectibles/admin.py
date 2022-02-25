@@ -3,8 +3,9 @@ from parler.admin import TranslatableAdmin, TranslatableModelForm
 from mptt.admin import DraggableMPTTAdmin
 from mptt.forms import MPTTAdminForm
 from .models import CollectibleCategory, Collectible, CollectiblePurchaseTransaction, StudentCollectible
+from .models import Description, CollectibleDescription
 from import_export import admin as import_export_admin
-from .resources import CollectibleResource
+from .resources import CollectibleResource, DescriptionResource, CollectibleDescriptionResource
 
 
 @admin.action(description='Hard delete objects')
@@ -30,6 +31,18 @@ class CollectibleAdmin(
         TranslatableAdmin,
         import_export_admin.ImportExportModelAdmin):
     resource_class = CollectibleResource
+
+
+@admin.register(Description)
+class DescriptionAdmin(
+        TranslatableAdmin,
+        import_export_admin.ImportExportModelAdmin):
+    resource_class = DescriptionResource
+
+
+@admin.register(CollectibleDescription)
+class CollectibleDescriptionAdmin(import_export_admin.ImportExportModelAdmin):
+    resource_class = CollectibleDescriptionResource
 
 
 @admin.register(CollectiblePurchaseTransaction)
