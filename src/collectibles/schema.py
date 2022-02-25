@@ -3,8 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType
 from collectibles.models import CollectibleCategory, Collectible, StudentCollectible
-from .models import CollectiblePurchaseTransaction, CollectiblePackPurchaseTransaction
-from .models import Description, CollectibleDescription
+from .models import CollectiblePurchaseTransaction, CollectiblePackPurchaseTransaction, Description
 from students.models import Student
 
 
