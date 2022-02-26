@@ -3,7 +3,10 @@ from django.db import models
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel, ActiveManager
 from wallets.models import Withdraw
 from parler.models import TranslatableModel, TranslatedFields, TranslatableManager
-
+from django.conf import settings
+from django.core.files import File
+import os
+import lxml.html as LH
 
 class GameCategoryManager(ActiveManager, TranslatableManager):
     pass
@@ -20,6 +23,7 @@ class Game(TimestampModel, TranslatableModel, RandomSlugModel, IsActiveModel):
         name=models.CharField(max_length=128, null=True)
     )
     image = models.URLField(null=True)
+    path = models.CharField(null=False, max_length=30)
     cost = models.DecimalField(
         blank=True, null=True, decimal_places=2, max_digits=15)
     play_stats = models.BigIntegerField(default=0, null=True)
@@ -28,7 +32,43 @@ class Game(TimestampModel, TranslatableModel, RandomSlugModel, IsActiveModel):
 
     def __str__(self):
         return self.safe_translation_getter("name", any_language=True)
-    
+
+    def get_game_content(self) :
+        path = settings.MEDIA_ROOT + "games/" + self.path + "/" + self.random_slug+"_index.html"
+        # --------------- Change the index.html file name to randomg slug name -S----------------#    
+        if not os.path.exists(path) :
+            initial_path = settings.MEDIA_ROOT + "games/" + self.path + "/"
+            if os.path.exists(initial_path + "index.html") :
+                initial_path = initial_path + "index.html"
+            elif os.path.exists(initial_path + "index.htm") :
+                initial_path = initial_path + "index.htm"
+            else : 
+                raise Exception("Game content not exists")
+                return;
+            os.rename(initial_path, path)
+        # --------------- Change the file name  (index.html) to randomg slug name -S----------------#  
+          
+        # --------------- Read Content of index.html file -S---------------------#
+        file = open(path, 'r')
+        contents =file.read()
+        # --------------- Read Content of index.html file -E---------------------#
+
+        # --------------- Change src target -S---------------------------------#
+        contents_LH = LH.fromstring(contents)
+        for element in contents_LH.iter('link'):
+            try:
+                element.attrib['href'] = 'https://api.withsocrates.com/media/games/' + self.path + "/" + element.attrib['href']
+            except Exception as e:
+                print(str(e))
+        for element in contents_LH.iter(['script', 'img']):
+            try:
+                element.attrib['src'] = 'https://api.withsocrates.com/media/games/' + self.path + "/" + element.attrib['src']
+            except Exception as e:
+                print(str(e))
+            # 
+        # --------------- Change src target -E---------------------------------#
+        
+        return LH.tostring(contents_LH, pretty_print=True).decode("utf-8")
 
 class GameCategory(TimestampModel, TranslatableModel, RandomSlugModel, IsActiveModel):
     translations = TranslatedFields(

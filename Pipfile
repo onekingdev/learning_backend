@@ -29,6 +29,9 @@ gtts = "*"
 django-admin-sortable2 = "*"
 django-money = "*"
 dj-stripe = "*"
+beautifulsoup4 = "*"
+html5lib = "*"
+lxml = "*"
 
 [dev-packages]
 

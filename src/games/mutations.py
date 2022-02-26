@@ -13,16 +13,21 @@ class PlayGame(graphene.Mutation):
         PlayGameTransactionSchema)
     student = graphene.Field(StudentSchema)
     game = graphene.Field(GameSchema)
+    gameContent = graphene.String()
 
     class Arguments:
-        student = graphene.ID(required=True)
         game = graphene.ID(required=True)
 
-    def mutate(self, info, student, game):
-        student = Student.objects.get(id=student)
+    def mutate(self, info, game):
+        user = info.context.user
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        
+        student = user.student
         game = Game.objects.get(id=game)
         account, new = CoinWallet.objects.get_or_create(student=student)
         if account.balance > game.cost:
+            gameContent = game.get_game_content()
             play_game_transaction = PlayGameTransaction(
                 game=game,
                 account=account,
@@ -35,9 +40,9 @@ class PlayGame(graphene.Mutation):
                 play_game_transaction=play_game_transaction,
                 student=student,
                 game=game,
+                gameContent=gameContent
             )
         raise GraphQLError('Insufficient balance')
-
 
 class Mutation(graphene.ObjectType):
     play_game = PlayGame.Field()
