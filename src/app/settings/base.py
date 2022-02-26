@@ -18,6 +18,10 @@ from .env import ALLOWED_HOSTS as ENV_ALLOWED_HOSTS
 from pathlib import Path
 from datetime import timedelta
 from django.conf import settings
+import mimetypes
+
+# Enable mimetypes
+mimetypes.add_type("text/javascript", ".js", True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent

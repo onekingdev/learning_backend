@@ -32,6 +32,10 @@ class Topic(
         blank=True,
         related_name='sub_topics'
     )
+    # universal_topic = models.ManyToManyField(
+    #     'universals.UniversalTopic',
+    #     blank=True
+    # )
 
     video_assistor = models.URLField(null=True, blank=True)
 
@@ -79,4 +83,4 @@ class Prerequisite(TimestampModel, UUIDModel, IsActiveModel):
     information = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.topic_grade}'
+        return '{}/{}'.format(self.topic_grade, self.prerequisite)
