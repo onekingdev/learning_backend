@@ -46,7 +46,7 @@ class Game(TimestampModel, TranslatableModel, RandomSlugModel, IsActiveModel):
                 raise Exception("Game content not exists")
                 return;
             os.rename(initial_path, path)
-        # --------------- Change the file name  (index.html) to randomg slug name -S----------------#  
+        # --------------- Change the file name  (index.html) to randomg slug name -E----------------#  
           
         # --------------- Read Content of index.html file -S---------------------#
         file = open(path, 'r')
