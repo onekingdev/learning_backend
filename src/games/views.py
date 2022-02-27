@@ -12,7 +12,7 @@ import lxml.html as LH
 
 User = get_user_model()
 
-def crud(request, folder_name):
+def game_loader(request, folder_name):
     token = request.GET['token'];
     print(request)
     id = ""

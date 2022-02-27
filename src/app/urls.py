@@ -20,11 +20,11 @@ from django.views.decorators.csrf import csrf_exempt
 from users.admin import hidden_admin
 from django.conf import settings
 from django.conf.urls.static import static
-from games.views import crud
+from games.views import game_loader
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('articles/<int:pk>/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
-    re_path(r'^media/games/(?P<folder_name>.*)/index', crud),
+    re_path(r'^media/games/(?P<folder_name>.*)/index', game_loader),
     path('hidden-admin/', hidden_admin.urls),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path('', csrf_exempt(GraphQLView.as_view(graphiql=True))),
