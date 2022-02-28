@@ -27,6 +27,7 @@ def game_loader(request, folder_name):
         game = Game.objects.get(path = folder_name)
         path = settings.MEDIA_ROOT + "games/" + game.path + "/" + game.random_slug+"_index.html"
     except Exception as e:
+        print("exceptionon", e)
         return HttpResponse(contents)
     # --------------------- Get user and game from DB -E--------------------------#
     
@@ -38,6 +39,7 @@ def game_loader(request, folder_name):
         elif os.path.exists(initial_path + "index.htm") :
             initial_path = initial_path + "index.html"
         else : 
+            print("no path exists")
             return HttpResponse(contents)
         os.rename(initial_path, path)
     # --------------- Change the file name  (index.html) to randomg slug name -E----------------#  
