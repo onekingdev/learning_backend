@@ -36,6 +36,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     points = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     int_period_start_at = models.DateField(auto_now_add=True)
+    student_plan = models.ManyToManyField('plans.StudentPlan')
     active_student_plan = models.ForeignKey(
         'plans.StudentPlan',
         related_name="active_student_plan",

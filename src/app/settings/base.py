@@ -29,12 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
-CORS_ORIGIN_WHITELIST = ENV_CORS_ORIGIN_WHITELIST
-ALLOWED_HOSTS = ENV_ALLOWED_HOSTS
+# CORS_ORIGIN_WHITELIST = ENV_CORS_ORIGIN_WHITELIST
+# ALLOWED_HOSTS = ENV_ALLOWED_HOSTS
 
 INSTALLED_APPS = [
     'django.contrib.admin',
