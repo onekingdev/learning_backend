@@ -23,7 +23,7 @@ from django.conf.urls.static import static
 from games.views import game_loader
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path(r'^media/games/(?P<folder_name>.*)/gamePlay', game_loader),
+    re_path(r'^media/games/(?P<folder_name>.*)/index', game_loader),
     path('hidden-admin/', hidden_admin.urls),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path('', csrf_exempt(GraphQLView.as_view(graphiql=True))),

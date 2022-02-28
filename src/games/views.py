@@ -13,8 +13,8 @@ import lxml.html as LH
 User = get_user_model()
 
 def game_loader(request, folder_name):
-    print("game loader")
     token = request.GET['token'];
+    print(request)
     id = ""
     contents = "Game Not Found!"
     game = ""
@@ -38,15 +38,12 @@ def game_loader(request, folder_name):
             initial_path = initial_path + "index.html"
         else : 
             return HttpResponse(contents)
-        # Add permission to rename file
-        os.chmod(initial_path, 0o0777)
         os.rename(initial_path, path)
     # --------------- Change the file name  (index.html) to randomg slug name -E----------------#  
 
     # --------------- Read Content of index.html file -S---------------------#
     file = open(path, 'r')
     contents =file.read()
-    file.close()
     # --------------- Read Content of index.html file -E---------------------#   
 
     if( not id or not contents) :
