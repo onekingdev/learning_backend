@@ -7,22 +7,36 @@ import lxml.html as LH
 from graphql_jwt.utils import jwt_decode
 from django.contrib.auth import get_user_model
 from games.models import Game
+from wallets.models import CoinWallet
+from .models import PlayGameTransaction
+from django.contrib.auth.models import User
+
 import os
 import lxml.html as LH
 
 User = get_user_model()
 
 def game_loader(request, folder_name):
+    print("game loader")
     token = request.GET['token'];
-    print(request)
     id = ""
     contents = "Game Not Found!"
     game = ""
     path = ""
+    user = None
+    student = None
+    account = None
     # --------------------- Get user and game from DB -S--------------------------#
     try:
         payload = jwt_decode(token)
         id = payload['sub']
+        # Get User By Id
+        user = User.objects.get(pk=int(id))
+        # Get Student From User
+        student = user.student
+        # Get Wallet of Student
+        account, new = CoinWallet.objects.get_or_create(student=student)
+        # Get Game by Folder Name
         game = Game.objects.get(path = folder_name)
         path = settings.MEDIA_ROOT + "games/" + game.path + "/" + game.random_slug+"_index.html"
     except Exception as e:
@@ -38,14 +52,27 @@ def game_loader(request, folder_name):
             initial_path = initial_path + "index.html"
         else : 
             return HttpResponse(contents)
+        # Add permission to rename file
+        os.chmod(initial_path, 0o0777)
+        # Rename index.html to random name
         os.rename(initial_path, path)
     # --------------- Change the file name  (index.html) to randomg slug name -E----------------#  
 
-    # --------------- Read Content of index.html file -S---------------------#
-    file = open(path, 'r')
-    contents =file.read()
-    # --------------- Read Content of index.html file -E---------------------#   
+    if account.balance > game.cost:
+        # ----------- Deduct Coin from Wallet -S------------------------ #
+        play_game_transaction = PlayGameTransaction(
+            game=game,
+            account=account,
+        )
+        play_game_transaction.save()
+        game.play_stats += 1
+        game.save()
+        # ----------- Deduct Coin from Wallet -E------------------------ #
 
-    if( not id or not contents) :
-        contents = "Game Not Found!"
+        # --------------- Read Content of index.html file -S---------------------#
+        file = open(path, 'r')
+        contents =file.read()
+        file.close()
+        # --------------- Read Content of index.html file -E---------------------#   
+
     return HttpResponse(contents)
