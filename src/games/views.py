@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.core.files import File
 from django.conf import settings
 import lxml.html as LH
-from graphql_jwt.utils import jwt_decode
+from graphql_jwt.utils import (jwt_decode, refresh_has_expired)
 from django.contrib.auth import get_user_model
 from games.models import Game
 from wallets.models import CoinWallet
@@ -29,6 +29,8 @@ def game_loader(request, folder_name):
     # --------------------- Get user and game from DB -S--------------------------#
     try:
         payload = jwt_decode(token)
+        if (refresh_has_expired(payload['exp'])) :
+            raise Exception("Token has expired")
         id = payload['sub']
         # Get User By Id
         user = User.objects.get(pk=int(id))
@@ -40,6 +42,7 @@ def game_loader(request, folder_name):
         game = Game.objects.get(path = folder_name)
         path = settings.MEDIA_ROOT + "games/" + game.path + "/" + game.random_slug+"_index.html"
     except Exception as e:
+        print(e)
         return HttpResponse(contents)
     # --------------------- Get user and game from DB -E--------------------------#
     
