@@ -53,7 +53,7 @@ def game_loader(request, folder_name):
         else : 
             return HttpResponse(contents)
         # Add permission to rename file
-        os.chmod(initial_path, 0o0777)
+        # os.chmod(initial_path, 0o0777)
         # Rename index.html to random name
         os.rename(initial_path, path)
     # --------------- Change the file name  (index.html) to randomg slug name -E----------------#  
