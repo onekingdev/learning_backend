@@ -9,7 +9,7 @@ from django.utils.html import strip_tags
 
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
-
+import time
 
 class Question(
         TimestampModel,
@@ -40,18 +40,6 @@ class Question(
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
     
-    def save_gtts(self):
-        Text = self.safe_translation_getter("question_text", any_language=True)
-        language = self.get_current_language()
-        # TTS = gTTS(text=Text, lang=language)
-        # TTS.save("media/gtts/question/" + self.random_slug + "_" + language + ".mp3")
-    def save(self, *args, **kwargs):
-        # self.set_calculated_fields()
-        # ---------------- save gtts audio file -S-------------------#
-        super().save(*args, **kwargs)
-        self.save_gtts()
-        # ---------------- save gtts audio file -E-------------------#
-
     # ---------------- Generate gtts audio file -S-------------------#
     def save_gtts(self):
         # get question's text
@@ -59,7 +47,6 @@ class Question(
         if not text: return
         # get language of current question
         language = self.get_current_language()
-        print(language)
 
         #------------- generate path to save gtts and save text to speech audio file to the path-S-------------#
         path = "media/gtts/" + language  + "/" + self.identifier
@@ -156,7 +143,11 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
         isPathExist = os.path.exists(path)
         if not isPathExist:
             os.makedirs(path)
-        TTS = gTTS(text=text, lang=language)
+        try:
+            TTS = gTTS(text=text, lang=language)
+        except Exception as e:
+            print("Exception on gtts", e)
+        time.sleep(1)
         TTS.save(path +"/answer_" + self.random_slug + ".mp3")
         #------------- generate path to save gtts and save text to speech audio file to the path -E-------------#
     # ---------------- Generate gtts audio file -E-------------------#
