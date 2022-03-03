@@ -114,8 +114,7 @@ class QuestionImageAsset(QuestionAsset):
 
 class QuestionAudioAsset(QuestionAsset):
     PREFIX = 'question_audio_asset_'
-    # audio_file = models.FileField()
-    audio_file = models.URLField(null=True)
+    audio_file = models.FileField()
 
 
 class QuestionTTSAsset(QuestionAsset):

@@ -95,9 +95,6 @@ class Collectible(
         max_length=32,
     )
 
-    def __str__(self):
-        return self.safe_translation_getter("name", any_language=True)
-
 
 class CollectibleDescription(models.Model):
     collectible = models.ForeignKey(Collectible, on_delete=models.CASCADE)
