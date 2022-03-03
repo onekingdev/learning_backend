@@ -105,7 +105,6 @@ class AnswerOptionAdmin(
     resource_class = resources.AnswerOptionResource
 
 
-
 @admin.register(Question)
 class QuestionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
     resource_class = resources.QuestionResource
@@ -137,13 +136,4 @@ class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
         'question_slug',
         'identifier',
         'image',
-    )
-
-@admin.register(QuestionAudioAsset)
-class QuestionAudioAssetAdmin(import_export_admin.ImportExportModelAdmin):
-    resource_class = resources.QuestionAudioAssetResource
-    list_display = (
-        'question_slug',
-        'identifier',
-        'audio_file',
     )

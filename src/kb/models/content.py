@@ -59,6 +59,7 @@ class Question(
         if not text: return
         # get language of current question
         language = self.get_current_language()
+        print(language)
 
         #------------- generate path to save gtts and save text to speech audio file to the path-S-------------#
         path = "media/gtts/" + language  + "/" + self.identifier
