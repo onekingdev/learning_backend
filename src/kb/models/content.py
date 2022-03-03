@@ -53,14 +53,12 @@ class Question(
         isPathExist = os.path.exists(path)
         if not isPathExist:
             os.makedirs(path)
-        if not isPathExist:
-                os.makedirs(path)
-        try:
-            TTS = gTTS(text=text, lang=language)
-            time.sleep(1)
-            TTS.save(path + "/question" + ".mp3")
-        except Exception as e:
-            print("Exception on gtts", e)
+            try:
+                TTS = gTTS(text=text, lang=language)
+                time.sleep(1)
+                TTS.save(path + "/question" + ".mp3")
+            except Exception as e:
+                print("Exception on gtts", e)
         #------------- generate path to save gtts and save text to speech audio file to the path-E-------------#
     # ---------------- Generate gtts audio file -E-------------------#
 
@@ -149,12 +147,12 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
         isPathExist = os.path.exists(path)
         if not isPathExist:
             os.makedirs(path)
-        try:
-            TTS = gTTS(text=text, lang=language)
-            time.sleep(1)
-            TTS.save(path +"/answer_" + self.random_slug + ".mp3")
-        except Exception as e:
-            print("Exception on gtts", e)
+            try:
+                TTS = gTTS(text=text, lang=language)
+                time.sleep(1)
+                TTS.save(path +"/answer_" + self.random_slug + ".mp3")
+            except Exception as e:
+                print("Exception on gtts", e)
         #------------- generate path to save gtts and save text to speech audio file to the path -E-------------#
     # ---------------- Generate gtts audio file -E-------------------#
 
