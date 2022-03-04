@@ -9,6 +9,7 @@ from django.utils.html import strip_tags
 
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
+import time
 
 
 class Question(
@@ -51,6 +52,34 @@ class Question(
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
 
+    # ---------------- Generate gtts audio file -S-------------------#
+    def save_gtts(self):
+        # get question's text
+        text = self.safe_translation_getter("question_text", any_language=True)
+        if not text:
+            return
+        # get language of current question
+        language = self.get_current_language()
+
+        # ------------- generate path to save gtts and save text to speech audio file to the path-S-------------#
+        path = "media/gtts/" + language + "/" + self.identifier
+        isPathExist = os.path.exists(path)
+        if not isPathExist:
+            os.makedirs(path)
+            try:
+                TTS = gTTS(text=text, lang=language)
+                time.sleep(1)
+                TTS.save(path + "/question" + ".mp3")
+            except Exception as e:
+                print("Exception on gtts", e)
+        # ------------- generate path to save gtts and save text to speech audio file to the path-E-------------#
+    # ---------------- Generate gtts audio file -E-------------------#
+
+    def save(self, *args, **kwargs):
+        # self.set_calculated_fields()
+        super().save(*args, **kwargs)
+        self.save_gtts()
+
     @admin.display(description='Question')
     def question(self):
         return self.safe_translation_getter("question_text", any_language=True)
@@ -90,7 +119,8 @@ class QuestionImageAsset(QuestionAsset):
 
 class QuestionAudioAsset(QuestionAsset):
     PREFIX = 'question_audio_asset_'
-    audio_file = models.FileField()
+    # audio_file = models.FileField()
+    audio_file = models.URLField(null=True)
 
 
 class QuestionTTSAsset(QuestionAsset):
@@ -132,10 +162,15 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
         isPathExist = os.path.exists(path)
         if not isPathExist:
             os.makedirs(path)
-        TTS = gTTS(text=text, lang=language)
-        TTS.save(path + "/answer_" + self.random_slug + ".mp3")
-        # Generate path to save gtts and save text to speech audio file to the path
-    # ---------------- Generate gtts audio file -E-------------------#
+
+        try:
+            TTS = gTTS(text=text, lang=language)
+            time.sleep(1)
+            TTS.save(path + "/answer_" + self.random_slug + ".mp3")
+        except Exception as e:
+            print("Exception on gtts", e)
+        # ------------- generate path to save gtts and save text to speech audio file to the path -E-------------#
+        # ---------------- Generate gtts audio file -E-------------------#
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

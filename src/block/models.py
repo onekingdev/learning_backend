@@ -178,6 +178,7 @@ class BlockPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     start_timestamp = models.DateTimeField(auto_now_add=True, null=True)
     end_timestamp = models.DateTimeField(null=True)
 
+
 class BlockTransaction(Deposit):
     blockPresentation = models.ForeignKey(
         BlockPresentation, on_delete=models.PROTECT, null=True)
