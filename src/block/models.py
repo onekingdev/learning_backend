@@ -135,6 +135,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     # Metrics
     experience_points_available = models.PositiveSmallIntegerField(null=True)
     coins_available = models.PositiveSmallIntegerField(null=True)
+    coins_per_question = models.PositiveSmallIntegerField(default=10)
 
     def save(self, *args, **kwargs):
         is_new = False
