@@ -40,6 +40,26 @@ class Query(graphene.ObjectType):
         # Querying a single question
         return Order.objects.get(pk=id)
 
+    # ----------------- Order Detail ----------------- #
+    order_details = graphene.List(OrderDetailSchema)
+    order_detail_by_id = graphene.Field(OrderDetailSchema, id=graphene.String())
+    order_detail_by_guardian_id = graphene.List(OrderDetailSchema, guardian_id=graphene.String())
+    guardian_available_brought_plan = graphene.List(OrderDetailSchema, guardian_id=graphene.String())
+
+    def resolve_order_details(self, info, **kwargs):
+        # Querying a list
+        return OrderDetail.objects.all()
+
+    def resolve_order_detail_by_id(self, info, id):
+        # Querying a single question
+        return OrderDetail.objects.get(pk=id)
+
+    def resolve_order_detail_by_guardian_id(self, info, guardian_id):
+        return OrderDetail.objects.filter(order__guardian_id=guardian_id)
+
+    def resolve_guardian_available_brought_plan(self, info, guardian_id):
+        return OrderDetail.objects.filter(order__guardian_id=guardian_id, is_cancel=False)
+
     # ----------------- Payment Method ----------------- #
     payment_methods = graphene.List(PaymentMethodSchema)
     payment_method_id = graphene.Field(PaymentMethodSchema, id=graphene.String())
