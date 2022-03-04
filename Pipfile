@@ -32,7 +32,6 @@ dj-stripe = "*"
 beautifulsoup4 = "*"
 html5lib = "*"
 lxml = "*"
-paypalrestsdk = "*"
 
 [dev-packages]
 

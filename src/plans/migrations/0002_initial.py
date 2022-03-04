@@ -9,14 +9,20 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('guardians', '0001_initial'),
+        ('plans', '0001_initial'),
+        ('kb', '0001_initial'),
         ('students', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='guardianstudent',
+            model_name='guardianstudentplan',
             name='student',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='students.student'),
+        ),
+        migrations.AddField(
+            model_name='guardianstudentplan',
+            name='subject',
+            field=models.ManyToManyField(blank=True, to='kb.AreaOfKnowledge'),
         ),
     ]

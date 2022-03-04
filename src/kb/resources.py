@@ -3,7 +3,7 @@ from app.widgets import TranslatableForeignKeyWidget
 from import_export.fields import Field
 from import_export.resources import ModelResource
 from .models import Topic, Grade, TopicGrade
-from .models.content import Question, AnswerOption, QuestionImageAsset,QuestionAudioAsset
+from .models.content import Question, AnswerOption, QuestionImageAsset
 from .models.areas_of_knowledge import AreaOfKnowledge
 
 
@@ -184,25 +184,4 @@ class AnswerOptionResource(TranslatableModelResource):
             'create_timestamp',
             'update_timestamp',
             'random_slug',
-        )
-
-
-class QuestionAudioAssetResource(ModelResource):
-    class Meta:
-        model = QuestionAudioAsset
-        skip_unchanged = True
-        report_skipped = False
-        fields = (
-            'id',
-            'identifier',
-            'question',
-            'order',
-            'audio_file'
-        )
-        export_order = (
-            'id',
-            'identifier',
-            'question',
-            'order',
-            'audio_file'
         )

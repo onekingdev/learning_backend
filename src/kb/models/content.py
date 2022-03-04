@@ -9,7 +9,7 @@ from django.utils.html import strip_tags
 
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
-import time
+
 
 class Question(
         TimestampModel,
@@ -25,11 +25,22 @@ class Question(
     grade = models.ForeignKey(
         'kb.Grade', on_delete=models.PROTECT)
     objects = QuestionManager()
+
     def __str__(self):
-        return strip_tags(self.safe_translation_getter("question_text", any_language=True))[:100]
+        return strip_tags(
+            self.safe_translation_getter(
+                "question_text",
+                any_language=True
+            )
+        )[:100]
 
     def __repr__(self):
-        return strip_tags(self.safe_translation_getter("question_text", any_language=True))[:100]
+        return strip_tags(
+            self.safe_translation_getter(
+                "question_text",
+                any_language=True
+            )
+        )[:100]
 
     def get_questionimageasset_set(self):
         return QuestionImageAsset.objects.filter(question=self)
@@ -39,33 +50,6 @@ class Question(
 
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
-    
-    # ---------------- Generate gtts audio file -S-------------------#
-    def save_gtts(self):
-        # get question's text
-        text = self.safe_translation_getter("question_text", any_language=True)
-        if not text: return
-        # get language of current question
-        language = self.get_current_language()
-
-        #------------- generate path to save gtts and save text to speech audio file to the path-S-------------#
-        path = "media/gtts/" + language  + "/" + self.identifier
-        isPathExist = os.path.exists(path)
-        if not isPathExist:
-            os.makedirs(path)
-            try:
-                TTS = gTTS(text=text, lang=language)
-                time.sleep(1)
-                TTS.save(path + "/question" + ".mp3")
-            except Exception as e:
-                print("Exception on gtts", e)
-        #------------- generate path to save gtts and save text to speech audio file to the path-E-------------#
-    # ---------------- Generate gtts audio file -E-------------------#
-
-    def save(self, *args, **kwargs):
-        # self.set_calculated_fields()
-        super().save(*args, **kwargs)
-        self.save_gtts()
 
     @admin.display(description='Question')
     def question(self):
@@ -106,8 +90,7 @@ class QuestionImageAsset(QuestionAsset):
 
 class QuestionAudioAsset(QuestionAsset):
     PREFIX = 'question_audio_asset_'
-    # audio_file = models.FileField()
-    audio_file = models.URLField(null=True)
+    audio_file = models.FileField()
 
 
 class QuestionTTSAsset(QuestionAsset):
@@ -136,24 +119,22 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
     def save_gtts(self):
         text = self.safe_translation_getter("answer_text", any_language=True)
         # if text is empty or answer's question is empty, disable to save
-        if not text: return
-        if not self.question : return
+        if not text:
+            return
+        if not self.question:
+            return
 
         # get current answer's language
         language = self.get_current_language()
 
-        #------------- generate path to save gtts and save text to speech audio file to the path-S-------------#
+        # Generate path to save gtts and save text to speech audio file to the path
         path = "media/gtts/" + language + "/" + self.question.identifier
         isPathExist = os.path.exists(path)
         if not isPathExist:
             os.makedirs(path)
-            try:
-                TTS = gTTS(text=text, lang=language)
-                time.sleep(1)
-                TTS.save(path +"/answer_" + self.random_slug + ".mp3")
-            except Exception as e:
-                print("Exception on gtts", e)
-        #------------- generate path to save gtts and save text to speech audio file to the path -E-------------#
+        TTS = gTTS(text=text, lang=language)
+        TTS.save(path + "/answer_" + self.random_slug + ".mp3")
+        # Generate path to save gtts and save text to speech audio file to the path
     # ---------------- Generate gtts audio file -E-------------------#
 
     def save(self, *args, **kwargs):

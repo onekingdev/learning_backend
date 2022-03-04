@@ -1,23 +1,9 @@
-import paypalrestsdk
-
-from app import settings
 from app.utils import add_months
 from guardians.models import Guardian
 from payments.card import Card
-from payments.models import Order, OrderDetail, PaypalTransaction, PaymentMethod, CardTransaction, DiscountCode
+from payments.models import Order, OrderDetail, PaypalTransaction, PaymentMethod, CardTransaction
 from payments.paypal import Paypal
 from plans.models import Plan, GuardianStudentPlan
-
-
-class TmpOrderDetail:
-    plan: Plan
-    period: str
-    quantity: int
-
-    def __init__(self, plan: Plan, period: str, quantity: int):
-        self.plan = plan
-        self.period = period
-        self.quantity = quantity
 
 
 class CreateOrderResp:
@@ -29,131 +15,22 @@ class CreateOrderResp:
         self.order = order
 
 
-# ----------------- Payment Method Service ----------------- #
-
-
-def check_is_duplicate(method: str, guardian_id, card_number=None, card_cvc=None):
-    # get all guardian payment method
+def add_or_update_payment_method(method: str, guardian_id):
     payment_methods = PaymentMethod.objects.filter(guardian_id=guardian_id)
-    has_info = False
-    obj_id = 0
 
-    # check  if payment method already created
-    for payment_method in payment_methods:
-        if payment_method.method == method:
-            # if card are the same
-            if payment_method.card_number == card_number and payment_method.card_cvc == card_cvc:
-                has_info = True
-                obj_id = payment_method.id
-
-    return{
-        "status": has_info,
-        "id": obj_id
-    }
-
-
-def add_or_update_payment_method(method: str, guardian_id, card_first_name=None, card_last_name=None, card_number=None, card_exp_month=None, card_exp_year=None, card_cvc=None) -> str:
-    method = method.upper()
-    if method == "CARD" and card_number is None and card_cvc is None:
-        return "cannot create card with no card number"
-
-    # get all guardian payment method
-    payment_methods = PaymentMethod.objects.filter(guardian_id=guardian_id)
-    is_default = False
-    has_info = check_is_duplicate(method=method, guardian_id=guardian_id, card_number=card_number, card_cvc=card_cvc)
-
-    if has_info["status"]:
-        return "has already"
-
-    if len(payment_methods) == 0:
-        is_default = True
-
-    # create payment method
-    PaymentMethod.objects.create(
-        guardian_id=guardian_id,
-        method=method,
-        card_first_name=card_first_name,
-        card_last_name=card_last_name,
-        card_number=card_number,
-        card_exp_month=card_exp_month,
-        card_exp_year=card_exp_year,
-        card_cvc=card_cvc,
-        is_default=is_default
-    )
-    return "created"
-
-
-def change_default_payment_method(method: str, guardian_id, card_first_name=None, card_last_name=None, card_number=None, card_exp_month=None, card_exp_year=None, card_cvc=None):
-    method = method.upper()
-    has_info = check_is_duplicate(method=method, guardian_id=guardian_id, card_number=card_number, card_cvc=card_cvc)
-
-    payment_methods = PaymentMethod.objects.filter(guardian_id=guardian_id)
-    for payment_method in payment_methods:
-        payment_method.is_default = False
-        payment_method.save()
-
-    if has_info["status"]:
-        obj = PaymentMethod.objects.get(pk=has_info["id"])
-        obj.is_default = True
+    if payment_methods.count() > 0:
+        obj = PaymentMethod.objects.get(pk=payment_methods[0].id)
+        print(obj.method, method)
+        obj.method = method
         obj.save()
         return
+
     PaymentMethod.objects.create(
         guardian_id=guardian_id,
         method=method,
-        card_first_name=card_first_name,
-        card_last_name=card_last_name,
-        card_number=card_number,
-        card_exp_month=card_exp_month,
-        card_exp_year=card_exp_year,
-        card_cvc=card_cvc,
         is_default=True
     )
     return
-
-
-def edit_payment_method(payment_method_id, card_first_name=None, card_last_name=None, card_number=None, card_exp_month=None, card_exp_year=None, card_cvc=None):
-
-    payment_method = PaymentMethod.objects.get(pk=payment_method_id)
-    payment_method.card_first_name = card_first_name
-    payment_method.card_last_name = card_last_name
-    payment_method.card_number = card_number
-    payment_method.card_exp_month = card_exp_month
-    payment_method.card_exp_year = card_exp_year
-    payment_method.card_cvc = card_cvc
-    payment_method.save()
-    return
-
-# ----------------- Create Order Service ----------------- #
-
-
-def payment_card_subscription(order_detail: OrderDetail, email: str, card_number: str, card_exp_month: int, card_exp_year: int, card_cvc: str, has_order: bool):
-    card = Card()
-    payment_method = card.create_payment_method(
-        number=card_number,
-        exp_month=card_exp_month,
-        exp_year=card_exp_year,
-        cvc=card_cvc
-    )
-
-    customer = card.create_customer(
-        email,
-        payment_method_id=payment_method.id
-    )
-
-    # get a coupon if has
-    coupon_id = None
-    if order_detail.order.discount_code != "" and order_detail.order.discount_code is not None:
-        discount_code = DiscountCode.objects.get(code=order_detail.order.discount_code)
-        coupon_id = card.create_or_get_coupon(code=discount_code.code, percentage=discount_code.percentage)
-
-    sub = card.create_subscription(
-        customer_id=customer.id,
-        plan_id=order_detail.payment_method_plan_id,
-        quantity=order_detail.quantity,
-        has_order=has_order,
-        coupon_id=coupon_id
-    )
-    return sub
 
 
 def create_order(guardian_id,
@@ -162,143 +39,60 @@ def create_order(guardian_id,
                  sub_total,
                  total,
                  payment_method,
-                 order_detail_list,
-                 return_url,
-                 card_first_name=None,
-                 card_last_name=None,
-                 card_number=None,
-                 card_exp_month=None,
-                 card_exp_year=None,
-                 card_cvc=None,
-                 order_detail_id=0
-                 ) -> CreateOrderResp:
+                 order_detail_input,
+                 return_url) -> CreateOrderResp:
 
     guardian = Guardian.objects.get(pk=guardian_id)
-    payment_method = payment_method.upper()
 
-    if payment_method != "CARD" and payment_method != "PAYPAL" and payment_method != "APPLEPAY":
+    if payment_method != "Card" and payment_method != "PayPal" and payment_method != "ApplePay":
         raise Exception("need payment method enum Card, PayPal, ApplePay.")
 
-    if payment_method == "CARD" and card_number is None and card_exp_month is None and card_exp_year is None and card_cvc is None:
-        raise Exception("need card information")
-
-    sub_total = 0
-    total = 0
-
-    # create order
     order = Order.objects.create(
-        discount_code='',
         guardian_id=guardian.id,
+        sub_total=sub_total,
+        discount_code=discount_code,
+        discount=discount,
+        total=total,
         payment_method=payment_method
     )
 
-    # sorted input by DESC
-    tmp_order_details = []
-    for order_detail in order_detail_list:
-        plan = Plan.objects.get(pk=order_detail.plan_id)
-        tmp_order_details.append(
-            TmpOrderDetail(plan=plan, period=order_detail.period.upper(), quantity=order_detail.quantity)
-        )
-    tmp_order_details.sort(key=lambda x: x.plan.price_month, reverse=True)
-
-    # go through order detail
-    for index, tmp_order_detail in enumerate(tmp_order_details):
-
-        order_detail_price = 0
-        more_than_two = tmp_order_detail.quantity - 1
-
-        # check if first index then calculate normal
-        if index == 0:
-            if tmp_order_detail.period == "MONTHLY":
-                order_detail_price += (tmp_order_detail.plan.price_month + more_than_two * (tmp_order_detail.plan.price_month / 2))
-            else:
-                order_detail_price += (tmp_order_detail.plan.price_year + more_than_two * (tmp_order_detail.plan.price_year / 2))
-        else:
-            if tmp_order_detail.period == "MONTHLY":
-                order_detail_price += tmp_order_detail.quantity * (tmp_order_detail.plan.price_month / 2)
-            else:
-                order_detail_price += tmp_order_detail.quantity * (tmp_order_detail.plan.price_year / 2)
-
-        # check plan payment id by payment_method
-        payment_method_plan_id = ""
-        if order.payment_method == "CARD":
-            if index == 0:
-                if tmp_order_detail.period == "MONTHLY":
-                    payment_method_plan_id = tmp_order_detail.plan.stripe_monthly_plan_id
-                else:
-                    payment_method_plan_id = tmp_order_detail.plan.stripe_yearly_plan_id
-            else:
-                if tmp_order_detail.period == "MONTHLY":
-                    payment_method_plan_id = tmp_order_detail.plan.stripe_monthly_plan_half_price_id
-                else:
-                    payment_method_plan_id = tmp_order_detail.plan.stripe_yearly_plan_half_price_id
-
-        # calculate sub_total and total price before add to order
-        sub_total += order_detail_price
-        total += order_detail_price
-
-        # create order detail
+    for order_detail_element in order_detail_input:
+        plan = Plan.objects.get(pk=order_detail_element.plan_id)
+        guardian_student_plan_id = None
+        if order_detail_element.guardian_student_plan_id:
+            guardian_student_plan_id = order_detail_element.guardian_student_plan_id
         OrderDetail.objects.create(
-            plan_id=tmp_order_detail.plan.id,
-            payment_method_plan_id=payment_method_plan_id,
-            quantity=tmp_order_detail.quantity,
-            total=order_detail_price,
+            guardian_student_plan_id=guardian_student_plan_id,
+            plan_id=plan.id,
+            quantity=order_detail_element.quantity,
+            total=order_detail_element.total,
             order_id=order.id,
-            period=tmp_order_detail.period,
-            update_from_detail_id=order_detail_id
+            period=order_detail_element.period
         )
-
-    order.sub_total = sub_total
-
-    # calculate discount
-    code = DiscountCode.objects.filter(code=discount_code)
-    if len(code) > 0:
-        code = code.first()
-        discount_price = (code.percentage/100) * sub_total
-        total = total - discount_price
-        order.discount_code = discount_code
-        order.discount = discount_price
-
-    order.total = total
-    order.save()
 
     url_redirect = ""
-    if order.payment_method.upper() == "PAYPAL":
+    if order.payment_method == "PayPal":
         paypal = Paypal()
-        paypal_tx = paypal.create_sub("https://www.example.com/", "https://www.example.com/", 2, order_id=order.id)
-        url_redirect = paypal_tx.approve_link
-    elif order.payment_method.upper() == "CARD":
-        order_details = OrderDetail.objects.filter(order_id=order.id)
-        for order_detail in order_details:
-            sub = payment_card_subscription(
-                order_detail=order_detail,
-                email=order.guardian.user.email,
-                card_number=card_number,
-                card_exp_month=card_exp_month,
-                card_exp_year=card_exp_year,
-                card_cvc=card_cvc,
-                has_order=order.guardian.has_order
-            )
-            order_detail.subscription_id = sub.id
-            order_detail.save()
+        paypal.get_token()
+        paypal.check_out(return_url=return_url, cancel_url=return_url, value=order.total)
+        PaypalTransaction.objects.create(
+            order_id=order.id,
+            token_id=paypal.token_id,
+            approve_link=paypal.approve_link,
+            capture_link=paypal.capture_link
+        )
+        url_redirect = paypal.approve_link
+    elif order.payment_method == "Card":
+        card = Card()
+        card.create_session(return_url=return_url, total=order.total)
+        CardTransaction.objects.create(
+            order_id=order.id,
+            session_id=card.session_id,
+            approve_link=card.url_redirect
+        )
+        url_redirect = card.url_redirect
 
-            # create card transaction
-            CardTransaction.objects.create(
-                order_detail_id=order_detail.id,
-                session_id=sub.latest_invoice,
-                card_first_name=card_first_name,
-                card_last_name=card_last_name,
-                card_number=card_number,
-                card_exp_month=card_exp_month,
-                card_exp_year=card_exp_year,
-                card_cvc=card_cvc,
-                approve_link="-"
-            )
-        url_redirect = "card.url_redirect"
-
-        order_from_db = Order.objects.get(pk=order.id)
-
-    return CreateOrderResp(url_redirect=url_redirect, order=order_from_db)
+    return CreateOrderResp(url_redirect=url_redirect, order=order)
 
 
 def confirm_order_payment(order_id) -> Order:
@@ -307,68 +101,48 @@ def confirm_order_payment(order_id) -> Order:
     if order.is_paid:
         raise Exception("This order already been paid.")
 
-    all_paid = True
-
     # Confirm payment by method type
-    if order.payment_method.upper() == "PAYPAL":
+    if order.payment_method == "PayPal":
         paypal_tx = PaypalTransaction.objects.get(order_id=order.id)
         paypal = Paypal()
         paypal.get_token()
-        tx = paypal.capture_sub(paypal_tx.token_id)
-        if tx != "paid":
-            raise Exception("unpaid")
-    elif order.payment_method.upper() == "CARD":
+        paypal.capture(paypal_tx)
+    elif order.payment_method == "Card":
+        card_tx = CardTransaction.objects.get(order_id=order.id)
         card = Card()
-        order_details = OrderDetail.objects.filter(order_id=order_id)
-        for order_detail in order_details:
-            card_tx = CardTransaction.objects.get(order_detail_id=order_detail.id)
-            result_sub = card.check_subscription(order_detail.subscription_id)
-            print(result_sub)
-            if result_sub["status"] != "active" and result_sub["status"] != "trialing":
-                all_paid = False
-                raise Exception(f"unpaid for card in sub_id: {order_detail.subscription_id}")
-            result = add_or_update_payment_method(
-                method="CARD",
-                guardian_id=order_detail.order.guardian.id,
-                card_first_name=card_tx.card_first_name,
-                card_last_name=card_tx.card_last_name,
-                card_number=card_tx.card_number,
-                card_exp_month=card_tx.card_exp_month,
-                card_exp_year=card_tx.card_exp_year,
-                card_cvc=card_tx.card_cvc
-            )
-            order_detail.status = result_sub["status"]
-            order_detail.expired_at = result_sub["expired_at"]
-            order_detail.is_paid = True
-            order_detail.save()
+        card.check_session(card_tx)
 
     # change order paid status to true
     order.is_paid = True
     order.save()
 
-    # update guardian status order
-    guardian = Guardian.objects.get(pk=order.guardian.id)
-    guardian.has_order = True
-    guardian.save()
+    # create GuardianStudentPlan if payment is complete
+    order_details = OrderDetail.objects.filter(order_id=order.id)
+    for order_detail in order_details:
+        if order_detail.guardian_student_plan is None:
+            # create GuardianStudentPlan
+            for package_amount in range(0, order_detail.quantity):
+                guardian_student_plan = GuardianStudentPlan.objects.create(
+                    guardian_id=order.guardian.id,
+                    plan_id=order_detail.plan.id,
+                    period=order_detail.period,
+                    price=order_detail.total,
+                    is_paid=True
+                )
+        else:
+            # update GuardianStudentPlan if have foreignkey
+            guardian_student_plan = GuardianStudentPlan.objects.get(pk=order_detail.guardian_student_plan.id)
+            guardian_student_plan.price = order_detail.total
+            guardian_student_plan.period = order_detail.period
+            guardian_student_plan.is_paid = True
+
+        # set expired date
+        if guardian_student_plan.period == "Monthly":
+            expired_date = add_months(guardian_student_plan.create_timestamp, 1)
+        else:
+            expired_date = add_months(guardian_student_plan.create_timestamp, 12)
+
+        guardian_student_plan.expired_at = expired_date
+        guardian_student_plan.save()
 
     return order
-
-
-def check_order_detail(order_detail_id) -> OrderDetail:
-
-    order_detail = OrderDetail.objects.get(pk=order_detail_id)
-
-    old_payment = order_detail.order.payment_method
-
-    if old_payment == "CARD":
-        card = Card()
-        resp = card.check_subscription(order_detail.subscription_id)
-        order_detail.status = resp["status"]
-        order_detail.expired_at = resp["expired_at"]
-
-        if resp["status"] == "canceled":
-            order_detail.is_cancel = True
-
-    order_detail.save()
-
-    return order_detail

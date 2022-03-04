@@ -22,7 +22,6 @@ class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
         on_delete=models.SET_NULL,
         null=True
     )
-    has_order = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username

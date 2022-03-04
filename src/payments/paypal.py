@@ -1,8 +1,6 @@
 import collections
 import json
 from urllib.parse import urlencode
-from app import settings
-import paypalrestsdk
 from .models import PaypalTransaction
 import requests
 from requests.auth import HTTPBasicAuth
@@ -17,7 +15,6 @@ class DecimalEncoder(json.JSONEncoder):
 
 
 class Paypal:
-    my_api: paypalrestsdk.Api
     token_type: str
     access_token: str
     approve_link: str
@@ -27,11 +24,6 @@ class Paypal:
     def __init__(self):
         self.token_type = ""
         self.access_token = ""
-        self.my_api = paypalrestsdk.Api({
-            "mode": "sandbox",
-            "client_id": settings.PAYPAL_CLIENT_ID,
-            "client_secret": settings.PAYPAL_SECRET_KEY
-        })
 
     def get_token(self):
         url = "https://api-m.sandbox.paypal.com/v1/oauth2/token"
@@ -59,31 +51,6 @@ class Paypal:
             self.access_token = resp['access_token']
         else:
             raise Exception("Cannot get token paypal.")
-
-    def create_sub(self, return_url, cancel_url, quantity, order_id):
-        data = {
-           "plan_id": settings.PAYPAL_MONTHLY_SOLO_FIRST_ID,
-           "application_context": {
-              "return_url": return_url,
-              "cancel_url": return_url
-           },
-           "quantity": quantity
-        }
-        response = self.my_api.post("v1/billing/subscriptions", data)
-        if response['status'] == 'APPROVAL_PENDING':
-            test = PaypalTransaction.objects.create(
-                order_id=order_id,
-                token_id=response["id"],
-                approve_link=self.get_url_from_links(response["links"], "approve"),
-                capture_link=self.get_url_from_links(response["links"], "self")
-            )
-            return test
-        raise Exception("[CREATE-SUB-PAYPAL]: Cannot create sub")
-
-    def cancel_sub(self, id):
-        response = self.my_api.post(f"v1/billing/subscriptions/{id}/cancel")
-        print(response)
-
 
     def check_out(self, return_url, cancel_url, value):
         url = "https://api-m.sandbox.paypal.com/v2/checkout/orders"
@@ -141,16 +108,3 @@ class Paypal:
             paypal_tx.save()
         else:
             raise Exception("Cannot capture checkout paypal.")
-
-    def capture_sub(self, id):
-        response = self.my_api.get(f"v1/billing/subscriptions/{id}")
-        if response['status'] == 'ACTIVE':
-            return "paid"
-        elif response['status'] == 'APPROVAL_PENDING':
-            return "unpaid"
-        raise Exception("Cannot capture checkout paypal.")
-
-    def get_url_from_links(self, links: [], rel: str) -> str:
-        for link in links:
-            if link["rel"] == rel:
-                return link["href"]
