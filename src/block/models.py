@@ -135,7 +135,6 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     # Metrics
     experience_points_available = models.PositiveSmallIntegerField(null=True)
     coins_available = models.PositiveSmallIntegerField(null=True)
-    coins_per_question = models.PositiveSmallIntegerField(default=10)
 
     def save(self, *args, **kwargs):
         is_new = False
@@ -178,7 +177,6 @@ class BlockPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     coins = models.IntegerField(default=0, null=True)
     start_timestamp = models.DateTimeField(auto_now_add=True, null=True)
     end_timestamp = models.DateTimeField(null=True)
-
 
 class BlockTransaction(Deposit):
     blockPresentation = models.ForeignKey(

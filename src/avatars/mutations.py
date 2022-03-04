@@ -36,7 +36,7 @@ class PurchaseAvatar(graphene.Mutation):
                 student=student,
                 avatar=avatar,
             )
-        raise GraphQLError('Avatar already purchased')
+        # raise GraphQLError('Avatar already purchased')
 
 
 class SetCurrentAvatar(graphene.Mutation):
