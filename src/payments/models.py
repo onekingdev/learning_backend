@@ -88,8 +88,14 @@ class CardTransaction(TimestampModel, RandomSlugModel, IsActiveModel):
     card_exp_month = models.CharField(max_length=255, blank=True, null=True)
     card_exp_year = models.CharField(max_length=255, blank=True, null=True)
     card_cvc = models.CharField(max_length=255, blank=True, null=True)
+    address1 = models.CharField(max_length=255, blank=True, null=True)
+    address2 = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    state = models.CharField(max_length=255, blank=True, null=True)
+    post_code = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True)
     is_captured = models.BooleanField(default=False)
-
     slug = models.SlugField(editable=False)
 
     def __str__(self):
@@ -111,6 +117,13 @@ class PaymentMethod(TimestampModel, RandomSlugModel, IsActiveModel):
     card_exp_month = models.CharField(max_length=255, blank=True, null=True)
     card_exp_year = models.CharField(max_length=255, blank=True, null=True)
     card_cvc = models.CharField(max_length=255, blank=True, null=True)
+    address1 = models.CharField(max_length=255, blank=True, null=True)
+    address2 = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    state = models.CharField(max_length=255, blank=True, null=True)
+    post_code = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True)
     is_default = models.BooleanField(default=False)
     slug = models.SlugField(editable=False)
 

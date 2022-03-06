@@ -32,6 +32,7 @@ class TmpOrderDetailInput:
 
 
 class AddGuardianPlan(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     url_redirect = graphene.String()
     status = graphene.String()
@@ -67,10 +68,18 @@ class AddGuardianPlan(graphene.Mutation):
                     card_number=payment_method.card_number,
                     card_exp_month=payment_method.card_exp_month,
                     card_exp_year=payment_method.card_exp_year,
-                    card_cvc=payment_method.card_cvc
+                    card_cvc=payment_method.card_cvc,
+                    address1=payment_method.address1,
+                    address2=payment_method.address2,
+                    city=payment_method.city,
+                    state=payment_method.state,
+                    post_code=payment_method.post_code,
+                    country=payment_method.country,
+                    phone=payment_method.phone
                 )
 
                 return AddGuardianPlan(
+                    guardian=order_resp.order.guardian,
                     order=order_resp.order,
                     url_redirect=order_resp.url_redirect,
                     status="success"
@@ -84,6 +93,7 @@ class AddGuardianPlan(graphene.Mutation):
 
 
 class UpdateGuardianPlan(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     url_redirect = graphene.String()
     status = graphene.String()
@@ -134,10 +144,18 @@ class UpdateGuardianPlan(graphene.Mutation):
                     card_exp_month=payment_method.card_exp_month,
                     card_exp_year=payment_method.card_exp_year,
                     card_cvc=payment_method.card_cvc,
+                    address1=payment_method.address1,
+                    address2=payment_method.address2,
+                    city=payment_method.city,
+                    state=payment_method.state,
+                    post_code=payment_method.post_code,
+                    country=payment_method.country,
+                    phone=payment_method.phone,
                     order_detail_id=order_detail.id
                 )
 
                 return UpdateGuardianPlan(
+                    guardian=order_resp.order.guardian,
                     order=order_resp.order,
                     url_redirect=order_resp.url_redirect,
                     status="success"
@@ -152,6 +170,7 @@ class UpdateGuardianPlan(graphene.Mutation):
 
 # Confirm update have been paid
 class ConfirmUpdateGuardianPlan(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
 
@@ -194,6 +213,7 @@ class ConfirmUpdateGuardianPlan(graphene.Mutation):
                 old_order_detail.save()
 
                 return ConfirmUpdateGuardianPlan(
+                    guardian=order.guardian,
                     order=order,
                     status="success"
                 )
@@ -207,6 +227,7 @@ class ConfirmUpdateGuardianPlan(graphene.Mutation):
 
 # Cancel guardian plan with reason
 class CancelGuardianPlan(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     status = graphene.String()
 
     class Arguments:
@@ -224,6 +245,7 @@ class CancelGuardianPlan(graphene.Mutation):
                 order_detail = OrderDetail.objects.get(pk=order_detail_id)
 
                 old_payment = order_detail.order.payment_method
+
                 if old_payment == "CARD":
                     card = Card()
                     sub = card.cancel_subscription(sub_id=order_detail.subscription_id)
@@ -245,6 +267,7 @@ class CancelGuardianPlan(graphene.Mutation):
                     guardian_student_plan.save()
 
                 return CancelGuardianPlan(
+                    guardian=order_detail.order.guardian,
                     status="success"
                 )
         except (Exception, DatabaseError) as e:
@@ -257,6 +280,7 @@ class CancelGuardianPlan(graphene.Mutation):
 
 # Cancel membership (all order_detail and guardian student plan)
 class CancelMembership(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     status = graphene.String()
 
     class Arguments:
@@ -280,12 +304,20 @@ class CancelMembership(graphene.Mutation):
 
                 order_details = OrderDetail.objects.filter(order__guardian_id=guardian.id, is_cancel=False)
                 for order_detail in order_details:
+                    if order_detail.order.payment_method == "CARD":
+                        card = Card()
+                        sub = card.cancel_subscription(order_detail.subscription_id)
+
+                        if sub.status != "canceled":
+                            raise Exception(f"cannot unsub order_detail_id {order_detail.id} from stripe")
+
                     order_detail.cancel_reason = reason
                     order_detail.is_cancel = True
                     order_detail.update_timestamp = timezone.now()
                     order_detail.save()
 
                 return CancelMembership(
+                    guardian=guardian,
                     status="success"
                 )
         except (Exception, DatabaseError) as e:
@@ -298,6 +330,7 @@ class CancelMembership(graphene.Mutation):
 
 # check guardian plan
 class CheckGuardianPlan(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     order_detail = graphene.Field('payments.schema.OrderDetailSchema')
 
     class Arguments:
@@ -312,6 +345,7 @@ class CheckGuardianPlan(graphene.Mutation):
                 order_detail = payment_services.check_order_detail(order_detail_id=order_detail_id)
 
                 return CheckGuardianPlan(
+                    guardian=order_detail.order.guardian,
                     order_detail=order_detail
                 )
         except (Exception, DatabaseError) as e:

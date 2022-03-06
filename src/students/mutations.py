@@ -13,6 +13,7 @@ from plans.models import StudentPlan
 from organization.models import School, Group
 from kb.models.grades import Grade
 from kb.models import AreaOfKnowledge
+from guardians.models import Guardian
 from audiences.models import Audience
 from users.schema import UserSchema, UserProfileSchema
 from .schema import StudentGradeSchema
@@ -20,6 +21,7 @@ from plans.models import GuardianStudentPlan
 
 
 class CreateStudent(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     student = graphene.Field('students.schema.StudentSchema')
     user = graphene.Field(UserSchema)
     profile = graphene.Field(UserProfileSchema)
@@ -122,7 +124,10 @@ class CreateStudent(graphene.Mutation):
                 token = get_token(user)
                 refresh_token = create_refresh_token(user)
 
+                guardian = Guardian.objects.get(user_id=user.id)
+
                 return CreateStudent(
+                    guardian=guardian,
                     student=student,
                     user=user,
                     profile=profile_obj,
@@ -138,6 +143,7 @@ class CreateStudent(graphene.Mutation):
 
 
 class ChangeStudentPassword(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     student = graphene.Field('students.schema.StudentSchema')
     user = graphene.Field(UserSchema)
     profile = graphene.Field(UserProfileSchema)
@@ -153,16 +159,19 @@ class ChangeStudentPassword(graphene.Mutation):
             password):
         try:
             with transaction.atomic():
-                user = info.context.user
-                if not user.is_authenticated:
-                    raise Exception("Authentication credentials were not provided")
+                # user = info.context.user
+                # if not user.is_authenticated:
+                #     raise Exception("Authentication credentials were not provided")
                 student = Student.objects.get(pk=student_id)
                 student.user.set_password(password)
                 student.user.save()
 
                 profile_obj = profile.objects.get(user=student.user.id)
 
+                guardian = Guardian.objects.get(user_id=student.user.id)
+
                 return ChangeStudentPassword(
+                    guardian=guardian,
                     student=student,
                     user=student.user,
                     profile=profile_obj,
@@ -176,6 +185,7 @@ class ChangeStudentPassword(graphene.Mutation):
 
 
 class CreateChangeStudentGrade(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     student = graphene.Field('students.schema.StudentSchema')
     grade = graphene.Field('kb.schema.GradeSchema')
     student_grade = graphene.Field(StudentGradeSchema)
@@ -199,9 +209,9 @@ class CreateChangeStudentGrade(graphene.Mutation):
             is_active=True):
         try:
             with transaction.atomic():
-                user = info.context.user
-                if not user.is_authenticated:
-                    raise Exception("Authentication credentials were not provided")
+                # user = info.context.user
+                # if not user.is_authenticated:
+                #     raise Exception("Authentication credentials were not provided")
 
                 student_grade, created = StudentGrade.objects.get_or_create(
                     grade_id=grade_id,
@@ -222,7 +232,10 @@ class CreateChangeStudentGrade(graphene.Mutation):
 
                 student_grade.save()
 
+                guardian = Guardian.objects.get(user_id=student_grade.student.user.id)
+
                 return CreateChangeStudentGrade(
+                    guardian=guardian,
                     student_grade=student_grade,
                     grade=student_grade.grade,
                     student=student_grade.student

@@ -3,7 +3,6 @@ import sys
 import graphene
 from django.db import transaction, DatabaseError
 from payments import services
-from plans.models import Plan
 from plans import services as plan_services
 
 
@@ -15,6 +14,7 @@ class OrderDetailInput(graphene.InputObjectType):
 
 # Create new order
 class CreateOrder(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
     url_redirect = graphene.String()
@@ -31,6 +31,13 @@ class CreateOrder(graphene.Mutation):
         card_exp_month = graphene.String(required=False)
         card_exp_year = graphene.String(required=False)
         card_cvc = graphene.String(required=False)
+        address1 = graphene.String(required=False)
+        address2 = graphene.String(required=False)
+        city = graphene.String(required=False)
+        state = graphene.String(required=False)
+        post_code = graphene.String(required=False)
+        country = graphene.String(required=False)
+        phone = graphene.String(required=False)
 
     def mutate(
             self,
@@ -45,7 +52,14 @@ class CreateOrder(graphene.Mutation):
             card_number=None,
             card_exp_month=None,
             card_exp_year=None,
-            card_cvc=None
+            card_cvc=None,
+            address1=None,
+            address2=None,
+            city=None,
+            state=None,
+            post_code=None,
+            country=None,
+            phone=None
     ):
         try:
             with transaction.atomic():
@@ -66,10 +80,18 @@ class CreateOrder(graphene.Mutation):
                     card_exp_year=card_exp_year,
                     card_cvc=card_cvc,
                     card_first_name=card_first_name,
-                    card_last_name=card_last_name
+                    card_last_name=card_last_name,
+                    address1=address1,
+                    address2=address2,
+                    city=city,
+                    state=state,
+                    post_code=post_code,
+                    country=country,
+                    phone=phone
                 )
 
                 return CreateOrder(
+                    guardian=create_order_resp.order.guardian,
                     order=create_order_resp.order,
                     status="success",
                     url_redirect=create_order_resp.url_redirect
@@ -84,6 +106,7 @@ class CreateOrder(graphene.Mutation):
 
 # Confirm order have been paid
 class ConfirmPaymentOrder(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
 
@@ -102,6 +125,7 @@ class ConfirmPaymentOrder(graphene.Mutation):
                 plan_services.create_guardian_student_plan(order)
 
                 return ConfirmPaymentOrder(
+                    guardian=order.guardian,
                     order=order,
                     status="success"
                 )
@@ -115,6 +139,7 @@ class ConfirmPaymentOrder(graphene.Mutation):
 
 # Add new payment
 class ChangePaymentMethod(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     status = graphene.String()
 
     class Arguments:
@@ -126,6 +151,13 @@ class ChangePaymentMethod(graphene.Mutation):
         card_exp_month = graphene.String(required=False)
         card_exp_year = graphene.String(required=False)
         card_cvc = graphene.String(required=False)
+        address1 = graphene.String(required=False)
+        address2 = graphene.String(required=False)
+        city = graphene.String(required=False)
+        state = graphene.String(required=False)
+        post_code = graphene.String(required=False)
+        country = graphene.String(required=False)
+        phone = graphene.String(required=False)
 
     def mutate(
             self,
@@ -137,11 +169,17 @@ class ChangePaymentMethod(graphene.Mutation):
             card_number=None,
             card_exp_month=None,
             card_exp_year=None,
-            card_cvc=None
+            card_cvc=None,
+            address1=None,
+            address2=None,
+            city=None,
+            state=None,
+            post_code=None,
+            country=None,
+            phone=None
     ):
         try:
             with transaction.atomic():
-
                 services.change_default_payment_method(
                     guardian_id=guardian_id,
                     method=method,
@@ -150,10 +188,20 @@ class ChangePaymentMethod(graphene.Mutation):
                     card_exp_year=card_exp_year,
                     card_cvc=card_cvc,
                     card_first_name=first_name,
-                    card_last_name=last_name
+                    card_last_name=last_name,
+                    address1=address1,
+                    address2=address2,
+                    city=city,
+                    state=state,
+                    post_code=post_code,
+                    country=country,
+                    phone=phone
                 )
 
+                guardian = services.change_order_detail_payment_method(guardian_id=guardian_id)
+
                 return ChangePaymentMethod(
+                    guardian=guardian,
                     status="success"
                 )
         except (Exception, DatabaseError) as e:
@@ -166,6 +214,7 @@ class ChangePaymentMethod(graphene.Mutation):
 
 # Add new payment
 class EditPaymentMethod(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
     status = graphene.String()
 
     class Arguments:
@@ -176,6 +225,14 @@ class EditPaymentMethod(graphene.Mutation):
         card_exp_month = graphene.String(required=False)
         card_exp_year = graphene.String(required=False)
         card_cvc = graphene.String(required=False)
+        address1 = graphene.String(required=False)
+        address2 = graphene.String(required=False)
+        city = graphene.String(required=False)
+        state = graphene.String(required=False)
+        post_code = graphene.String(required=False)
+        country = graphene.String(required=False)
+        phone = graphene.String(required=False)
+
 
     def mutate(
             self,
@@ -186,22 +243,39 @@ class EditPaymentMethod(graphene.Mutation):
             card_number=None,
             card_exp_month=None,
             card_exp_year=None,
-            card_cvc=None
+            card_cvc=None,
+            address1=None,
+            address2=None,
+            city=None,
+            state=None,
+            post_code=None,
+            country=None,
+            phone=None
     ):
         try:
             with transaction.atomic():
 
-                services.edit_payment_method(
+                guardian_id = services.edit_payment_method(
                     payment_method_id=payment_method_id,
                     card_number=card_number,
                     card_exp_month=card_exp_month,
                     card_exp_year=card_exp_year,
                     card_cvc=card_cvc,
                     card_first_name=first_name,
-                    card_last_name=last_name
+                    card_last_name=last_name,
+                    address1=address1,
+                    address2=address2,
+                    city=city,
+                    state=state,
+                    post_code=post_code,
+                    country=country,
+                    phone=phone
                 )
 
+                guardian = services.change_order_detail_payment_method(guardian_id=guardian_id)
+
                 return ChangePaymentMethod(
+                    guardian=guardian,
                     status="success"
                 )
         except (Exception, DatabaseError) as e:
