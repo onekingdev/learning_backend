@@ -135,6 +135,7 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     # Metrics
     experience_points_available = models.PositiveSmallIntegerField(null=True)
     coins_available = models.PositiveSmallIntegerField(null=True)
+    coins_per_question = models.PositiveSmallIntegerField(default=10)
 
     def save(self, *args, **kwargs):
         is_new = False
@@ -178,6 +179,7 @@ class BlockPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     start_timestamp = models.DateTimeField(auto_now_add=True, null=True)
     end_timestamp = models.DateTimeField(null=True)
 
+
 class BlockTransaction(Deposit):
     blockPresentation = models.ForeignKey(
         BlockPresentation, on_delete=models.PROTECT, null=True)
@@ -217,8 +219,8 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
         on_delete=models.PROTECT,
         null=True
     )
-    topic_grade = models.ForeignKey(
-        'kb.TopicGrade',
+    topic = models.ForeignKey(
+        'kb.Topic',
         on_delete=models.PROTECT,
     )
 
@@ -236,7 +238,7 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
             return False
 
     def save(self, *args, **kwargs):
-        self.topic_grade = self.block_presentation.block.topic_grade
+        self.topic = self.block_presentation.block.topic
         if self.chosen_answer:
             if self.chosen_answer.is_correct:
                 self.status = self.STATUS_CORRECT
