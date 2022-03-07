@@ -76,7 +76,8 @@ class SetFavoriteAvatarCollection(graphene.Mutation):
         avatar_clothes = graphene.ID(required=True)
         avatar_pants = graphene.ID(required=True)
 
-    def mutate(self, info, student_id, avatar_head_id, avatar_clothes_id, avatar_pants_id, avatar_accessorie_id=None):
+    def mutate(self, info, student_id, avatar_head, avatar_clothes, avatar_pants, avatar_accessorie=None):
+        print("hello")
         current_favorites = FavoriteAvatarCollection.objects.filter(
             student=student_id
         ).order_by('create_timestamp')
@@ -86,10 +87,10 @@ class SetFavoriteAvatarCollection(graphene.Mutation):
 
         new_favorite = FavoriteAvatarCollection(
             student=student_id,
-            avatar_accessorie=avatar_accessorie_id,
-            avatar_head=avatar_head_id,
-            avatar_clothes=avatar_clothes_id,
-            avatar_pants=avatar_pants_id,
+            avatar_accessorie=avatar_accessorie,
+            avatar_head=avatar_head,
+            avatar_clothes=avatar_clothes,
+            avatar_pants=avatar_pants
         )
 
         return SetFavoriteAvatarCollection(favorite_avatar_collection=new_favorite)
