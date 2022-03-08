@@ -1,67 +1,11 @@
 from django.db import models
 from app.models import TimestampModel, UUIDModel, IsActiveModel
-from engine.models import TopicMasterySettings
-from block.models import BlockQuestionPresentation
 import datetime
 
 TYPE_ACCESSORIES = 'ACCESSORIES'
 TYPE_HEAD = 'HEAD'
 TYPE_CLOTHES = 'CLOTHES'
 TYPE_PANTS = 'PANTS'
-
-
-class StudentTopicStatus(TimestampModel):
-
-    class Status(models.TextChoices):
-        BLOCKED = 'B', 'Blocked'
-        PREVIEW = 'P', 'Preview'
-        AVAILABLE = 'A', 'Available'
-
-    student = models.ForeignKey('Student', on_delete=models.CASCADE)
-    topic = models.ForeignKey(
-        'kb.Topic',
-        on_delete=models.CASCADE,
-        related_name='status'
-    )
-    status = models.CharField(
-        max_length=1,
-        choices=Status.choices,
-        default=Status.BLOCKED,
-    )
-
-
-class StudentTopicMastery(TimestampModel, UUIDModel, IsActiveModel):
-    PREFIX = 'student_topic_mastery_'
-
-    MASTERY_LEVEL_NOT_PRACTICED = 'NP'
-    MASTERY_LEVEL_NOVICE = 'N'
-    MASTERY_LEVEL_COMPETENT = 'C'
-    MASTERY_LEVEL_MASTER = 'M'
-
-    MASTERY_LEVEL_CHOICES = (
-        (MASTERY_LEVEL_NOT_PRACTICED, 'Not practiced'),
-        (MASTERY_LEVEL_NOVICE, 'Novice'),
-        (MASTERY_LEVEL_COMPETENT, 'Competent'),
-        (MASTERY_LEVEL_MASTER, 'Master')
-    )
-
-    # FK's
-    topic = models.ForeignKey(
-        'kb.Topic',
-        on_delete=models.PROTECT,
-        related_name='mastery',
-    )
-    student = models.ForeignKey(
-        'students.Student',
-        on_delete=models.PROTECT,
-    )
-
-    # Attributes
-    mastery_level = models.CharField(
-        max_length=3,
-        choices=MASTERY_LEVEL_CHOICES,
-        default='NP'
-    )
 
 
 class Student(TimestampModel, UUIDModel, IsActiveModel):
@@ -91,6 +35,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     points = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    guardian = models.ForeignKey('guardians.Guardian', blank=True, null=True, on_delete=models.PROTECT)
     int_period_start_at = models.DateField(auto_now_add=True)
     student_plan = models.ManyToManyField('plans.StudentPlan')
     active_student_plan = models.ForeignKey(
@@ -168,114 +113,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
     @property
     def get_level_number(self):
-        return int(self.level.name.split("_")[1]) if (self.level.name) else 0
-
-    def init_student_topic_mastery(self):
-        from plans.models import GuardianStudentPlan
-        from kb.models import AreaOfKnowledge
-        try:
-            available_aoks = GuardianStudentPlan.objects.get(student=self)
-        except GuardianStudentPlan.DoesNotExist:
-            audience = self.grade.audience
-            available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
-
-        for aok in available_aoks:
-            topics = aok.topic_set.all()
-            for topic in topics:
-                topic_mastery = StudentTopicMastery(
-                    student=self,
-                    topic=topic,
-                )
-                topic_mastery.save()
-
-    def update_student_topic_mastery(self, topic):
-        mastery_settings = TopicMasterySettings.objects.get(
-            topic=topic
-        )
-        total_correct = 0
-        sample_size = mastery_settings.sample_size
-        mastery_percentage = mastery_settings.mastery_percentage
-        competence_percentage = mastery_settings.competence_percentage
-        # Get last N questions from topic sorted by date
-        last_questions = BlockQuestionPresentation.objects.filter(
-            topic=topic
-        ).order_by('-create_timestamp')[:sample_size]
-        for question in last_questions:
-            if question.is_correct:
-                total_correct += 1
-        if total_correct < sample_size*mastery_percentage*competence_percentage:
-            mastery_level = 'N'
-        elif total_correct < sample_size*mastery_percentage:
-            mastery_level = 'C'
-        else:
-            mastery_level = 'M'
-        student_topic_mastery, new = StudentTopicMastery.get_or_create(
-            student=self,
-            topic=topic,
-        )
-        student_topic_mastery.mastery_level = mastery_level
-        student_topic_mastery.save()
-
-    def init_student_topic_status(self):
-        from plans.models import GuardianStudentPlan
-        from kb.models import AreaOfKnowledge
-        try:
-            available_aoks = GuardianStudentPlan.objects.get(student=self)
-        except GuardianStudentPlan.DoesNotExist:
-            audience = self.grade.audience
-            available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
-
-        for aok in available_aoks:
-            topics = aok.topic_set.all()
-            for topic in topics:
-                if topic.prerequisites is None:
-                    status = 'A'
-                else:
-                    prerequisites = topic.prerequisites
-                    prerequisites_mastery = []
-                    for prerequisite in prerequisites:
-                        prerequisites_mastery.append(
-                            prerequisite.mastery_level
-                        )
-                    if 'NP' in prerequisites_mastery:
-                        status = 'B'
-                    elif 'N' in prerequisites_mastery:
-                        status = 'B'
-                    elif 'C' in prerequisites_mastery:
-                        status = 'P'
-                    else:
-                        status = 'A'
-                topic_status = StudentTopicStatus(
-                    student=self,
-                    topic=topic,
-                    status=status,
-                )
-                topic_status.save()
-
-    def update_student_topic_status(self, topic):
-        if topic.prerequisites is None:
-            status = 'A'
-        else:
-            prerequisites = topic.prerequisites
-            prerequisites_mastery = []
-            for prerequisite in prerequisites:
-                prerequisites_mastery.append(
-                    prerequisite.mastery_level
-                )
-            if 'NP' in prerequisites_mastery:
-                status = 'B'
-            elif 'N' in prerequisites_mastery:
-                status = 'B'
-            elif 'C' in prerequisites_mastery:
-                status = 'P'
-            else:
-                status = 'A'
-        topic_status = StudentTopicStatus(
-            student=self,
-            topic=topic,
-            status=status,
-        )
-        topic_status.save()
+        return int(self.level.name.split("_")[1]) if(self.level.name) else 0
 
     def __str__(self):
         return self.full_name
@@ -302,6 +140,37 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         return super().save(*args, **kwargs)
 
 
+class StudentTopicMastery(TimestampModel, UUIDModel, IsActiveModel):
+    PREFIX = 'student_topic_mastery_'
+
+    MASTERY_LEVEL_NOT_PRACTICED = 0
+    MASTERY_LEVEL_NOVICE = 1
+    MASTERY_LEVEL_COMPETENT = 2
+    MASTERY_LEVEL_MASTER = 3
+
+    MASTERY_LEVEL_CHOICES = (
+        (MASTERY_LEVEL_NOT_PRACTICED, 'Not practiced'),
+        (MASTERY_LEVEL_NOVICE, 'Novice'),
+        (MASTERY_LEVEL_COMPETENT, 'Competent'),
+        (MASTERY_LEVEL_MASTER, 'Master')
+    )
+
+    # FK's
+    topic_grade = models.ForeignKey(
+        'kb.TopicGrade',
+        on_delete=models.PROTECT,
+        null=True)
+    student = models.ForeignKey(
+        'students.Student', on_delete=models.PROTECT, null=True)
+
+    # Attributes
+    mastery_level = models.CharField(
+        max_length=32,
+        choices=MASTERY_LEVEL_CHOICES,
+        default=0
+    )
+
+
 class StudentGrade(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'student_grade_'
     grade = models.ForeignKey('kb.Grade', on_delete=models.PROTECT, null=True)
@@ -320,3 +189,19 @@ class StudentAchievement(TimestampModel, UUIDModel, IsActiveModel):
         'students.Student', on_delete=models.PROTECT, null=True)
     is_liberate = models.IntegerField(null=True)
     liberation_date = models.DateField(null=True, blank=True)
+
+
+class StudentTopicGradeStatus(TimestampModel):
+
+    class Status(models.TextChoices):
+        BLOCKED = 'B', 'Blocked'
+        PREVIEW = 'P', 'Preview'
+        AVAILABLE = 'A', 'Available'
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    topic_grade = models.ForeignKey('kb.TopicGrade', on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=1,
+        choices=Status.choices,
+        default=Status.BLOCKED,
+    )
