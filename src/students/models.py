@@ -2,6 +2,7 @@ from django.db import models
 from app.models import TimestampModel, UUIDModel, IsActiveModel
 from experiences.models import Level
 import datetime
+from decimal import Decimal
 
 TYPE_ACCESSORIES = 'ACCESSORIES'
 TYPE_HEAD = 'HEAD'
@@ -35,7 +36,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         editable=False)
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
-    points = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    points = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal(0.00))
     guardian = models.ForeignKey('guardians.Guardian', blank=True, null=True, on_delete=models.PROTECT)
     int_period_start_at = models.DateField(auto_now_add=True)
     student_plan = models.ManyToManyField('plans.StudentPlan')
