@@ -1,6 +1,7 @@
 from django.db import models
 from app.models import RandomSlugModel, TimestampModel
 import datetime
+from decimal import Decimal
 
 class Account(RandomSlugModel, TimestampModel):
     calculated_fields = ['balance']
@@ -55,7 +56,7 @@ class Account(RandomSlugModel, TimestampModel):
         balance = positive_movements_balance - negative_movements_balance
         dict['positive_movements_balance'] = positive_movements_balance
         dict['negative_movements_balance'] = negative_movements_balance
-        dict['total_movements_balance'] = balance
+        dict['total_movements_balance'] = Decimal(balance)
         return dict
 
     def get_latest_movements(self, count_limit=40):
