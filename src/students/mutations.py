@@ -127,8 +127,6 @@ class CreateStudent(graphene.Mutation):
                 token = get_token(user)
                 refresh_token = create_refresh_token(user)
 
-                guardian = Guardian.objects.get(user_id=user.id)
-
                 return CreateStudent(
                     guardian=student.guardian,
                     student=student,
@@ -170,8 +168,6 @@ class ChangeStudentPassword(graphene.Mutation):
                 student.user.save()
 
                 profile_obj = profile.objects.get(user=student.user.id)
-
-                guardian = Guardian.objects.get(user_id=student.user.id)
 
                 return ChangeStudentPassword(
                     guardian=student.guardian,
@@ -234,8 +230,6 @@ class CreateChangeStudentGrade(graphene.Mutation):
                     student_grade.is_active = False
 
                 student_grade.save()
-
-                guardian = Guardian.objects.get(user_id=student_grade.student.user.id)
 
                 return CreateChangeStudentGrade(
                     guardian=student_grade.student.guardian,
