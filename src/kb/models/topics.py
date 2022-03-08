@@ -7,21 +7,6 @@ from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 
-class Prerequisite(TimestampModel, UUIDModel, IsActiveModel):
-    PREFIX = 'prerequisite_'
-
-    topic = models.ForeignKey(
-        'Topic',
-        on_delete=models.PROTECT,
-        related_name="Topic"
-    )
-    prerequisites = models.ManyToManyField('Topic', blank=True)
-    information = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.topic}'
-
-
 class Topic(
         TimestampModel,
         RandomSlugModel,
@@ -47,27 +32,10 @@ class Topic(
         blank=True,
         related_name='sub_topics'
     )
+
     video_assistor = models.URLField(null=True, blank=True)
 
     objects = TopicManager()
-
-    @property
-    def prerequisites(self):
-        try:
-            prerequisites = Prerequisite.objects.get(
-                topic=self).prerequisites.all()
-        except Prerequisite.DoesNotExist:
-            prerequisites = None
-        return prerequisites
-
-    @property
-    def mastery_level(self):
-        from students.models import StudentTopicMastery
-        try:
-            mastery_level = StudentTopicMastery.objects.get(topic=self)
-        except StudentTopicMastery.DoesNotExist:
-            mastery_level = None
-        return mastery_level
 
     def __str__(self):
         return self.safe_translation_getter("name", any_language=True)
@@ -100,3 +68,15 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
 
     def __str__(self):
         return '{}/{}'.format(self.topic, self.grade)
+
+
+class Prerequisite(TimestampModel, UUIDModel, IsActiveModel):
+    PREFIX = 'prerequisite_'
+
+    topic_grade = models.ForeignKey(
+        TopicGrade, on_delete=models.PROTECT, related_name="Topic_grade")
+    prerequisites = models.ManyToManyField(TopicGrade, blank=True)
+    information = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.topic_grade}'

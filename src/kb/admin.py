@@ -52,16 +52,13 @@ class TopicAdmin(
         'indented_title',
         'area_of_knowledge',
         'create_timestamp',
-        'update_timestamp',
-        'id',
+        'update_timestamp'
     )
     actions = [hard_delete_selected]
 
 
 @admin.register(AreaOfKnowledge)
-class AreaOfKnowledgeAdmin(
-        import_export_admin.ImportExportModelAdmin,
-        parler_admin.TranslatableAdmin):
+class AreaOfKnowledgeAdmin(import_export_admin.ImportExportModelAdmin, parler_admin.TranslatableAdmin):
     resource_class = resources.AreaOfKnowledgeResource
     list_display = (
         'name',
@@ -106,16 +103,11 @@ class AnswerOptionAdmin(
         parler_admin.TranslatableAdmin,
         import_export_admin.ImportExportModelAdmin):
     resource_class = resources.AnswerOptionResource
-    list_display = (
-        'answer_text',
-        'question',
-        'is_correct',
-    )
+
 
 
 @admin.register(Question)
-class QuestionAdmin(parler_admin.TranslatableAdmin,
-                    import_export_admin.ImportExportModelAdmin):
+class QuestionAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
     resource_class = resources.QuestionResource
     inlines = [AnswerOptionInline,
                QuestionImageAssetInline,
@@ -146,7 +138,6 @@ class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
         'identifier',
         'image',
     )
-
 
 @admin.register(QuestionAudioAsset)
 class QuestionAudioAssetAdmin(import_export_admin.ImportExportModelAdmin):

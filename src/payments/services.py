@@ -52,7 +52,23 @@ def check_is_duplicate(method: str, guardian_id, card_number=None, card_cvc=None
     }
 
 
-def add_or_update_payment_method(method: str, guardian_id, card_first_name=None, card_last_name=None, card_number=None, card_exp_month=None, card_exp_year=None, card_cvc=None) -> str:
+def add_or_update_payment_method(
+     method: str,
+     guardian_id,
+     card_first_name=None,
+     card_last_name=None,
+     card_number=None,
+     card_exp_month=None,
+     card_exp_year=None,
+     card_cvc=None,
+     address1=None,
+     address2=None,
+     city=None,
+     state=None,
+     post_code=None,
+     country=None,
+     phone=None,
+) -> str:
     method = method.upper()
     if method == "CARD" and card_number is None and card_cvc is None:
         return "cannot create card with no card number"
@@ -78,12 +94,35 @@ def add_or_update_payment_method(method: str, guardian_id, card_first_name=None,
         card_exp_month=card_exp_month,
         card_exp_year=card_exp_year,
         card_cvc=card_cvc,
+        address1=address1,
+        address2=address2,
+        city=city,
+        state=state,
+        post_code=post_code,
+        country=country,
+        phone=phone,
         is_default=is_default
     )
     return "created"
 
 
-def change_default_payment_method(method: str, guardian_id, card_first_name=None, card_last_name=None, card_number=None, card_exp_month=None, card_exp_year=None, card_cvc=None):
+def change_default_payment_method(
+        method: str,
+        guardian_id,
+        card_first_name=None,
+        card_last_name=None,
+        card_number=None,
+        card_exp_month=None,
+        card_exp_year=None,
+        card_cvc=None,
+        address1=None,
+        address2=None,
+        city=None,
+        state=None,
+        post_code=None,
+        country=None,
+        phone=None,
+):
     method = method.upper()
     has_info = check_is_duplicate(method=method, guardian_id=guardian_id, card_number=card_number, card_cvc=card_cvc)
 
@@ -106,12 +145,34 @@ def change_default_payment_method(method: str, guardian_id, card_first_name=None
         card_exp_month=card_exp_month,
         card_exp_year=card_exp_year,
         card_cvc=card_cvc,
+        address1=address1,
+        address2=address2,
+        city=city,
+        state=state,
+        post_code=post_code,
+        country=country,
+        phone=phone,
         is_default=True
     )
     return
 
 
-def edit_payment_method(payment_method_id, card_first_name=None, card_last_name=None, card_number=None, card_exp_month=None, card_exp_year=None, card_cvc=None):
+def edit_payment_method(
+        payment_method_id,
+        card_first_name=None,
+        card_last_name=None,
+        card_number=None,
+        card_exp_month=None,
+        card_exp_year=None,
+        card_cvc=None,
+        address1=None,
+        address2=None,
+        city=None,
+        state=None,
+        post_code=None,
+        country=None,
+        phone=None,
+):
 
     payment_method = PaymentMethod.objects.get(pk=payment_method_id)
     payment_method.card_first_name = card_first_name
@@ -120,19 +181,81 @@ def edit_payment_method(payment_method_id, card_first_name=None, card_last_name=
     payment_method.card_exp_month = card_exp_month
     payment_method.card_exp_year = card_exp_year
     payment_method.card_cvc = card_cvc
+    payment_method.address1 = address1
+    payment_method.address2 = address2
+    payment_method.city = city
+    payment_method.state = state
+    payment_method.post_code = post_code
+    payment_method.country = country
+    payment_method.phone = phone
     payment_method.save()
-    return
+    return payment_method.guardian.id
+
+
+def change_order_detail_payment_method(guardian_id) -> Guardian:
+    guardian = Guardian.objects.get(pk=guardian_id)
+    payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, is_default=True)
+    order_details = OrderDetail.objects.filter(order__guardian_id=guardian.id, is_cancel=False)
+    for order_detail in order_details:
+        if order_detail.order.payment_method == "CARD":
+            card = Card()
+            card.change_payment_method(
+                sub_id=order_detail.subscription_id,
+                number=payment_method.card_number,
+                exp_month=payment_method.card_exp_month,
+                exp_year=payment_method.card_exp_year,
+                cvc=payment_method.card_cvc,
+                first_name=payment_method.card_first_name,
+                last_name=payment_method.card_last_name,
+                address1=payment_method.address1,
+                address2=payment_method.address2,
+                city=payment_method.city,
+                state=payment_method.state,
+                country=payment_method.country,
+                post_code=payment_method.post_code,
+                email=order_detail.order.guardian.user.email,
+                phone=payment_method.phone
+            )
+    return guardian
+
 
 # ----------------- Create Order Service ----------------- #
 
 
-def payment_card_subscription(order_detail: OrderDetail, email: str, card_number: str, card_exp_month: int, card_exp_year: int, card_cvc: str, has_order: bool):
+def payment_card_subscription(
+        order_detail: OrderDetail,
+        email: str,
+        card_number: str,
+        card_exp_month: int,
+        card_exp_year: int,
+        card_cvc: str,
+        first_name: str,
+        last_name: str,
+        address1: str,
+        address2: str,
+        city: str,
+        country: str,
+        post_code: str,
+        state: str,
+        phone: str,
+        has_order: bool
+):
     card = Card()
     payment_method = card.create_payment_method(
         number=card_number,
         exp_month=card_exp_month,
         exp_year=card_exp_year,
-        cvc=card_cvc
+        cvc=card_cvc,
+        first_name=first_name,
+        last_name=last_name,
+        address1=address1,
+        address2=address2,
+        city=city,
+        country=country,
+        post_code=post_code,
+        state=state,
+        phone=phone,
+        email=email
     )
 
     customer = card.create_customer(
@@ -170,6 +293,13 @@ def create_order(guardian_id,
                  card_exp_month=None,
                  card_exp_year=None,
                  card_cvc=None,
+                 address1=None,
+                 address2=None,
+                 city=None,
+                 state=None,
+                 post_code=None,
+                 country=None,
+                 phone=None,
                  order_detail_id=0
                  ) -> CreateOrderResp:
 
@@ -277,6 +407,15 @@ def create_order(guardian_id,
                 card_exp_month=card_exp_month,
                 card_exp_year=card_exp_year,
                 card_cvc=card_cvc,
+                first_name=card_first_name,
+                last_name=card_last_name,
+                address1=address1,
+                address2=address2,
+                city=city,
+                state=state,
+                country=country,
+                post_code=post_code,
+                phone=phone,
                 has_order=order.guardian.has_order
             )
             order_detail.subscription_id = sub.id
@@ -292,6 +431,13 @@ def create_order(guardian_id,
                 card_exp_month=card_exp_month,
                 card_exp_year=card_exp_year,
                 card_cvc=card_cvc,
+                address1=address1,
+                address2=address2,
+                city=city,
+                state=state,
+                post_code=post_code,
+                country=country,
+                phone=phone,
                 approve_link="-"
             )
         url_redirect = "card.url_redirect"
@@ -335,7 +481,14 @@ def confirm_order_payment(order_id) -> Order:
                 card_number=card_tx.card_number,
                 card_exp_month=card_tx.card_exp_month,
                 card_exp_year=card_tx.card_exp_year,
-                card_cvc=card_tx.card_cvc
+                card_cvc=card_tx.card_cvc,
+                address1=card_tx.address1,
+                address2=card_tx.address2,
+                city=card_tx.city,
+                state=card_tx.state,
+                post_code=card_tx.post_code,
+                country=card_tx.country,
+                phone=card_tx.phone
             )
             order_detail.status = result_sub["status"]
             order_detail.expired_at = result_sub["expired_at"]

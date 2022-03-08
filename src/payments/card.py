@@ -20,7 +20,7 @@ class Card:
     def __init__(self):
         stripe.api_key = secret_key
 
-    def create_payment_method(self, number, exp_month, exp_year, cvc):
+    def create_payment_method(self, number, exp_month, exp_year, cvc, first_name, last_name, address1, address2, city, country, post_code, state, email, phone):
         payment_method = stripe.PaymentMethod.create(
             type="card",
             card={
@@ -29,6 +29,19 @@ class Card:
                 "exp_year": exp_year,
                 "cvc": cvc,
             },
+            billing_details={
+                "address": {
+                    "city": city,
+                    "country": country,
+                    "line1": address1,
+                    "line2": address2,
+                    "postal_code": post_code,
+                    "state": state
+                },
+                "email": email,
+                "name": f"{first_name} {last_name}",
+                "phone": phone
+            }
         )
         return payment_method
 
@@ -59,6 +72,42 @@ class Card:
             payment_behavior="error_if_incomplete"
         )
         return subscription
+
+    def change_payment_method(self, sub_id, number, exp_month, exp_year, cvc, first_name, last_name, address1, address2, city, country, post_code, state, email, phone):
+        sub = stripe.Subscription.retrieve(sub_id)
+        payment_method = self.create_payment_method(
+            number=number,
+            exp_month=exp_month,
+            exp_year=exp_year,
+            cvc=cvc,
+            first_name=first_name,
+            last_name=last_name,
+            address1=address1,
+            address2=address2,
+            city=city,
+            country=country,
+            post_code=post_code,
+            state=state,
+            email=email,
+            phone=phone
+        )
+
+        stripe.PaymentMethod.attach(
+            payment_method.id,
+            customer=sub.customer,
+        )
+
+        stripe.Customer.modify(
+            sub.customer,
+            invoice_settings={
+                'default_payment_method': payment_method.id
+            }
+        )
+        stripe.Subscription.modify(
+            sub_id,
+            default_payment_method=payment_method.id,
+        )
+        return
 
     def create_or_get_coupon(self, code, percentage):
         try:
