@@ -4,7 +4,7 @@ from django.utils import timezone
 from students.schema import StudentSchema
 from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPresentation
 from .schema import BlockPresentationSchema
-from students.models import Student, StudentTopicMastery, StudentTopicStatus
+from students.models import StudentTopicMastery, StudentTopicStatus
 from kb.models import Topic, AreaOfKnowledge
 from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
 from decimal import Decimal
