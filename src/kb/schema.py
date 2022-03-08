@@ -4,8 +4,9 @@ from graphene_django import DjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from kb.models.content import Question, AnswerOption
 from kb.models.content import QuestionImageAsset
-from gtts import gTTS
 import os
+
+
 class AreaOfKnowledgeSchema(DjangoObjectType):
     class Meta:
         model = AreaOfKnowledge
@@ -19,7 +20,8 @@ class AreaOfKnowledgeSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("name", language_code=current_language)
+        return self.safe_translation_getter(
+            "name", language_code=current_language)
 
 
 class GradeSchema(DjangoObjectType):
@@ -35,7 +37,8 @@ class GradeSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("name", language_code=current_language)
+        return self.safe_translation_getter(
+            "name", language_code=current_language)
 
 
 class TopicSchema(DjangoObjectType):
@@ -51,7 +54,8 @@ class TopicSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("name", language_code=current_language)
+        return self.safe_translation_getter(
+            "name", language_code=current_language)
 
 
 class TopicGradeSchema(DjangoObjectType):
@@ -91,9 +95,10 @@ class QuestionSchema(DjangoObjectType):
         language = self.get_current_language()
         url = "media/gtts/" + language + "/" + self.identifier + "/question" + ".mp3"
 
-        if not os.path.isfile(url) :
+        if not os.path.isfile(url):
             self.save_gtts()
         return url
+
 
 class AnswerOptionSchema(DjangoObjectType):
     class Meta:
@@ -106,6 +111,7 @@ class AnswerOptionSchema(DjangoObjectType):
     audio_file = graphene.String()
     video = graphene.String()
     answer_audio_url = graphene.String()
+
     def resolve_answer_text(self, info, language_code=None):
         return self.safe_translation_getter("answer_text", any_language=True)
 
@@ -115,7 +121,8 @@ class AnswerOptionSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("image", language_code=current_language)
+        return self.safe_translation_getter(
+            "image", language_code=current_language)
 
     def resolve_explanation(self, info, language_code=None):
         try:
@@ -123,7 +130,8 @@ class AnswerOptionSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("explanation", language_code=current_language)
+        return self.safe_translation_getter(
+            "explanation", language_code=current_language)
 
     def resolve_audio_file(self, info, language_code=None):
         try:
@@ -131,7 +139,8 @@ class AnswerOptionSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("audio_file", language_code=current_language)
+        return self.safe_translation_getter(
+            "audio_file", language_code=current_language)
 
     def resolve_video(self, info, language_code=None):
         try:
@@ -139,17 +148,20 @@ class AnswerOptionSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        return self.safe_translation_getter("video", language_code=current_language)
-        
+        return self.safe_translation_getter(
+            "video", language_code=current_language)
+
     def resolve_answer_audio_url(self, info):
         language = self.get_current_language()
-        if self.question :
-            url = "media/gtts/" + language + "/" + self.question.identifier +"/answer_" + self.random_slug + ".mp3"
-            if not os.path.isfile(url) :
+        if self.question:
+            url = "media/gtts/" + language + "/" + self.question.identifier + \
+                "/answer_" + self.random_slug + ".mp3"
+            if not os.path.isfile(url):
                 self.save_gtts()
             return url
-        else :
+        else:
             return "null"
+
 
 class Query(graphene.ObjectType):
     # ----------------- AreaOfKnowledge ----------------- #
