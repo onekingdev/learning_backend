@@ -36,7 +36,7 @@ class PurchaseAvatar(graphene.Mutation):
                 student=student,
                 avatar=avatar,
             )
-        # raise GraphQLError('Avatar already purchased')
+        raise GraphQLError('Avatar already purchased')
 
 
 class SetCurrentAvatar(graphene.Mutation):
@@ -75,27 +75,23 @@ class SetFavoriteAvatarCollection(graphene.Mutation):
         avatar_head = graphene.ID(required=True)
         avatar_clothes = graphene.ID(required=True)
         avatar_pants = graphene.ID(required=True)
-        skin_tone = graphene.ID()
 
-    def mutate(self, info, student_id, avatar_head, avatar_clothes, avatar_pants, avatar_accessorie=None, skin_tone = None):
+    def mutate(self, info, student_id, avatar_head_id, avatar_clothes_id, avatar_pants_id, avatar_accessorie_id=None):
         current_favorites = FavoriteAvatarCollection.objects.filter(
             student=student_id
         ).order_by('create_timestamp')
+
         if current_favorites.count() >= 4:
             current_favorites.first().delete()
-        student = Student.objects.get(pk = student_id)
-        avatar_head = Avatar.objects.get(pk = avatar_head)
-        avatar_clothes = Avatar.objects.get(pk = avatar_clothes)
-        avatar_pants = Avatar.objects.get(pk = avatar_pants)
-        if avatar_accessorie : avatar_accessorie = Avatar.objects.get( pk = avatar_accessorie)
-        new_favorite = FavoriteAvatarCollection.objects.create(
-            student=student,
-            avatar_accessorie=avatar_accessorie,
-            avatar_head=avatar_head,
-            avatar_clothes=avatar_clothes,
-            avatar_pants=avatar_pants,
-            skin_tone = skin_tone
+
+        new_favorite = FavoriteAvatarCollection(
+            student=student_id,
+            avatar_accessorie=avatar_accessorie_id,
+            avatar_head=avatar_head_id,
+            avatar_clothes=avatar_clothes_id,
+            avatar_pants=avatar_pants_id,
         )
+
         return SetFavoriteAvatarCollection(favorite_avatar_collection=new_favorite)
 
 

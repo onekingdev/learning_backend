@@ -60,35 +60,6 @@ class Card:
         )
         return subscription
 
-    def change_payment_method(self, sub_id, number, exp_month, exp_year, cvc):
-        sub = stripe.Subscription.retrieve(sub_id)
-        payment_method = stripe.PaymentMethod.create(
-            type="card",
-            card={
-                "number": number,
-                "exp_month": exp_month,
-                "exp_year": exp_year,
-                "cvc": cvc,
-            },
-        )
-
-        stripe.PaymentMethod.attach(
-            payment_method.id,
-            customer=sub.customer,
-        )
-
-        stripe.Customer.modify(
-            sub.customer,
-            invoice_settings={
-                'default_payment_method': payment_method.id
-            }
-        )
-        stripe.Subscription.modify(
-            sub_id,
-            default_payment_method=payment_method.id,
-        )
-        return
-
     def create_or_get_coupon(self, code, percentage):
         try:
             coupon = stripe.Coupon.create(

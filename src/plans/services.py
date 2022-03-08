@@ -18,7 +18,7 @@ def create_guardian_student_plan(order: Order):
                 price=order_detail.total,
                 is_paid=True
             )
-            if guardian_student_plan.period == "MONTHLY":
+            if guardian_student_plan.period == "Monthly":
                 expired_date = add_months(guardian_student_plan.create_timestamp, 1)
             else:
                 expired_date = add_months(guardian_student_plan.create_timestamp, 12)
