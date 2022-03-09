@@ -5,7 +5,8 @@ from students.schema import StudentSchema
 from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPresentation
 from .schema import BlockPresentationSchema
 from students.models import StudentTopicMastery, StudentTopicStatus
-from kb.models import Topic, AreaOfKnowledge
+from kb.models import Topic, TopicGrade, AreaOfKnowledge
+from kb.models.content import Question
 from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
 from decimal import Decimal
 from wallets.models import CoinWallet
@@ -93,31 +94,53 @@ class CreateAIBlockPresentation(graphene.Mutation):
         qs1 = StudentTopicStatus.objects.filter(
             student=student,
             topic__in=topics,
-            status=topic_status_level_selection,
+            status='A',
         ).values('topic')
+        print(qs1)
         qs2 = StudentTopicMastery.objects.filter(
             student=student,
             topic__in=topics,
-            mastery_level=topic_mastery_level_selection,
+            mastery_level='NP',
         ).values('topic')
+        print(qs2)
         topic_set = qs1.intersection(qs2)
+        print(topic_set)
         topic_choice = random.choice(topic_set)
+        print(topic_choice)
         selected_topic = Topic.objects.get(id=topic_choice['topic'])
+        print(selected_topic)
+        topic_grade = TopicGrade.objects.get(topic=selected_topic)
+        print(topic_grade)
 
         # Create block if it doesn't exist
-        block = Block.objects.get_or_create(
-            students=student,
-            topic_grade__topic=selected_topic,
+        block, new = Block.objects.get_or_create(
+            topic_grade=topic_grade,
             modality='AI',
         )
         block.save()
+        print(block)
+        block.students.add(student)
+        block.save()
+        available_questions = list(
+            Question.objects.filter(
+                topic=topic_grade.topic).filter(
+                grade=topic_grade.grade))
+        if len(available_questions) < block.block_size:
+            for question in available_questions:
+                block.questions.add(question)
+        else:
+            random_questions = random.sample(
+                available_questions, block.block_size)
+            for question in random_questions:
+                block.questions.add(question)
 
         # Create block presentation for block
-        block_presentation = BlockPresentation.objects.get_or_create(
+        block_presentation, new = BlockPresentation.objects.get_or_create(
             block=block,
             student=student,
         )
         block_presentation.save()
+        print(block_presentation)
 
         return CreateAIBlockPresentation(block_presentation=block_presentation)
 
