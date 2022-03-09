@@ -188,7 +188,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                 )
                 topic_mastery.save()
 
-    def update_student_topic_mastery(self, topic):
+    def update_student_topic_mastery(self):
         from plans.models import GuardianStudentPlan
         from kb.models import AreaOfKnowledge
         try:

@@ -207,6 +207,9 @@ class FinishBlockPresentation(graphene.Mutation):
         )
         block_transaction.save()
 
+        student.update_student_topic_mastery()
+        student.update_student_topic_status()
+
         return FinishBlockPresentation(
             block_presentation=block_presentation,
             student=student)
