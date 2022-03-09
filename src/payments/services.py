@@ -204,7 +204,17 @@ def change_order_detail_payment_method(guardian_id) -> Guardian:
                 number=payment_method.card_number,
                 exp_month=payment_method.card_exp_month,
                 exp_year=payment_method.card_exp_year,
-                cvc=payment_method.card_cvc
+                cvc=payment_method.card_cvc,
+                first_name=payment_method.card_first_name,
+                last_name=payment_method.card_last_name,
+                address1=payment_method.address1,
+                address2=payment_method.address2,
+                city=payment_method.city,
+                state=payment_method.state,
+                country=payment_method.country,
+                post_code=payment_method.post_code,
+                email=order_detail.order.guardian.user.email,
+                phone=payment_method.phone
             )
     return guardian
 
@@ -212,13 +222,40 @@ def change_order_detail_payment_method(guardian_id) -> Guardian:
 # ----------------- Create Order Service ----------------- #
 
 
-def payment_card_subscription(order_detail: OrderDetail, email: str, card_number: str, card_exp_month: int, card_exp_year: int, card_cvc: str, has_order: bool):
+def payment_card_subscription(
+        order_detail: OrderDetail,
+        email: str,
+        card_number: str,
+        card_exp_month: int,
+        card_exp_year: int,
+        card_cvc: str,
+        first_name: str,
+        last_name: str,
+        address1: str,
+        address2: str,
+        city: str,
+        country: str,
+        post_code: str,
+        state: str,
+        phone: str,
+        has_order: bool
+):
     card = Card()
     payment_method = card.create_payment_method(
         number=card_number,
         exp_month=card_exp_month,
         exp_year=card_exp_year,
-        cvc=card_cvc
+        cvc=card_cvc,
+        first_name=first_name,
+        last_name=last_name,
+        address1=address1,
+        address2=address2,
+        city=city,
+        country=country,
+        post_code=post_code,
+        state=state,
+        phone=phone,
+        email=email
     )
 
     customer = card.create_customer(
@@ -370,6 +407,15 @@ def create_order(guardian_id,
                 card_exp_month=card_exp_month,
                 card_exp_year=card_exp_year,
                 card_cvc=card_cvc,
+                first_name=card_first_name,
+                last_name=card_last_name,
+                address1=address1,
+                address2=address2,
+                city=city,
+                state=state,
+                country=country,
+                post_code=post_code,
+                phone=phone,
                 has_order=order.guardian.has_order
             )
             order_detail.subscription_id = sub.id
