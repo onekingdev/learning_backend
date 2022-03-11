@@ -197,10 +197,10 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             )
             total_correct = 0
             sample_size = mastery_settings.sample_size
-            mastery_percentage = mastery_settings.mastery_percentage
-            competence_percentage = mastery_settings.competence_percentage
+            mastery_percentage = mastery_settings.mastery_percentage/100
+            competence_percentage = mastery_settings.competence_percentage/100
             # Get last N questions from topic sorted by date
-            last_questions = BlockQuestionPresentation.objects.filter(
+            last_questions = BlockQuestionPresentation.all_objects.filter(
                 topic=topic
             ).order_by('-create_timestamp')[:sample_size]
             for question in last_questions:
@@ -270,7 +270,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                 prerequisites_mastery = []
                 for prerequisite in prerequisites:
                     prerequisites_mastery.append(
-                        prerequisite.mastery_level
+                        prerequisite.mastery_level.mastery_level
                     )
                 if 'NP' in prerequisites_mastery:
                     status = 'B'
@@ -284,7 +284,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                 student=self,
                 topic=topic,
             )
-            topic_status.satus = status
+            topic_status.status = status
             topic_status.save()
 
     def __str__(self):

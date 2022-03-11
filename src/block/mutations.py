@@ -92,39 +92,43 @@ class CreateAIBlockPresentation(graphene.Mutation):
             student=student,
             topic__in=topics,
         )
-        qs2 = StudentTopicMastery.objects.filter(
-            student=student,
-            topic__in=topics,
-        )
 
         available_status = [
             status['status'] for status in qs1.values('status').distinct()
         ]
-        available_mastery = [
-            mastery['mastery_level'] for mastery in qs2.values('mastery_level').distinct()
-        ]
 
         available_status_weights = [
             status_weights[status] for status in available_status
-        ]
-        available_mastery_weights = [
-            mastery_weights[mastery] for mastery in available_mastery
         ]
 
         status_selection = random.choices(
             population=available_status,
             weights=available_status_weights,
         )[0]
+
+        qs1 = qs1.filter(status=status_selection).values('topic')
+
+        qs2 = StudentTopicMastery.objects.filter(
+            student=student,
+            topic__in=[topic['topic'] for topic in qs1],
+        )
+
+        available_mastery = [
+            mastery['mastery_level'] for mastery in qs2.values('mastery_level').distinct()
+        ]
+
+        available_mastery_weights = [
+            mastery_weights[mastery] for mastery in available_mastery
+        ]
+
         mastery_selection = random.choices(
             population=available_mastery,
             weights=available_mastery_weights,
         )[0]
 
-        qs1 = qs1.filter(status=status_selection).values('topic')
         qs2 = qs2.filter(mastery_level=mastery_selection).values('topic')
 
-        topic_set = qs1.intersection(qs2)
-        topic_choice = random.choice(topic_set)
+        topic_choice = random.choice(qs2)
         selected_topic = Topic.objects.get(id=topic_choice['topic'])
         topic_grade = TopicGrade.objects.get(topic=selected_topic)
 
@@ -212,7 +216,8 @@ class FinishBlockPresentation(graphene.Mutation):
         for question in questions:
             status = 'CORRECT' if question['is_correct'] else 'INCORRECT'
             question_object = Question.objects.get(id=question['question'])
-            answer_object = AnswerOption.objects.get(id=question['question'])
+            answer_object = AnswerOption.objects.get(
+                id=question['answer_option'])
             block_question_presentation = BlockQuestionPresentation(
                 block_presentation=block_presentation,
                 chosen_answer=answer_object,
@@ -258,7 +263,6 @@ class FinishBlockPresentation(graphene.Mutation):
         student.update_student_topic_mastery(block_aok)
         student.update_student_topic_status(block_aok)
 
-        block_presentation.block.delete()
         block_presentation.delete()
 
         return FinishBlockPresentation(

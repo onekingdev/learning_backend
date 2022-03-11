@@ -196,7 +196,7 @@ class BlockTransaction(Deposit):
     #     return super().save(*args, **kwargs)
 
 
-class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
+class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     PREFIX = 'block_question_presentation'
 
     STATUS_PENDING = 'PENDING'
@@ -235,6 +235,13 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
         default=STATUS_PENDING
     )
 
+    @property
+    def is_correct(self):
+        if self.status == self.STATUS_CORRECT:
+            return True
+        elif self.status == self.STATUS_INCORRECT:
+            return False
+
     def is_answered(self):
         if self.status != self.STATUS_PENDING:
             return True
@@ -250,6 +257,7 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
                 self.status = self.STATUS_INCORRECT
         else:
             self.status = self.STATUS_PENDING
+        super(BlockQuestionPresentation, self).save(*args, **kwargs)
 
 
 class BlockAssignment(TimestampModel):
