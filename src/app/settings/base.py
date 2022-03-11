@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'block',
     'collectibles',
     'emails',
+    'engine',
     'experiences',
     'guardians',
     'games',

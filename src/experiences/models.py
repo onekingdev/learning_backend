@@ -20,7 +20,6 @@ class Level(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
     objects = LevelManager()
 
     def get_next_level(self):
-        print("get next level")
         next_level, new = self.__class__.objects.get_or_create(amount = self.amount + 1)
         if(new) :
             for language in self.get_available_languages():

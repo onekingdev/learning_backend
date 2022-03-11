@@ -17,9 +17,11 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
         max_digits=15, decimal_places=2, default=0)
     currency = models.CharField(max_length=4)
     stripe_monthly_plan_id = models.CharField(max_length=255, blank=True)
-    stripe_monthly_plan_half_price_id = models.CharField(max_length=255, blank=True)
+    stripe_monthly_plan_half_price_id = models.CharField(
+        max_length=255, blank=True)
     stripe_yearly_plan_id = models.CharField(max_length=255, blank=True)
-    stripe_yearly_plan_half_price_id = models.CharField(max_length=255, blank=True)
+    stripe_yearly_plan_half_price_id = models.CharField(
+        max_length=255, blank=True)
     is_cancel = models.BooleanField(default=False)
 
     def __str__(self):
@@ -33,9 +35,12 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
 class GuardianStudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'guardian_plan_'
 
-    guardian = models.ForeignKey('guardians.Guardian', on_delete=models.PROTECT)
-    student = models.ForeignKey('students.Student', on_delete=models.PROTECT, blank=True, null=True)
-    order_detail = models.ForeignKey('payments.OrderDetail', on_delete=models.CASCADE)
+    guardian = models.ForeignKey(
+        'guardians.Guardian', on_delete=models.PROTECT)
+    student = models.ForeignKey(
+        'students.Student', on_delete=models.PROTECT, blank=True, null=True)
+    order_detail = models.ForeignKey(
+        'payments.OrderDetail', on_delete=models.CASCADE)
     slug = models.SlugField(editable=False)
     plan = models.ForeignKey('Plan', on_delete=models.PROTECT, blank=True)
     subject = models.ManyToManyField(

@@ -1,13 +1,21 @@
 import graphene
+import random
 from django.utils import timezone
-
 from students.schema import StudentSchema
-from .models import BlockPresentation, Block, BlockTransaction
+from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPresentation
 from .schema import BlockPresentationSchema
-from students.models import Student
-from kb.models import Topic
+from students.models import StudentTopicMastery, StudentTopicStatus
+from kb.models import Topic, TopicGrade, AreaOfKnowledge
+from kb.models.content import Question
+from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
 from decimal import Decimal
 from wallets.models import CoinWallet
+
+
+class BlockQuestionInput(graphene.InputObjectType):
+    question = graphene.ID()
+    answer_option = graphene.ID()
+    is_correct = graphene.Boolean()
 
 
 class CreatePathBlockPresentation(graphene.Mutation):
@@ -18,29 +26,6 @@ class CreatePathBlockPresentation(graphene.Mutation):
         topic_id = graphene.ID(required=True)
 
     def mutate(self, info, student_id, topic_id):
-        student = Student.objects.get(id=student_id)
-        topic = Topic.objects.get(id=topic_id)
-        block = Block.objects.filter(
-            topic_grade__topic=topic).filter(students=student).first()
-
-        block_presentation, new = BlockPresentation.objects.get_or_create(
-            student=student, block=block)
-        block_presentation.save()
-
-        return CreatePathBlockPresentation(block_presentation=block_presentation)
-
-
-class FinishBlockPresentation(graphene.Mutation):
-    block_presentation = graphene.Field(BlockPresentationSchema)
-    student = graphene.Field(StudentSchema)
-    class Arguments:
-        block_presentation_id = graphene.ID(required=True)
-        hits = graphene.Int(required=True)
-        errors = graphene.Int(required=True)
-        bonusCoins = graphene.Float(required=True)
-
-    def mutate(self, info, block_presentation_id, hits, errors, bonusCoins):
-
         user = info.context.user
 
         if not user.is_authenticated:
@@ -48,14 +33,170 @@ class FinishBlockPresentation(graphene.Mutation):
         if not user.student:
             raise Exception("Not found student")
 
-        exp_unit = 5
-        coin_unit = 10;
-        print("user point is", user.student.points)
-        exp = exp_unit * (hits + errors) + user.student.points
-        print("exp is", exp)
+        student = user.student
 
+        try:
+            selected_topic = Topic.objects.get(id=topic_id)
+        except Topic.DoesNotExist:
+            raise Exception("Topic does not exist")
+
+        # Create block if it doesn't exist
+        block = Block.objects.get_or_create(
+            students=student,
+            topic_grade__topic=selected_topic,
+            modality='AI',
+        )
+        block.save()
+
+        # Create block presentation for block
+        block_presentation = BlockPresentation.objects.get_or_create(
+            block=block,
+            student=student,
+        )
+        block_presentation.save()
+
+        return CreatePathBlockPresentation(
+            block_presentation=block_presentation)
+
+
+class CreateAIBlockPresentation(graphene.Mutation):
+    block_presentation = graphene.Field(BlockPresentationSchema)
+
+    class Arguments:
+        student_id = graphene.ID()
+        aok_id = graphene.ID(required=True)
+
+    def mutate(self, info, aok_id, student_id=None):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        if not user.student:
+            raise Exception("Not found student")
+
+        student = user.student
+
+        # Define weights for status and mastery
+        mastery_weights = {'NP': 50, 'N': 30, 'C': 20, 'M': 0}
+        status_weights = {'B': 0, 'P': 20, 'A': 80}
+
+        # Find a topic given the AoK
+        try:
+            area_of_knowledge = AreaOfKnowledge.objects.get(id=aok_id)
+        except AreaOfKnowledge.DoesNotExist:
+            raise Exception("Area of knowledge does not exist")
+
+        topics = area_of_knowledge.topic_set.all()
+
+        qs1 = StudentTopicStatus.objects.filter(
+            student=student,
+            topic__in=topics,
+        )
+        qs2 = StudentTopicMastery.objects.filter(
+            student=student,
+            topic__in=topics,
+        )
+
+        available_status = [
+            status['status'] for status in qs1.values('status').distinct()
+        ]
+        available_mastery = [
+            mastery['mastery_level'] for mastery in qs2.values('mastery_level').distinct()
+        ]
+
+        available_status_weights = [
+            status_weights[status] for status in available_status
+        ]
+        available_mastery_weights = [
+            mastery_weights[mastery] for mastery in available_mastery
+        ]
+
+        status_selection = random.choices(
+            population=available_status,
+            weights=available_status_weights,
+        )[0]
+        mastery_selection = random.choices(
+            population=available_mastery,
+            weights=available_mastery_weights,
+        )[0]
+
+        qs1 = qs1.filter(status=status_selection).values('topic')
+        qs2 = qs2.filter(mastery_level=mastery_selection).values('topic')
+
+        topic_set = qs1.intersection(qs2)
+        topic_choice = random.choice(topic_set)
+        selected_topic = Topic.objects.get(id=topic_choice['topic'])
+        topic_grade = TopicGrade.objects.get(topic=selected_topic)
+
+        # Create block if it doesn't exist
+        block, new = Block.objects.get_or_create(
+            topic_grade=topic_grade,
+            modality='AI',
+        )
+        block.save()
+        print(block)
+        block.students.add(student)
+        block.save()
+        available_questions = list(
+            Question.objects.filter(
+                topic=topic_grade.topic).filter(
+                grade=topic_grade.grade))
+        if len(available_questions) < block.block_size:
+            for question in available_questions:
+                block.questions.add(question)
+        else:
+            random_questions = random.sample(
+                available_questions, block.block_size)
+            for question in random_questions:
+                block.questions.add(question)
+
+        # Create block presentation for block
+        block_presentation, new = BlockPresentation.objects.get_or_create(
+            block=block,
+            student=student,
+        )
+        block_presentation.save()
+        print(block_presentation)
+
+        return CreateAIBlockPresentation(block_presentation=block_presentation)
+
+
+class FinishBlockPresentation(graphene.Mutation):
+    block_presentation = graphene.Field(BlockPresentationSchema)
+    student = graphene.Field(StudentSchema)
+
+    class Arguments:
+        block_presentation_id = graphene.ID(required=True)
+        hits = graphene.Int(required=True)
+        errors = graphene.Int(required=True)
+        bonusCoins = graphene.Float(required=True)
+        questions = graphene.List(BlockQuestionInput)
+
+    def mutate(
+            self,
+            info,
+            block_presentation_id,
+            hits,
+            errors,
+            bonusCoins,
+            questions):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        if not user.student:
+            raise Exception("Not found student")
+
+        student = user.student
+
+        exp_unit = 5
+        coin_unit = 10
+        exp = exp_unit * (hits + errors) + user.student.points
+
+        # Assign values to BlockPresentation
         block_presentation = BlockPresentation.objects.get(
-            id=block_presentation_id)
+            id=block_presentation_id
+        )
         block_presentation.hits = hits
         block_presentation.errors = errors
         block_presentation.total = hits + errors
@@ -63,35 +204,64 @@ class FinishBlockPresentation(graphene.Mutation):
         block_presentation.points = exp_unit * (hits + errors)
         block_presentation.bonusCoins = bonusCoins
         block_presentation.coins = coin_unit * hits
-        # block_presentation.is_active = False
         block_presentation.save()
 
-        student = user.student
-        #--------------------- level up -S--------------------------------------#
-        while exp > student.level.points_required : 
+        # Create registers on BlockQuestionPresentation
+        block_topic = block_presentation.block.topic_grade.topic
+        block_aok = block_topic.area_of_knowledge
+        for question in questions:
+            status = 'CORRECT' if question.is_correct else 'INCORRECT'
+            block_question_presentation = BlockQuestionPresentation(
+                block_presentation=block_presentation,
+                chowsen_answer=question.answer_option,
+                question=question.question,
+                status=status,
+                topic=block_topic,
+            )
+            block_question_presentation.save()
+
+        # Create registers for report tables
+        topic_report, new = TopicStudentReport.objects.get_or_create(
+            topic=block_topic,
+            student=student,
+        )
+        topic_report.questions_answered += block_presentation.total
+        topic_report.correct_question += block_presentation.hits
+        topic_report.save()
+
+        aok_report, new = AreaOfKnowledgeStudentReport.objects.get_or_create(
+            aok=block_aok,
+            student=student,
+        )
+        aok_report.questions_answered += block_presentation.total
+        aok_report.correct_question += block_presentation.hits
+        aok_report.save()
+
+        while exp > student.level.points_required:
             exp -= student.level.points_required
             next_level = student.level.get_next_level()
             student.level = next_level
-        #--------------------- level up -S--------------------------------------#
 
-        # -------------------- set earned points to student -S------------------#
         student.points = Decimal(exp)
         student.save()
-        # -------------------- set earned points to student -E------------------#
 
-        #--------------------- increase coins and bonus coins on wallet -S------#
         account, new = CoinWallet.objects.get_or_create(student=student)
-        
+
         block_transaction = BlockTransaction(
             blockPresentation=block_presentation,
             account=account,
         )
         block_transaction.save()
-        #--------------------- increase coins and bonus coins on wallet -S------#    
 
-        return FinishBlockPresentation(block_presentation = block_presentation, student = student)
+        student.update_student_topic_mastery()
+        student.update_student_topic_status()
+
+        return FinishBlockPresentation(
+            block_presentation=block_presentation,
+            student=student)
 
 
 class Mutation(graphene.ObjectType):
     create_path_block_presentation = CreatePathBlockPresentation.Field()
+    create_ai_block_presentation = CreateAIBlockPresentation.Field()
     finish_block_presentation = FinishBlockPresentation.Field()

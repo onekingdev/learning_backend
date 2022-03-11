@@ -29,9 +29,7 @@ class StudentSchema(DjangoObjectType):
     
     def resolve_next_level(self, info):
         # Querying a single next level
-        print("in resolve next level")
         current_level = self.level;
-        print(current_level)
         # Get next level
         next_level = self.level.get_next_level()
         return next_level

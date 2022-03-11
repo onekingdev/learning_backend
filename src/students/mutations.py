@@ -60,15 +60,11 @@ class CreateStudent(graphene.Mutation):
         try:
             with transaction.atomic():
                 user = get_user_model()()
-
                 student = Student(
                     first_name=first_name,
                     last_name=last_name,
-                    full_name=first_name + ' ' + last_name,
+                    full_name=first_name + ' ' + last_name
                 )
-
-                if(grade) :
-                    grade = Grade.objects.get(pk = grade)
 
                 if username:
                     user.username = username
@@ -114,13 +110,6 @@ class CreateStudent(graphene.Mutation):
                 student.student_plan.add(student_plan)
 
                 student.save()
-
-                if(grade) :
-                    student_grade = StudentGrade(
-                        student=student,
-                        grade=grade,
-                    )
-                    student_grade.save();
 
                 guardian_student_plan = GuardianStudentPlan.objects.get(pk=guardian_student_plan_id)
 
