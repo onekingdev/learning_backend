@@ -167,7 +167,6 @@ class CreateAIBlockPresentation(graphene.Mutation):
 
 class FinishBlockPresentation(graphene.Mutation):
     block_presentation = graphene.Field(BlockPresentationSchema)
-    student = graphene.Field(StudentSchema)
 
     class Arguments:
         block_presentation_id = graphene.ID(required=True)
