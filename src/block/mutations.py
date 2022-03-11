@@ -264,6 +264,7 @@ class FinishBlockPresentation(graphene.Mutation):
         student.update_student_topic_status(block_aok)
 
         block_presentation.delete()
+        block_presentation.block.delete()
 
         return FinishBlockPresentation(
             block_presentation=block_presentation,
