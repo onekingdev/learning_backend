@@ -137,18 +137,20 @@ class CreateAIBlockPresentation(graphene.Mutation):
         print(block)
         block.students.add(student)
         block.save()
-        available_questions = list(
-            Question.objects.filter(
-                topic=topic_grade.topic).filter(
-                grade=topic_grade.grade))
-        if len(available_questions) < block.block_size:
-            for question in available_questions:
-                block.questions.add(question)
-        else:
-            random_questions = random.sample(
-                available_questions, block.block_size)
-            for question in random_questions:
-                block.questions.add(question)
+        if block.questions is None:
+            available_questions = list(
+                Question.objects.filter(
+                    topic=topic_grade.topic).filter(
+                    grade=topic_grade.grade))
+            if len(available_questions) < block.block_size:
+                for question in available_questions:
+                    block.questions.add(question)
+            else:
+                random_questions = random.sample(
+                    available_questions, block.block_size)
+                for question in random_questions:
+                    block.questions.add(question)
+        block.save()
 
         # Create block presentation for block
         block_presentation, new = BlockPresentation.objects.get_or_create(
@@ -209,6 +211,8 @@ class FinishBlockPresentation(graphene.Mutation):
         # Create registers on BlockQuestionPresentation
         block_topic = block_presentation.block.topic_grade.topic
         block_aok = block_topic.area_of_knowledge
+        print(questions)
+        return
         for question in questions:
             status = 'CORRECT' if question.is_correct else 'INCORRECT'
             block_question_presentation = BlockQuestionPresentation(
