@@ -188,45 +188,38 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                 )
                 topic_mastery.save()
 
-    def update_student_topic_mastery(self):
-        from plans.models import GuardianStudentPlan
-        from kb.models import AreaOfKnowledge
-        try:
-            available_aoks = GuardianStudentPlan.objects.get(
-                student=self).subject
-        except GuardianStudentPlan.DoesNotExist:
-            audience = self.get_active_audience
-            available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
+    def update_student_topic_mastery(self, aok):
+        topics = aok.topic_set.all()
 
-        for aok in available_aoks:
-            topics = aok.topic_set.all()
-            for topic in topics:
-                mastery_settings = TopicMasterySettings.objects.get_or_create(
-                    topic=topic
-                )
-                total_correct = 0
-                sample_size = mastery_settings.sample_size
-                mastery_percentage = mastery_settings.mastery_percentage
-                competence_percentage = mastery_settings.competence_percentage
-                # Get last N questions from topic sorted by date
-                last_questions = BlockQuestionPresentation.objects.filter(
-                    topic=topic
-                ).order_by('-create_timestamp')[:sample_size]
-                for question in last_questions:
-                    if question.is_correct:
-                        total_correct += 1
-                if total_correct < sample_size*mastery_percentage*competence_percentage:
-                    mastery_level = 'N'
-                elif total_correct < sample_size*mastery_percentage:
-                    mastery_level = 'C'
-                else:
-                    mastery_level = 'M'
-                student_topic_mastery, new = StudentTopicMastery.get_or_create(
-                    student=self,
-                    topic=topic,
-                )
-                student_topic_mastery.mastery_level = mastery_level
-                student_topic_mastery.save()
+        for topic in topics:
+            mastery_settings, new = TopicMasterySettings.objects.get_or_create(
+                topic=topic
+            )
+            total_correct = 0
+            sample_size = mastery_settings.sample_size
+            mastery_percentage = mastery_settings.mastery_percentage
+            competence_percentage = mastery_settings.competence_percentage
+            # Get last N questions from topic sorted by date
+            last_questions = BlockQuestionPresentation.objects.filter(
+                topic=topic
+            ).order_by('-create_timestamp')[:sample_size]
+            for question in last_questions:
+                if question.is_correct:
+                    total_correct += 1
+            if total_correct == 0:
+                mastery_level = 'NP'
+            elif total_correct < sample_size*mastery_percentage*competence_percentage:
+                mastery_level = 'N'
+            elif total_correct < sample_size*mastery_percentage:
+                mastery_level = 'C'
+            else:
+                mastery_level = 'M'
+            student_topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                student=self,
+                topic=topic,
+            )
+            student_topic_mastery.mastery_level = mastery_level
+            student_topic_mastery.save()
 
     def init_student_topic_status(self):
         from plans.models import GuardianStudentPlan
@@ -265,42 +258,34 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                 )
                 topic_status.save()
 
-    def update_student_topic_status(self):
-        from plans.models import GuardianStudentPlan
-        from kb.models import AreaOfKnowledge
-        try:
-            available_aoks = GuardianStudentPlan.objects.get(
-                student=self).subject
-        except GuardianStudentPlan.DoesNotExist:
-            audience = self.get_active_audience
-            available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
+    def update_student_topic_status(self, aok):
+        topics = aok.topic_set.all()
 
-        for aok in available_aoks:
-            topics = aok.topic_set.all()
-            for topic in topics:
-                if topic.prerequisites is None:
-                    status = 'A'
+        topics = aok.topic_set.all()
+        for topic in topics:
+            if topic.prerequisites is None:
+                status = 'A'
+            else:
+                prerequisites = topic.prerequisites
+                prerequisites_mastery = []
+                for prerequisite in prerequisites:
+                    prerequisites_mastery.append(
+                        prerequisite.mastery_level
+                    )
+                if 'NP' in prerequisites_mastery:
+                    status = 'B'
+                elif 'N' in prerequisites_mastery:
+                    status = 'B'
+                elif 'C' in prerequisites_mastery:
+                    status = 'P'
                 else:
-                    prerequisites = topic.prerequisites
-                    prerequisites_mastery = []
-                    for prerequisite in prerequisites:
-                        prerequisites_mastery.append(
-                            prerequisite.mastery_level
-                        )
-                    if 'NP' in prerequisites_mastery:
-                        status = 'B'
-                    elif 'N' in prerequisites_mastery:
-                        status = 'B'
-                    elif 'C' in prerequisites_mastery:
-                        status = 'P'
-                    else:
-                        status = 'A'
-                topic_status = StudentTopicStatus(
-                    student=self,
-                    topic=topic,
-                    status=status,
-                )
-                topic_status.save()
+                    status = 'A'
+            topic_status, new = StudentTopicStatus.objects.get_or_create(
+                student=self,
+                topic=topic,
+            )
+            topic_status.satus = status
+            topic_status.save()
 
     def __str__(self):
         return self.full_name

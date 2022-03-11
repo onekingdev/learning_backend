@@ -179,6 +179,10 @@ class BlockPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     start_timestamp = models.DateTimeField(auto_now_add=True, null=True)
     end_timestamp = models.DateTimeField(null=True)
 
+    def save(self, *args, **kwargs):
+        self.total = self.errors + self.hits
+        return super().save(*args, **kwargs)
+
 
 class BlockTransaction(Deposit):
     blockPresentation = models.ForeignKey(
@@ -208,7 +212,7 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
     # FK's
     block_presentation = models.ForeignKey(
         BlockPresentation,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     question = models.ForeignKey(
         'kb.Question',
@@ -238,7 +242,7 @@ class BlockQuestionPresentation(TimestampModel, RandomSlugModel):
             return False
 
     def save(self, *args, **kwargs):
-        self.topic = self.block_presentation.block.topic
+        self.topic = self.block_presentation.block.topic_grade.topic
         if self.chosen_answer:
             if self.chosen_answer.is_correct:
                 self.status = self.STATUS_CORRECT

@@ -6,7 +6,7 @@ from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPre
 from .schema import BlockPresentationSchema
 from students.models import StudentTopicMastery, StudentTopicStatus
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
-from kb.models.content import Question
+from kb.models.content import Question, AnswerOption
 from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
 from decimal import Decimal
 from wallets.models import CoinWallet
@@ -134,10 +134,9 @@ class CreateAIBlockPresentation(graphene.Mutation):
             modality='AI',
         )
         block.save()
-        print(block)
         block.students.add(student)
         block.save()
-        if block.questions is None:
+        if block.questions.all().count() == 0:
             available_questions = list(
                 Question.objects.filter(
                     topic=topic_grade.topic).filter(
@@ -158,7 +157,6 @@ class CreateAIBlockPresentation(graphene.Mutation):
             student=student,
         )
         block_presentation.save()
-        print(block_presentation)
 
         return CreateAIBlockPresentation(block_presentation=block_presentation)
 
@@ -211,14 +209,14 @@ class FinishBlockPresentation(graphene.Mutation):
         # Create registers on BlockQuestionPresentation
         block_topic = block_presentation.block.topic_grade.topic
         block_aok = block_topic.area_of_knowledge
-        print(questions)
-        return
         for question in questions:
-            status = 'CORRECT' if question.is_correct else 'INCORRECT'
+            status = 'CORRECT' if question['is_correct'] else 'INCORRECT'
+            question_object = Question.objects.get(id=question['question'])
+            answer_object = AnswerOption.objects.get(id=question['question'])
             block_question_presentation = BlockQuestionPresentation(
                 block_presentation=block_presentation,
-                chowsen_answer=question.answer_option,
-                question=question.question,
+                chosen_answer=answer_object,
+                question=question_object,
                 status=status,
                 topic=block_topic,
             )
@@ -234,7 +232,7 @@ class FinishBlockPresentation(graphene.Mutation):
         topic_report.save()
 
         aok_report, new = AreaOfKnowledgeStudentReport.objects.get_or_create(
-            aok=block_aok,
+            area_of_knowledge=block_aok,
             student=student,
         )
         aok_report.questions_answered += block_presentation.total
@@ -257,8 +255,11 @@ class FinishBlockPresentation(graphene.Mutation):
         )
         block_transaction.save()
 
-        student.update_student_topic_mastery()
-        student.update_student_topic_status()
+        student.update_student_topic_mastery(block_aok)
+        student.update_student_topic_status(block_aok)
+
+        block_presentation.block.delete()
+        block_presentation.delete()
 
         return FinishBlockPresentation(
             block_presentation=block_presentation,
