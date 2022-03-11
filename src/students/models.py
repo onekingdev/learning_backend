@@ -182,7 +182,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         for aok in available_aoks:
             topics = aok.topic_set.all()
             for topic in topics:
-                topic_mastery = StudentTopicMastery(
+                topic_mastery = StudentTopicMastery.objects.get_or_create(
                     student=self,
                     topic=topic,
                 )
@@ -251,11 +251,11 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                         status = 'P'
                     else:
                         status = 'A'
-                topic_status = StudentTopicStatus(
+                topic_status = StudentTopicStatus.objects.get_or_create(
                     student=self,
                     topic=topic,
-                    status=status,
                 )
+                topic_status = status
                 topic_status.save()
 
     def update_student_topic_status(self, aok):
