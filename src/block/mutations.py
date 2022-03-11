@@ -4,7 +4,7 @@ from django.utils import timezone
 from students.schema import StudentSchema
 from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPresentation
 from .schema import BlockPresentationSchema
-from students.models import StudentTopicMastery, StudentTopicStatus
+from students.models import StudentTopicMastery, StudentTopicStatus, Student
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
 from kb.models.content import Question, AnswerOption
 from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
@@ -67,14 +67,17 @@ class CreateAIBlockPresentation(graphene.Mutation):
         aok_id = graphene.ID(required=True)
 
     def mutate(self, info, aok_id, student_id=None):
-        user = info.context.user
+        if student_id is None:
+            user = info.context.user
 
-        if not user.is_authenticated:
-            raise Exception("Authentication credentials were not provided")
-        if not user.student:
-            raise Exception("Not found student")
+            if not user.is_authenticated:
+                raise Exception("Authentication credentials were not provided")
+            if not user.student:
+                raise Exception("Not found student")
 
-        student = user.student
+            student = user.student
+        else:
+            student = Student.objects.get(id=student_id)
 
         # Define weights for status and mastery
         mastery_weights = {'NP': 50, 'N': 30, 'C': 20, 'M': 0}
@@ -167,6 +170,7 @@ class CreateAIBlockPresentation(graphene.Mutation):
 
 class FinishBlockPresentation(graphene.Mutation):
     block_presentation = graphene.Field(BlockPresentationSchema)
+    student = graphene.Field(StudentSchema)
 
     class Arguments:
         block_presentation_id = graphene.ID(required=True)
