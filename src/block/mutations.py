@@ -15,7 +15,6 @@ from wallets.models import CoinWallet
 class BlockQuestionInput(graphene.InputObjectType):
     question = graphene.ID()
     answer_option = graphene.ID()
-    is_correct = graphene.Boolean()
 
 
 class CreatePathBlockPresentation(graphene.Mutation):
@@ -217,7 +216,6 @@ class FinishBlockPresentation(graphene.Mutation):
         block_topic = block_presentation.block.topic_grade.topic
         block_aok = block_topic.area_of_knowledge
         for question in questions:
-            status = 'CORRECT' if question['is_correct'] else 'INCORRECT'
             question_object = Question.objects.get(id=question['question'])
             answer_object = AnswerOption.objects.get(
                 id=question['answer_option'])
@@ -225,7 +223,6 @@ class FinishBlockPresentation(graphene.Mutation):
                 block_presentation=block_presentation,
                 chosen_answer=answer_object,
                 question=question_object,
-                status=status,
                 topic=block_topic,
             )
             block_question_presentation.save()
