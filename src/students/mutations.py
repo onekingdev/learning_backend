@@ -13,11 +13,12 @@ from plans.models import StudentPlan
 from organization.models import School, Group
 from kb.models.grades import Grade
 from kb.models import AreaOfKnowledge
-from guardians.models import Guardian
+from guardians.models import Guardian, GuardianStudent
 from audiences.models import Audience
 from users.schema import UserSchema, UserProfileSchema
 from .schema import StudentGradeSchema
 from plans.models import GuardianStudentPlan
+from users.models import User
 
 
 class CreateStudent(graphene.Mutation):
@@ -59,12 +60,20 @@ class CreateStudent(graphene.Mutation):
 
         try:
             with transaction.atomic():
-                user = get_user_model()()
+                user_guardain = info.context.user
+                if not user_guardain.is_authenticated:
+                    raise Exception("Authentication credentials were not provided")
+                guardian = user_guardain.guardian
+
+                user = User()
                 student = Student(
                     first_name=first_name,
                     last_name=last_name,
-                    full_name=first_name + ' ' + last_name
+                    full_name=first_name + ' ' + last_name,
                 )
+
+                if(grade) :
+                    grade = Grade.objects.get(pk = grade)
 
                 if username:
                     user.username = username
@@ -76,7 +85,6 @@ class CreateStudent(graphene.Mutation):
                         else:
                             break
                     user.username = first_name + last_name + count
-
                 if password:
                     user.set_password(password)
                 else:
@@ -90,6 +98,11 @@ class CreateStudent(graphene.Mutation):
                     student.dob = dob
 
                 student.save()
+
+                guardianStudent = GuardianStudent.objects.create(
+                    student = student,
+                    guardian = guardian
+                )
 
                 # Student Plan
                 if student_plan:
@@ -111,6 +124,13 @@ class CreateStudent(graphene.Mutation):
 
                 student.save()
 
+                if(grade) :
+                    student_grade = StudentGrade(
+                        student=student,
+                        grade=grade,
+                    )
+                    student_grade.save();
+
                 guardian_student_plan = GuardianStudentPlan.objects.get(pk=guardian_student_plan_id)
 
                 guardian_student_plan.student_id = student.id
@@ -123,12 +143,13 @@ class CreateStudent(graphene.Mutation):
                 student.guardian_id = guardian_student_plan.guardian.id
                 student.save()
 
+                print("after student save")
                 profile_obj = profile.objects.get(user=user.id)
                 token = get_token(user)
                 refresh_token = create_refresh_token(user)
 
                 return CreateStudent(
-                    guardian=student.guardian,
+                    guardian=guardian,
                     student=student,
                     user=user,
                     profile=profile_obj,
@@ -230,9 +251,11 @@ class CreateChangeStudentGrade(graphene.Mutation):
                     student_grade.is_active = False
 
                 student_grade.save()
-
+                student = student_grade.student
+                student = Student.objects.get(pk = student.id)
+                print(student.id, student.guardianstudentSet[0])
                 return CreateChangeStudentGrade(
-                    guardian=student_grade.student.guardian,
+                    guardian=student.guardianstudentSet[0].guaridan,
                     student_grade=student_grade,
                     grade=student_grade.grade,
                     student=student_grade.student

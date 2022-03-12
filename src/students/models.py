@@ -1,8 +1,10 @@
 from django.db import models
 from app.models import TimestampModel, UUIDModel, IsActiveModel
+from experiences.models import Level
 from engine.models import TopicMasterySettings
 from block.models import BlockQuestionPresentation
 import datetime
+from decimal import Decimal
 
 TYPE_ACCESSORIES = 'ACCESSORIES'
 TYPE_HEAD = 'HEAD'
@@ -163,7 +165,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
     @property
     def get_active_audience(self):
-        return self.active_group.grade.audience
+        return self.active_group.grade.audience if(self.active_group) else None
 
     @property
     def get_level_number(self):
@@ -308,6 +310,10 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                 name=self.user.username
             )
             bank_account.save()
+
+            if self.level == None :
+                current_level = Level.objects.get(amount = 1)
+                self.level = current_level
 
             self.init_student_topic_mastery()
             self.init_student_topic_status()
