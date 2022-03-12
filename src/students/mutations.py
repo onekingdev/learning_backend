@@ -227,6 +227,13 @@ class CreateChangeStudentGrade(graphene.Mutation):
             percentage=None,
             complete_date=None,
             is_active=True):
+
+        user = info.context.user
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        if not user.guardian:
+            raise Exception("Not found student")
+        guardian = user.guardian
         try:
             with transaction.atomic():
                 # user = info.context.user
@@ -253,9 +260,9 @@ class CreateChangeStudentGrade(graphene.Mutation):
                 student_grade.save()
                 student = student_grade.student
                 student = Student.objects.get(pk = student.id)
-                print(student.id, student.guardianstudentSet[0])
+                guardian = Guardian.objects.get(pk = guardian.id)
                 return CreateChangeStudentGrade(
-                    guardian=student.guardianstudentSet[0].guaridan,
+                    guardian=guardian,
                     student_grade=student_grade,
                     grade=student_grade.grade,
                     student=student_grade.student
