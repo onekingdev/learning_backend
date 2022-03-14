@@ -4,7 +4,6 @@ from experiences.models import Level
 from engine.models import TopicMasterySettings
 from block.models import BlockQuestionPresentation
 import datetime
-from decimal import Decimal
 
 TYPE_ACCESSORIES = 'ACCESSORIES'
 TYPE_HEAD = 'HEAD'
@@ -199,8 +198,8 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             )
             total_correct = 0
             sample_size = mastery_settings.sample_size
-            mastery_percentage = mastery_settings.mastery_percentage/100
-            competence_percentage = mastery_settings.competence_percentage/100
+            mastery_percentage = mastery_settings.mastery_percentage / 100
+            competence_percentage = mastery_settings.competence_percentage / 100
             # Get last N questions from topic sorted by date
             last_questions = BlockQuestionPresentation.all_objects.filter(
                 topic=topic
@@ -210,16 +209,14 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                     total_correct += 1
             if total_correct == 0:
                 mastery_level = 'NP'
-            elif total_correct < sample_size*mastery_percentage*competence_percentage:
+            elif total_correct < sample_size * mastery_percentage * competence_percentage:
                 mastery_level = 'N'
-            elif total_correct < sample_size*mastery_percentage:
+            elif total_correct < sample_size * mastery_percentage:
                 mastery_level = 'C'
             else:
                 mastery_level = 'M'
             student_topic_mastery, new = StudentTopicMastery.objects.get_or_create(
-                student=self,
-                topic=topic,
-            )
+                student=self, topic=topic, )
             student_topic_mastery.mastery_level = mastery_level
             student_topic_mastery.save()
 
@@ -311,8 +308,8 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             )
             bank_account.save()
 
-            if self.level == None :
-                current_level = Level.objects.get(amount = 1)
+            if self.level is None:
+                current_level = Level.objects.get(amount=1)
                 self.level = current_level
 
             self.init_student_topic_mastery()
