@@ -1,8 +1,14 @@
+import os
+import sys
+
 from django.contrib.auth import get_user_model
+from django.db import transaction, DatabaseError
+
 from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from students.models import Student
 from guardians.models import Guardian, GuardianStudent
+from payments.models import DiscountCode
 from users.schema import UserSchema, UserProfileSchema
 from users.models import User
 from bank.models import Interest
@@ -54,31 +60,49 @@ class CreateGuardian(graphene.Mutation):
         username = graphene.String(required=True)
         password = graphene.String(required=True)
         email = graphene.String(required=False)
+        name = graphene.String(required=True)
+        last_name = graphene.String(required=True)
+        coupon = graphene.String(required=True)
 
-    def mutate(self, info, username, password, email):
-        user = get_user_model()(
-            username=username,
-        )
-        user.set_password(password)
-        if email is not None:
-            user.email = email
-        user.save()
+    def mutate(self, info, username, password, email, name, last_name, coupon):
+        try:
+            with transaction.atomic():
+                user = get_user_model()(
+                    username=username,
+                )
+                user.set_password(password)
+                if email is not None:
+                    user.email = email
+                user.save()
 
-        guardian = Guardian(
-            user=user,
-        )
-        guardian.save()
+                guardian = Guardian(
+                    user=user,
+                    name=name,
+                    last_name=last_name,
+                )
+                guardian.save()
 
-        profile_obj = profile.objects.get(user=user.id)
-        token = get_token(user)
-        refresh_token = create_refresh_token(user)
+                if coupon:
+                    discount = DiscountCode.objects.get(code=coupon)
+                    guardian.coupon_code_id = discount.id
+                    guardian.save()
 
-        return CreateGuardian(
-            guardian=guardian,
-            user=user, profile=profile_obj,
-            token=token,
-            refresh_token=refresh_token
-        )
+                profile_obj = profile.objects.get(user=user.id)
+                token = get_token(user)
+                refresh_token = create_refresh_token(user)
+
+                return CreateGuardian(
+                    guardian=guardian,
+                    user=user, profile=profile_obj,
+                    token=token,
+                    refresh_token=refresh_token
+                )
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
 
 
 # TODO: move to guardian student mutations

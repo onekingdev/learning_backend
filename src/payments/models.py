@@ -3,7 +3,7 @@ from django.utils.text import slugify
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
 
 
-PAYMENT_METHOD = (("CARD", "CARD"), ("PAYPAL", "PAYPAL"), ("APPLEPAY", "APPLEPAY"))
+PAYMENT_METHOD = (("CARD", "CARD"), ("PAYPAL", "PAYPAL"), ("APPLEPAY", "APPLEPAY"), ("FREE", "FREE"))
 
 
 class Order(TimestampModel, RandomSlugModel, IsActiveModel):
@@ -140,6 +140,7 @@ class DiscountCode(TimestampModel, RandomSlugModel, IsActiveModel):
 
     code = models.CharField(max_length=255, unique=True)
     percentage = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    trial_day = models.IntegerField(default=0)
     expired_at = models.DateTimeField()
     stripe_coupon_id = models.CharField(max_length=255, blank=True, null=True)
     slug = models.SlugField(editable=False)

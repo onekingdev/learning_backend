@@ -13,7 +13,6 @@ class PlanSchema(DjangoObjectType):
     subjects = graphene.List(AreaOfKnowledgeSchema)
 
     def resolve_subjects(self, info):
-        print(self.name)
         return AreaOfKnowledge.objects.all()
 
 
@@ -53,7 +52,7 @@ class Query(graphene.ObjectType):
 
     def resolve_guardian_student_plan_by_guardian_id(self, info, guardian_id):
         # Querying a single question that has guardian_id
-        return GuardianStudentPlan.objects.all().filter(guardian_id=guardian_id, is_cancel=False, is_paid=True)
+        return GuardianStudentPlan.objects.all().filter(guardian_id=guardian_id, order_detail__is_paid=True, order_detail__is_cancel=False)
 
     def resolve_guardian_student_plan_by_id(self, info, id):
         # Querying a single question

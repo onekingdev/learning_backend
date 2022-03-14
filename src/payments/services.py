@@ -1,4 +1,5 @@
 import paypalrestsdk
+from django.utils import timezone
 
 from app import settings
 from app.utils import add_months
@@ -7,6 +8,7 @@ from payments.card import Card
 from payments.models import Order, OrderDetail, PaypalTransaction, PaymentMethod, CardTransaction, DiscountCode
 from payments.paypal import Paypal
 from plans.models import Plan, GuardianStudentPlan
+from app.utils import add_months
 
 
 class TmpOrderDetail:
@@ -265,16 +267,20 @@ def payment_card_subscription(
 
     # get a coupon if has
     coupon_id = None
+    trial_day = 0
     if order_detail.order.discount_code != "" and order_detail.order.discount_code is not None:
         discount_code = DiscountCode.objects.get(code=order_detail.order.discount_code)
-        coupon_id = card.create_or_get_coupon(code=discount_code.code, percentage=discount_code.percentage)
+        trial_day = discount_code.trial_day
+        if discount_code.percentage > 0:
+            coupon_id = card.create_or_get_coupon(code=discount_code.code, percentage=discount_code.percentage)
 
     sub = card.create_subscription(
         customer_id=customer.id,
         plan_id=order_detail.payment_method_plan_id,
         quantity=order_detail.quantity,
         has_order=has_order,
-        coupon_id=coupon_id
+        coupon_id=coupon_id,
+        trial_day=trial_day
     )
     return sub
 
@@ -381,13 +387,20 @@ def create_order(guardian_id,
     order.sub_total = sub_total
 
     # calculate discount
-    code = DiscountCode.objects.filter(code=discount_code)
-    if len(code) > 0:
-        code = code.first()
-        discount_price = (code.percentage/100) * sub_total
+    if discount_code:
+        code = DiscountCode.objects.filter(code=discount_code)
+        if len(code) > 0:
+            code = code.first()
+            discount_price = (code.percentage/100) * sub_total
+            total = total - discount_price
+            order.discount_code = code.code
+            order.discount = discount_price
+    elif guardian.coupon_code:
+        discount_price = (guardian.coupon_code.percentage / 100) * sub_total
         total = total - discount_price
-        order.discount_code = discount_code
+        order.discount_code = guardian.coupon_code.code
         order.discount = discount_price
+
 
     order.total = total
     order.save()
@@ -469,7 +482,6 @@ def confirm_order_payment(order_id) -> Order:
         for order_detail in order_details:
             card_tx = CardTransaction.objects.get(order_detail_id=order_detail.id)
             result_sub = card.check_subscription(order_detail.subscription_id)
-            print(result_sub)
             if result_sub["status"] != "active" and result_sub["status"] != "trialing":
                 all_paid = False
                 raise Exception(f"unpaid for card in sub_id: {order_detail.subscription_id}")
@@ -494,6 +506,20 @@ def confirm_order_payment(order_id) -> Order:
             order_detail.expired_at = result_sub["expired_at"]
             order_detail.is_paid = True
             order_detail.save()
+    elif order.payment_method.upper() == "FREE":
+        order_details = OrderDetail.objects.filter(order_id=order_id)
+        for order_detail in order_details:
+            order_detail.status = "active"
+
+            if order_detail.period == "MONTHLY":
+                expired_date = add_months(order_detail.create_timestamp, 1)
+            else:
+                expired_date = add_months(order_detail.create_timestamp, 1)
+
+            order_detail.expired_at = expired_date
+            order_detail.is_paid = True
+            order_detail.save()
+
 
     # change order paid status to true
     order.is_paid = True
@@ -501,6 +527,7 @@ def confirm_order_payment(order_id) -> Order:
 
     # update guardian status order
     guardian = Guardian.objects.get(pk=order.guardian.id)
+    guardian.coupon_code = None
     guardian.has_order = True
     guardian.save()
 
@@ -521,7 +548,87 @@ def check_order_detail(order_detail_id) -> OrderDetail:
 
         if resp["status"] == "canceled":
             order_detail.is_cancel = True
+    elif old_payment == "FREE":
+        if timezone.now() > order_detail.expired_at:
+            order_detail.status = "canceled"
+            order_detail.is_cancel = True
 
     order_detail.save()
 
     return order_detail
+
+
+def create_order_with_out_pay(
+        guardian_id,
+        order_detail_list,
+) -> CreateOrderResp:
+
+    guardian = Guardian.objects.get(pk=guardian_id)
+
+    sub_total = 0
+    total = 0
+
+    # create order
+    order = Order.objects.create(
+        discount_code='',
+        guardian_id=guardian.id,
+        payment_method="FREE"
+    )
+
+    # sorted input by DESC
+    tmp_order_details = []
+    for order_detail in order_detail_list:
+        plan = Plan.objects.get(pk=order_detail.plan_id)
+        tmp_order_details.append(
+            TmpOrderDetail(plan=plan, period=order_detail.period.upper(), quantity=order_detail.quantity)
+        )
+    tmp_order_details.sort(key=lambda x: x.plan.price_month, reverse=True)
+
+    # go through order detail
+    for index, tmp_order_detail in enumerate(tmp_order_details):
+
+        order_detail_price = 0
+        more_than_two = tmp_order_detail.quantity - 1
+
+        # check if first index then calculate normal
+        if index == 0:
+            if tmp_order_detail.period == "MONTHLY":
+                order_detail_price += (tmp_order_detail.plan.price_month + more_than_two * (tmp_order_detail.plan.price_month / 2))
+            else:
+                order_detail_price += (tmp_order_detail.plan.price_year + more_than_two * (tmp_order_detail.plan.price_year / 2))
+        else:
+            if tmp_order_detail.period == "MONTHLY":
+                order_detail_price += tmp_order_detail.quantity * (tmp_order_detail.plan.price_month / 2)
+            else:
+                order_detail_price += tmp_order_detail.quantity * (tmp_order_detail.plan.price_year / 2)
+
+        # check plan payment id by payment_method
+        payment_method_plan_id = ""
+
+        # calculate sub_total and total price before add to order
+        sub_total += order_detail_price
+        total += order_detail_price
+
+        # create order detail
+        OrderDetail.objects.create(
+            plan_id=tmp_order_detail.plan.id,
+            payment_method_plan_id=payment_method_plan_id,
+            quantity=tmp_order_detail.quantity,
+            total=order_detail_price,
+            order_id=order.id,
+            period=tmp_order_detail.period,
+            update_from_detail_id=0
+        )
+
+    order.sub_total = sub_total
+
+    order.total = total
+    order.save()
+
+    if guardian.coupon_code:
+        order.discount_code = guardian.coupon_code.code
+        order.save()
+
+    order_from_db = Order.objects.get(pk=order.id)
+
+    return CreateOrderResp(url_redirect="", order=order_from_db)

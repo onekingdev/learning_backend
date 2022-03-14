@@ -1,6 +1,12 @@
 import graphene
 from graphene_django import DjangoObjectType
-from .models import Order, OrderDetail, PaymentMethod
+from .models import Order, OrderDetail, PaymentMethod, DiscountCode
+
+
+class DiscountCodeSchema(DjangoObjectType):
+    class Meta:
+        model = DiscountCode
+        fields = "__all__"
 
 
 class PaymentMethodSchema(DjangoObjectType):

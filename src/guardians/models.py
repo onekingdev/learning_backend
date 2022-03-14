@@ -22,6 +22,7 @@ class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
         on_delete=models.SET_NULL,
         null=True
     )
+    coupon_code = models.ForeignKey('payments.DiscountCode', on_delete=models.CASCADE, blank=True, null=True)
     has_order = models.BooleanField(default=False)
 
     def __str__(self):

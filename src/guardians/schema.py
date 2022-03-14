@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from guardians.models import Guardian, GuardianStudent
-from payments.models import PaymentMethod
+from payments.models import PaymentMethod, DiscountCode
 
 
 class GuardianSchema(DjangoObjectType):
@@ -10,6 +10,7 @@ class GuardianSchema(DjangoObjectType):
         model = Guardian
         fields = "__all__"
 
+    coupon_code = graphene.Field('payments.schema.DiscountCodeSchema')
     payment_method = graphene.Field('payments.schema.PaymentMethodSchema')
 
     def resolve_payment_method(self, info):
@@ -17,6 +18,12 @@ class GuardianSchema(DjangoObjectType):
         if payment_method.count() != 0:
             return payment_method[0]
         return
+
+    def resolve_coupon_code(self, info):
+        if self.coupon_code:
+            discount = DiscountCode.objects.get(pk=self.coupon_code.id)
+            return discount
+        return None
 
 
 class GuardianStudentSchema(DjangoObjectType):

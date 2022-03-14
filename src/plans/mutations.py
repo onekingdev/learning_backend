@@ -41,13 +41,15 @@ class AddGuardianPlan(graphene.Mutation):
         guardian_id = graphene.ID(required=True)
         order_detail_input = graphene.List(OrderDetailInput)
         return_url = graphene.String(required=True)
+        coupon = graphene.String(required=False)
 
     def mutate(
             self,
             info,
             guardian_id,
             order_detail_input,
-            return_url
+            return_url,
+            coupon=None
     ):
         try:
             with transaction.atomic():
@@ -56,7 +58,7 @@ class AddGuardianPlan(graphene.Mutation):
 
                 order_resp = payment_services.create_order(
                     guardian_id=guardian_id,
-                    discount_code="",
+                    discount_code=coupon,
                     discount=0,
                     sub_total=0,
                     total=0,
@@ -194,7 +196,6 @@ class ConfirmUpdateGuardianPlan(graphene.Mutation):
                 guardian_student_plans = GuardianStudentPlan.objects.filter(order_detail_id=old_order_detail.id)
 
                 for guardian_student_plan in guardian_student_plans:
-                    print("test", guardian_student_plan.id)
                     guardian_student_plan.order_detail_id = new_order_detail.id
                     guardian_student_plan.save()
 
@@ -253,6 +254,7 @@ class CancelGuardianPlan(graphene.Mutation):
                     if sub.status != "canceled":
                         raise Exception(f"cannot unsub order_detail_id {order_detail.id} from stripe")
 
+                order_detail.status = "canceled"
                 order_detail.cancel_reason = reason
                 order_detail.is_cancel = True
                 order_detail.update_timestamp = timezone.now()
@@ -311,6 +313,7 @@ class CancelMembership(graphene.Mutation):
                         if sub.status != "canceled":
                             raise Exception(f"cannot unsub order_detail_id {order_detail.id} from stripe")
 
+                    order_detail.status = "canceled"
                     order_detail.cancel_reason = reason
                     order_detail.is_cancel = True
                     order_detail.update_timestamp = timezone.now()

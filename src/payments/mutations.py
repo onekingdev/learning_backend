@@ -21,7 +21,6 @@ class CreateOrder(graphene.Mutation):
 
     class Arguments:
         guardian_id = graphene.ID(required=True)
-        discount_code = graphene.String(required=True)
         payment_method = graphene.String(required=True)
         order_detail_input = graphene.List(OrderDetailInput)
         return_url = graphene.String(required=True)
@@ -43,7 +42,6 @@ class CreateOrder(graphene.Mutation):
             self,
             info,
             guardian_id,
-            discount_code,
             payment_method,
             order_detail_input,
             return_url,
@@ -68,7 +66,7 @@ class CreateOrder(graphene.Mutation):
                 total = 0
                 create_order_resp = services.create_order(
                     guardian_id=guardian_id,
-                    discount_code=discount_code,
+                    discount_code=None,
                     discount=discount,
                     sub_total=sub_total,
                     total=total,
@@ -286,8 +284,47 @@ class EditPaymentMethod(graphene.Mutation):
             return e
 
 
+# Create new order with out pay
+class CreateOrderWithOutPay(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
+    order = graphene.Field('payments.schema.OrderSchema')
+    status = graphene.String()
+
+    class Arguments:
+        guardian_id = graphene.ID(required=True)
+        order_detail_input = graphene.List(OrderDetailInput)
+
+    def mutate(
+            self,
+            info,
+            guardian_id,
+            order_detail_input,
+    ):
+        try:
+            with transaction.atomic():
+                create_order_resp = services.create_order_with_out_pay(
+                    guardian_id=guardian_id,
+                    order_detail_list=order_detail_input,
+                )
+                services.confirm_order_payment(create_order_resp.order.id)
+                plan_services.create_guardian_student_plan(create_order_resp.order)
+
+                return CreateOrder(
+                    guardian=create_order_resp.order.guardian,
+                    order=create_order_resp.order,
+                    status="success",
+                )
+        except (Exception, AssertionError, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
+
 class Mutation(graphene.ObjectType):
     create_order = CreateOrder.Field()
+    create_order_with_out_pay = CreateOrderWithOutPay.Field()
     confirm_payment_order = ConfirmPaymentOrder.Field()
     change_payment_method = ChangePaymentMethod.Field()
     edit_payment_method = EditPaymentMethod.Field()

@@ -22,7 +22,7 @@ class StudentSchema(DjangoObjectType):
         return self.coinWallet
 
     def resolve_grade(self, info):
-        student_grade = StudentGrade.objects.filter(student_id=self.id, is_active=True)
+        student_grade = StudentGrade.objects.filter(student_id=self.id, is_active=True).order_by("-create_timestamp")
         if student_grade.count() != 0:
             return student_grade[0]
         return

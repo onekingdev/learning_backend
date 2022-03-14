@@ -55,10 +55,7 @@ class Card:
         )
         return customer
 
-    def create_subscription(self, customer_id, plan_id, quantity, has_order, coupon_id):
-        trial_day = 0
-        if not has_order:
-            trial_day = 7
+    def create_subscription(self, customer_id, plan_id, quantity, has_order, coupon_id, trial_day=0):
         subscription = stripe.Subscription.create(
             customer=customer_id,
             items=[

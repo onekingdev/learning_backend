@@ -49,14 +49,6 @@ class GuardianStudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
     )
     cancel_reason = models.TextField(blank=True)
     is_cancel = models.BooleanField(default=False)
-    is_paid = models.BooleanField(default=False)
-    expired_at = models.DateTimeField(null=True)
-    period = models.CharField(
-        max_length=100,
-        choices=(("MONTHLY", "Monthly"), ("YEARLY", "Yearly")),
-        default="MONTHLY"
-    )
-    price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
     def __str__(self):
         return str(self.id)

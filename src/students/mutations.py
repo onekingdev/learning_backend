@@ -1,5 +1,6 @@
 
 import os
+import random
 import sys
 import graphene
 from django.contrib.auth import get_user_model
@@ -19,6 +20,7 @@ from users.schema import UserSchema, UserProfileSchema
 from .schema import StudentGradeSchema
 from plans.models import GuardianStudentPlan
 from users.models import User
+from avatars.models import Avatar, StudentAvatar
 
 
 class CreateStudent(graphene.Mutation):
@@ -63,7 +65,8 @@ class CreateStudent(graphene.Mutation):
                 user_guardain = info.context.user
                 if not user_guardain.is_authenticated:
                     raise Exception("Authentication credentials were not provided")
-                guardian = user_guardain.guardian
+
+                guardian = Guardian.objects.filter(user__username=user_guardain.username).first()
 
                 user = User()
                 student = Student(
@@ -142,6 +145,20 @@ class CreateStudent(graphene.Mutation):
 
                 student.guardian_id = guardian_student_plan.guardian.id
                 student.save()
+
+                # set default avatar
+                avatars = Avatar.objects.all()
+                avatar = random.choice(avatars)
+                student_avatar = StudentAvatar.objects.create(
+                    student_id=student.id, avatar_id=avatar.id)
+                avatar_type = avatar.type_of
+                StudentAvatar.objects.filter(
+                    student=student,
+                    avatar__type_of=avatar_type,
+                    in_use=True).update(
+                    in_use=False)
+                student_avatar.in_use = True
+                student_avatar.save()
 
                 print("after student save")
                 profile_obj = profile.objects.get(user=user.id)
