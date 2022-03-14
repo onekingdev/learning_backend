@@ -60,13 +60,9 @@ class Topic(
             prerequisites = None
         return prerequisites
 
-    @property
-    def mastery_level(self):
+    def mastery_level(self, student):
         from students.models import StudentTopicMastery
-        try:
-            mastery_level = StudentTopicMastery.objects.get(topic=self)
-        except StudentTopicMastery.DoesNotExist:
-            mastery_level = None
+        mastery_level = StudentTopicMastery.objects.get(student=student, topic=self).mastery_level
         return mastery_level
 
     def __str__(self):
