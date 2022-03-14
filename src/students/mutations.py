@@ -1,4 +1,3 @@
-
 import os
 import random
 import sys
@@ -65,8 +64,8 @@ class CreateStudent(graphene.Mutation):
                 user_guardain = info.context.user
                 if not user_guardain.is_authenticated:
                     raise Exception("Authentication credentials were not provided")
-
-                guardian = Guardian.objects.filter(user__username=user_guardain.username).first()
+                    
+                guardian = user_guardain.guardian
 
                 user = User()
                 student = Student(
@@ -160,7 +159,6 @@ class CreateStudent(graphene.Mutation):
                 student_avatar.in_use = True
                 student_avatar.save()
 
-                print("after student save")
                 profile_obj = profile.objects.get(user=user.id)
                 token = get_token(user)
                 refresh_token = create_refresh_token(user)
@@ -173,6 +171,7 @@ class CreateStudent(graphene.Mutation):
                     token=token,
                     refresh_token=refresh_token
                 )
+              
         except (Exception, DatabaseError) as e:
             transaction.rollback()
             exc_type, exc_obj, exc_tb = sys.exc_info()
