@@ -60,11 +60,11 @@ class CreateGuardian(graphene.Mutation):
         username = graphene.String(required=True)
         password = graphene.String(required=True)
         email = graphene.String(required=False)
-        name = graphene.String(required=True)
+        first_name = graphene.String(required=True)
         last_name = graphene.String(required=True)
         coupon = graphene.String(required=True)
 
-    def mutate(self, info, username, password, email, name, last_name, coupon):
+    def mutate(self, info, username, password, email, first_name, last_name, coupon):
         try:
             with transaction.atomic():
                 user = get_user_model()(
@@ -77,7 +77,7 @@ class CreateGuardian(graphene.Mutation):
 
                 guardian = Guardian(
                     user=user,
-                    name=name,
+                    first_name=first_name,
                     last_name=last_name,
                 )
                 guardian.save()
@@ -187,10 +187,8 @@ class Query(graphene.ObjectType):
             bankBallance = student.bankWallet.balance
             interests = Interest.objects.filter(
                 period__lte=delta, requireCoin__lte=bankBallance).order_by('-requireCoin')
-            print(student.int_period_start_at, interests)
             if(len(interests) > 0):
                 amount = interests[0].amount
-                # user.student.bankWallet.balance += amount
                 BankMovement.objects.create(
                     amount=amount,
                     account=student.bankWallet,

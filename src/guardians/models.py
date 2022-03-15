@@ -14,7 +14,7 @@ class Guardian(TimestampModel, RandomSlugModel, IsActiveModel):
 
     PREFIX = 'guardian_'
 
-    name = models.CharField(max_length=128, null=True)
+    first_name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     user = models.OneToOneField(
