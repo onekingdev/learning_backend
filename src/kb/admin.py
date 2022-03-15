@@ -135,6 +135,8 @@ class QuestionAdmin(parler_admin.TranslatableAdmin,
     )
     list_filter = (
         'grade__audience',
+        'topic__area_of_knowledge',
+        'grade',
     )
 
 
