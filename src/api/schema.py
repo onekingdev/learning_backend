@@ -16,9 +16,9 @@ import graphene
 from datetime import datetime
 from accounting.models import BankMovement
 from accounting.models import Account
+
+
 # TODO: move to user mutations
-
-
 class CreateUser(graphene.Mutation):
     user = graphene.Field(UserSchema)
     profile = graphene.Field(UserProfileSchema)
@@ -179,20 +179,21 @@ class Query(graphene.ObjectType):
 
     def resolve_whoami(root, info, **kwargs):
         user = info.context.user
-        if user.student:
-            student = user.student
-            now = datetime.now().date()
-            delta = (
-                now - student.int_period_start_at).total_seconds() / 3600 / 24
-            bankBallance = student.bankWallet.balance
-            interests = Interest.objects.filter(
-                period__lte=delta, requireCoin__lte=bankBallance).order_by('-requireCoin')
-            if(len(interests) > 0):
-                amount = interests[0].amount
-                BankMovement.objects.create(
-                    amount=amount,
-                    account=student.bankWallet,
-                    side=Account.SIDE_CHOICE_RIGHT_INTEREST)
+        # TODO: Move to cronjob
+        # if user.student:
+        #     student = user.student
+        #     now = datetime.now().date()
+        #     delta = (
+        #         now - student.int_period_start_at).total_seconds() / 3600 / 24
+        #     bankBallance = student.bankWallet.balance
+        #     interests = Interest.objects.filter(
+        #         period__lte=delta, requireCoin__lte=bankBallance).order_by('-requireCoin')
+        #     if(len(interests) > 0):
+        #         amount = interests[0].amount
+        #         BankMovement.objects.create(
+        #             amount=amount,
+        #             account=student.bankWallet,
+        #             side=Account.SIDE_CHOICE_RIGHT_INTEREST)
         if user.is_anonymous:
             raise Exception('Authentication Failure')
         return user

@@ -48,7 +48,6 @@ class Topic(
         related_name='sub_topics'
     )
     video_assistor = models.URLField(null=True, blank=True)
-    standard_topic = models.CharField(max_length=16, null=True)
 
     objects = TopicManager()
 
