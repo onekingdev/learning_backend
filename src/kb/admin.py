@@ -2,11 +2,10 @@ from django.contrib import admin
 from .models import Topic, AreaOfKnowledge, Grade, TopicGrade
 from .models.content import Question, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset, QuestionTTSAsset
 from .models.content import AnswerOption
-from . import resources
 
+from . import resources
 from parler import admin as parler_admin
 from import_export import admin as import_export_admin
-from polymorphic import admin as polymorphic_admin
 from mptt.admin import DraggableMPTTAdmin
 
 
@@ -105,21 +104,13 @@ class TopicGradeAdmin(
 @admin.register(AnswerOption)
 class AnswerOptionAdmin(
         parler_admin.TranslatableAdmin,
-        import_export_admin.ImportExportModelAdmin,
-        polymorphic_admin.PolymorphicParentModelAdmin):
-    # Display settings
+        import_export_admin.ImportExportModelAdmin):
+    resource_class = resources.AnswerOptionResource
     list_display = (
         'answer_text',
         'question',
         'is_correct',
     )
-
-    # Import-Export settings
-    resource_class = resources.AnswerOptionResource
-
-    # Polymorphic settings
-    base_model = AnswerOption
-    child_models = ()
 
 
 @admin.register(Question)

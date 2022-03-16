@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib import admin
 from ckeditor.fields import RichTextField
 from polymorphic.models import PolymorphicModel
-from kb.managers.content import QuestionManager, AnswerOptionManager
+from kb.managers.content import QuestionManager
 from gtts import gTTS
 import os
 from django.utils.html import strip_tags
@@ -133,7 +133,7 @@ class QuestionVideoAsset(QuestionAsset):
     url = models.URLField()
 
 
-class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel, PolymorphicModel):
+class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
     PREFIX = 'answer_option_'
     question = models.ForeignKey(Question, on_delete=models.PROTECT)
     translations = TranslatedFields(
@@ -144,7 +144,6 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel, Polymorph
         video=models.URLField(null=True, blank=True),
     )
     is_correct = models.BooleanField(default=False)
-    objects = AnswerOptionManager()
 
     # ---------------- Generate gtts audio file -S-------------------#
     def save_gtts(self):

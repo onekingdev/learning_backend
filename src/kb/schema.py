@@ -91,6 +91,12 @@ class QuestionSchema(DjangoObjectType):
     def resolve_question_image_assets(self, info):
         return self.get_questionimageasset_set()
 
+    def resolve_question_audio_assets(self, info):
+        return self.get_questionaudioasset_set()
+
+    def resolve_question_video_assets(self, info):
+        return self.get_questionvideoasset_set()
+
     def resolve_question_audio_url(self, info):
         language = self.get_current_language()
         url = "media/gtts/" + language + "/" + self.identifier + "/question" + ".mp3"
