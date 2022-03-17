@@ -8,7 +8,9 @@ from .models.content import (
     AnswerOption,
     QuestionImageAsset,
     QuestionAudioAsset,
-    MultipleChoiceAnswerOption
+    MultipleChoiceAnswerOption,
+    MultipleSelectAnswerOption,
+    TypeInAnswerOption,
 )
 from .models.areas_of_knowledge import AreaOfKnowledge
 
@@ -168,6 +170,78 @@ class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
 
     class Meta:
         model = MultipleChoiceAnswerOption
+        skip_unchanged = True
+        report_skipped = False
+        fields = (
+            'id',
+            # 'identifier',
+            'language_code',
+            'answer_text',
+            'question',
+            'is_correct',
+        )
+        export_order = (
+            'id',
+            # 'identifier',
+            'language_code',
+            'answer_text',
+            'question',
+            'is_correct',
+        )
+        exclude = (
+            'create_timestamp',
+            'update_timestamp',
+            'random_slug',
+        )
+
+
+class MultipleSelectAnswerOptionResource(TranslatableModelResource):
+    language_code = Field(
+        attribute='_current_language'
+    )
+
+    answer_text = Field(
+        attribute='answer_text'
+    )
+
+    class Meta:
+        model = MultipleSelectAnswerOption
+        skip_unchanged = True
+        report_skipped = False
+        fields = (
+            'id',
+            # 'identifier',
+            'language_code',
+            'answer_text',
+            'question',
+            'is_correct',
+        )
+        export_order = (
+            'id',
+            # 'identifier',
+            'language_code',
+            'answer_text',
+            'question',
+            'is_correct',
+        )
+        exclude = (
+            'create_timestamp',
+            'update_timestamp',
+            'random_slug',
+        )
+
+
+class TypeInAnswerOptionResource(TranslatableModelResource):
+    language_code = Field(
+        attribute='_current_language'
+    )
+
+    answer_text = Field(
+        attribute='answer_text'
+    )
+
+    class Meta:
+        model = TypeInAnswerOption
         skip_unchanged = True
         report_skipped = False
         fields = (

@@ -4,8 +4,10 @@ from .models.content import Question, QuestionImageAsset, QuestionVideoAsset, Qu
 from .models.content import (
     AnswerOption,
     MultipleChoiceAnswerOption,
+    MultipleSelectAnswerOption,
     OrderAnswerOption,
     RelateAnswerOption,
+    TypeInAnswerOption,
 )
 from . import resources
 
@@ -27,6 +29,18 @@ class AnswerOptionInline(
     ):
         model = MultipleChoiceAnswerOption
 
+    class MultipleSelectAnswerOptionInline(
+            parler_admin.TranslatableStackedInline,
+            polymorphic_admin.StackedPolymorphicInline.Child,
+    ):
+        model = MultipleSelectAnswerOption
+
+    class TypeInAnswerOptionInline(
+            parler_admin.TranslatableStackedInline,
+            polymorphic_admin.StackedPolymorphicInline.Child,
+    ):
+        model = TypeInAnswerOption
+
     class OrderAnswerOptionInline(
         parler_admin.TranslatableStackedInline,
         polymorphic_admin.StackedPolymorphicInline.Child,
@@ -41,6 +55,8 @@ class AnswerOptionInline(
 
     child_inlines = (
         MultipleChoiceAnswerOptionInline,
+        MultipleSelectAnswerOptionInline,
+        TypeInAnswerOptionInline,
         OrderAnswerOptionInline,
         RelateAnswerOptionInline,
     )
@@ -147,6 +163,34 @@ class MultipleChoiceAnswerOptionAdmin(
     show_in_index = True
 
 
+@admin.register(MultipleSelectAnswerOption)
+class MultipleSelectAnswerOptionAdmin(
+    parler_admin.TranslatableAdmin,
+    import_export_admin.ImportExportModelAdmin,
+    polymorphic_admin.PolymorphicChildModelAdmin,
+):
+    # Import-Export settings
+    resource_class = resources.MultipleSelectAnswerOptionResource
+
+    # Polymorphic settings
+    base_model = MultipleSelectAnswerOption
+    show_in_index = True
+
+
+@admin.register(TypeInAnswerOption)
+class TypeInAnswerOptionAdmin(
+    parler_admin.TranslatableAdmin,
+    import_export_admin.ImportExportModelAdmin,
+    polymorphic_admin.PolymorphicChildModelAdmin,
+):
+    # Import-Export settings
+    resource_class = resources.TypeInAnswerOptionResource
+
+    # Polymorphic settings
+    base_model = TypeInAnswerOption
+    show_in_index = True
+
+
 @admin.register(OrderAnswerOption)
 class OrderAnswerOptionAdmin(
     parler_admin.TranslatableAdmin,
@@ -175,10 +219,10 @@ class AnswerOptionAdmin(
 ):
     # Display settings
     list_display = (
-        # 'answer_text',
-        'identifier',
+        '__str__',
         'question',
         'question_type',
+        'id',
     )
     list_filter = (
         'question__question_type',
@@ -188,9 +232,12 @@ class AnswerOptionAdmin(
     resource_class = resources.AnswerOptionResource
 
     # Polymorphic settings
+    polymorphic_list = True
     base_model = AnswerOption
     child_models = (
         MultipleChoiceAnswerOption,
+        MultipleSelectAnswerOption,
+        TypeInAnswerOption,
         OrderAnswerOption,
         RelateAnswerOption,
     )

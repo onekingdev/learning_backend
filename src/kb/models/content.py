@@ -25,6 +25,7 @@ class Question(
         MULTIPLE_SELECT = 'MS', 'Multiple Select'
         ORDER = 'O', 'Order'
         RELATE = 'R', 'Relate'
+        TYPE_IN = 'T', 'Type In'
 
     PREFIX = 'question_'
     translations = TranslatedFields(
@@ -151,6 +152,10 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel, Polymorph
     def question_type(self):
         return self.question.question_type
 
+    @admin.display(description='Answer')
+    def answer_display(self):
+        return self.__str__
+
     def save_gtts(self):
         text = self.safe_translation_getter("answer_text", any_language=True)
         # if text is empty or answer's question is empty, disable to save
@@ -180,7 +185,7 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel, Polymorph
         # self.save_gtts()
 
 
-class MultipleChoiceAnswerOption(AnswerOption, PolymorphicModel):
+class MultipleChoiceAnswerOption(AnswerOption):
     translations = TranslatedFields(
         answer_text=models.CharField(max_length=256),
         explanation=RichTextField(null=True, blank=True),
@@ -194,7 +199,35 @@ class MultipleChoiceAnswerOption(AnswerOption, PolymorphicModel):
         return self.safe_translation_getter("answer_text", any_language=True)
 
 
-class OrderAnswerOption(AnswerOption, PolymorphicModel):
+class MultipleSelectAnswerOption(AnswerOption):
+    translations = TranslatedFields(
+        answer_text=models.CharField(max_length=256),
+        explanation=RichTextField(null=True, blank=True),
+        image=models.URLField(null=True, blank=True),
+        audio_file=models.URLField(null=True, blank=True),
+        video=models.URLField(null=True, blank=True),
+    )
+    is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.safe_translation_getter("answer_text", any_language=True)
+
+
+class TypeInAnswerOption(AnswerOption):
+    translations = TranslatedFields(
+        answer_text=models.CharField(max_length=256),
+        explanation=RichTextField(null=True, blank=True),
+        image=models.URLField(null=True, blank=True),
+        audio_file=models.URLField(null=True, blank=True),
+        video=models.URLField(null=True, blank=True),
+    )
+    is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.safe_translation_getter("answer_text", any_language=True)
+
+
+class OrderAnswerOption(AnswerOption):
     translations = TranslatedFields(
         answer_text=models.CharField(max_length=256),
         image=models.URLField(null=True, blank=True),
@@ -203,11 +236,21 @@ class OrderAnswerOption(AnswerOption, PolymorphicModel):
     )
     order = models.IntegerField()
 
+    def __str__(self):
+        return self.safe_translation_getter("answer_text", any_language=True)
 
-class RelateAnswerOption(AnswerOption, PolymorphicModel):
+
+class RelateAnswerOption(AnswerOption):
     translations = TranslatedFields(
         key=models.CharField(max_length=256),
         value=models.CharField(max_length=256),
         key_image=models.URLField(null=True, blank=True),
         value_image=models.URLField(null=True, blank=True),
     )
+
+    def __str__(self):
+        return (
+            self.safe_translation_getter("key", any_language=True)
+            + " - "
+            + self.safe_translation_getter("value", any_language=True)
+        )
