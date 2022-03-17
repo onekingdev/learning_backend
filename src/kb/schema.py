@@ -3,7 +3,7 @@ from django.conf import settings
 from graphene_django import DjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from kb.models.content import Question, AnswerOption
-from kb.models.content import QuestionImageAsset, QuestionAudioAsset, QuestionVideoAsset
+from kb.models.content import QuestionImageAsset
 import os
 
 
@@ -76,18 +76,6 @@ class QuestionImageAssetSchema(DjangoObjectType):
         fields = "__all__"
 
 
-class QuestionAudioAssetSchema(DjangoObjectType):
-    class Meta:
-        model = QuestionAudioAsset
-        fields = "__all__"
-
-
-class QuestionVideoAssetSchema(DjangoObjectType):
-    class Meta:
-        model = QuestionVideoAsset
-        fields = "__all__"
-
-
 class QuestionSchema(DjangoObjectType):
     class Meta:
         model = Question
@@ -95,8 +83,6 @@ class QuestionSchema(DjangoObjectType):
 
     question_text = graphene.String()
     question_image_assets = graphene.List(QuestionImageAssetSchema)
-    question_audio_assets = graphene.List(QuestionAudioAssetSchema)
-    question_video_assets = graphene.List(QuestionVideoAssetSchema)
     question_audio_url = graphene.String()
 
     def resolve_question_text(self, info, language_code=None):
@@ -104,12 +90,6 @@ class QuestionSchema(DjangoObjectType):
 
     def resolve_question_image_assets(self, info):
         return self.get_questionimageasset_set()
-
-    def resolve_question_audio_assets(self, info):
-        return self.get_questionaudioasset_set()
-
-    def resolve_question_video_assets(self, info):
-        return self.get_questionvideoasset_set()
 
     def resolve_question_audio_url(self, info):
         language = self.get_current_language()
