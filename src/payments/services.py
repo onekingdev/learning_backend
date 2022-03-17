@@ -460,7 +460,18 @@ def create_order(guardian_id,
     return CreateOrderResp(url_redirect=url_redirect, order=order_from_db)
 
 
-def confirm_order_payment(order_id) -> Order:
+def confirm_order_payment(
+        order_id,
+        first_name=None,
+        last_name=None,
+        address1=None,
+        address2=None,
+        city=None,
+        state=None,
+        post_code=None,
+        country=None,
+        phone=None
+) -> Order:
     order = Order.objects.get(pk=order_id)
 
     if order.is_paid:
@@ -510,6 +521,20 @@ def confirm_order_payment(order_id) -> Order:
         order_details = OrderDetail.objects.filter(order_id=order_id)
         for order_detail in order_details:
             order_detail.status = "active"
+
+            add_or_update_payment_method(
+                method="FREE",
+                guardian_id=order_detail.order.guardian.id,
+                card_first_name=first_name,
+                card_last_name=last_name,
+                address1=address1,
+                address2=address2,
+                city=city,
+                state=state,
+                post_code=post_code,
+                country=country,
+                phone=phone
+            )
 
             if order_detail.period == "MONTHLY":
                 expired_date = add_months(order_detail.create_timestamp, 1)

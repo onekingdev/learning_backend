@@ -2,16 +2,14 @@ from django.db import models
 from django.contrib import admin
 from ckeditor.fields import RichTextField
 from polymorphic.models import PolymorphicModel
-from kb.managers.content import (
-    QuestionManager, AnswerOptionManager
-)
+from kb.managers.content import QuestionManager
 from gtts import gTTS
-import time
 import os
 from django.utils.html import strip_tags
 
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
+import time
 
 
 class Question(
@@ -19,14 +17,6 @@ class Question(
         RandomSlugModel,
         IsActiveModel,
         TranslatableModel):
-
-    class QuestionType(models.TextChoices):
-        MULTIPLE_CHOICE = 'MC', 'Multiple Choice'
-        MULTIPLE_SELECT = 'MS', 'Multiple Select'
-        ORDER = 'O', 'Order'
-        RELATE = 'R', 'Relate'
-        TYPE_IN = 'T', 'Type In'
-
     PREFIX = 'question_'
     translations = TranslatedFields(
         question_text=RichTextField(blank=True)
@@ -36,10 +26,6 @@ class Question(
     grade = models.ForeignKey(
         'kb.Grade', on_delete=models.PROTECT)
     objects = QuestionManager()
-    question_type = models.CharField(
-        max_length=2,
-        choices=QuestionType.choices,
-    )
 
     def __str__(self):
         return strip_tags(
@@ -66,6 +52,7 @@ class Question(
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
 
+    # ---------------- Generate gtts audio file -S-------------------#
     def save_gtts(self):
         # get question's text
         text = self.safe_translation_getter("question_text", any_language=True)
@@ -85,8 +72,11 @@ class Question(
                 TTS.save(path + "/question" + ".mp3")
             except Exception as e:
                 print("Exception on gtts", e)
+        # ------------- generate path to save gtts and save text to speech audio file to the path-E-------------#
+    # ---------------- Generate gtts audio file -E-------------------#
 
     def save(self, *args, **kwargs):
+        # self.set_calculated_fields()
         super().save(*args, **kwargs)
         self.save_gtts()
 
@@ -143,19 +133,19 @@ class QuestionVideoAsset(QuestionAsset):
     url = models.URLField()
 
 
-class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel, PolymorphicModel):
+class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
     PREFIX = 'answer_option_'
     question = models.ForeignKey(Question, on_delete=models.PROTECT)
-    objects = AnswerOptionManager()
+    translations = TranslatedFields(
+        answer_text=models.CharField(max_length=256),
+        explanation=RichTextField(null=True, blank=True),
+        image=models.ImageField(null=True, blank=True),
+        audio_file=models.FileField(null=True, blank=True),
+        video=models.URLField(null=True, blank=True),
+    )
+    is_correct = models.BooleanField(default=False)
 
-    @admin.display(description='Question type')
-    def question_type(self):
-        return self.question.question_type
-
-    @admin.display(description='Answer')
-    def answer_display(self):
-        return self.__str__
-
+    # ---------------- Generate gtts audio file -S-------------------#
     def save_gtts(self):
         text = self.safe_translation_getter("answer_text", any_language=True)
         # if text is empty or answer's question is empty, disable to save
@@ -179,78 +169,12 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel, Polymorph
             TTS.save(path + "/answer_" + self.random_slug + ".mp3")
         except Exception as e:
             print("Exception on gtts", e)
+        # ------------- generate path to save gtts and save text to speech audio file to the path -E-------------#
+        # ---------------- Generate gtts audio file -E-------------------#
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # self.save_gtts()
-
-
-class MultipleChoiceAnswerOption(AnswerOption):
-    translations = TranslatedFields(
-        answer_text=models.CharField(max_length=256),
-        explanation=RichTextField(null=True, blank=True),
-        image=models.URLField(null=True, blank=True),
-        audio_file=models.URLField(null=True, blank=True),
-        video=models.URLField(null=True, blank=True),
-    )
-    is_correct = models.BooleanField(default=False)
+        self.save_gtts()
 
     def __str__(self):
         return self.safe_translation_getter("answer_text", any_language=True)
-
-
-class MultipleSelectAnswerOption(AnswerOption):
-    translations = TranslatedFields(
-        answer_text=models.CharField(max_length=256),
-        explanation=RichTextField(null=True, blank=True),
-        image=models.URLField(null=True, blank=True),
-        audio_file=models.URLField(null=True, blank=True),
-        video=models.URLField(null=True, blank=True),
-    )
-    is_correct = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.safe_translation_getter("answer_text", any_language=True)
-
-
-class TypeInAnswerOption(AnswerOption):
-    translations = TranslatedFields(
-        answer_text=models.CharField(max_length=256),
-        explanation=RichTextField(null=True, blank=True),
-        image=models.URLField(null=True, blank=True),
-        audio_file=models.URLField(null=True, blank=True),
-        video=models.URLField(null=True, blank=True),
-    )
-    is_correct = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.safe_translation_getter("answer_text", any_language=True)
-
-
-class OrderAnswerOption(AnswerOption):
-    translations = TranslatedFields(
-        answer_text=models.CharField(max_length=256),
-        image=models.URLField(null=True, blank=True),
-        audio_file=models.URLField(null=True, blank=True),
-        video=models.URLField(null=True, blank=True),
-    )
-    order = models.IntegerField()
-
-    def __str__(self):
-        return self.safe_translation_getter("answer_text", any_language=True)
-
-
-class RelateAnswerOption(AnswerOption):
-    translations = TranslatedFields(
-        key=models.CharField(max_length=256),
-        value=models.CharField(max_length=256),
-        key_image=models.URLField(null=True, blank=True),
-        value_image=models.URLField(null=True, blank=True),
-    )
-
-    def __str__(self):
-        return (
-            self.safe_translation_getter("key", any_language=True)
-            + " - "
-            + self.safe_translation_getter("value", any_language=True)
-        )

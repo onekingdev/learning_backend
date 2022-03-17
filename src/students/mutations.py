@@ -142,9 +142,6 @@ class CreateStudent(graphene.Mutation):
 
                 guardian_student_plan.save()
 
-                student.guardian_id = guardian_student_plan.guardian.id
-                student.save()
-
                 # set default avatar
                 avatars = Avatar.objects.all()
                 avatar = random.choice(avatars)
@@ -204,10 +201,12 @@ class ChangeStudentPassword(graphene.Mutation):
                 student.user.set_password(password)
                 student.user.save()
 
+                guardian_student = student.guardianstudent_set.all().order_by('create_timestamp').first()
+
                 profile_obj = profile.objects.get(user=student.user.id)
 
                 return ChangeStudentPassword(
-                    guardian=student.guardian,
+                    guardian=guardian_student.guardian if guardian_student else None,
                     student=student,
                     user=student.user,
                     profile=profile_obj,

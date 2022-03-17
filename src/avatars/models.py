@@ -71,6 +71,12 @@ class FavoriteAvatarCollection(TimestampModel):
         null=True,
     )
 
+    def set_in_use(self):
+        self.avatar_accessorie.update(in_use=True)
+        self.avatar_head.update(in_use=True)
+        self.avatar_clothes.update(in_use=True)
+        self.avatar_pants.update(in_use=True)
+
 
 class AvatarPurchaseTransaction(Withdraw):
     avatar = models.ForeignKey(
