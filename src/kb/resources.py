@@ -3,15 +3,7 @@ from app.widgets import TranslatableForeignKeyWidget
 from import_export.fields import Field
 from import_export.resources import ModelResource
 from .models import Topic, Grade, TopicGrade
-from .models.content import (
-    Question,
-    AnswerOption,
-    QuestionImageAsset,
-    QuestionAudioAsset,
-    MultipleChoiceAnswerOption,
-    MultipleSelectAnswerOption,
-    TypeInAnswerOption,
-)
+from .models.content import Question, AnswerOption, QuestionImageAsset,QuestionAudioAsset
 from .models.areas_of_knowledge import AreaOfKnowledge
 
 
@@ -156,114 +148,6 @@ class QuestionImageAssetResource(ModelResource):
             'question',
             'order',
             'image'
-        )
-
-
-class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
-    language_code = Field(
-        attribute='_current_language'
-    )
-
-    answer_text = Field(
-        attribute='answer_text'
-    )
-
-    class Meta:
-        model = MultipleChoiceAnswerOption
-        skip_unchanged = True
-        report_skipped = False
-        fields = (
-            'id',
-            # 'identifier',
-            'language_code',
-            'answer_text',
-            'question',
-            'is_correct',
-        )
-        export_order = (
-            'id',
-            # 'identifier',
-            'language_code',
-            'answer_text',
-            'question',
-            'is_correct',
-        )
-        exclude = (
-            'create_timestamp',
-            'update_timestamp',
-            'random_slug',
-        )
-
-
-class MultipleSelectAnswerOptionResource(TranslatableModelResource):
-    language_code = Field(
-        attribute='_current_language'
-    )
-
-    answer_text = Field(
-        attribute='answer_text'
-    )
-
-    class Meta:
-        model = MultipleSelectAnswerOption
-        skip_unchanged = True
-        report_skipped = False
-        fields = (
-            'id',
-            # 'identifier',
-            'language_code',
-            'answer_text',
-            'question',
-            'is_correct',
-        )
-        export_order = (
-            'id',
-            # 'identifier',
-            'language_code',
-            'answer_text',
-            'question',
-            'is_correct',
-        )
-        exclude = (
-            'create_timestamp',
-            'update_timestamp',
-            'random_slug',
-        )
-
-
-class TypeInAnswerOptionResource(TranslatableModelResource):
-    language_code = Field(
-        attribute='_current_language'
-    )
-
-    answer_text = Field(
-        attribute='answer_text'
-    )
-
-    class Meta:
-        model = TypeInAnswerOption
-        skip_unchanged = True
-        report_skipped = False
-        fields = (
-            'id',
-            # 'identifier',
-            'language_code',
-            'answer_text',
-            'question',
-            'is_correct',
-        )
-        export_order = (
-            'id',
-            # 'identifier',
-            'language_code',
-            'answer_text',
-            'question',
-            'is_correct',
-        )
-        exclude = (
-            'create_timestamp',
-            'update_timestamp',
-            'random_slug',
         )
 
 

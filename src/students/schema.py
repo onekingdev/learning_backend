@@ -4,6 +4,7 @@ from students.models import Student, StudentTopicMastery, StudentGrade, StudentA
 from audiences.schema import AudienceSchema
 from wallets.schema import CoinWalletSchema
 from experiences.schema import LevelSchema
+from guardians.models import GuardianStudent
 
 class StudentSchema(DjangoObjectType):
     class Meta:
@@ -62,6 +63,7 @@ class Query(graphene.ObjectType):
 
     students = graphene.List(StudentSchema)
     student_by_id = graphene.Field(StudentSchema, id=graphene.ID())
+    students_by_guardian_id = graphene.List(StudentSchema, guardian_id=graphene.ID())
 
     def resolve_students(root, info, **kwargs):
         # Querying a list
@@ -70,6 +72,11 @@ class Query(graphene.ObjectType):
     def resolve_student_by_id(root, info, id):
         # Querying a single question
         return Student.objects.get(pk=id)
+
+    def resolve_students_by_guardian_id(root, info, guardian_id):
+        # Querying a list
+        student_list = [obj.student for obj in GuardianStudent.objects.filter(guardian_id=guardian_id)]
+        return student_list
 
     # ----------------- StudentTopicMastery ----------------- #
 
