@@ -64,46 +64,6 @@ class SetCurrentAvatar(graphene.Mutation):
         )
 
 
-class SetCurrentFavoriteAvatarCollection(graphene.Mutation):
-    favorite_avatar_collection = graphene.Field(
-        FavoriteAvatarCollectionSchema
-    )
-    student = graphene.Field(StudentSchema)
-
-    class Arguments:
-        student_id = graphene.ID()
-        favorite_avatar_collection_id = graphene.ID(required=True)
-
-    def mutate(self, info, favorite_avatar_collection_id, student_id=None):
-        if student_id:
-            try:
-                student = Student.objects.get(id=student_id)
-            except Student.DoesNotExist:
-                raise Exception("Student does not exist")
-        else:
-            user = info.context.user
-            if user.is_anonymous:
-                raise Exception("User is anonymous")
-            elif user.student:
-                student = user.student
-            else:
-                raise Exception("User has no student")
-
-        try:
-            favorite_avatar_collection = FavoriteAvatarCollection.objects.get(id=favorite_avatar_collection_id)
-        except FavoriteAvatarCollection.DoesNotExist:
-            raise Exception("FavoriteAvatarCollection does not exist")
-
-        StudentAvatar.objects.filter(
-            student=student_id,
-            in_use=True,
-        ).update(in_use=False)
-
-        favorite_avatar_collection.set_in_use()
-
-        return SetCurrentFavoriteAvatarCollection(favorite_avatar_collection=favorite_avatar_collection, student=student)
-
-
 class SetFavoriteAvatarCollection(graphene.Mutation):
     favorite_avatar_collection = graphene.Field(
         FavoriteAvatarCollectionSchema
@@ -172,4 +132,3 @@ class Mutation(graphene.ObjectType):
     current_avatar = SetCurrentAvatar.Field()
     set_favorite_avatar_collection = SetFavoriteAvatarCollection.Field()
     set_avatar_skin_tone = SetAvatarSkinTone.Field()
-    set_current_favorite_avatar_collection = SetCurrentFavoriteAvatarCollection.Field()

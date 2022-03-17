@@ -83,7 +83,6 @@ class CreateGuardian(graphene.Mutation):
                 guardian.save()
 
                 if coupon:
-                    coupon = coupon.upper()
                     discount = DiscountCode.objects.get(code=coupon)
                     guardian.coupon_code_id = discount.id
                     guardian.save()
