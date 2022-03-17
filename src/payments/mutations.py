@@ -293,12 +293,30 @@ class CreateOrderWithOutPay(graphene.Mutation):
     class Arguments:
         guardian_id = graphene.ID(required=True)
         order_detail_input = graphene.List(OrderDetailInput)
+        first_name = graphene.String(required=False)
+        last_name = graphene.String(required=False)
+        address1 = graphene.String(required=False)
+        address2 = graphene.String(required=False)
+        city = graphene.String(required=False)
+        state = graphene.String(required=False)
+        post_code = graphene.String(required=False)
+        country = graphene.String(required=False)
+        phone = graphene.String(required=False)
 
     def mutate(
             self,
             info,
             guardian_id,
             order_detail_input,
+            first_name=None,
+            last_name=None,
+            address1=None,
+            address2=None,
+            city=None,
+            state=None,
+            post_code=None,
+            country=None,
+            phone=None
     ):
         try:
             with transaction.atomic():
@@ -306,7 +324,18 @@ class CreateOrderWithOutPay(graphene.Mutation):
                     guardian_id=guardian_id,
                     order_detail_list=order_detail_input,
                 )
-                services.confirm_order_payment(create_order_resp.order.id)
+                services.confirm_order_payment(
+                    create_order_resp.order.id,
+                    first_name=first_name,
+                    last_name=last_name,
+                    address1=address1,
+                    address2=address2,
+                    city=city,
+                    state=state,
+                    post_code=post_code,
+                    country=country,
+                    phone=phone
+                )
                 plan_services.create_guardian_student_plan(create_order_resp.order)
 
                 return CreateOrder(

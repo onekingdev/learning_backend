@@ -26,7 +26,7 @@ class AreaOfKnowledge(TimestampModel, RandomSlugModel, TranslatableModel):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f'{self.name} / {self.audience}'
+        return self.name
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
