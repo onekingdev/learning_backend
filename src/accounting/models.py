@@ -2,6 +2,8 @@ from django.db import models
 from app.models import RandomSlugModel, TimestampModel
 import datetime
 from decimal import Decimal
+from model_utils.managers import InheritanceManager
+
 
 class Account(RandomSlugModel, TimestampModel):
     calculated_fields = ['balance']
@@ -79,6 +81,7 @@ class Movement(RandomSlugModel, TimestampModel):
     comment = models.CharField(
         'Comentario', max_length=128, null=True, blank=True, )
     amount = models.DecimalField('Monto', decimal_places=2, max_digits=11)
+    objects = InheritanceManager()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
