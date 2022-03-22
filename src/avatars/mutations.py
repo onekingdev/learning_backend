@@ -68,7 +68,7 @@ class SetCurrentFavoriteAvatarCollection(graphene.Mutation):
     favorite_avatar_collection = graphene.Field(
         FavoriteAvatarCollectionSchema
     )
-    student = graphene.Field(StudentSchema)
+    student = graphene.Field(Student)
 
     class Arguments:
         student_id = graphene.ID()
@@ -90,7 +90,8 @@ class SetCurrentFavoriteAvatarCollection(graphene.Mutation):
                 raise Exception("User has no student")
 
         try:
-            favorite_avatar_collection = FavoriteAvatarCollection.objects.get(id=favorite_avatar_collection_id)
+            favorite_avatar_collection = FavoriteAvatarCollection.objects.get(
+                id=favorite_avatar_collection_id)
         except FavoriteAvatarCollection.DoesNotExist:
             raise Exception("FavoriteAvatarCollection does not exist")
 
@@ -101,7 +102,10 @@ class SetCurrentFavoriteAvatarCollection(graphene.Mutation):
 
         favorite_avatar_collection.set_in_use()
 
-        return SetCurrentFavoriteAvatarCollection(favorite_avatar_collection=favorite_avatar_collection, student=student)
+        return SetCurrentFavoriteAvatarCollection(
+            favorite_avatar_collection=favorite_avatar_collection,
+            student=student
+        )
 
 
 class SetFavoriteAvatarCollection(graphene.Mutation):

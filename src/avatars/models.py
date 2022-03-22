@@ -72,10 +72,14 @@ class FavoriteAvatarCollection(TimestampModel):
     )
 
     def set_in_use(self):
-        self.avatar_accessorie.update(in_use=True)
-        self.avatar_head.update(in_use=True)
-        self.avatar_clothes.update(in_use=True)
-        self.avatar_pants.update(in_use=True)
+        self.avatar_accessorie.in_use = True
+        self.avatar_accessorie.save()
+        self.avatar_head.in_use = True
+        self.avatar_head.save()
+        self.avatar_clothes.in_use = True
+        self.avatar_clothes.save()
+        self.avatar_pants.in_use = True
+        self.avatar_pants.save()
 
 
 class AvatarPurchaseTransaction(Withdraw):

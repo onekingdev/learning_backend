@@ -33,7 +33,6 @@ beautifulsoup4 = "*"
 html5lib = "*"
 lxml = "*"
 paypalrestsdk = "*"
-django-model-utils = "*"
 
 [dev-packages]
 

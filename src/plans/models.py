@@ -37,7 +37,7 @@ class GuardianStudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
 
     guardian = models.ForeignKey(
         'guardians.Guardian', on_delete=models.PROTECT)
-    student = models.OneToOneField(
+    student = models.ForeignKey(
         'students.Student', on_delete=models.PROTECT, blank=True, null=True)
     order_detail = models.ForeignKey(
         'payments.OrderDetail', on_delete=models.CASCADE)
