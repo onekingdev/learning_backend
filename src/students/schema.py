@@ -6,6 +6,7 @@ from wallets.schema import CoinWalletSchema
 from experiences.schema import LevelSchema
 from guardians.models import GuardianStudent
 
+
 class StudentSchema(DjangoObjectType):
     class Meta:
         model = Student
@@ -23,15 +24,16 @@ class StudentSchema(DjangoObjectType):
         return self.coinWallet
 
     def resolve_grade(self, info):
-        student_grade = StudentGrade.objects.filter(student_id=self.id, is_active=True).order_by("-create_timestamp")
+        student_grade = StudentGrade.objects.filter(
+            student_id=self.id, is_active=True).order_by("-create_timestamp")
         if student_grade.count() != 0:
             return student_grade[0]
         return
-    
+
     def resolve_next_level(self, info):
         # Querying a single next level
         print("in resolve next level")
-        current_level = self.level;
+        current_level = self.level
         print(current_level)
         # Get next level
         next_level = self.level.get_next_level()
@@ -56,14 +58,14 @@ class StudentAchievementSchema(DjangoObjectType):
         fields = "__all__"
 
 
-
 class Query(graphene.ObjectType):
 
     # ----------------- Student ----------------- #
 
     students = graphene.List(StudentSchema)
     student_by_id = graphene.Field(StudentSchema, id=graphene.ID())
-    students_by_guardian_id = graphene.List(StudentSchema, guardian_id=graphene.ID())
+    students_by_guardian_id = graphene.List(
+        StudentSchema, guardian_id=graphene.ID())
 
     def resolve_students(root, info, **kwargs):
         # Querying a list
@@ -75,7 +77,9 @@ class Query(graphene.ObjectType):
 
     def resolve_students_by_guardian_id(root, info, guardian_id):
         # Querying a list
-        student_list = [obj.student for obj in GuardianStudent.objects.filter(guardian_id=guardian_id)]
+        student_list = [
+            obj.student for obj in GuardianStudent.objects.filter(
+                guardian_id=guardian_id)]
         return student_list
 
     # ----------------- StudentTopicMastery ----------------- #

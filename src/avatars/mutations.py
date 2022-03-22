@@ -68,7 +68,7 @@ class SetCurrentFavoriteAvatarCollection(graphene.Mutation):
     favorite_avatar_collection = graphene.Field(
         FavoriteAvatarCollectionSchema
     )
-    student = graphene.Field(Student)
+    student = graphene.Field(StudentSchema)
 
     class Arguments:
         student_id = graphene.ID()
