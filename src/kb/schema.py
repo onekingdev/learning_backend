@@ -4,6 +4,8 @@ from graphene_django import DjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from kb.models.content import Question, AnswerOption
 from kb.models.content import QuestionImageAsset, QuestionAudioAsset, QuestionVideoAsset
+from engine.models import TopicStudentReport
+from engine.schema import TopicStudentReportSchema
 import os
 
 
@@ -47,6 +49,10 @@ class TopicSchema(DjangoObjectType):
         fields = "__all__"
 
     name = graphene.String()
+    report = graphene.Field(
+        TopicStudentReportSchema,
+        student=graphene.ID()
+    )
 
     def resolve_name(self, info, language_code=None):
         try:
@@ -56,6 +62,18 @@ class TopicSchema(DjangoObjectType):
 
         return self.safe_translation_getter(
             "name", language_code=current_language)
+
+    def resolve_report(self, info, student=None):
+        if student is None:
+            student = info.context.user.student
+        try:
+            report = TopicStudentReport.objects.get(
+                topic=self,
+                student=student,
+            )
+        except TopicStudentReport.DoesNotExist:
+            report = None
+        return report
 
 
 class TopicGradeSchema(DjangoObjectType):
@@ -220,7 +238,9 @@ class Query(graphene.ObjectType):
     # ----------------- Topic ----------------- #
 
     topics = graphene.List(TopicSchema)
-    topic_by_id = graphene.Field(TopicSchema, id=graphene.String())
+    topic_by_id = graphene.Field(TopicSchema, id=graphene.ID())
+    root_topics = graphene.List(TopicSchema)
+    root_topics_by_aok = graphene.List(TopicSchema, aok_id=graphene.ID())
 
     def resolve_topics(root, info, **kwargs):
         # Querying a list
@@ -229,6 +249,15 @@ class Query(graphene.ObjectType):
     def resolve_topic_by_id(root, info, id):
         # Querying a single question
         return Topic.objects.get(pk=id)
+
+    def resolve_root_topics(root, info):
+        return Topic.objects.filter(level=0)
+
+    def resolve_root_topics_by_aok(root, info, aok_id):
+        return Topic.objects.filter(
+            level=0,
+            area_of_knowledge=aok_id,
+        )
 
     # ----------------- TopicGrade ----------------- #
 
