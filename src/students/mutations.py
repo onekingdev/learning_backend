@@ -33,14 +33,15 @@ class CreateStudent(graphene.Mutation):
     class Arguments:
         first_name = graphene.String(required=True)
         last_name = graphene.String(required=True)
-        username = graphene.String(required=False)
-        password = graphene.String(required=False)
+        guardian_student_plan_id = graphene.ID(required=True)
+        username = graphene.String(required=True)
+        password = graphene.String(required=True)
+        audience = graphene.ID(required=True)
         school = graphene.ID(required=False)
         grade = graphene.ID(required=False)
         group = graphene.ID(required=False)
         dob = graphene.Date(required=False)
         student_plan = graphene.ID(required=False)
-        guardian_student_plan_id = graphene.ID(required=True)
         list_subject_id = graphene.List(ID)
 
     def mutate(
@@ -52,6 +53,7 @@ class CreateStudent(graphene.Mutation):
             list_subject_id,
             username,
             password,
+            audience,
             school=None,
             grade=None,
             group=None,
@@ -63,8 +65,9 @@ class CreateStudent(graphene.Mutation):
             with transaction.atomic():
                 user_guardain = info.context.user
                 if not user_guardain.is_authenticated:
-                    raise Exception("Authentication credentials were not provided")
-                    
+                    raise Exception(
+                        "Authentication credentials were not provided")
+
                 guardian = user_guardain.guardian
 
                 user = User()
@@ -74,8 +77,8 @@ class CreateStudent(graphene.Mutation):
                     full_name=first_name + ' ' + last_name,
                 )
 
-                if(grade) :
-                    grade = Grade.objects.get(pk = grade)
+                if(grade):
+                    grade = Grade.objects.get(pk=grade)
 
                 if username:
                     user.username = username
@@ -99,11 +102,15 @@ class CreateStudent(graphene.Mutation):
                 if dob:
                     student.dob = dob
 
+                audience = Audience.objects.get(id=audience)
+
                 student.save()
 
+                student.audience = audience
+
                 guardianStudent = GuardianStudent.objects.create(
-                    student = student,
-                    guardian = guardian
+                    student=student,
+                    guardian=guardian
                 )
 
                 # Student Plan
@@ -126,14 +133,15 @@ class CreateStudent(graphene.Mutation):
 
                 student.save()
 
-                if(grade) :
+                if(grade):
                     student_grade = StudentGrade(
                         student=student,
                         grade=grade,
                     )
-                    student_grade.save();
+                    student_grade.save()
 
-                guardian_student_plan = GuardianStudentPlan.objects.get(pk=guardian_student_plan_id)
+                guardian_student_plan = GuardianStudentPlan.objects.get(
+                    pk=guardian_student_plan_id)
 
                 guardian_student_plan.student_id = student.id
                 for subject_id in list_subject_id:
@@ -168,7 +176,7 @@ class CreateStudent(graphene.Mutation):
                     token=token,
                     refresh_token=refresh_token
                 )
-              
+
         except (Exception, DatabaseError) as e:
             transaction.rollback()
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -201,7 +209,8 @@ class ChangeStudentPassword(graphene.Mutation):
                 student.user.set_password(password)
                 student.user.save()
 
-                guardian_student = student.guardianstudent_set.all().order_by('create_timestamp').first()
+                guardian_student = student.guardianstudent_set.all().order_by(
+                    'create_timestamp').first()
 
                 profile_obj = profile.objects.get(user=student.user.id)
 
@@ -274,8 +283,8 @@ class CreateChangeStudentGrade(graphene.Mutation):
 
                 student_grade.save()
                 student = student_grade.student
-                student = Student.objects.get(pk = student.id)
-                guardian = Guardian.objects.get(pk = guardian.id)
+                student = Student.objects.get(pk=student.id)
+                guardian = Guardian.objects.get(pk=guardian.id)
                 return CreateChangeStudentGrade(
                     guardian=guardian,
                     student_grade=student_grade,
@@ -296,11 +305,14 @@ class CreateChangeStudentGrade(graphene.Mutation):
 #               studentSchema,
 #               userSchema
 #   }
+
+
 class LevelUp(graphene.Mutation):
     student = graphene.Field('students.schema.StudentSchema')
     user = graphene.Field(UserSchema)
     # class Arguments:
     #     pass
+
     def mutate(self, info):
         user = info.context.user
 
@@ -310,12 +322,13 @@ class LevelUp(graphene.Mutation):
             raise Exception("Not found student")
 
         level_amount = user.student.level.amount
-        next_level = user.student.level.__class__.objects.get(amount=level_amount + 1);
-        if next_level :
-            user.student.level = next_level;
-            user.student.level.save();
+        next_level = user.student.level.__class__.objects.get(
+            amount=level_amount + 1)
+        if next_level:
+            user.student.level = next_level
+            user.student.level.save()
 
-        return LevelUp(user= user, student= user.student)
+        return LevelUp(user=user, student=user.student)
 
 # Set Student's point
 # Student's info comes from logined user info
@@ -324,6 +337,8 @@ class LevelUp(graphene.Mutation):
 #               studentSchema,
 #               userSchema
 #   }
+
+
 class setPoint(graphene.Mutation):
     student = graphene.Field('students.schema.StudentSchema')
     user = graphene.Field(UserSchema)
@@ -345,6 +360,7 @@ class setPoint(graphene.Mutation):
 
         return setPoint()
     pass
+
 
 class Mutation(graphene.ObjectType):
     create_student = CreateStudent.Field()

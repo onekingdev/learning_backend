@@ -112,6 +112,10 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         'experiences.Level',
         on_delete=models.PROTECT,
         null=True)
+    audience = models.ForeignKey(
+        'audiences.Audience',
+        on_delete=models.PROTECT,
+    )
 
     def current_age(self):
         today = datetime.date.today()
