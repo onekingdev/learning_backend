@@ -6,6 +6,7 @@ from kb.models.content import Question, AnswerOption
 from kb.models.content import QuestionImageAsset, QuestionAudioAsset, QuestionVideoAsset
 from engine.models import TopicStudentReport
 from engine.schema import TopicStudentReportSchema
+from students.models import StudentTopicMastery
 import os
 
 
@@ -53,6 +54,9 @@ class TopicSchema(DjangoObjectType):
         TopicStudentReportSchema,
         student=graphene.ID()
     )
+    mastery = graphene.String(
+        student=graphene.ID()
+    )
 
     def resolve_name(self, info, language_code=None):
         try:
@@ -74,6 +78,18 @@ class TopicSchema(DjangoObjectType):
         except TopicStudentReport.DoesNotExist:
             report = None
         return report
+
+    def resolve_mastery(self, info, student=None):
+        if student is None:
+            student = info.context.user.student
+        try:
+            mastery = StudentTopicMastery.objects.get(
+                topic=self,
+                student=student,
+            ).mastery_level
+        except StudentTopicMastery.DoesNotExist:
+            mastery = None
+        return mastery
 
 
 class TopicGradeSchema(DjangoObjectType):
