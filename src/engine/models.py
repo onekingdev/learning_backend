@@ -25,6 +25,10 @@ class TopicStudentReport(TimestampModel):
         default=Decimal(0.0)
     )
 
+    def save(self, *args, **kwargs):
+        self.accuracy = self.correct_question / self.questions_answered * 100
+        super(TopicStudentReport, self).save(*args, **kwargs)
+
 
 class AreaOfKnowledgeStudentReport(TimestampModel):
     area_of_knowledge = models.ForeignKey(
@@ -39,3 +43,7 @@ class AreaOfKnowledgeStudentReport(TimestampModel):
         decimal_places=1,
         default=Decimal(0.0)
     )
+
+    def save(self, *args, **kwargs):
+        self.accuracy = self.correct_question / self.questions_answered * 100
+        super(TopicStudentReport, self).save(*args, **kwargs)
