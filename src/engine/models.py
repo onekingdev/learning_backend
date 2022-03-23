@@ -26,8 +26,9 @@ class TopicStudentReport(TimestampModel):
     )
 
     def save(self, *args, **kwargs):
-        self.accuracy = round(self.correct_question /
-                              self.questions_answered * 100, 1)
+        if self.questions_answered > 0:
+            self.accuracy = round(self.correct_question /
+                                  self.questions_answered * 100, 1)
         super(TopicStudentReport, self).save(*args, **kwargs)
 
 
@@ -46,6 +47,7 @@ class AreaOfKnowledgeStudentReport(TimestampModel):
     )
 
     def save(self, *args, **kwargs):
-        self.accuracy = round(self.correct_question /
-                              self.questions_answered * 100, 1)
+        if self.questions_answered > 0:
+            self.accuracy = round(self.correct_question /
+                                  self.questions_answered * 100, 1)
         super(TopicStudentReport, self).save(*args, **kwargs)
