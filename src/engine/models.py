@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import Decimal
 from app.models import TimestampModel
 
 
@@ -18,7 +19,11 @@ class TopicStudentReport(TimestampModel):
     student = models.ForeignKey('students.Student', on_delete=models.PROTECT)
     questions_answered = models.IntegerField(default=0)
     correct_question = models.IntegerField(default=0)
-    accuracy = models.IntegerField(default=0)
+    accuracy = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        default=Decimal(0.0)
+    )
 
 
 class AreaOfKnowledgeStudentReport(TimestampModel):
@@ -29,4 +34,8 @@ class AreaOfKnowledgeStudentReport(TimestampModel):
     student = models.ForeignKey('students.Student', on_delete=models.PROTECT)
     questions_answered = models.IntegerField(default=0)
     correct_question = models.IntegerField(default=0)
-    accuracy = models.IntegerField(default=0)
+    accuracy = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        default=Decimal(0.0)
+    )
