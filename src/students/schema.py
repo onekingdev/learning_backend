@@ -5,6 +5,7 @@ from audiences.schema import AudienceSchema
 from wallets.schema import CoinWalletSchema
 from experiences.schema import LevelSchema
 from guardians.models import GuardianStudent
+from avatars.models import StudentAvatar
 
 
 class StudentSchema(DjangoObjectType):
@@ -16,6 +17,10 @@ class StudentSchema(DjangoObjectType):
     coin_wallet = graphene.Field(CoinWalletSchema)
     grade = graphene.Field('students.schema.StudentGradeSchema')
     next_level = graphene.Field(LevelSchema)
+    current_avatar_head = graphene.Field('avatars.schema.AvatarSchema')
+    current_avatar_accessories = graphene.Field('avatars.schema.AvatarSchema')
+    current_avatar_clothes = graphene.Field('avatars.schema.AvatarSchema')
+    current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
 
     def resolve_audience(self, info):
         return self.get_active_audience
@@ -34,6 +39,50 @@ class StudentSchema(DjangoObjectType):
         # Get next level
         next_level = self.level.get_next_level()
         return next_level
+
+    def resolve_current_avatar_head(self, info):
+        try:
+            avatar = StudentAvatar.objects.get(
+                student=self,
+                avatar__type_of='HEAD',
+                in_use=True,
+            ).avatar
+        except StudentAvatar.DoesNotExist:
+            avatar = None
+        return avatar
+
+    def resolve_current_avatar_accesories(self, info):
+        try:
+            avatar = StudentAvatar.objects.get(
+                student=self,
+                avatar__type_of='ACCESSORIES',
+                in_use=True,
+            ).avatar
+        except StudentAvatar.DoesNotExist:
+            avatar = None
+        return avatar
+
+    def resolve_current_avatar_clothes(self, info):
+        try:
+            avatar = StudentAvatar.objects.get(
+                student=self,
+                avatar__type_of='CLOTHES',
+                in_use=True,
+            ).avatar
+        except StudentAvatar.DoesNotExist:
+            avatar = None
+        return avatar
+
+    def resolve_current_avatar_pants(self, info):
+        try:
+            avatar = StudentAvatar.objects.get(
+                student=self,
+                avatar__type_of='PANTS',
+                in_use=True,
+            ).avatar
+        except StudentAvatar.DoesNotExist:
+            avatar = None
+        return avatar
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
