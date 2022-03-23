@@ -142,7 +142,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         from kb.models import AreaOfKnowledge
         try:
             available_aoks = GuardianStudentPlan.objects.get(
-                student=self).subject
+                student=self).subject.all()
         except GuardianStudentPlan.DoesNotExist:
             audience = self.get_active_audience
             available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
@@ -192,7 +192,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         from kb.models import AreaOfKnowledge
         try:
             available_aoks = GuardianStudentPlan.objects.get(
-                student=self).subject
+                student=self).subject.all()
         except GuardianStudentPlan.DoesNotExist:
             audience = self.get_active_audience
             available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
