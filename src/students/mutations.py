@@ -160,6 +160,9 @@ class CreateStudent(graphene.Mutation):
                 token = get_token(user)
                 refresh_token = create_refresh_token(user)
 
+                student.init_student_topic_mastery()
+                student.init_student_topic_status()
+
                 return CreateStudent(
                     guardian=guardian,
                     student=student,
