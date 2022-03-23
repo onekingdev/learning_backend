@@ -34,19 +34,48 @@ class CreateOrderResp:
 # ----------------- Payment Method Service ----------------- #
 
 
-def check_is_duplicate(method: str, guardian_id, card_number=None, card_cvc=None):
+def check_is_duplicate(
+        method: str,
+        guardian_id,
+        card_number=None,
+        card_cvc=None,
+        card_first_name=None,
+        card_last_name=None,
+        card_exp_month=None,
+        card_exp_year=None,
+        address1=None,
+        address2=None,
+        city=None,
+        state=None,
+        post_code=None,
+        country=None,
+        phone=None,
+):
     # get all guardian payment method
-    payment_methods = PaymentMethod.objects.filter(guardian_id=guardian_id)
+    payment_methods = PaymentMethod.objects.filter(
+        guardian_id=guardian_id,
+        method=method,
+        card_number=card_number,
+        card_cvc=card_cvc,
+        card_first_name=card_first_name,
+        card_last_name=card_last_name,
+        card_exp_month=card_exp_month,
+        card_exp_year=card_exp_year,
+        address1=address1,
+        address2=address2,
+        city=city,
+        state=state,
+        post_code=post_code,
+        country=country,
+        phone=phone
+    )
+
     has_info = False
     obj_id = 0
 
-    # check  if payment method already created
-    for payment_method in payment_methods:
-        if payment_method.method == method:
-            # if card are the same
-            if payment_method.card_number == card_number and payment_method.card_cvc == card_cvc:
-                has_info = True
-                obj_id = payment_method.id
+    if len(payment_methods) > 0:
+        has_info = True
+        obj_id = payment_methods.first().id
 
     return{
         "status": has_info,
@@ -78,7 +107,21 @@ def add_or_update_payment_method(
     # get all guardian payment method
     payment_methods = PaymentMethod.objects.filter(guardian_id=guardian_id)
     is_default = False
-    has_info = check_is_duplicate(method=method, guardian_id=guardian_id, card_number=card_number, card_cvc=card_cvc)
+    has_info = check_is_duplicate(
+        method=method,
+        guardian_id=guardian_id,
+        card_number=card_number,
+        card_cvc=card_cvc,
+        card_exp_month=card_exp_month,
+        card_exp_year=card_exp_year,
+        address1=address1,
+        address2=address2,
+        city=city,
+        state=state,
+        post_code=post_code,
+        country=country,
+        phone=phone
+    )
 
     if has_info["status"]:
         return "has already"
@@ -126,7 +169,23 @@ def change_default_payment_method(
         phone=None,
 ):
     method = method.upper()
-    has_info = check_is_duplicate(method=method, guardian_id=guardian_id, card_number=card_number, card_cvc=card_cvc)
+    has_info = check_is_duplicate(
+        method=method,
+        guardian_id=guardian_id,
+        card_first_name=card_first_name,
+        card_last_name=card_last_name,
+        card_number=card_number,
+        card_exp_month=card_exp_month,
+        card_exp_year=card_exp_year,
+        card_cvc=card_cvc,
+        address1=address1,
+        address2=address2,
+        city=city,
+        state=state,
+        post_code=post_code,
+        country=country,
+        phone=phone,
+    )
 
     payment_methods = PaymentMethod.objects.filter(guardian_id=guardian_id)
     for payment_method in payment_methods:
