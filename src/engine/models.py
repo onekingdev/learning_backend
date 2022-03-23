@@ -20,7 +20,7 @@ class TopicStudentReport(TimestampModel):
     questions_answered = models.IntegerField(default=0)
     correct_question = models.IntegerField(default=0)
     accuracy = models.DecimalField(
-        max_digits=3,
+        max_digits=4,
         decimal_places=1,
         default=Decimal(0.0)
     )
@@ -41,7 +41,7 @@ class AreaOfKnowledgeStudentReport(TimestampModel):
     questions_answered = models.IntegerField(default=0)
     correct_question = models.IntegerField(default=0)
     accuracy = models.DecimalField(
-        max_digits=3,
+        max_digits=4,
         decimal_places=1,
         default=Decimal(0.0)
     )
