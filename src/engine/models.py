@@ -50,4 +50,4 @@ class AreaOfKnowledgeStudentReport(TimestampModel):
         if self.questions_answered > 0:
             self.accuracy = round(self.correct_question /
                                   self.questions_answered * 100, 1)
-        super(TopicStudentReport, self).save(*args, **kwargs)
+        super(AreaOfKnowledgeStudentReport, self).save(*args, **kwargs)
