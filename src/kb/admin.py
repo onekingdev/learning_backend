@@ -55,6 +55,9 @@ class TopicAdmin(
         'update_timestamp',
         'id',
     )
+    list_filter = (
+        'area_of_knowledge__universal_area_knowledge',
+    )
     actions = [hard_delete_selected]
 
 
