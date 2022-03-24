@@ -45,20 +45,20 @@ class CreateStudent(graphene.Mutation):
         list_subject_id = graphene.List(ID)
 
     def mutate(
-            self,
-            info,
-            first_name,
-            last_name,
-            guardian_student_plan_id,
-            list_subject_id,
-            username,
-            password,
-            audience,
-            school=None,
-            grade=None,
-            group=None,
-            dob=None,
-            student_plan=None,
+        self,
+        info,
+        first_name,
+        last_name,
+        guardian_student_plan_id,
+        list_subject_id,
+        username,
+        password,
+        audience,
+        school=None,
+        grade=None,
+        group=None,
+        dob=None,
+        student_plan=None,
     ):
 
         try:
@@ -69,12 +69,14 @@ class CreateStudent(graphene.Mutation):
                         "Authentication credentials were not provided")
 
                 guardian = user_guardain.guardian
+                audience = Audience.objects.get(id=audience)
 
                 user = User()
                 student = Student(
                     first_name=first_name,
                     last_name=last_name,
                     full_name=first_name + ' ' + last_name,
+                    audience=audience
                 )
 
                 if(grade):
@@ -102,11 +104,7 @@ class CreateStudent(graphene.Mutation):
                 if dob:
                     student.dob = dob
 
-                audience = Audience.objects.get(id=audience)
-
                 student.save()
-
-                student.audience = audience
 
                 guardianStudent = GuardianStudent.objects.create(
                     student=student,
