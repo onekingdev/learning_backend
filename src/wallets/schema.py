@@ -33,7 +33,7 @@ class CoinWalletTransactionSchema(DjangoObjectType):
 class Query(graphene.ObjectType):
     # ----------------- CoinWallet ----------------- #
 
-    coin_wallet = graphene.List(CoinWalletSchema)
+    coin_wallets = graphene.List(CoinWalletSchema)
     coin_wallet_by_id = graphene.Field(CoinWalletSchema, id=graphene.ID())
     coin_wallet_transactions_by_id = graphene.List(CoinWalletTransactionSchema, student_id=graphene.ID())
 
