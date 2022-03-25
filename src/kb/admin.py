@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Topic, AreaOfKnowledge, Grade, TopicGrade
+from .models import Topic, AreaOfKnowledge, Grade, TopicGrade, Prerequisite
 from .models.content import Question, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset, QuestionTTSAsset
 from .models.content import AnswerOption
 
@@ -59,6 +59,21 @@ class TopicAdmin(
     )
     actions = [hard_delete_selected]
     search_fields = ['translations__name']
+
+
+@admin.register(Prerequisite)
+class PrerequisiteAdmin(
+        import_export_admin.ImportExportModelAdmin,
+):
+    list_display = (
+        'id',
+        'topic',
+    )
+    list_filter = (
+        'topic__area_of_knowledge__universal_area_knowledge',
+    )
+    actions = [hard_delete_selected]
+    autocomplete_fields = ['topic', 'prerequisites']
 
 
 @admin.register(AreaOfKnowledge)
