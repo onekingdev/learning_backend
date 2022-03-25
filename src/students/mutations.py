@@ -149,18 +149,24 @@ class CreateStudent(graphene.Mutation):
                 guardian_student_plan.save()
 
                 # set default avatar
-                avatars = Avatar.objects.all()
-                avatar = random.choice(avatars)
-                student_avatar = StudentAvatar.objects.create(
-                    student_id=student.id, avatar_id=avatar.id)
-                avatar_type = avatar.type_of
-                StudentAvatar.objects.filter(
-                    student=student,
-                    avatar__type_of=avatar_type,
-                    in_use=True).update(
-                    in_use=False)
-                student_avatar.in_use = True
-                student_avatar.save()
+                accessories = Avatar.objects.filter(type_of="ACCESSORIES")
+                heads = Avatar.objects.filter(type_of="HEAD")
+                clothes = Avatar.objects.filter(type_of="CLOTHES")
+                pants = Avatar.objects.filter(type_of="PANTS")
+
+                list_avatar_items = [random.choice(accessories), random.choice(heads), random.choice(clothes), random.choice(pants)]
+
+                for avatar in list_avatar_items:
+                    student_avatar = StudentAvatar.objects.create(
+                        student_id=student.id, avatar_id=avatar.id)
+                    avatar_type = avatar.type_of
+                    StudentAvatar.objects.filter(
+                        student=student,
+                        avatar__type_of=avatar_type,
+                        in_use=True).update(
+                        in_use=False)
+                    student_avatar.in_use = True
+                    student_avatar.save()
 
                 profile_obj = profile.objects.get(user=user.id)
                 token = get_token(user)

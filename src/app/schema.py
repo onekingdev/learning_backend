@@ -1,5 +1,9 @@
 import graphene
 import graphql_jwt
+from django.contrib.auth import get_user_model
+from graphql_jwt import ObtainJSONWebToken
+from students.models import Student
+
 import achievements.schema
 import api.schema
 import audiences.schema
@@ -29,44 +33,57 @@ import games.mutations
 import games.schema
 
 
-class Mutation(
-        api.schema.Mutation,
-        block.mutations.Mutation,
-        bank.mutations.Mutation,
-        students.mutations.Mutation,
-        collectibles.mutations.Mutation,
-        emails.schema.Mutation,
-        avatars.mutations.Mutation,
-        plans.mutations.Mutation,
-        payments.mutations.Mutation,
-        games.mutations.Mutation,
-        graphene.ObjectType):
+class CustomTokenAuth(ObtainJSONWebToken):
 
-    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    @classmethod
+    def resolve(cls, root, info, **kwargs):
+        user = info.context.user
+
+        if hasattr(user, 'student'):
+            student_plan = user.student.guardianstudentplan
+            if student_plan.is_cancel:
+                raise Exception("Please reactive your plan")
+
+        return cls()
+
+
+class Mutation(
+    api.schema.Mutation,
+    block.mutations.Mutation,
+    bank.mutations.Mutation,
+    students.mutations.Mutation,
+    collectibles.mutations.Mutation,
+    emails.schema.Mutation,
+    avatars.mutations.Mutation,
+    plans.mutations.Mutation,
+    payments.mutations.Mutation,
+    games.mutations.Mutation,
+    graphene.ObjectType):
+    token_auth = CustomTokenAuth.Field()
     refresh_token = graphql_jwt.Refresh.Field()
     verify_token = graphql_jwt.Verify.Field()
 
 
 class Query(
-        achievements.schema.Query,
-        payments.schema.Query,
-        api.schema.Query,
-        audiences.schema.Query,
-        block.schema.Query,
-        bank.schema.Query,
-        collectibles.schema.Query,
-        experiences.schema.Query,
-        guardians.schema.Query,
-        kb.schema.Query,
-        organization.schema.Query,
-        plans.schema.Query,
-        users.schema.Query,
-        students.schema.Query,
-        avatars.schema.Query,
-        universals.schema.Query,
-        wallets.schema.Query,
-        games.schema.Query,
-        graphene.ObjectType):
+    achievements.schema.Query,
+    payments.schema.Query,
+    api.schema.Query,
+    audiences.schema.Query,
+    block.schema.Query,
+    bank.schema.Query,
+    collectibles.schema.Query,
+    experiences.schema.Query,
+    guardians.schema.Query,
+    kb.schema.Query,
+    organization.schema.Query,
+    plans.schema.Query,
+    users.schema.Query,
+    students.schema.Query,
+    avatars.schema.Query,
+    universals.schema.Query,
+    wallets.schema.Query,
+    games.schema.Query,
+    graphene.ObjectType):
     pass
 
 
