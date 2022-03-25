@@ -173,6 +173,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             competence_percentage = mastery_settings.competence_percentage / 100
             # Get last N questions from topic sorted by date
             last_questions = BlockQuestionPresentation.all_objects.filter(
+                block_presentation__student=self,
                 topic=topic
             ).order_by('-create_timestamp')[:sample_size]
             for question in last_questions:
