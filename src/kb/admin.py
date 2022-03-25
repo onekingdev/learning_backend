@@ -51,9 +51,8 @@ class TopicAdmin(
         'tree_actions',
         'indented_title',
         'area_of_knowledge',
-        'create_timestamp',
-        'update_timestamp',
         'id',
+        'standard_topic',
     )
     list_filter = (
         'area_of_knowledge__universal_area_knowledge',
