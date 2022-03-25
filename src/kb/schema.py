@@ -1,5 +1,6 @@
 import graphene
 from django.conf import settings
+from django.utils.html import strip_tags
 from graphene_django import DjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from kb.models.content import Question, AnswerOption
@@ -134,7 +135,7 @@ class QuestionSchema(DjangoObjectType):
     question_audio_url = graphene.String()
 
     def resolve_question_text(self, info, language_code=None):
-        return self.safe_translation_getter("question_text", any_language=True)
+        return strip_tags(self.safe_translation_getter("question_text", any_language=True))
 
     def resolve_question_image_assets(self, info):
         return self.get_questionimageasset_set()
