@@ -58,6 +58,7 @@ class TopicAdmin(
         'area_of_knowledge__universal_area_knowledge',
     )
     actions = [hard_delete_selected]
+    search_fields = ['translations__name']
 
 
 @admin.register(AreaOfKnowledge)
@@ -101,6 +102,8 @@ class TopicGradeAdmin(
     list_filter = (
         'grade__audience',
     )
+    search_fields = ['topic__translations__name']
+    autocomplete_fields = ['topic']
 
 
 @admin.register(AnswerOption)
@@ -113,6 +116,7 @@ class AnswerOptionAdmin(
         'question',
         'is_correct',
     )
+    autocomplete_fields = ['question']
 
 
 @admin.register(Question)
@@ -140,6 +144,8 @@ class QuestionAdmin(parler_admin.TranslatableAdmin,
         'topic__area_of_knowledge',
         'grade',
     )
+    autocomplete_fields = ['topic']
+    search_fields = ['translations__name']
 
 
 @admin.register(QuestionImageAsset)
@@ -150,6 +156,7 @@ class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
         'identifier',
         'image',
     )
+    autocomplete_fields = ['question']
 
 
 @admin.register(QuestionAudioAsset)
@@ -160,3 +167,4 @@ class QuestionAudioAssetAdmin(import_export_admin.ImportExportModelAdmin):
         'identifier',
         'audio_file',
     )
+    autocomplete_fields = ['question']

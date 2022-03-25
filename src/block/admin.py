@@ -50,6 +50,7 @@ class BlockAdmin(admin.ModelAdmin):
         'modality',
         'random_slug',
     )
+    autocomplete_fields = ['questions', 'topic_grade']
 
     def save_related(self, request, form, formsets, change):
         super(BlockAdmin, self).save_related(request, form, formsets, change)
