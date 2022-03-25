@@ -51,7 +51,7 @@ class StudentSchema(DjangoObjectType):
             avatar = None
         return avatar
 
-    def resolve_current_avatar_accesories(self, info):
+    def resolve_current_avatar_accessories(self, info):
         try:
             avatar = StudentAvatar.objects.get(
                 student=self,
