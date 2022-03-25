@@ -20,7 +20,7 @@ class Account(RandomSlugModel, TimestampModel):
     name = models.CharField(max_length=128)
     positive_side = models.CharField(default=SIDE_CHOICE_RIGHT, choices=SIDE_CHOICE_SET,
                                      max_length=16, )
-    balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    balance = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         self.set_calculated_fields()
