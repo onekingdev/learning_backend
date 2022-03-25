@@ -7,10 +7,10 @@ from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, UUIDModel, IsActiveModel
 
 
-class Prerequisite(TimestampModel, UUIDModel, IsActiveModel):
+class Prerequisite(UUIDModel):
     PREFIX = 'prerequisite_'
 
-    topic = models.ForeignKey(
+    topic = models.OneToOneField(
         'Topic',
         on_delete=models.PROTECT,
         related_name="Topic"
