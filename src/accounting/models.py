@@ -18,8 +18,11 @@ class Account(RandomSlugModel, TimestampModel):
     )
 
     name = models.CharField(max_length=128)
-    positive_side = models.CharField(default=SIDE_CHOICE_RIGHT, choices=SIDE_CHOICE_SET,
-                                     max_length=16, )
+    positive_side = models.CharField(
+        default=SIDE_CHOICE_RIGHT,
+        choices=SIDE_CHOICE_SET,
+        max_length=16,
+    )
     balance = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
@@ -45,13 +48,13 @@ class Account(RandomSlugModel, TimestampModel):
     def get_balance_aggregate(self):
         positive_movements_aggregate = self.movement_set.filter(
             side=self.positive_side).aggregate(models.Sum('amount'))
-        negative_movements_aggregate = self.movement_set.filter(side=self.get_negative_side).aggregate(
-            models.Sum('amount'))
+        negative_movements_aggregate = self.movement_set.filter(
+            side=self.get_negative_side).aggregate(models.Sum('amount'))
 
-        positive_movements_balance = positive_movements_aggregate['amount__sum'] if positive_movements_aggregate[
-            'amount__sum'] else 0
-        negative_movements_balance = negative_movements_aggregate['amount__sum'] if negative_movements_aggregate[
-            'amount__sum'] else 0
+        positive_movements_balance = positive_movements_aggregate[
+            'amount__sum'] if positive_movements_aggregate['amount__sum'] else 0
+        negative_movements_balance = negative_movements_aggregate[
+            'amount__sum'] if negative_movements_aggregate['amount__sum'] else 0
 
         dict = {}
         # balance = positive_movements_balance - negative_movements_balance
@@ -113,10 +116,12 @@ class NegativeMovement(Movement):
         return super().save(*args, **kwargs)
 
 
-''' 
+'''
 Bank Wallet Implementation
 
 '''
+
+
 class BankManager(models.Manager):
     def create(self, *args, **kwargs):
         account = kwargs['account']
@@ -127,6 +132,7 @@ class BankManager(models.Manager):
 
     def inactive_objects(self):
         return super().get_queryset().filter(is_active=False)
+
 
 class BankMovement(RandomSlugModel, TimestampModel):
     class Meta:
@@ -141,6 +147,7 @@ class BankMovement(RandomSlugModel, TimestampModel):
         'Comentario', max_length=128, null=True, blank=True, )
     amount = models.FloatField(null=False)
     objects = BankManager()
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
@@ -151,6 +158,7 @@ class BankMovement(RandomSlugModel, TimestampModel):
         account = self.account
         super(BankMovement, self).delete(*args, **kwargs)
         account.save()
+
 
 class BankPositiveMovement(BankMovement):
     def save(self, *args, **kwargs):
