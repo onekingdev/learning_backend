@@ -40,6 +40,7 @@ class CollectibleCategorySchema(DjangoObjectType):
         fields = "__all__"
 
     name = graphene.String()
+    owned = graphene.Boolean()
 
     def resolve_name(self, info, language_code=None):
         try:
@@ -49,6 +50,24 @@ class CollectibleCategorySchema(DjangoObjectType):
 
         return self.safe_translation_getter(
             "name", language_code=current_language)
+
+    def resolve_owned(self, info):
+        user = info.context.user
+
+        if user.is_anonymous:
+            raise Exception("User is not logged in")
+
+        if user.student is None:
+            raise Exception("User is not a student")
+
+        student = user.student
+
+        owned = StudentCollectible.objects.filter(
+            student=student,
+            collectible__collectible_category=self,
+        ).exists()
+
+        return owned
 
 
 class CollectibleSchema(DjangoObjectType):
@@ -168,7 +187,8 @@ class Query(graphene.ObjectType):
     def resolve_collectible_count_by_category(root, info, category_id):
         return Collectible.objects.filter(category=category_id).count()
 
-    def resolve_purchased_collectible_count_by_category(root, info, category_id):
+    def resolve_purchased_collectible_count_by_category(
+            root, info, category_id):
         user = info.context.user
 
         if user.is_anonymous:
@@ -177,7 +197,8 @@ class Query(graphene.ObjectType):
             raise Exception("User has no student")
 
         student = user.student
-        return StudentCollectible.objects.filter(student=student, collectible__category=category_id).count()
+        return StudentCollectible.objects.filter(
+            student=student, collectible__category=category_id).count()
 
     # ----------------- StudentTransactionCollectible ----------------- #
 
