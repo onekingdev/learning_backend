@@ -64,7 +64,7 @@ class CollectibleCategorySchema(DjangoObjectType):
 
         owned = StudentCollectible.objects.filter(
             student=student,
-            collectible__collectible_category=self,
+            collectible__category=self,
         ).exists()
 
         return owned
