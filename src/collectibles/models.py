@@ -48,8 +48,10 @@ class CollectibleCategory(
 
     front_image = models.URLField(null=True)
     back_image = models.URLField(null=True)
-    objects = CollectibleCategoryManager()
     price = models.IntegerField(default=100)
+    firebase_name = models.CharField(max_length=64)
+
+    objects = CollectibleCategoryManager()
 
 
 class Description(TranslatableModel):
