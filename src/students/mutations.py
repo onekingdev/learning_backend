@@ -20,6 +20,7 @@ from .schema import StudentGradeSchema
 from plans.models import GuardianStudentPlan
 from users.models import User
 from avatars.models import Avatar, StudentAvatar
+from experiences.models import Battery
 
 
 class CreateStudent(graphene.Mutation):
@@ -105,6 +106,11 @@ class CreateStudent(graphene.Mutation):
                     student.dob = dob
 
                 student.save()
+
+                battery = Battery.objects.get_or_create(
+                    student=student,
+                )
+                battery.save()
 
                 guardianStudent = GuardianStudent.objects.create(
                     student=student,

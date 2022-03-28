@@ -266,12 +266,18 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
         if self.pk is None:
             from wallets.models import CoinWallet
+            from experiences.models import Battery
             super().save(*args, **kwargs)
             coin_wallet, cw_new = CoinWallet.objects.get_or_create(
                 student=self,
                 name=self.user.username
             )
             coin_wallet.save()
+
+            battery, new = Battery.objects.get_or_create(
+                student=self,
+            )
+            battery.save()
 
             from bank.models import BankWallet
             bank_account, ba_new = BankWallet.objects.get_or_create(
@@ -287,7 +293,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             self.init_student_topic_mastery()
             self.init_student_topic_status()
 
-        return super().save(*args, **kwargs)
+        return super(Student, self).save(*args, **kwargs)
 
 
 class StudentGrade(TimestampModel, UUIDModel, IsActiveModel):
