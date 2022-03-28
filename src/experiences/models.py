@@ -30,3 +30,8 @@ class Level(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
             next_level.points_required = 100 * (pow(next_level.amount, 1.3))
             next_level.save()
         return next_level
+
+
+class Battery(TimestampModel):
+    student = models.OneToOneField('students.Student', on_delete=models.CASCADE)
+    level = models.IntegerField(default=0)
