@@ -8,7 +8,7 @@ from students.models import StudentTopicMastery, StudentTopicStatus, Student
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
 from kb.models.content import Question, AnswerOption
 from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
-from experience.models import Battery
+from experiences.models import Battery
 from decimal import Decimal
 from wallets.models import CoinWallet
 
@@ -177,7 +177,7 @@ class FinishBlockPresentation(graphene.Mutation):
         hits = graphene.Int(required=True)
         errors = graphene.Int(required=True)
         bonusCoins = graphene.Float(required=True)
-        battery_level = graphene.Int(required=True)
+        # battery_level = graphene.Int(required=True)
         questions = graphene.List(BlockQuestionInput)
 
     def mutate(
@@ -187,7 +187,7 @@ class FinishBlockPresentation(graphene.Mutation):
             hits,
             errors,
             bonusCoins,
-            battery_level,
+            # battery_level,
             questions):
         user = info.context.user
 
@@ -198,15 +198,13 @@ class FinishBlockPresentation(graphene.Mutation):
 
         student = user.student
 
-        incorrect_exp_unit = 1
-        correct_exp_unit = 5
+        exp_unit = 5
         coin_unit = 10
-        exp = (correct_exp_unit * hits) + \
-            (incorrect_exp_unit * errors) + user.student.points
+        exp = exp_unit * (hits + errors) + user.student.points
 
-        battery = Battery.objects.get_or_crate(student=student)
+        # battery = Battery.objects.get_or_crate(student=student)
 
-        battery.update(level=battery_level)
+        # battery.update(level=battery_level)
 
         # Assign values to BlockPresentation
         block_presentation = BlockPresentation.objects.get(
@@ -216,7 +214,7 @@ class FinishBlockPresentation(graphene.Mutation):
         block_presentation.errors = errors
         block_presentation.total = hits + errors
         block_presentation.end_timestamp = timezone.now()
-        block_presentation.points = exp
+        block_presentation.points = exp_unit * (hits + errors)
         block_presentation.bonusCoins = bonusCoins
         block_presentation.coins = coin_unit * hits
         block_presentation.save()
