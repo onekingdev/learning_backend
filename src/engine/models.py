@@ -9,7 +9,7 @@ class TopicMasterySettings(models.Model):
         on_delete=models.CASCADE,
         related_name='values'
     )
-    sample_size = models.IntegerField(default=50)
+    sample_size = models.IntegerField(default=20)
     mastery_percentage = models.IntegerField(default=90)
     competence_percentage = models.IntegerField(default=60)
 
