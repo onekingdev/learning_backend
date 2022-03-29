@@ -8,7 +8,7 @@ from students.models import StudentTopicMastery, StudentTopicStatus, Student
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
 from kb.models.content import Question, AnswerOption
 from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
-from experience.models import Battery
+from experiences.models import Battery
 from decimal import Decimal
 from wallets.models import CoinWallet
 
@@ -187,7 +187,7 @@ class FinishBlockPresentation(graphene.Mutation):
             hits,
             errors,
             bonusCoins,
-            battery_level,
+            # battery_level,
             questions):
         user = info.context.user
 

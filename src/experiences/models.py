@@ -33,5 +33,9 @@ class Level(TimestampModel, RandomSlugModel, IsActiveModel, TranslatableModel):
 
 
 class Battery(TimestampModel):
-    student = models.OneToOneField('students.Student', on_delete=models.CASCADE)
+    student = models.OneToOneField(
+        'students.Student',
+        on_delete=models.CASCADE,
+        related_name='battery',
+    )
     level = models.IntegerField(default=0)
