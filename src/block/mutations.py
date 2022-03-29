@@ -187,7 +187,7 @@ class FinishBlockPresentation(graphene.Mutation):
             hits,
             errors,
             bonusCoins,
-            # battery_level,
+            battery_level,
             questions):
         user = info.context.user
 
@@ -204,9 +204,10 @@ class FinishBlockPresentation(graphene.Mutation):
         exp = (correct_exp_unit * hits) + \
             (incorrect_exp_unit * errors) + user.student.points
 
-        battery = Battery.objects.get_or_crate(student=student)
+        battery, new = Battery.objects.get_or_create(student=student)
 
-        battery.update(level=battery_level)
+        battery.level = battery_level
+        battery.save()
 
         # Assign values to BlockPresentation
         block_presentation = BlockPresentation.objects.get(
