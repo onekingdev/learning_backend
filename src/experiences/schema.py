@@ -1,7 +1,7 @@
 import graphene
 from django.conf import settings
 from graphene_django import DjangoObjectType
-from experiences.models import Level
+from experiences.models import Level, Battery
 
 
 class LevelSchema(DjangoObjectType):
@@ -18,6 +18,12 @@ class LevelSchema(DjangoObjectType):
             current_language = settings.LANGUAGE_CODE
 
         return self.safe_translation_getter("name", language_code=current_language)
+
+
+class BatterySchema(DjangoObjectType):
+    class Meta:
+        model = Battery
+        fields = "__all__"
 
 
 class Query(graphene.ObjectType):
