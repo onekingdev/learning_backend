@@ -34,7 +34,6 @@ html5lib = "*"
 lxml = "*"
 paypalrestsdk = "*"
 django-model-utils = "*"
-django-admin-autocomplete-filter = "*"
 
 [dev-packages]
 

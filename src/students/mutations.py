@@ -107,7 +107,7 @@ class CreateStudent(graphene.Mutation):
 
                 student.save()
 
-                battery, new = Battery.objects.get_or_create(
+                battery = Battery.objects.get_or_create(
                     student=student,
                 )
                 battery.save()
