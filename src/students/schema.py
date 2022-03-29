@@ -13,7 +13,6 @@ class StudentSchema(DjangoObjectType):
         model = Student
         fields = "__all__"
 
-    audience = graphene.Field(AudienceSchema)
     coin_wallet = graphene.Field(CoinWalletSchema)
     grade = graphene.Field('students.schema.StudentGradeSchema')
     next_level = graphene.Field(LevelSchema)
@@ -21,9 +20,6 @@ class StudentSchema(DjangoObjectType):
     current_avatar_accessories = graphene.Field('avatars.schema.AvatarSchema')
     current_avatar_clothes = graphene.Field('avatars.schema.AvatarSchema')
     current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
-
-    def resolve_audience(self, info):
-        return self.get_active_audience
 
     def resolve_coin_wallet(self, info):
         return self.coinWallet
