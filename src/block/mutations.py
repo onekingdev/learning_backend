@@ -198,9 +198,11 @@ class FinishBlockPresentation(graphene.Mutation):
 
         student = user.student
 
-        exp_unit = 5
+        incorrect_exp_unit = 1
+        correct_exp_unit = 5
         coin_unit = 10
-        exp = exp_unit * (hits + errors) + user.student.points
+        exp = (correct_exp_unit * hits) + \
+            (incorrect_exp_unit * errors) + user.student.points
 
         # battery = Battery.objects.get_or_crate(student=student)
 
@@ -214,7 +216,7 @@ class FinishBlockPresentation(graphene.Mutation):
         block_presentation.errors = errors
         block_presentation.total = hits + errors
         block_presentation.end_timestamp = timezone.now()
-        block_presentation.points = exp_unit * (hits + errors)
+        block_presentation.points = exp
         block_presentation.bonusCoins = bonusCoins
         block_presentation.coins = coin_unit * hits
         block_presentation.save()
