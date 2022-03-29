@@ -177,7 +177,7 @@ class FinishBlockPresentation(graphene.Mutation):
         hits = graphene.Int(required=True)
         errors = graphene.Int(required=True)
         bonusCoins = graphene.Float(required=True)
-        # battery_level = graphene.Int(required=True)
+        battery_level = graphene.Int(required=True)
         questions = graphene.List(BlockQuestionInput)
 
     def mutate(
@@ -204,9 +204,9 @@ class FinishBlockPresentation(graphene.Mutation):
         exp = (correct_exp_unit * hits) + \
             (incorrect_exp_unit * errors) + user.student.points
 
-        # battery = Battery.objects.get_or_crate(student=student)
+        battery = Battery.objects.get_or_crate(student=student)
 
-        # battery.update(level=battery_level)
+        battery.update(level=battery_level)
 
         # Assign values to BlockPresentation
         block_presentation = BlockPresentation.objects.get(
