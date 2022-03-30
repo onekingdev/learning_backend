@@ -141,6 +141,14 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     def get_level_number(self):
         return int(self.level.name.split("_")[1]) if (self.level.name) else 0
 
+    @property
+    def grade(self):
+        student_grade = StudentGrade.objects.filter(
+            student_id=self.id, is_active=True).order_by("-create_timestamp")
+        if student_grade.count() != 0:
+            return student_grade[0].grade
+        return
+
     def init_student_topic_mastery(self):
         from plans.models import GuardianStudentPlan
         from kb.models import AreaOfKnowledge
