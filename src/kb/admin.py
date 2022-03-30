@@ -84,7 +84,7 @@ class GradePrerequisiteAdmin(
         'area_of_knowledge__universal_area_knowledge',
         'area_of_knowledge__audience',
     )
-    autocomplete_fields = ['grade', 'mastery', 'competence']
+    autocomplete_fields = ['grade__name', 'mastery', 'competence']
 
 
 @admin.register(AreaOfKnowledge)
