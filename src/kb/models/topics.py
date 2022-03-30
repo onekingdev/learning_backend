@@ -66,7 +66,8 @@ class Topic(
 
     def mastery_level(self, student):
         from students.models import StudentTopicMastery
-        mastery_level = StudentTopicMastery.objects.get(student=student, topic=self).mastery_level
+        mastery_level = StudentTopicMastery.objects.get(
+            student=student, topic=self).mastery_level
         return mastery_level
 
     def __str__(self):
@@ -100,3 +101,24 @@ class TopicGrade(TimestampModel, UUIDModel, IsActiveModel):
 
     def __str__(self):
         return '{}/{}'.format(self.topic, self.grade)
+
+
+class GradePrerequisite(UUIDModel):
+    PREFIX = 'grade_prerequisite_'
+
+    area_of_knowledge = models.ForeignKey(
+        'kb.AreaOfKnowledge',
+        on_delete=models.PROTECT,
+    )
+    grade = models.ForeignKey(
+        'kb.Grade',
+        on_delete=models.PROTECT,
+    )
+    mastery = models.ManyToManyField(
+        'Topic',
+        related_name='mastery_start',
+    )
+    competence = models.ManyToManyField(
+        'Topic',
+        related_name='competence_start',
+    )
