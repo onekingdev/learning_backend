@@ -125,6 +125,7 @@ class GradeAdmin(
     )
     search_fields = (
         'translations__name',
+        'id',
     )
 
 
