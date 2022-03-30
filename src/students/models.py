@@ -3,6 +3,7 @@ from app.models import TimestampModel, UUIDModel, IsActiveModel
 from experiences.models import Level
 from engine.models import TopicMasterySettings
 from block.models import BlockQuestionPresentation
+from kb.models.topics import GradePrerequisite
 import datetime
 
 TYPE_ACCESSORIES = 'ACCESSORIES'
@@ -159,14 +160,51 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             audience = self.get_active_audience
             available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
 
+        grade = self.grade
+
         for aok in available_aoks:
             topics = aok.topic_set.all()
-            for topic in topics:
-                topic_mastery, new = StudentTopicMastery.objects.get_or_create(
-                    student=self,
-                    topic=topic,
+            try:
+                grade_prerequisite = GradePrerequisite.objects.get(
+                    area_of_knowledge=aok,
+                    grade=grade,
                 )
-                topic_mastery.save()
+            except GradePrerequisite.DoesNotExist:
+                grade_prerequisite = None
+            if grade_prerequisite:
+                competence_topics = grade_prerequisite.competence.all()
+                mastery_topics = grade_prerequisite.mastery.all()
+                np_topics = topics.difference(
+                    competence_topics,
+                    mastery_topics
+                )
+                for topic in competence_topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                        mastery_level='C',
+                    )
+                    topic_mastery.save()
+                for topic in mastery_topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                        mastery_level='M',
+                    )
+                    topic_mastery.save()
+                for topic in np_topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                    )
+                    topic_mastery.save()
+            else:
+                for topic in topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                    )
+                    topic_mastery.save()
 
     def update_student_topic_mastery(self, aok):
         topics = aok.topic_set.all()
