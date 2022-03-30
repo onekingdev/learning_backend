@@ -58,7 +58,7 @@ class TopicAdmin(
         'area_of_knowledge__universal_area_knowledge',
     )
     actions = [hard_delete_selected]
-    search_fields = ['translations__name']
+    search_fields = ['translations__name', 'id']
 
 
 @admin.register(Prerequisite)
@@ -125,7 +125,6 @@ class GradeAdmin(
     )
     search_fields = (
         'translations__name',
-        'id',
     )
 
 
