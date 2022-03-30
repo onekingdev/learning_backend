@@ -117,8 +117,10 @@ class GradePrerequisite(UUIDModel):
     mastery = models.ManyToManyField(
         'Topic',
         related_name='mastery_start',
+        blank=True,
     )
     competence = models.ManyToManyField(
         'Topic',
         related_name='competence_start',
+        blank=True,
     )
