@@ -10,6 +10,11 @@ class CoinWalletSchema(DjangoObjectType):
         model = CoinWallet
         fields = "__all__"
 
+    block_transaction_coins = graphene.Int()
+
+    def resolve_block_transaction_coins(self, info):
+        return self.block_transaction_aggregate
+
 
 class BlockTransactionSchema():
     class Meta:
@@ -36,6 +41,7 @@ class Query(graphene.ObjectType):
     coin_wallets = graphene.List(CoinWalletSchema)
     coin_wallet_by_id = graphene.Field(CoinWalletSchema, id=graphene.ID())
     coin_wallet_transactions_by_id = graphene.List(CoinWalletTransactionSchema, student_id=graphene.ID())
+    coin_wallet_block_transactions = graphene.List(CoinWalletSchema)
 
     def resolve_coin_wallets(root, info, **kwargs):
         # Querying a list
@@ -48,3 +54,6 @@ class Query(graphene.ObjectType):
     def resolve_coin_wallet_transactions_by_id(root, info, student_id):
         # Querying wallet transaction
         return reversed(Movement.objects.filter(account__student=student_id).order_by("create_timestamp")[:100])
+
+    def resolve_coin_wallet_by_id(root, info):
+        return sorted(CoinWallet.objects.all(), key=lambda c: c.block_transaction_aggregate)

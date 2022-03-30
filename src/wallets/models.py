@@ -10,10 +10,11 @@ class CoinWallet(Account):
         related_name="coinWallet",
         null=True)
 
-    def get_block_transaction_aggregate(self):
+    @property
+    def block_transaction_aggregate(self):
         positive_movements_aggregate = self.movement_set.filter(
             side=self.positive_side,
-            comment="Answer the question.",
+            comment="Answer the questions.",
         ).aggregate(models.Sum('amount'))
 
         positive_movements_balance = positive_movements_aggregate[
