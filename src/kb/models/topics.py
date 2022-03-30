@@ -21,6 +21,9 @@ class Prerequisite(UUIDModel):
     def __str__(self):
         return f'{self.topic}'
 
+    def get_prerequisites(self):
+        return "\n".join([p.name for p in self.prerequisites.all()])
+
 
 class Topic(
         TimestampModel,

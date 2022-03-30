@@ -68,6 +68,7 @@ class PrerequisiteAdmin(
     list_display = (
         'id',
         'topic',
+        'get_prerequisites',
     )
     list_filter = (
         'topic__area_of_knowledge__universal_area_knowledge',
