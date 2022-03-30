@@ -1,7 +1,12 @@
 from django.contrib import admin
 from .models import TopicMasterySettings
+from admin_auto_filters.filters import AutocompleteFilter
 
-# Register your models here.
+
+class TopicFilter(AutocompleteFilter):
+    title = 'Topic'
+    field_name = 'topic'
+
 @admin.register(TopicMasterySettings)
 class TopicMasterySettingsAdmin(admin.ModelAdmin):
     list_display = (
@@ -14,3 +19,4 @@ class TopicMasterySettingsAdmin(admin.ModelAdmin):
     list_filter = (
         'topic__area_of_knowledge__universal_area_knowledge',
     )
+    # list_filter = [TopicFilter]
