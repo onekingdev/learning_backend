@@ -10,6 +10,10 @@ class AvatarAdmin(
     resource_class = AvatarResource
     list_display = [
         'name',
+        'id',
         'type_of',
         'price',
     ]
+    list_filter = (
+        'type_of',
+    )
