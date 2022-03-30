@@ -81,7 +81,8 @@ class GradePrerequisiteAdmin(
         import_export_admin.ImportExportModelAdmin,
 ):
     list_filter = (
-        'area_of_knowledge',
+        'area_of_knowledge__universal_area_knowledge',
+        'area_of_knowledge__audience',
     )
     autocomplete_fields = ['grade', 'mastery', 'competence']
 
