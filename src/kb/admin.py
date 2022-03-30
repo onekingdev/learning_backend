@@ -80,6 +80,11 @@ class PrerequisiteAdmin(
 class GradePrerequisiteAdmin(
         import_export_admin.ImportExportModelAdmin,
 ):
+    list_display = (
+        'area_of_knowledge',
+        'grade',
+        'id',
+    )
     list_filter = (
         'area_of_knowledge__universal_area_knowledge',
         'area_of_knowledge__audience',
