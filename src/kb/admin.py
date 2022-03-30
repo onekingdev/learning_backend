@@ -85,7 +85,7 @@ class GradePrerequisiteAdmin(
         'area_of_knowledge__audience',
     )
     autocomplete_fields = [
-        'grade__translations__name',
+        'grade',
         'mastery',
         'competence'
     ]
@@ -119,7 +119,7 @@ class GradeAdmin(
         'audience',
     )
     search_fields = (
-        'name',
+        'translations__name',
     )
 
 
