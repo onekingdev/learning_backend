@@ -10,6 +10,13 @@ class StudentFilter(AutocompleteFilter):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'first_name',
+        'last_name',
+        'create_timestamp',
+    )
     search_fields = ['user__username']
 
 
@@ -48,4 +55,5 @@ class StudentTopicMastery(admin.ModelAdmin):
         'student',
         'topic',
         'mastery_level',
+        'status',
     )
