@@ -65,6 +65,7 @@ class TopicAdmin(
 class PrerequisiteAdmin(
         import_export_admin.ImportExportModelAdmin,
 ):
+    resource_class = resources.PrerequisiteResource
     list_display = (
         'id',
         'topic',
@@ -80,6 +81,7 @@ class PrerequisiteAdmin(
 class GradePrerequisiteAdmin(
         import_export_admin.ImportExportModelAdmin,
 ):
+    resource_class = resources.GradePrerequisiteResource
     list_display = (
         'area_of_knowledge',
         'grade',
@@ -91,8 +93,8 @@ class GradePrerequisiteAdmin(
     )
     autocomplete_fields = [
         'grade',
-        'mastery',
-        'competence'
+        # 'mastery',
+        # 'competence'
     ]
 
 
@@ -103,6 +105,7 @@ class AreaOfKnowledgeAdmin(
     resource_class = resources.AreaOfKnowledgeResource
     list_display = (
         'name',
+        'id',
         'audience',
         'universal_area_knowledge',
         'is_active',
