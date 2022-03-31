@@ -10,7 +10,7 @@ class StudentFilter(AutocompleteFilter):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    search_fields = ['user']
+    search_fields = ['user__username']
 
 
 @admin.register(StudentTopicStatus)

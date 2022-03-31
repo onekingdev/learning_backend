@@ -35,6 +35,7 @@ lxml = "*"
 paypalrestsdk = "*"
 django-model-utils = "*"
 django-admin-autocomplete-filter = "*"
+django-graphql-auth = "*"
 
 [dev-packages]
 
