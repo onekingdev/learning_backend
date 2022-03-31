@@ -64,6 +64,14 @@ class StudentTopicMastery(TimestampModel, UUIDModel):
         default='NP'
     )
 
+    @property
+    def status(self):
+        try:
+            status = StudentTopicStatus.objects.get(topic=self.topic, student=self.student).status
+        except StudentTopicStatus.DoesNotExist:
+            status = None
+        return status
+
 
 class Student(TimestampModel, UUIDModel, IsActiveModel):
     GENDER_MALE = 'MALE'
@@ -183,6 +191,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                         student=self,
                         topic=topic,
                         mastery_level='C',
+                        is_force=True,
                     )
                     topic_mastery.save()
                 for topic in mastery_topics:
@@ -190,6 +199,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                         student=self,
                         topic=topic,
                         mastery_level='M',
+                        is_force=True,
                     )
                     topic_mastery.save()
                 for topic in np_topics:
@@ -206,37 +216,34 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                     )
                     topic_mastery.save()
 
-    def update_student_topic_mastery(self, aok):
-        topics = aok.topic_set.all()
-
-        for topic in topics:
-            mastery_settings, new = TopicMasterySettings.objects.get_or_create(
-                topic=topic
-            )
-            total_correct = 0
-            sample_size = mastery_settings.sample_size
-            mastery_percentage = mastery_settings.mastery_percentage / 100
-            competence_percentage = mastery_settings.competence_percentage / 100
-            # Get last N questions from topic sorted by date
-            last_questions = BlockQuestionPresentation.all_objects.filter(
-                block_presentation__student=self,
-                topic=topic
-            ).order_by('-create_timestamp')[:sample_size]
-            for question in last_questions:
-                if question.is_correct:
-                    total_correct += 1
-            if total_correct == 0:
-                mastery_level = 'NP'
-            elif total_correct < sample_size * mastery_percentage * competence_percentage:
-                mastery_level = 'N'
-            elif total_correct < sample_size * mastery_percentage:
-                mastery_level = 'C'
-            else:
-                mastery_level = 'M'
-            student_topic_mastery, new = StudentTopicMastery.objects.get_or_create(
-                student=self, topic=topic, )
-            student_topic_mastery.mastery_level = mastery_level
-            student_topic_mastery.save()
+    def update_student_topic_mastery(self, topic):
+        mastery_settings, new = TopicMasterySettings.objects.get_or_create(
+            topic=topic
+        )
+        total_correct = 0
+        sample_size = mastery_settings.sample_size
+        mastery_percentage = mastery_settings.mastery_percentage / 100
+        competence_percentage = mastery_settings.competence_percentage / 100
+        # Get last N questions from topic sorted by date
+        last_questions = BlockQuestionPresentation.all_objects.filter(
+            block_presentation__student=self,
+            topic=topic
+        ).order_by('-create_timestamp')[:sample_size]
+        for question in last_questions:
+            if question.is_correct:
+                total_correct += 1
+        if total_correct == 0:
+            mastery_level = 'NP'
+        elif total_correct < sample_size * mastery_percentage * competence_percentage:
+            mastery_level = 'N'
+        elif total_correct < sample_size * mastery_percentage:
+            mastery_level = 'C'
+        else:
+            mastery_level = 'M'
+        student_topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+            student=self, topic=topic, )
+        student_topic_mastery.mastery_level = mastery_level
+        student_topic_mastery.save()
 
     def init_student_topic_status(self):
         from plans.models import GuardianStudentPlan
@@ -305,7 +312,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             topic_status.save()
 
     def __str__(self):
-        return self.full_name
+        return self.user.username
 
     def save(self, *args, **kwargs):
         self.full_name = self.get_full_name
