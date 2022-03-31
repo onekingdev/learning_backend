@@ -2,7 +2,8 @@ from app.resources import TranslatableModelResource
 from app.widgets import TranslatableForeignKeyWidget
 from import_export.fields import Field
 from import_export.resources import ModelResource
-from .models import Topic, Grade, TopicGrade
+from import_export.widgets import ManyToManyWidget
+from .models import Topic, Grade, TopicGrade, Prerequisite, GradePrerequisite
 from .models.content import Question, AnswerOption, QuestionImageAsset,QuestionAudioAsset
 from .models.areas_of_knowledge import AreaOfKnowledge
 
@@ -207,3 +208,25 @@ class QuestionAudioAssetResource(ModelResource):
             'order',
             'audio_file'
         )
+
+
+class PrerequisiteResource(ModelResource):
+    class Meta:
+        model = Prerequisite
+        skip_unchanged = True
+        report_skipped = False
+        fields = ['id', 'topic', 'prerequisites']
+
+
+class GradePrerequisiteResource(ModelResource):
+    class Meta:
+        model = GradePrerequisite
+        skip_unchanged = True
+        report_skipped = False
+        fields = [
+            'id',
+            'area_of_knowledge',
+            'grade',
+            'mastery',
+            'competence',
+        ]
