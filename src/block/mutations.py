@@ -270,7 +270,7 @@ class FinishBlockPresentation(graphene.Mutation):
         )
         block_transaction.save()
 
-        student.update_student_topic_mastery(block_aok)
+        student.update_student_topic_mastery(block_topic)
         student.update_student_topic_status(block_aok)
 
         block_presentation.delete()
