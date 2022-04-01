@@ -13,9 +13,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from .env import SECRET_KEY, ENV_INSTALLED_APPS, SENDGRID_API_KEY, SENDGRID_DEFAULT_SENDER
 from .env import CORS_ORIGIN_WHITELIST as ENV_CORS_ORIGIN_WHITELIST
 from .env import ALLOWED_HOSTS as ENV_ALLOWED_HOSTS
-# from .env import GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_CLIENT_SECRET, GOOGLE_AUTH_API_KEY
+from .env import GMAIL_PASSWORD as ENV_GMAIL_PASSWORD
 
-import os
 from pathlib import Path
 from datetime import timedelta
 from django.conf import settings
@@ -65,7 +64,7 @@ INSTALLED_APPS = [
     'adminsortable2',
     'djmoney',
     'djstripe',
-    'crispy_forms',
+    # 'graphql_auth',
 
     'api',
     'avatars',
@@ -116,7 +115,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -197,11 +196,24 @@ GRAPHQL_JWT = {
     # TODO: Change to environment variable
     'JWT_SECRET_KEY': 'llave super secreta',
     'JWT_ALGORITHM': 'HS256',
+    # "JWT_ALLOW_ANY_CLASSES": [
+        # "graphql_auth.mutations.Register",
+        # "graphql_auth.mutations.VerifyAccount",
+        # "graphql_auth.mutations.ResendActivationEmail",
+        # "graphql_auth.mutations.SendPasswordResetEmail",
+        # "graphql_auth.mutations.PasswordReset",
+        # "graphql_auth.mutations.ObtainJSONWebToken",
+        # "graphql_auth.mutations.VerifyToken",
+        # "graphql_auth.mutations.RefreshToken",
+        # "graphql_auth.mutations.RevokeToken",
+        # "graphql_auth.mutations.VerifySecondaryEmail",
+    # ],
 }
 AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',
     # 'allauth.account.auth_backend.AuthenticationBackends',
+    # 'graphql_auth.backends.GraphQLAuthBackend',
 ]
 
 
@@ -210,15 +222,20 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 
-EMAIL_BACKEND = "mailer.backend.DbBackend"
+# EMAIL_BACKEND = "mailer.backend.DbBackend"
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-EMAIL_HOST = 'smtp.sendgrid.net'
+# DEFAULT_FROM_EMAIL = 'albert@learnwithsocrates.com'
+
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'apikey'  # this is exactly the value 'apikey'
-EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
-DEFAULT_FROM_EMAIL = SENDGRID_DEFAULT_SENDER
+# EMAIL_HOST_USER = 'apikey'  # this is exactly the value 'apikey'
+# EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+# DEFAULT_FROM_EMAIL = SENDGRID_DEFAULT_SENDER
+EMAIL_HOST_USER = 'customerservice@learnwithsocrates.com'
+EMAIL_HOST_PASSWORD = ENV_GMAIL_PASSWORD
+DEFAULT_FROM_EMAIL = 'customerservice@learwithsocrates.com'
 
 # Additional languages
 settings.LANGUAGES.append(
@@ -241,8 +258,6 @@ IMPORT_EXPORT_CELERY_MODELS = {
         'resource': topics_resource,
     }
 }
-
-CRISPY_TEMPLATE_PACK = 'bootstrap'
 
 # SOCIALACCOUNT_PROVIDERS = {
 #     'google': {
