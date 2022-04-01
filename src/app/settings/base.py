@@ -15,6 +15,7 @@ from .env import CORS_ORIGIN_WHITELIST as ENV_CORS_ORIGIN_WHITELIST
 from .env import ALLOWED_HOSTS as ENV_ALLOWED_HOSTS
 # from .env import GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_CLIENT_SECRET, GOOGLE_AUTH_API_KEY
 
+import os
 from pathlib import Path
 from datetime import timedelta
 from django.conf import settings
@@ -64,6 +65,7 @@ INSTALLED_APPS = [
     'adminsortable2',
     'djmoney',
     'djstripe',
+    'crispy_forms',
 
     'api',
     'avatars',
@@ -114,7 +116,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -239,6 +241,8 @@ IMPORT_EXPORT_CELERY_MODELS = {
         'resource': topics_resource,
     }
 }
+
+CRISPY_TEMPLATE_PACK = 'bootstrap'
 
 # SOCIALACCOUNT_PROVIDERS = {
 #     'google': {
