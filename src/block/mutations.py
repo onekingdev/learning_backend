@@ -42,10 +42,11 @@ class CreatePathBlockPresentation(graphene.Mutation):
 
         # Create block if it doesn't exist
         block = Block.objects.get_or_create(
-            students=student,
             topic_grade__topic=selected_topic,
-            modality='AI',
+            modality='PATH',
         )
+        block.save()
+        block.students.add(student)
         block.save()
 
         # Create block presentation for block
