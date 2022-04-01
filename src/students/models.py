@@ -196,7 +196,6 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                         student=self,
                         topic=topic,
                         mastery_level='C',
-                        is_force=True,
                     )
                     topic_mastery.save()
                 for topic in mastery_topics:
@@ -204,7 +203,6 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                         student=self,
                         topic=topic,
                         mastery_level='M',
-                        is_force=True,
                     )
                     topic_mastery.save()
                 for topic in np_topics:
