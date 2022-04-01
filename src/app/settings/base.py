@@ -15,6 +15,7 @@ from .env import CORS_ORIGIN_WHITELIST as ENV_CORS_ORIGIN_WHITELIST
 from .env import ALLOWED_HOSTS as ENV_ALLOWED_HOSTS
 from .env import GMAIL_PASSWORD as ENV_GMAIL_PASSWORD
 
+import os
 from pathlib import Path
 from datetime import timedelta
 from django.conf import settings
@@ -64,7 +65,7 @@ INSTALLED_APPS = [
     'adminsortable2',
     'djmoney',
     'djstripe',
-    # 'graphql_auth',
+    'crispy_forms',
 
     'api',
     'avatars',
@@ -115,7 +116,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -196,18 +197,6 @@ GRAPHQL_JWT = {
     # TODO: Change to environment variable
     'JWT_SECRET_KEY': 'llave super secreta',
     'JWT_ALGORITHM': 'HS256',
-    # "JWT_ALLOW_ANY_CLASSES": [
-        # "graphql_auth.mutations.Register",
-        # "graphql_auth.mutations.VerifyAccount",
-        # "graphql_auth.mutations.ResendActivationEmail",
-        # "graphql_auth.mutations.SendPasswordResetEmail",
-        # "graphql_auth.mutations.PasswordReset",
-        # "graphql_auth.mutations.ObtainJSONWebToken",
-        # "graphql_auth.mutations.VerifyToken",
-        # "graphql_auth.mutations.RefreshToken",
-        # "graphql_auth.mutations.RevokeToken",
-        # "graphql_auth.mutations.VerifySecondaryEmail",
-    # ],
 }
 AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
@@ -258,6 +247,8 @@ IMPORT_EXPORT_CELERY_MODELS = {
         'resource': topics_resource,
     }
 }
+
+CRISPY_TEMPLATE_PACK = 'bootstrap'
 
 # SOCIALACCOUNT_PROVIDERS = {
 #     'google': {
