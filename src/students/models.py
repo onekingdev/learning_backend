@@ -350,6 +350,8 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             self.init_student_topic_mastery()
             self.init_student_topic_status()
 
+            self.is_new = True
+
         return super(Student, self).save(*args, **kwargs)
 
 
