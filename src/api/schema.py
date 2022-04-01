@@ -64,7 +64,15 @@ class CreateGuardian(graphene.Mutation):
         last_name = graphene.String(required=True)
         coupon = graphene.String(required=True)
 
-    def mutate(self, info, username, password, email, first_name, last_name, coupon):
+    def mutate(
+            self,
+            info,
+            username,
+            password,
+            email,
+            first_name,
+            last_name,
+            coupon):
         try:
             with transaction.atomic():
                 user = get_user_model()(
@@ -81,6 +89,20 @@ class CreateGuardian(graphene.Mutation):
                     last_name=last_name,
                 )
                 guardian.save()
+
+                email_template = "emails/join.txt"
+
+                c = {"first_name": guardian.first_name}
+
+                email = render_to_string(email_template, c)
+
+                send_mail(
+                    'Welcome to Learn With Socrates!',
+                    email,
+                    'Learn With Scorates',
+                    [user.email],
+                    fail_silently=False,
+                )
 
                 if coupon:
                     coupon = coupon.upper()
