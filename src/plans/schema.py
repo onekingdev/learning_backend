@@ -13,10 +13,19 @@ class PlanSchema(DjangoObjectType):
     subjects = graphene.List(AreaOfKnowledgeSchema)
 
     def resolve_subjects(self, info):
-        return AreaOfKnowledge.objects.all()
+        return AreaOfKnowledge.objects.filter(is_active=True)
 
 
 class GuardianStudentPlanSchema(DjangoObjectType):
+    subject = graphene.List(AreaOfKnowledgeSchema)
+
+    def resolve_subject(self, info):
+        subject = self.subject.filter(
+            # audience=self.student.audience,
+            is_active=True
+        )
+        return subject
+
     class Meta:
         model = GuardianStudentPlan
         fields = "__all__"
