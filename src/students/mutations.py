@@ -372,7 +372,24 @@ class setPoint(graphene.Mutation):
         student.save()
 
         return setPoint()
-    pass
+
+
+class UpdateIsNew(graphene.Mutation):
+    student = graphene.Field('students.schema.StudentSchema')
+
+    def mutate(self, info):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        if not user.student:
+            raise Exception("Not found student")
+
+        student = user.student
+        student.is_new = False
+        student.save()
+
+        return UpdateIsNew(student=student)
 
 
 class Mutation(graphene.ObjectType):
@@ -381,3 +398,4 @@ class Mutation(graphene.ObjectType):
     create_change_student_grade = CreateChangeStudentGrade.Field()
     level_up = LevelUp.Field()
     set_point = setPoint.Field()
+    update_is_new = UpdateIsNew.Field()

@@ -125,6 +125,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         'audiences.Audience',
         on_delete=models.PROTECT,
     )
+    is_new = models.BooleanField(default=True)
 
     def current_age(self):
         today = datetime.date.today()
