@@ -131,8 +131,13 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         birthDate = self.dob
 
         if self.dob is not None:
-            age = (today.year - birthDate.year -
-                   ((today.month, today.day) < (birthDate.month, birthDate.day)))
+            age = (
+                today.year
+                - birthDate.year
+                - (
+                    (today.month, today.day) < (birthDate.month, birthDate.day)
+                )
+            )
         else:
             age = None
             return age
