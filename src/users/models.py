@@ -17,6 +17,7 @@ class User(AbstractUser):
         blank=True,
         null=True,
     )
+    email = models.EmailField(unique=True)
 
     def save(self, *args, **kwargs):
         current_site = Site.objects.get_current()
