@@ -201,6 +201,7 @@ GRAPHQL_JWT = {
 AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'app.backends.CustomBackend',
     # 'allauth.account.auth_backend.AuthenticationBackends',
     # 'graphql_auth.backends.GraphQLAuthBackend',
 ]
