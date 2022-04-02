@@ -3,19 +3,19 @@ import sys
 
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
+# from graphql_auth.schema import UserQuery, MeQuery
+# from graphql_auth import mutations
 from students.models import Student
 from guardians.models import Guardian, GuardianStudent
 from payments.models import DiscountCode
 from users.schema import UserSchema, UserProfileSchema
 from users.models import User
-from bank.models import Interest
 import graphene
-from datetime import datetime
-from accounting.models import BankMovement
-from accounting.models import Account
 
 
 # TODO: move to user mutations
