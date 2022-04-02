@@ -194,6 +194,11 @@ class Mutation(graphene.ObjectType):
     create_guardian = CreateGuardian.Field()
     create_guardian_student = CreateGuardianStudent.Field()
     change_guardian_email_password = ChangeGuardianEmailPassword.Field()
+    # register = mutations.Register.Field()
+    # verify_account = mutations.VerifyAccount.Field()
+    # resend_activation_email = mutations.ResendActivationEmail.Field()
+    # send_password_reset_email = mutations.SendPasswordResetEmail.Field()
+    # password_reset = mutations.PasswordReset.Field()
 
 
 class Query(graphene.ObjectType):
