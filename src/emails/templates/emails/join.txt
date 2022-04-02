@@ -22,7 +22,7 @@ To see their progress, go to the manage kids page and click on your child’s av
 
 If you have questions at anytime - or ideas for us to make the product better, please email us at socrates@withsocrates.com or use the live chat service available for parents.  We are here to help.
 
-
-FYI we will send out a weekly summary of your child’s progress.  If you wish to opt out of that email, you can change this in the settings page. 
+Sincerely,
+The Socrates Team
 
 {% endautoescape %}
