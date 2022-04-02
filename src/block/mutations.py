@@ -199,12 +199,6 @@ class FinishBlockPresentation(graphene.Mutation):
 
         student = user.student
 
-        incorrect_exp_unit = 1
-        correct_exp_unit = 5
-        coin_unit = 10
-        exp = (correct_exp_unit * hits) + \
-            (incorrect_exp_unit * errors) + user.student.points
-
         battery, new = Battery.objects.get_or_create(student=student)
 
         battery.level = battery_level
@@ -214,6 +208,21 @@ class FinishBlockPresentation(graphene.Mutation):
         block_presentation = BlockPresentation.objects.get(
             id=block_presentation_id
         )
+
+        block = block_presentation.block
+
+        if block.modality != 'AI':
+            incorrect_exp_unit = 1
+            correct_exp_unit = 5
+            coin_unit = 10
+            exp = (correct_exp_unit * hits) + \
+                (incorrect_exp_unit * errors) + user.student.points
+        else:
+            incorrect_exp_unit = 0
+            correct_exp_unit = 0
+            coin_unit = 0
+            exp = 0
+
         block_presentation.hits = hits
         block_presentation.errors = errors
         block_presentation.total = hits + errors
