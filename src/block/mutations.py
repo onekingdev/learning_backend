@@ -211,7 +211,7 @@ class FinishBlockPresentation(graphene.Mutation):
 
         block = block_presentation.block
 
-        if block.modality != 'AI':
+        if block.modality == 'AI':
             incorrect_exp_unit = 1
             correct_exp_unit = 5
             coin_unit = 10
