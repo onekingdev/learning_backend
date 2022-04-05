@@ -152,7 +152,13 @@ class QuestionSchema(DjangoObjectType):
         return self.get_questionvideoasset_set()
 
     def resolve_question_audio_url(self, info):
-        return f'{settings.DOMAIN}{self.get_questionttsasset().tts_file.url}'
+        try:
+            tts_file = self.get_questionttsasset().tts_file.url
+        except Exception as e:
+            print(e)
+            self.save_gtts()
+            tts_file = self.get_questionttsasset().tts_file.url
+        return f'{settings.DOMAIN}{tts_file}'
 
 
 class AnswerOptionSchema(DjangoObjectType):
@@ -165,6 +171,7 @@ class AnswerOptionSchema(DjangoObjectType):
     image = graphene.String()
     audio_file = graphene.String()
     video = graphene.String()
+    answer_audio_url = graphene.String()
 
     def resolve_answer_text(self, info, language_code=None):
         return self.safe_translation_getter("answer_text", any_language=True)
@@ -204,6 +211,15 @@ class AnswerOptionSchema(DjangoObjectType):
 
         return self.safe_translation_getter(
             "video", language_code=current_language)
+
+    def resolve_answer_audio_url(self, info):
+        try:
+            tts_file = self.tts_file.url
+        except Exception as e:
+            print(e)
+            self.save_gtts()
+            tts_file = self.tts_file.url
+        return f'{settings.DOMAIN}{tts_file}'
 
 
 class Query(graphene.ObjectType):
