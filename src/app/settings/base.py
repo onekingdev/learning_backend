@@ -235,7 +235,7 @@ settings.LANGUAGES.append(
 # Media files
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media/')
 
 
 PARLER_ENABLE_CACHING = False

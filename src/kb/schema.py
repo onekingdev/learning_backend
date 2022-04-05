@@ -4,11 +4,10 @@ from django.utils.html import strip_tags
 from graphene_django import DjangoObjectType
 from kb.models import AreaOfKnowledge, Grade, Topic, TopicGrade, Prerequisite
 from kb.models.content import Question, AnswerOption
-from kb.models.content import QuestionImageAsset, QuestionAudioAsset, QuestionVideoAsset
+from kb.models.content import QuestionImageAsset, QuestionAudioAsset, QuestionVideoAsset, QuestionTTSAsset
 from engine.models import TopicStudentReport
 from engine.schema import TopicStudentReportSchema
 from students.models import StudentTopicMastery
-import os
 
 
 class AreaOfKnowledgeSchema(DjangoObjectType):
@@ -123,6 +122,12 @@ class QuestionVideoAssetSchema(DjangoObjectType):
         fields = "__all__"
 
 
+class QuestionTTSAssetSchema(DjangoObjectType):
+    class Meta:
+        model = QuestionTTSAsset
+        fields = "__all__"
+
+
 class QuestionSchema(DjangoObjectType):
     class Meta:
         model = Question
@@ -132,7 +137,7 @@ class QuestionSchema(DjangoObjectType):
     question_image_assets = graphene.List(QuestionImageAssetSchema)
     question_audio_assets = graphene.List(QuestionAudioAssetSchema)
     question_video_assets = graphene.List(QuestionVideoAssetSchema)
-    question_audio_url = graphene.String()
+    question_tts_asset = graphene.Field(QuestionTTSAssetSchema)
 
     def resolve_question_text(self, info, language_code=None):
         return strip_tags(self.safe_translation_getter("question_text", any_language=True))
@@ -146,14 +151,8 @@ class QuestionSchema(DjangoObjectType):
     def resolve_question_video_assets(self, info):
         return self.get_questionvideoasset_set()
 
-    def resolve_question_audio_url(self, info):
-        # language = self.get_current_language()
-        # url = "media/gtts/" + language + "/" + self.identifier + "/question" + ".mp3"
-
-        # if not os.path.isfile(url):
-        #     self.save_gtts()
-        # return url
-        return None
+    def resolve_question_tts_asset(self, info):
+        return self.get_questionttsasset()
 
 
 class AnswerOptionSchema(DjangoObjectType):
@@ -166,7 +165,6 @@ class AnswerOptionSchema(DjangoObjectType):
     image = graphene.String()
     audio_file = graphene.String()
     video = graphene.String()
-    answer_audio_url = graphene.String()
 
     def resolve_answer_text(self, info, language_code=None):
         return self.safe_translation_getter("answer_text", any_language=True)
@@ -206,18 +204,6 @@ class AnswerOptionSchema(DjangoObjectType):
 
         return self.safe_translation_getter(
             "video", language_code=current_language)
-
-    def resolve_answer_audio_url(self, info):
-        # language = self.get_current_language()
-        # if self.question:
-        #     url = "media/gtts/" + language + "/" + self.question.identifier + \
-        #         "/answer_" + self.random_slug + ".mp3"
-        #     if not os.path.isfile(url):
-        #         self.save_gtts()
-        #     return url
-        # else:
-        #     return "null"
-        return None
 
 
 class Query(graphene.ObjectType):

@@ -1,11 +1,14 @@
+import os
 from django.db import models
 from django.contrib import admin
 from ckeditor.fields import RichTextField
 from polymorphic.models import PolymorphicModel
 from kb.managers.content import QuestionManager
 from gtts import gTTS
-import os
 from django.utils.html import strip_tags
+from django.conf import settings
+from django.core.files import File
+from pathlib import Path
 
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
@@ -52,43 +55,60 @@ class Question(
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
 
-    # ---------------- Generate gtts audio file -S-------------------#
+    def get_questionttsasset(self):
+        return QuestionTTSAsset.objects.get(question=self)
+
     def save_gtts(self):
-        # get question's text
-        text = self.safe_translation_getter("question_text", any_language=True)
-        if not text:
-            return
-        # get language of current question
+        question_text = self.safe_translation_getter(
+            "question_text", any_language=True)
+        if not question_text:
+            return None
+
         language = self.get_current_language()
 
-        # ------------- generate path to save gtts and save text to speech audio file to the path-S-------------#
-        path = "media/gtts/" + language + "/" + self.identifier
-        isPathExist = os.path.exists(path)
-        if not isPathExist:
-            os.makedirs(path)
-            try:
-                TTS = gTTS(text=text, lang=language)
-                time.sleep(1)
-                TTS.save(path + "/question" + ".mp3")
-            except Exception as e:
-                print("Exception on gtts", e)
-        # ------------- generate path to save gtts and save text to speech audio file to the path-E-------------#
-    # ---------------- Generate gtts audio file -E-------------------#
+        question_tts_asset, new = QuestionTTSAsset.objects.get_or_create(
+            question=self,
+        )
+
+        try:
+            tts_file = question_tts_asset.tts_file.file
+        except Exception as e:
+            tts_file = None
+            print(e)
+
+        if new or (tts_file is None):
+            question_path = os.path.join(
+                settings.MEDIA_ROOT, f'tts/{language}/{self.identifier}/')
+
+            Path(question_path).mkdir(parents=True, exist_ok=True)
+
+            tts_file_name = f'{self.identifier}.mp3'
+
+            tts_file_path = os.path.join(question_path, tts_file_name)
+
+            with open(tts_file_path, 'wb') as f:
+                try:
+                    tts = gTTS(text=question_text, lang=language)
+                    tts.write_to_fp(f)
+                except Exception as e:
+                    print("Exception on gtts", e)
+
+            question_tts_asset.tts_file = f'tts/{language}/{self.identifier}/{self.identifier}.mp3'
+            question_tts_asset.save()
 
     def save(self, *args, **kwargs):
         # self.set_calculated_fields()
         super().save(*args, **kwargs)
-        self.save_gtts()
 
-    @admin.display(description='Question')
+    @ admin.display(description='Question')
     def question(self):
         return self.safe_translation_getter("question_text", any_language=True)
 
-    @admin.display(description='Audience')
+    @ admin.display(description='Audience')
     def grade_audience(self):
         return self.grade.audience
 
-    @admin.display(description='Topic identifier')
+    @ admin.display(description='Topic identifier')
     def topic_identifier(self):
         return self.topic.identifier
 
@@ -101,7 +121,7 @@ class QuestionAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     order = models.PositiveIntegerField(blank=True, null=True)
 
-    @admin.display(description='Question identifier')
+    @ admin.display(description='Question identifier')
     def question_slug(self):
         return self.question.random_slug
 
@@ -125,7 +145,7 @@ class QuestionAudioAsset(QuestionAsset):
 
 class QuestionTTSAsset(QuestionAsset):
     PREFIX = 'question_tts_asset_'
-    tts_file = models.FileField(null=True, blank=True)
+    tts_file = models.FileField(null=True, blank=True, upload_to='tts')
 
 
 class QuestionVideoAsset(QuestionAsset):
@@ -144,33 +164,41 @@ class AnswerOption(TimestampModel, RandomSlugModel, TranslatableModel):
         video=models.URLField(null=True, blank=True),
     )
     is_correct = models.BooleanField(default=False)
+    tts_file = models.FileField(null=True, blank=True, upload_to='tts')
 
-    # ---------------- Generate gtts audio file -S-------------------#
     def save_gtts(self):
-        text = self.safe_translation_getter("answer_text", any_language=True)
-        # if text is empty or answer's question is empty, disable to save
-        if not text:
-            return
-        if not self.question:
-            return
+        answer_text = self.safe_translation_getter(
+            "answer_text", any_language=True)
+        if not answer_text:
+            return None
 
-        # get current answer's language
         language = self.get_current_language()
 
-        # Generate path to save gtts and save text to speech audio file to the path
-        path = "media/gtts/" + language + "/" + self.question.identifier
-        isPathExist = os.path.exists(path)
-        if not isPathExist:
-            os.makedirs(path)
-
         try:
-            TTS = gTTS(text=text, lang=language)
-            time.sleep(1)
-            TTS.save(path + "/answer_" + self.random_slug + ".mp3")
+            tts_file = self.tts_file.file
         except Exception as e:
-            print("Exception on gtts", e)
-        # ------------- generate path to save gtts and save text to speech audio file to the path -E-------------#
-        # ---------------- Generate gtts audio file -E-------------------#
+            tts_file = None
+            print(e)
+
+        if tts_file is None:
+            answer_path = os.path.join(
+                settings.MEDIA_ROOT, f'tts/{language}/{self.question.identifier}/')
+
+            Path(answer_path).mkdir(parents=True, exist_ok=True)
+
+            tts_file_name = f'{self.identifier}.mp3'
+
+            tts_file_path = os.path.join(answer_path, tts_file_name)
+
+            with open(tts_file_path, 'wb') as f:
+                try:
+                    tts = gTTS(text=answer_text, lang=language)
+                    tts.write_to_fp(f)
+                except Exception as e:
+                    print("Exception on gtts", e)
+
+            self.tts_file = f'tts/{language}/{self.question.identifier}/{self.identifier}.mp3'
+            self.save()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

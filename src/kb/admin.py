@@ -175,6 +175,7 @@ class QuestionAdmin(parler_admin.TranslatableAdmin,
         'grade',
     )
     list_display = (
+        'id',
         'question',
         'topic',
         'grade',
