@@ -137,7 +137,7 @@ class QuestionSchema(DjangoObjectType):
     question_image_assets = graphene.List(QuestionImageAssetSchema)
     question_audio_assets = graphene.List(QuestionAudioAssetSchema)
     question_video_assets = graphene.List(QuestionVideoAssetSchema)
-    question_tts_asset = graphene.Field(QuestionTTSAssetSchema)
+    question_audio_url = graphene.Field(QuestionTTSAssetSchema)
 
     def resolve_question_text(self, info, language_code=None):
         return strip_tags(self.safe_translation_getter("question_text", any_language=True))
@@ -151,8 +151,8 @@ class QuestionSchema(DjangoObjectType):
     def resolve_question_video_assets(self, info):
         return self.get_questionvideoasset_set()
 
-    def resolve_question_tts_asset(self, info):
-        return self.get_questionttsasset()
+    def resolve_question_audio_url(self, info):
+        return f'{settings.DOMAIN}{self.get_questionttsasset().tts_file.url}'
 
 
 class AnswerOptionSchema(DjangoObjectType):
