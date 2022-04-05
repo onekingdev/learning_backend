@@ -137,7 +137,7 @@ class QuestionSchema(DjangoObjectType):
     question_image_assets = graphene.List(QuestionImageAssetSchema)
     question_audio_assets = graphene.List(QuestionAudioAssetSchema)
     question_video_assets = graphene.List(QuestionVideoAssetSchema)
-    question_audio_url = graphene.Field(QuestionTTSAssetSchema)
+    question_audio_url = graphene.String()
 
     def resolve_question_text(self, info, language_code=None):
         return strip_tags(self.safe_translation_getter("question_text", any_language=True))
