@@ -90,7 +90,7 @@ class CreateAIBlockPresentation(graphene.Mutation):
         except AreaOfKnowledge.DoesNotExist:
             raise Exception("Area of knowledge does not exist")
 
-        topics = area_of_knowledge.topic_set.all()
+        topics = area_of_knowledge.topic_set.all().filter(parent=None)
 
         qs1 = StudentTopicStatus.objects.filter(
             student=student,
