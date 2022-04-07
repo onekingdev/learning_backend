@@ -154,11 +154,12 @@ class QuestionSchema(DjangoObjectType):
     def resolve_question_audio_url(self, info):
         try:
             tts_file = self.get_questionttsasset().tts_file.url
+            tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
             print(e)
-            self.save_gtts()
-            tts_file = self.get_questionttsasset().tts_file.url
-        return f'{settings.DOMAIN}{tts_file}'
+            # self.save_gtts()
+            tts_string = None
+        return tts_string
 
 
 class AnswerOptionSchema(DjangoObjectType):
@@ -215,11 +216,11 @@ class AnswerOptionSchema(DjangoObjectType):
     def resolve_answer_audio_url(self, info):
         try:
             tts_file = self.tts_file.url
+            tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
             print(e)
-            self.save_gtts()
-            tts_file = self.tts_file.url
-        return f'{settings.DOMAIN}{tts_file}'
+            tts_string = None
+        return tts_string
 
 
 class Query(graphene.ObjectType):
