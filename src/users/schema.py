@@ -5,6 +5,11 @@ from django.contrib.auth.models import User
 
 
 class UserSchema(DjangoObjectType):
+    language = graphene.String()
+
+    def resolve_language(self, info):
+        return self.language
+
     class Meta:
         model = User
 
