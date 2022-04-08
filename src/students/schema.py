@@ -20,6 +20,7 @@ class StudentSchema(DjangoObjectType):
     current_avatar_accessories = graphene.Field('avatars.schema.AvatarSchema')
     current_avatar_clothes = graphene.Field('avatars.schema.AvatarSchema')
     current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
+    user = graphene.Field('users.schems.UserSchema')
 
     def resolve_coin_wallet(self, info):
         return self.coinWallet
@@ -79,6 +80,9 @@ class StudentSchema(DjangoObjectType):
         except StudentAvatar.DoesNotExist:
             avatar = None
         return avatar
+
+    def resolve_user(self, info):
+        return self.user
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
