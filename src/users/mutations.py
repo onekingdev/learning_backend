@@ -1,5 +1,5 @@
 import graphene
-from user.schema import UserSchema
+from users.schema import UserSchema
 
 
 class ChangeLanguage(graphene.Mutation):
