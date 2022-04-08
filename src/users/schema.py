@@ -12,7 +12,7 @@ class UserSchema(DjangoObjectType):
         return self.language
 
     class Meta:
-        model = get_user_model
+        model = get_user_model()
 
 
 class UserProfileSchema(DjangoObjectType):
