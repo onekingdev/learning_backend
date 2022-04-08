@@ -153,6 +153,8 @@ class Query(graphene.ObjectType):
 
     collectibles = graphene.List(CollectibleSchema)
     collectible_by_id = graphene.Field(CollectibleSchema, id=graphene.String())
+    collectibles_by_category = graphene.List(
+        CollectibleSchema, category_id=graphene.ID())
     collectibles_not_owned = graphene.Field(CollectibleSchema)
     collectible_count_by_category = graphene.Int(category_id=graphene.ID())
     purchased_collectible_count_by_category = graphene.Int(
@@ -165,6 +167,9 @@ class Query(graphene.ObjectType):
     def resolve_collectible_by_id(root, info, id):
         # Querying a single question
         return Collectible.objects.get(pk=id)
+
+    def resolve_collectibles_by_category(root, info, category_id):
+        return Collectible.objects.filter(category=category_id)
 
     def resolve_collectibles_not_owned(root, info):
         user = info.context.user
