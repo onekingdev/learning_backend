@@ -31,6 +31,7 @@ import payments.mutations
 import payments.schema
 import games.mutations
 import games.schema
+import users.mutations
 
 
 class CustomTokenAuth(ObtainJSONWebToken):
@@ -58,32 +59,34 @@ class Mutation(
     plans.mutations.Mutation,
     payments.mutations.Mutation,
     games.mutations.Mutation,
-    graphene.ObjectType):
+    users.mutations.Mutation,
+    graphene.ObjectType
+):
     token_auth = CustomTokenAuth.Field()
     refresh_token = graphql_jwt.Refresh.Field()
     verify_token = graphql_jwt.Verify.Field()
 
 
 class Query(
-    achievements.schema.Query,
-    payments.schema.Query,
-    api.schema.Query,
-    audiences.schema.Query,
-    block.schema.Query,
-    bank.schema.Query,
-    collectibles.schema.Query,
-    experiences.schema.Query,
-    guardians.schema.Query,
-    kb.schema.Query,
-    organization.schema.Query,
-    plans.schema.Query,
-    users.schema.Query,
-    students.schema.Query,
-    avatars.schema.Query,
-    universals.schema.Query,
-    wallets.schema.Query,
-    games.schema.Query,
-    graphene.ObjectType):
+        achievements.schema.Query,
+        payments.schema.Query,
+        api.schema.Query,
+        audiences.schema.Query,
+        block.schema.Query,
+        bank.schema.Query,
+        collectibles.schema.Query,
+        experiences.schema.Query,
+        guardians.schema.Query,
+        kb.schema.Query,
+        organization.schema.Query,
+        plans.schema.Query,
+        users.schema.Query,
+        students.schema.Query,
+        avatars.schema.Query,
+        universals.schema.Query,
+        wallets.schema.Query,
+        games.schema.Query,
+        graphene.ObjectType):
     pass
 
 
