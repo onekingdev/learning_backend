@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from api.models import profile
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 
 
@@ -11,7 +12,7 @@ class UserSchema(DjangoObjectType):
         return self.language
 
     class Meta:
-        model = User
+        model = get_user_model
 
 
 class UserProfileSchema(DjangoObjectType):
