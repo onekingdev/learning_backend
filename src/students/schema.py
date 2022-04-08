@@ -20,7 +20,7 @@ class StudentSchema(DjangoObjectType):
     current_avatar_accessories = graphene.Field('avatars.schema.AvatarSchema')
     current_avatar_clothes = graphene.Field('avatars.schema.AvatarSchema')
     current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
-    user = graphene.Field('users.schems.UserSchema')
+    user = graphene.Field('users.schema.UserSchema')
 
     def resolve_coin_wallet(self, info):
         return self.coinWallet
