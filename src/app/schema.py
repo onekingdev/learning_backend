@@ -86,7 +86,6 @@ class Query(
         universals.schema.Query,
         wallets.schema.Query,
         games.schema.Query,
-        users.schema.Query,
         graphene.ObjectType):
     pass
 
