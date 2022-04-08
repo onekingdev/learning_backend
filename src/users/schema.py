@@ -29,8 +29,8 @@ class Query(graphene.ObjectType):
 
     def resolve_users(root, info, **kwargs):
         # Querying a list
-        return User.objects.all()
+        return get_user_model().objects.all()
 
     def resolve_user_by_id(root, info, id):
         # Querying a single question
-        return User.objects.get(pk=id)
+        return get_user_model().objects.get(pk=id)
