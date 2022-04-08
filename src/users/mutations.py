@@ -21,4 +21,4 @@ class ChangeLanguage(graphene.Mutation):
 
 
 class Mutation(graphene.ObjectType):
-    change_language = graphene.Field(ChangeLanguage)
+    change_language = ChangeLanguage.Field()
