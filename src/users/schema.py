@@ -1,13 +1,12 @@
 import graphene
 from graphene_django import DjangoObjectType
-from django.contrib.auth import get_user_model
 from api.models import profile
 from django.contrib.auth.models import User
 
 
 class UserSchema(DjangoObjectType):
     class Meta:
-        model = get_user_model()
+        model = User
 
 
 class UserProfileSchema(DjangoObjectType):
