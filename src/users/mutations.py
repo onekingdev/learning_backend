@@ -2,7 +2,7 @@ import graphene
 from users.schema import UserSchema
 
 
-class UpdateUserLanguage(graphene.Mutation):
+class ChangeLanguage(graphene.Mutation):
     user = graphene.Field(UserSchema)
 
     class Arguments:
@@ -17,8 +17,8 @@ class UpdateUserLanguage(graphene.Mutation):
         user.language = language
         user.save()
 
-        return UpdateUserLanguage(user=user)
+        return ChangeLanguage(user=user)
 
 
 class Mutation(graphene.ObjectType):
-    update_user_language = UpdateUserLanguage.Field()
+    change_language = ChangeLanguage.Field()
