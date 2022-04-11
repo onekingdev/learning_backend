@@ -2,7 +2,6 @@ from app.resources import TranslatableModelResource
 from app.widgets import TranslatableForeignKeyWidget
 from import_export.fields import Field
 from import_export.resources import ModelResource
-from import_export.widgets import ManyToManyWidget
 from .models import Topic, Grade, TopicGrade, Prerequisite, GradePrerequisite
 from .models.content import (
     Question,
