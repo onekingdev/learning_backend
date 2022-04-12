@@ -256,6 +256,7 @@ class TypeInAnswerOption(AnswerOption):
         audio_file=models.URLField(null=True, blank=True),
         video=models.URLField(null=True, blank=True),
     )
+    case_sensitive = models.BooleanField(default=False)
 
     def __str__(self):
         return self.safe_translation_getter("answer_text", any_language=True)
