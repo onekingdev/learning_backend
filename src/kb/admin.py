@@ -343,7 +343,7 @@ class QuestionAdmin(
         'grade',
     )
     autocomplete_fields = ['topic']
-    search_fields = ['translations__question_text']
+    search_fields = ['translations__question_text', 'id']
 
 
 @admin.register(QuestionImageAsset)
