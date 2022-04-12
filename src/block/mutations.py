@@ -36,7 +36,7 @@ class BlockQuestionInput(graphene.InputObjectType):
     multiple_choice_answer_option = graphene.ID()
     multiple_select_answer_options = graphene.List(graphene.ID())
     type_in_answer_option = TypeInAnswerOptionInput()
-    order_answer_option = graphene.List(graphene.String())
+    order_answer_options = graphene.List(graphene.String())
     relate_answer_options = graphene.List(RelateAnswerOptionInput)
 
 
@@ -260,14 +260,75 @@ class FinishBlockPresentation(graphene.Mutation):
         for question in questions:
             question_object = Question.objects.get(id=question['question'])
             question_type = question_object.question_type
-            answer_object = AnswerOption.objects.get(
-                id=question['answer_option'])
+            # answer_object = AnswerOption.objects.get(
+            #     id=question['answer_option'])
+
             block_question_presentation = BlockQuestionPresentation(
                 block_presentation=block_presentation,
-                chosen_answer=answer_object,
                 question=question_object,
                 topic=block_topic,
             )
+            block_question_presentation.save()
+
+            if question_type == 'MC':
+                answer_option = MultipleChoiceAnswerOption.objects.get(
+                    id=question['multiple_choice_answer_option']
+                )
+                block_question_presentation.chosen_answer.add(answer_option)
+            elif question_type == 'MS':
+                for answer in question['multiple_select_answer_options']:
+                    answer_option = MultipleSelectAnswerOption.objects.get(
+                        id=answer
+                    )
+                    block_question_presentation.add(answer_option)
+            elif question_type == 'T':
+                is_correct = True
+                answer_text = question['type_in_answer_option']['typed_answer']
+                correct_answer_id = question['type_in_answer_option']['answer_option']
+                correct_answer = TypeInAnswerOption.objects.get(
+                    id=correct_answer_id
+                )
+                if correct_answer.case_sensitive:
+                    if answer_text.casefold() == correct_answer.answer_text.casefold():
+                        is_correct = True
+                    else:
+                        is_correct = False
+                else:
+                    if answer_text == correct_answer.answer_text:
+                        is_correct = True
+                    else:
+                        is_correct = False
+
+                block_question_presentation.typed_answer = answer_text
+                if is_correct:
+                    block_question_presentation.status = 'CORRECT'
+                else:
+                    block_question_presentation.status = 'INCORRECT'
+            elif question_type == 'O':
+                answer_options = question['order_answer_options']
+                for order, answer_option in enumerate(answer_options):
+                    order_answer_option, new = OrderAnswerOption.objects.get_or_create(
+                        question=question_object,
+                        answer_text=answer_option,
+                        order=order,
+                    )
+                    order_answer_option.save()
+                    block_question_presentation.chosen_answer.add(
+                        order_answer_option
+                    )
+            elif question_type == 'R':
+                answer_options = question['relate_answer_options']
+                for key, value in answer_options.values():
+                    relate_answer_option, new = RelateAnswerOption.objects.get_or_create(
+                        question=question_object,
+                        key=key,
+                        value=value,
+                    )
+                    relate_answer_option.save()
+                    block_question_presentation.chosen_answer.add(
+                        relate_answer_option
+                    )
+
             block_question_presentation.save()
 
         # Create registers for report tables
