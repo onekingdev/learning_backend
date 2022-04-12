@@ -208,6 +208,8 @@ class MultipleChoiceAnswerOptionAdmin(
     base_model = MultipleChoiceAnswerOption
     show_in_index = True
 
+    autocomplete_fields = ['question']
+
 
 @admin.register(MultipleSelectAnswerOption)
 class MultipleSelectAnswerOptionAdmin(
@@ -221,6 +223,8 @@ class MultipleSelectAnswerOptionAdmin(
     # Polymorphic settings
     base_model = MultipleSelectAnswerOption
     show_in_index = True
+
+    autocomplete_fields = ['question']
 
 
 @admin.register(TypeInAnswerOption)
@@ -236,6 +240,8 @@ class TypeInAnswerOptionAdmin(
     base_model = TypeInAnswerOption
     show_in_index = True
 
+    autocomplete_fields = ['question']
+
 
 @admin.register(OrderAnswerOption)
 class OrderAnswerOptionAdmin(
@@ -250,6 +256,8 @@ class OrderAnswerOptionAdmin(
     base_model = OrderAnswerOption
     show_in_index = True
 
+    autocomplete_fields = ['question']
+
 
 @admin.register(RelateAnswerOption)
 class RelateAnswerOptionAdmin(
@@ -263,6 +271,8 @@ class RelateAnswerOptionAdmin(
     # Polymorphic settings
     base_model = RelateAnswerOption
     show_in_index = True
+
+    autocomplete_fields = ['question']
 
 
 @admin.register(AnswerOption)
