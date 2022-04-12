@@ -1,7 +1,6 @@
 import graphene
 import random
 from django.utils import timezone
-from django.db.models import F
 from students.schema import StudentSchema
 from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPresentation
 from .schema import BlockPresentationSchema
