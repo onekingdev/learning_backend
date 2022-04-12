@@ -221,6 +221,7 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     chosen_answer = models.ManyToManyField(
         'kb.AnswerOption',
     )
+    typed_answer = models.CharField(max_length=128, blank=True, null=True)
     topic = models.ForeignKey(
         'kb.Topic',
         on_delete=models.PROTECT,
