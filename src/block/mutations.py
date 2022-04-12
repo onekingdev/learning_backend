@@ -34,7 +34,7 @@ class TypeInAnswerOptionInput(graphene.InputObjectType):
 class BlockQuestionInput(graphene.InputObjectType):
     question = graphene.ID()
     multiple_choice_answer_option = graphene.ID()
-    multiple_select_answer_options = graphene.List(graphene.ID())
+    multiple_select_answer_options = graphene.List(graphene.ID)
     type_in_answer_option = TypeInAnswerOptionInput()
     order_answer_options = graphene.List(graphene.String())
     relate_answer_options = graphene.List(RelateAnswerOptionInput)
