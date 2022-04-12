@@ -218,11 +218,10 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
         'kb.Question',
         on_delete=models.PROTECT
     )
-    chosen_answer = models.ForeignKey(
+    chosen_answer = models.ManyToManyField(
         'kb.AnswerOption',
-        on_delete=models.PROTECT,
-        null=True
     )
+    typed_answer = models.CharField(max_length=128, blank=True, null=True)
     topic = models.ForeignKey(
         'kb.Topic',
         on_delete=models.PROTECT,
@@ -250,13 +249,20 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
 
     def save(self, *args, **kwargs):
         self.topic = self.block_presentation.block.topic_grade.topic
-        if self.chosen_answer:
-            if self.chosen_answer.is_correct:
-                self.status = self.STATUS_CORRECT
-            else:
-                self.status = self.STATUS_INCORRECT
+        is_correct = True
+
+        for answer in self.chosen_answer:
+            if self.chosen_answer:
+                if not self.chosen_answer.is_correct:
+                    is_correct = False
+
+        if is_correct:
+            self.status = self.STATUS_CORRECT
+        elif not is_correct:
+            self.status = self.STATUS_INCORRECT
         else:
             self.status = self.STATUS_PENDING
+
         super(BlockQuestionPresentation, self).save(*args, **kwargs)
 
 

@@ -1,17 +1,65 @@
 from django.contrib import admin
 from .models import Topic, AreaOfKnowledge, Grade, TopicGrade, Prerequisite, GradePrerequisite
 from .models.content import Question, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset, QuestionTTSAsset
-from .models.content import AnswerOption
-
+from .models.content import (
+    AnswerOption,
+    MultipleChoiceAnswerOption,
+    MultipleSelectAnswerOption,
+    OrderAnswerOption,
+    RelateAnswerOption,
+    TypeInAnswerOption,
+)
 from . import resources
+
 from parler import admin as parler_admin
 from import_export import admin as import_export_admin
+from polymorphic import admin as polymorphic_admin
 from mptt.admin import DraggableMPTTAdmin
 
 
-class AnswerOptionInline(parler_admin.TranslatableStackedInline):
+class AnswerOptionInline(
+    # parler_admin.TranslatableStackedInline,
+    polymorphic_admin.StackedPolymorphicInline,
+):
     model = AnswerOption
-    extra = 0
+
+    class MultipleChoiceAnswerOptionInline(
+            parler_admin.TranslatableStackedInline,
+            polymorphic_admin.StackedPolymorphicInline.Child,
+    ):
+        model = MultipleChoiceAnswerOption
+
+    class MultipleSelectAnswerOptionInline(
+            parler_admin.TranslatableStackedInline,
+            polymorphic_admin.StackedPolymorphicInline.Child,
+    ):
+        model = MultipleSelectAnswerOption
+
+    class TypeInAnswerOptionInline(
+            parler_admin.TranslatableStackedInline,
+            polymorphic_admin.StackedPolymorphicInline.Child,
+    ):
+        model = TypeInAnswerOption
+
+    class OrderAnswerOptionInline(
+        parler_admin.TranslatableStackedInline,
+        polymorphic_admin.StackedPolymorphicInline.Child,
+    ):
+        model = OrderAnswerOption
+
+    class RelateAnswerOptionInline(
+        parler_admin.TranslatableStackedInline,
+        polymorphic_admin.StackedPolymorphicInline.Child,
+    ):
+        model = RelateAnswerOption
+
+    child_inlines = (
+        MultipleChoiceAnswerOptionInline,
+        MultipleSelectAnswerOptionInline,
+        TypeInAnswerOptionInline,
+        OrderAnswerOptionInline,
+        RelateAnswerOptionInline,
+    )
 
 
 class QuestionImageAssetInline(admin.TabularInline):
@@ -55,7 +103,7 @@ class TopicAdmin(
         'standard_topic',
     )
     list_filter = (
-        'area_of_knowledge',
+        'area_of_knowledge__universal_area_knowledge',
     )
     actions = [hard_delete_selected]
     search_fields = ['translations__name', 'id']
@@ -147,40 +195,133 @@ class TopicGradeAdmin(
     autocomplete_fields = ['topic']
 
 
+@admin.register(MultipleChoiceAnswerOption)
+class MultipleChoiceAnswerOptionAdmin(
+    parler_admin.TranslatableAdmin,
+    import_export_admin.ImportExportModelAdmin,
+    polymorphic_admin.PolymorphicChildModelAdmin,
+):
+    # Import-Export settings
+    resource_class = resources.MultipleChoiceAnswerOptionResource
+
+    # Polymorphic settings
+    base_model = MultipleChoiceAnswerOption
+    show_in_index = True
+
+
+@admin.register(MultipleSelectAnswerOption)
+class MultipleSelectAnswerOptionAdmin(
+    parler_admin.TranslatableAdmin,
+    import_export_admin.ImportExportModelAdmin,
+    polymorphic_admin.PolymorphicChildModelAdmin,
+):
+    # Import-Export settings
+    resource_class = resources.MultipleSelectAnswerOptionResource
+
+    # Polymorphic settings
+    base_model = MultipleSelectAnswerOption
+    show_in_index = True
+
+
+@admin.register(TypeInAnswerOption)
+class TypeInAnswerOptionAdmin(
+    parler_admin.TranslatableAdmin,
+    import_export_admin.ImportExportModelAdmin,
+    polymorphic_admin.PolymorphicChildModelAdmin,
+):
+    # Import-Export settings
+    resource_class = resources.TypeInAnswerOptionResource
+
+    # Polymorphic settings
+    base_model = TypeInAnswerOption
+    show_in_index = True
+
+
+@admin.register(OrderAnswerOption)
+class OrderAnswerOptionAdmin(
+    parler_admin.TranslatableAdmin,
+    import_export_admin.ImportExportModelAdmin,
+    polymorphic_admin.PolymorphicChildModelAdmin,
+):
+    # Import-Export settings
+    resource_class = resources.OrderAnswerOptionResource
+
+    # Polymorphic settings
+    base_model = OrderAnswerOption
+    show_in_index = True
+
+
+@admin.register(RelateAnswerOption)
+class RelateAnswerOptionAdmin(
+    parler_admin.TranslatableAdmin,
+    import_export_admin.ImportExportModelAdmin,
+    polymorphic_admin.PolymorphicChildModelAdmin,
+):
+    # Import-Export settings
+    resource_class = resources.RelateAnswerOptionResource
+
+    # Polymorphic settings
+    base_model = RelateAnswerOption
+    show_in_index = True
+
+
 @admin.register(AnswerOption)
 class AnswerOptionAdmin(
-        parler_admin.TranslatableAdmin,
-        import_export_admin.ImportExportModelAdmin):
-    resource_class = resources.AnswerOptionResource
+    # parler_admin.TranslatableAdmin,
+    import_export_admin.ImportExportModelAdmin,
+    polymorphic_admin.PolymorphicParentModelAdmin,
+):
+    # Display settings
     list_display = (
-        'id',
-        'answer_text',
+        '__str__',
         'question',
-        'is_correct',
+        'question_type',
+        'id',
     )
     list_filter = (
-        'question__topic__area_of_knowledge',
+        'question__question_type',
+    )
+
+    # Import-Export settings
+    resource_class = resources.AnswerOptionResource
+
+    # Polymorphic settings
+    polymorphic_list = True
+    base_model = AnswerOption
+    child_models = (
+        MultipleChoiceAnswerOption,
+        MultipleSelectAnswerOption,
+        TypeInAnswerOption,
+        OrderAnswerOption,
+        RelateAnswerOption,
     )
     autocomplete_fields = ['question']
 
 
 @admin.register(Question)
-class QuestionAdmin(parler_admin.TranslatableAdmin,
-                    import_export_admin.ImportExportModelAdmin):
+class QuestionAdmin(
+    polymorphic_admin.PolymorphicInlineSupportMixin,
+    parler_admin.TranslatableAdmin,
+    import_export_admin.ImportExportModelAdmin,
+):
     resource_class = resources.QuestionResource
-    inlines = [AnswerOptionInline,
-               QuestionImageAssetInline,
-               QuestionVideoAssetInline,
-               QuestionTTSAssetInline,
-               QuestionAudioAssetInline]
+    inlines = [
+        AnswerOptionInline,
+        QuestionImageAssetInline,
+        QuestionVideoAssetInline,
+        QuestionTTSAssetInline,
+        QuestionAudioAssetInline
+    ]
     fields = (
         'question_text',
         'topic',
         'grade',
+        'question_type',
     )
     list_display = (
         'id',
         'question',
+        'question_type',
         'topic',
         'grade',
         'grade_audience',

@@ -1,7 +1,6 @@
 import graphene
 import random
 from django.utils import timezone
-from django.db.models import F
 from students.schema import StudentSchema
 from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPresentation
 from .schema import BlockPresentationSchema
@@ -14,9 +13,18 @@ from decimal import Decimal
 from wallets.models import CoinWallet
 
 
+class RelateAnswerOptionInput(graphene.InputObjectType):
+    key = graphene.String()
+    value = graphene.String()
+
+
 class BlockQuestionInput(graphene.InputObjectType):
     question = graphene.ID()
-    answer_option = graphene.ID()
+    multiple_choice_answer_option = graphene.ID()
+    multiple_select_answer_options = graphene.List(graphene.ID())
+    relate_answer_options = graphene.List(RelateAnswerOptionInput)
+    order_answer_option = graphene.List(graphene.String())
+    type_in_answer_option = graphene.String()
 
 
 class CreatePathBlockPresentation(graphene.Mutation):
@@ -238,6 +246,7 @@ class FinishBlockPresentation(graphene.Mutation):
         block_aok = block_topic.area_of_knowledge
         for question in questions:
             question_object = Question.objects.get(id=question['question'])
+            question_type = question_object.question_type
             answer_object = AnswerOption.objects.get(
                 id=question['answer_option'])
             block_question_presentation = BlockQuestionPresentation(
