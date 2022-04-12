@@ -1,12 +1,20 @@
 import graphene
 import random
 from django.utils import timezone
+from django.db.models import F
 from students.schema import StudentSchema
 from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPresentation
 from .schema import BlockPresentationSchema
 from students.models import StudentTopicMastery, StudentTopicStatus, Student
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
 from kb.models.content import Question, AnswerOption
+from kb.models.content import (
+    MultipleChoiceAnswerOption,
+    MultipleSelectAnswerOption,
+    TypeInAnswerOption,
+    OrderAnswerOption,
+    RelateAnswerOption
+)
 from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
 from experiences.models import Battery
 from decimal import Decimal
@@ -18,13 +26,18 @@ class RelateAnswerOptionInput(graphene.InputObjectType):
     value = graphene.String()
 
 
+class TypeInAnswerOptionInput(graphene.InputObjectType):
+    answer_option = graphene.ID()
+    typed_answer = graphene.String()
+
+
 class BlockQuestionInput(graphene.InputObjectType):
     question = graphene.ID()
     multiple_choice_answer_option = graphene.ID()
     multiple_select_answer_options = graphene.List(graphene.ID())
-    relate_answer_options = graphene.List(RelateAnswerOptionInput)
+    type_in_answer_option = TypeInAnswerOptionInput()
     order_answer_option = graphene.List(graphene.String())
-    type_in_answer_option = graphene.String()
+    relate_answer_options = graphene.List(RelateAnswerOptionInput)
 
 
 class CreatePathBlockPresentation(graphene.Mutation):

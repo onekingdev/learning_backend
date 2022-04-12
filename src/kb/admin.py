@@ -103,7 +103,7 @@ class TopicAdmin(
         'standard_topic',
     )
     list_filter = (
-        'area_of_knowledge__universal_area_knowledge',
+        'area_of_knowledge',
     )
     actions = [hard_delete_selected]
     search_fields = ['translations__name', 'id']
@@ -273,13 +273,11 @@ class AnswerOptionAdmin(
 ):
     # Display settings
     list_display = (
+        'id',
         '__str__',
         'question',
         'question_type',
         'id',
-    )
-    list_filter = (
-        'question__question_type',
     )
 
     # Import-Export settings
@@ -294,6 +292,10 @@ class AnswerOptionAdmin(
         TypeInAnswerOption,
         OrderAnswerOption,
         RelateAnswerOption,
+    )
+    list_filter = (
+        'question__topic__area_of_knowledge',
+        'question__question_type',
     )
     autocomplete_fields = ['question']
 
