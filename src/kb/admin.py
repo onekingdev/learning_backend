@@ -277,7 +277,6 @@ class AnswerOptionAdmin(
         '__str__',
         'question',
         'question_type',
-        'id',
     )
 
     # Import-Export settings
