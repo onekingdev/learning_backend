@@ -348,102 +348,12 @@ class OrderAnswerOptionSchema(DjangoObjectType):
         fields = "__all__"
         interfaces = (AnswerOptionInterface,)
 
-    answer_text = graphene.String()
-    explanation = graphene.String()
-    image = graphene.String()
-    audio_file = graphene.String()
-    video = graphene.String()
-
-    def resolve_answer_text(self, info, language_code=None):
-        return self.safe_translation_getter("answer_text", any_language=True)
-
-    def resolve_image(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "image", language_code=current_language)
-
-    def resolve_explanation(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "explanation", language_code=current_language)
-
-    def resolve_audio_file(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "audio_file", language_code=current_language)
-
-    def resolve_video(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "video", language_code=current_language)
-
 
 class RelateAnswerOptionSchema(DjangoObjectType):
     class Meta:
         model = RelateAnswerOption
         fields = "__all__"
         interfaces = (AnswerOptionInterface,)
-
-    answer_text = graphene.String()
-    explanation = graphene.String()
-    image = graphene.String()
-    audio_file = graphene.String()
-    video = graphene.String()
-
-    def resolve_answer_text(self, info, language_code=None):
-        return self.safe_translation_getter("answer_text", any_language=True)
-
-    def resolve_image(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "image", language_code=current_language)
-
-    def resolve_explanation(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "explanation", language_code=current_language)
-
-    def resolve_audio_file(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "audio_file", language_code=current_language)
-
-    def resolve_video(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "video", language_code=current_language)
 
 
 class Query(graphene.ObjectType):
