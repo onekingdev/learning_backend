@@ -7,7 +7,7 @@ from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPre
 from .schema import BlockPresentationSchema
 from students.models import StudentTopicMastery, StudentTopicStatus, Student
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
-from kb.models.content import Question, AnswerOption
+from kb.models.content import Question
 from kb.models.content import (
     MultipleChoiceAnswerOption,
     MultipleSelectAnswerOption,
