@@ -17,6 +17,11 @@ from engine.schema import TopicStudentReportSchema
 from students.models import StudentTopicMastery
 
 
+class AnswerOptionInterface(graphene.Interface):
+    question = graphene.Field(QuestionSchema)
+    is_correct = graphene.Boolean()
+
+
 class AreaOfKnowledgeSchema(DjangoObjectType):
     class Meta:
         model = AreaOfKnowledge
@@ -145,6 +150,7 @@ class QuestionSchema(DjangoObjectType):
     question_audio_assets = graphene.List(QuestionAudioAssetSchema)
     question_video_assets = graphene.List(QuestionVideoAssetSchema)
     question_audio_url = graphene.String()
+    answer_option_set = graphene.List(AnswerOptionInterface)
 
     def resolve_question_text(self, info, language_code=None):
         return strip_tags(self.safe_translation_getter("question_text", any_language=True))
@@ -168,11 +174,15 @@ class QuestionSchema(DjangoObjectType):
             tts_string = None
         return tts_string
 
+    def resolve_answer_option_set(self, info):
+        pass
+
 
 class AnswerOptionSchema(DjangoObjectType):
     class Meta:
         model = AnswerOption
         fields = "__all__"
+        interfaces = (AnswerOptionInterface,)
 
     answer_text = graphene.String()
     explanation = graphene.String()
@@ -228,11 +238,6 @@ class AnswerOptionSchema(DjangoObjectType):
             print(e)
             tts_string = None
         return tts_string
-
-
-class AnswerOptionInterface(graphene.Interface):
-    question = graphene.Field(QuestionSchema)
-    is_correct = graphene.Boolean()
 
 
 class MultipleChoiceAnswerOptionSchema(DjangoObjectType):
