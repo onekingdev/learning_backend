@@ -145,7 +145,7 @@ class QuestionSchema(DjangoObjectType):
     question_audio_assets = graphene.List(QuestionAudioAssetSchema)
     question_video_assets = graphene.List(QuestionVideoAssetSchema)
     question_audio_url = graphene.String()
-    answer_option_set = graphene.List('kb.schema.AnswerOptionInterface')
+    answer_options = graphene.List('kb.schema.AnswerOptionInterface')
 
     def resolve_question_text(self, info, language_code=None):
         return strip_tags(self.safe_translation_getter("question_text", any_language=True))
@@ -169,11 +169,12 @@ class QuestionSchema(DjangoObjectType):
             tts_string = None
         return tts_string
 
-    def resolve_answer_option_set(self, info):
+    def resolve_answer_options(self, info):
         return self.answeroption_set.all()
 
 
 class AnswerOptionInterface(graphene.Interface):
+    id = graphene.ID()
     question = graphene.Field(QuestionSchema)
     is_correct = graphene.Boolean()
 
