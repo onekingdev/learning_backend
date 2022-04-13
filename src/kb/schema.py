@@ -170,7 +170,7 @@ class QuestionSchema(DjangoObjectType):
         return tts_string
 
     def resolve_answer_option_set(self, info):
-        pass
+        return self.answeroption_set.all()
 
 
 class AnswerOptionInterface(graphene.Interface):
@@ -183,61 +183,6 @@ class AnswerOptionSchema(DjangoObjectType):
         model = AnswerOption
         fields = "__all__"
         interfaces = (AnswerOptionInterface,)
-
-    answer_text = graphene.String()
-    explanation = graphene.String()
-    image = graphene.String()
-    audio_file = graphene.String()
-    video = graphene.String()
-    answer_audio_url = graphene.String()
-
-    def resolve_answer_text(self, info, language_code=None):
-        return self.safe_translation_getter("answer_text", any_language=True)
-
-    def resolve_image(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "image", language_code=current_language)
-
-    def resolve_explanation(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "explanation", language_code=current_language)
-
-    def resolve_audio_file(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "audio_file", language_code=current_language)
-
-    def resolve_video(self, info, language_code=None):
-        try:
-            current_language = info.context.user.language
-        except AttributeError:
-            current_language = settings.LANGUAGE_CODE
-
-        return self.safe_translation_getter(
-            "video", language_code=current_language)
-
-    def resolve_answer_audio_url(self, info):
-        try:
-            tts_file = self.tts_file.url
-            tts_string = f'{settings.DOMAIN}{tts_file}'
-        except Exception as e:
-            print(e)
-            tts_string = None
-        return tts_string
 
 
 class MultipleChoiceAnswerOptionSchema(DjangoObjectType):
