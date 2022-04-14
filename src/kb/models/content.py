@@ -232,7 +232,7 @@ class MultipleChoiceAnswerOption(AnswerOption):
     )
 
     def __str__(self):
-        return self.safe_translation_getter("answer_text", any_language=True)
+        return strip_tags(self.safe_translation_getter("answer_text", any_language=True))
 
 
 class MultipleSelectAnswerOption(AnswerOption):
@@ -245,7 +245,7 @@ class MultipleSelectAnswerOption(AnswerOption):
     )
 
     def __str__(self):
-        return self.safe_translation_getter("answer_text", any_language=True)
+        return strip_tags(self.safe_translation_getter("answer_text", any_language=True))
 
 
 class TypeInAnswerOption(AnswerOption):
@@ -259,7 +259,7 @@ class TypeInAnswerOption(AnswerOption):
     case_sensitive = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.safe_translation_getter("answer_text", any_language=True)
+        return strip_tags(self.safe_translation_getter("answer_text", any_language=True))
 
 
 class OrderAnswerOption(AnswerOption):
@@ -272,7 +272,7 @@ class OrderAnswerOption(AnswerOption):
     order = models.IntegerField()
 
     def __str__(self):
-        return self.safe_translation_getter("answer_text", any_language=True)
+        return strip_tags(self.safe_translation_getter("answer_text", any_language=True))
 
 
 class RelateAnswerOption(AnswerOption):
@@ -284,7 +284,7 @@ class RelateAnswerOption(AnswerOption):
     )
 
     def __str__(self):
-        return (
+        return strip_tags(
             self.safe_translation_getter("key", any_language=True)
             + " - "
             + self.safe_translation_getter("value", any_language=True)
