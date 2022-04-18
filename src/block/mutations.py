@@ -139,9 +139,8 @@ class CreateAIBlockPresentation(graphene.Mutation):
             topic__in=[topic['topic'] for topic in qs1],
         )
 
-        available_mastery = [
-            mastery['mastery_level'] for mastery in qs2.values('mastery_level').distinct()
-        ]
+        available_mastery = [mastery['mastery_level']
+                             for mastery in qs2.values('mastery_level').distinct()]
 
         available_mastery_weights = [
             mastery_weights[mastery] for mastery in available_mastery
@@ -319,16 +318,14 @@ class FinishBlockPresentation(graphene.Mutation):
                     )
             elif question_type == 'R':
                 answer_options = question['relate_answer_options']
-                for key, value in answer_options.values():
-                    relate_answer_option, new = RelateAnswerOption.objects.get_or_create(
-                        question=question_object,
-                        key=key,
-                        value=value,
-                    )
-                    relate_answer_option.save()
-                    block_question_presentation.chosen_answer.add(
-                        relate_answer_option
-                    )
+                for answer_option in answer_options:
+                    for key, value in answer_option.values():
+                        relate_answer_option, new = RelateAnswerOption.objects.get_or_create(
+                            question=question_object, key=key, value=value, )
+                        relate_answer_option.save()
+                        block_question_presentation.chosen_answer.add(
+                            relate_answer_option
+                        )
 
             block_question_presentation.save()
 
