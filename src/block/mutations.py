@@ -292,12 +292,12 @@ class FinishBlockPresentation(graphene.Mutation):
                 print("Correct answer ID", correct_answer_id)
                 print("Correct answer", correct_answer)
                 if correct_answer.case_sensitive:
-                    if answer_text.casefold() == correct_answer.answer_text.casefold():
+                    if answer_text == correct_answer.answer_text:
                         is_correct = True
                     else:
                         is_correct = False
                 else:
-                    if answer_text == correct_answer.answer_text:
+                    if answer_text.casefold() == correct_answer.answer_text.casefold():
                         is_correct = True
                     else:
                         is_correct = False
