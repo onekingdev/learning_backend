@@ -254,6 +254,7 @@ class TypeInAnswerOptionResource(TranslatableModelResource):
             'answer_text',
             'question',
             'is_correct',
+            'case_sensitive',
         )
         export_order = (
             'id',
@@ -262,6 +263,7 @@ class TypeInAnswerOptionResource(TranslatableModelResource):
             'answer_text',
             'question',
             'is_correct',
+            'case_sensitive',
         )
         exclude = (
             'create_timestamp',
