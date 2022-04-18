@@ -310,7 +310,7 @@ class FinishBlockPresentation(graphene.Mutation):
                 for order, answer_option in enumerate(answer_options):
                     order_answer_option, new = OrderAnswerOption.objects.get_or_create(
                         question=question_object,
-                        answer_text=answer_option,
+                        translations__answer_text=answer_option,
                         order=order,
                     )
                     order_answer_option.save()
