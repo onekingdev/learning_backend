@@ -321,7 +321,10 @@ class FinishBlockPresentation(graphene.Mutation):
                 for answer_option in answer_options:
                     for key, value in answer_option.items():
                         relate_answer_option, new = RelateAnswerOption.objects.get_or_create(
-                            question=question_object, key=key, value=value, )
+                            question=question_object,
+                            translations__key=key,
+                            translations__value=value,
+                        )
                         relate_answer_option.save()
                         block_question_presentation.chosen_answer.add(
                             relate_answer_option
