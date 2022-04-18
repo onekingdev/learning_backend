@@ -78,7 +78,7 @@ class BlockAdmin(admin.ModelAdmin):
 class BlockQuestionPresentationAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'created_timestamp',
+        'create_timestamp',
         'block_presentation',
         'question',
         'typed_answer',
