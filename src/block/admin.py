@@ -1,7 +1,7 @@
 import random
 from django.contrib import admin
 from adminsortable2.admin import SortableAdminMixin
-from .models import BlockType, BlockAssignment, Block
+from .models import BlockType, BlockAssignment, Block, BlockQuestionPresentation
 from kb.models.content import Question
 from parler import admin as parler_admin
 
@@ -72,3 +72,18 @@ class BlockAdmin(admin.ModelAdmin):
         for student in form.instance.students.all():
             BlockAssignment.objects.get_or_create(
                 block=form.instance, student=student)
+
+
+@admin.register(BlockQuestionPresentation)
+class BlockQuestionPresentationAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'created_timestamp',
+        'block_presentation',
+        'question',
+        'typed_answer',
+        'topic',
+        'status',
+    )
+
+    autocomplete_fields = ['question']
