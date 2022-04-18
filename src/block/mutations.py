@@ -319,8 +319,7 @@ class FinishBlockPresentation(graphene.Mutation):
             elif question_type == 'R':
                 answer_options = question['relate_answer_options']
                 for answer_option in answer_options:
-                    print(answer_option)
-                    for key, value in answer_option.values():
+                    for key, value in answer_option.items():
                         relate_answer_option, new = RelateAnswerOption.objects.get_or_create(
                             question=question_object, key=key, value=value, )
                         relate_answer_option.save()
