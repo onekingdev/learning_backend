@@ -257,12 +257,12 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
                     if not answer.is_correct:
                         is_correct = False
 
-        if is_correct:
-            self.status = self.STATUS_CORRECT
-        elif not is_correct:
-            self.status = self.STATUS_INCORRECT
-        else:
-            self.status = self.STATUS_PENDING
+            if is_correct:
+                self.status = self.STATUS_CORRECT
+            elif not is_correct:
+                self.status = self.STATUS_INCORRECT
+            else:
+                self.status = self.STATUS_PENDING
 
         super(BlockQuestionPresentation, self).save(*args, **kwargs)
 
