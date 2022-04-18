@@ -307,6 +307,7 @@ class AnswerOptionAdmin(
         'question__question_type',
     )
     autocomplete_fields = ['question']
+    search_fields = ('id',)
 
 
 @admin.register(Question)
