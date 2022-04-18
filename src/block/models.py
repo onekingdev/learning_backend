@@ -251,10 +251,11 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
         self.topic = self.block_presentation.block.topic_grade.topic
         is_correct = True
 
-        for answer in self.chosen_answer:
-            if self.chosen_answer:
-                if not self.chosen_answer.is_correct:
-                    is_correct = False
+        if self.pk:
+            for answer in self.chosen_answer:
+                if self.chosen_answer:
+                    if not self.chosen_answer.is_correct:
+                        is_correct = False
 
         if is_correct:
             self.status = self.STATUS_CORRECT

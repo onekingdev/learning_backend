@@ -280,7 +280,8 @@ class FinishBlockPresentation(graphene.Mutation):
                     answer_option = MultipleSelectAnswerOption.objects.get(
                         id=answer
                     )
-                    block_question_presentation.add(answer_option)
+                    block_question_presentation.chosen_answer.add(
+                        answer_option)
             elif question_type == 'T':
                 is_correct = True
                 answer_text = question['type_in_answer_option']['typed_answer']
