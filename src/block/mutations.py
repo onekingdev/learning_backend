@@ -288,9 +288,6 @@ class FinishBlockPresentation(graphene.Mutation):
                 correct_answer = TypeInAnswerOption.objects.get(
                     id=correct_answer_id
                 )
-                print("Answer Text", answer_text)
-                print("Correct answer ID", correct_answer_id)
-                print("Correct answer", correct_answer)
                 if correct_answer.case_sensitive:
                     if answer_text == correct_answer.answer_text:
                         is_correct = True
@@ -302,7 +299,6 @@ class FinishBlockPresentation(graphene.Mutation):
                     else:
                         is_correct = False
 
-                print("Is correct?", is_correct)
                 block_question_presentation.typed_answer = answer_text
                 block_question_presentation.save()
                 if is_correct:
