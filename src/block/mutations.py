@@ -313,6 +313,7 @@ class FinishBlockPresentation(graphene.Mutation):
                         translations__answer_text=answer_option,
                         order=order+1,
                     )
+                    order_answer_option.answer_text = answer_option
                     order_answer_option.save()
                     block_question_presentation.chosen_answer.add(
                         order_answer_option
