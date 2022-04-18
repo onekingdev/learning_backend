@@ -86,4 +86,4 @@ class BlockQuestionPresentationAdmin(admin.ModelAdmin):
         'status',
     )
 
-    autocomplete_fields = ['question']
+    autocomplete_fields = ['question', 'topic']
