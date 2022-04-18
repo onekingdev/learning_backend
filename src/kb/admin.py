@@ -209,6 +209,12 @@ class MultipleChoiceAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
+    list_display = [
+        'id',
+        'answer_text',
+        'question',
+        'is_correct',
+    ]
 
 
 @admin.register(MultipleSelectAnswerOption)
@@ -225,6 +231,12 @@ class MultipleSelectAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
+    list_display = [
+        'id',
+        'answer_text',
+        'is_correct',
+        'question',
+    ]
 
 
 @admin.register(TypeInAnswerOption)
@@ -241,6 +253,12 @@ class TypeInAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
+    list_display = [
+        'id',
+        'answer_text',
+        'is_correct',
+        'question',
+    ]
 
 
 @admin.register(OrderAnswerOption)
@@ -257,6 +275,13 @@ class OrderAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
+    list_display = [
+        'id',
+        'answer_text',
+        'order',
+        'is_correct',
+        'question',
+    ]
 
 
 @admin.register(RelateAnswerOption)
@@ -273,6 +298,13 @@ class RelateAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
+    list_display = [
+        'id',
+        'key',
+        'value',
+        'is_correct',
+        'question',
+    ]
 
 
 @admin.register(AnswerOption)
