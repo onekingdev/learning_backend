@@ -288,6 +288,9 @@ class FinishBlockPresentation(graphene.Mutation):
                 correct_answer = TypeInAnswerOption.objects.get(
                     id=correct_answer_id
                 )
+                print("Answer Text", answer_text)
+                print("Correct answer ID", correct_answer_id)
+                print("Correct answer", correct_answer)
                 if correct_answer.case_sensitive:
                     if answer_text.casefold() == correct_answer.answer_text.casefold():
                         is_correct = True
