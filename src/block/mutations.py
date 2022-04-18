@@ -310,7 +310,7 @@ class FinishBlockPresentation(graphene.Mutation):
                     order_answer_option, new = OrderAnswerOption.objects.get_or_create(
                         question=question_object,
                         translations__answer_text=answer_option,
-                        order=order,
+                        order=order+1,
                     )
                     order_answer_option.save()
                     block_question_presentation.chosen_answer.add(
@@ -325,6 +325,8 @@ class FinishBlockPresentation(graphene.Mutation):
                             translations__key=key,
                             translations__value=value,
                         )
+                        relate_answer_option.key = key
+                        relate_answer_option.value = value
                         relate_answer_option.save()
                         block_question_presentation.chosen_answer.add(
                             relate_answer_option
