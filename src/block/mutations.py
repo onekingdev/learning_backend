@@ -319,18 +319,17 @@ class FinishBlockPresentation(graphene.Mutation):
             elif question_type == 'R':
                 answer_options = question['relate_answer_options']
                 for answer_option in answer_options:
-                    for key, value in answer_option.items():
-                        relate_answer_option, new = RelateAnswerOption.objects.get_or_create(
-                            question=question_object,
-                            translations__key=key,
-                            translations__value=value,
-                        )
-                        relate_answer_option.key = key
-                        relate_answer_option.value = value
-                        relate_answer_option.save()
-                        block_question_presentation.chosen_answer.add(
-                            relate_answer_option
-                        )
+                    relate_answer_option, new = RelateAnswerOption.objects.get_or_create(
+                        question=question_object,
+                        translations__key=answer_option['key'],
+                        translations__value=answer_option['value'],
+                    )
+                    relate_answer_option.key = answer_option['key']
+                    relate_answer_option.value = answer_option['value']
+                    relate_answer_option.save()
+                    block_question_presentation.chosen_answer.add(
+                        relate_answer_option
+                    )
 
             block_question_presentation.save()
 
