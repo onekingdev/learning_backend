@@ -252,7 +252,7 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
         is_correct = True
 
         if self.pk:
-            if not self.typed_answer:
+            if self.typed_answer is not None:
                 for answer in self.chosen_answer.all():
                     if not answer.is_correct:
                         is_correct = False

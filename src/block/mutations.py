@@ -304,6 +304,7 @@ class FinishBlockPresentation(graphene.Mutation):
 
                 print("Is correct?", is_correct)
                 block_question_presentation.typed_answer = answer_text
+                block_question_presentation.save()
                 if is_correct:
                     block_question_presentation.status = 'CORRECT'
                 else:
