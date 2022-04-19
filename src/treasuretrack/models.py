@@ -1,14 +1,19 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from app.models import IsActiveModel
-from accounting.models import Account
 
 
 class DailyTreasureLevel(IsActiveModel):
-    level = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    name = models.CharField(max_length=128)
+    level = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)]
+    )
     coins_required = models.PositiveIntegerField(
         validators=[MinValueValidator(1)]
     )
+
+    class Meta:
+        ordering = ['level']
 
 
 class DailyTreasure(IsActiveModel):
