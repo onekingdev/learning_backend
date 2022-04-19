@@ -1,4 +1,7 @@
 import graphene
+from django.db.models import Sum
+from django.db.models.functions import TruncDay
+from datetime import datetime, timedelta
 from graphene_django import DjangoObjectType
 from students.models import Student, StudentTopicMastery, StudentGrade, StudentAchievement
 from audiences.schema import AudienceSchema
@@ -6,6 +9,12 @@ from wallets.schema import CoinWalletSchema
 from experiences.schema import LevelSchema
 from guardians.models import GuardianStudent
 from avatars.models import StudentAvatar
+from block.models import BlockTransaction
+
+
+class CoinGraphType(graphene.ObjectType):
+    day = graphene.Date()
+    coins = graphene.Decimal()
 
 
 class StudentSchema(DjangoObjectType):
@@ -21,6 +30,7 @@ class StudentSchema(DjangoObjectType):
     current_avatar_clothes = graphene.Field('avatars.schema.AvatarSchema')
     current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
     user = graphene.Field('users.schema.UserSchema')
+    last_week_coins = graphene.Field(CoinGraphType)
 
     def resolve_coin_wallet(self, info):
         return self.coinWallet
@@ -83,6 +93,21 @@ class StudentSchema(DjangoObjectType):
 
     def resolve_user(self, info):
         return self.user
+
+    def resolve_last_week_coins(self, info):
+        last_week = datetime.now() - timedelta(days=7)
+        account = self.coinWallet
+
+        data = (BlockTransaction.objects.filter(account=account)
+                .filter(date__gt=last_week)
+                .annotate(day=TruncDay("date"))
+                .values("day")
+                .annotate(coins=Sum("amount"))
+                .values("day", "coins")
+                .order_by("date")
+                )
+
+        return data
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
