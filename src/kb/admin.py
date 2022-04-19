@@ -371,10 +371,10 @@ class QuestionAdmin(
         'grade_audience',
     )
     list_filter = (
-        'grade__audience',
+        'question_type',
         'topic__area_of_knowledge',
         'grade',
-        'question_type',
+        'grade__audience',
     )
     autocomplete_fields = ['topic']
     search_fields = ['translations__question_text', 'id']
