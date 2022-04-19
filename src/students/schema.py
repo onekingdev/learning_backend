@@ -1,5 +1,5 @@
 import graphene
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.db.models.functions import TruncDay
 from datetime import datetime, timedelta
 from graphene_django import DjangoObjectType
@@ -9,7 +9,7 @@ from wallets.schema import CoinWalletSchema
 from experiences.schema import LevelSchema
 from guardians.models import GuardianStudent
 from avatars.models import StudentAvatar
-from block.models import BlockTransaction
+from block.models import BlockTransaction, BlockQuestionPresentation
 
 
 class CoinGraphType(graphene.ObjectType):
@@ -21,6 +21,17 @@ class CoinGraphType(graphene.ObjectType):
 
     def resolve_coins(self, info):
         return self['coins']
+
+
+class QuestionsGraphType(graphene.ObjectType):
+    day = graphene.DateTime()
+    questions = graphene.Decimal()
+
+    def resolve_day(self, info):
+        return self['day']
+
+    def resolve_questions(self, info):
+        return self['questions']
 
 
 class StudentSchema(DjangoObjectType):
@@ -37,6 +48,7 @@ class StudentSchema(DjangoObjectType):
     current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
     user = graphene.Field('users.schema.UserSchema')
     last_week_coins = graphene.List(CoinGraphType)
+    last_week_questions = graphene.List(QuestionsGraphType)
 
     def resolve_coin_wallet(self, info):
         return self.coinWallet
@@ -112,7 +124,23 @@ class StudentSchema(DjangoObjectType):
                 .values("day", "coins")
                 .order_by("date")
                 )
-        
+
+        return data
+
+    def resolve_last_week_questions(self, info):
+        last_week = datetime.now() - timedelta(days=7)
+        data = (BlockQuestionPresentation.objects.filter(
+            block_presentation__block__students=self
+        )
+            .filter(status="CORRECT")
+            .filter(create_timestamp__gt=last_week)
+            .annotate(day=TruncDay("create_timestamp"))
+            .values("day")
+            .annotate(questions=Count("id"))
+            .values("day", "questions")
+            .order_by("day")
+        )
+
         return data
 
 
