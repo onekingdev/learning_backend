@@ -25,7 +25,7 @@ class CoinGraphType(graphene.ObjectType):
 
 class QuestionsGraphType(graphene.ObjectType):
     day = graphene.DateTime()
-    questions = graphene.Decimal()
+    questions = graphene.Int()
 
     def resolve_day(self, info):
         return self['day']
