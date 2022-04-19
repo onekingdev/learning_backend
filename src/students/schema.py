@@ -5,7 +5,6 @@ from django.utils import timezone
 from datetime import timedelta
 from graphene_django import DjangoObjectType
 from students.models import Student, StudentTopicMastery, StudentGrade, StudentAchievement
-from audiences.schema import AudienceSchema
 from wallets.schema import CoinWalletSchema
 from experiences.schema import LevelSchema
 from guardians.models import GuardianStudent
@@ -25,11 +24,10 @@ class CoinGraphType(graphene.ObjectType):
 
 
 class QuestionsGraphType(graphene.ObjectType):
-    day = graphene.DateTime()
+    day = graphene.Date()
     questions = graphene.Int()
 
     def resolve_day(self, info):
-        print(type(self['day']))
         return self['day']
 
     def resolve_questions(self, info):
@@ -50,7 +48,7 @@ class StudentSchema(DjangoObjectType):
     current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
     user = graphene.Field('users.schema.UserSchema')
     last_week_coins = graphene.List(CoinGraphType, week_count=graphene.Int())
-    last_week_questions = graphene.List(QuestionsGraphType)
+    last_week_questions = graphene.List(QuestionsGraphType, week_count=graphene.Int())
 
     def resolve_coin_wallet(self, info):
         return self.coinWallet
