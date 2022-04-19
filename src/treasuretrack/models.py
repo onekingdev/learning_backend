@@ -6,6 +6,7 @@ from app.models import IsActiveModel
 class DailyTreasureLevel(IsActiveModel):
     name = models.CharField(max_length=128)
     level = models.PositiveIntegerField(
+        default=0,
         validators=[MinValueValidator(1)]
     )
     coins_required = models.PositiveIntegerField(
