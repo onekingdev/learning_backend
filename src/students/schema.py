@@ -16,14 +16,11 @@ class CoinGraphType(graphene.ObjectType):
     day = graphene.Date()
     coins = graphene.Decimal()
 
-    class Meta:
-        model = BlockTransaction
-
     def resolve_day(self, info):
-        return getattr(self, 'day', None)
+        return self['day']
 
     def resolve_coins(self, info):
-        return getattr(self, 'coins', None)
+        return self['coins']
 
 
 class StudentSchema(DjangoObjectType):
@@ -115,7 +112,7 @@ class StudentSchema(DjangoObjectType):
                 .values("day", "coins")
                 .order_by("date")
                 )
-
+        
         return data
 
 
