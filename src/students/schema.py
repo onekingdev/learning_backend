@@ -1,7 +1,8 @@
 import graphene
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncDay
-from datetime import datetime, timedelta
+from django.utils import timezone
+from datetime import timedelta
 from graphene_django import DjangoObjectType
 from students.models import Student, StudentTopicMastery, StudentGrade, StudentAchievement
 from audiences.schema import AudienceSchema
@@ -28,6 +29,7 @@ class QuestionsGraphType(graphene.ObjectType):
     questions = graphene.Int()
 
     def resolve_day(self, info):
+        print(type(self['day']))
         return self['day']
 
     def resolve_questions(self, info):
@@ -113,10 +115,9 @@ class StudentSchema(DjangoObjectType):
         return self.user
 
     def resolve_last_week_coins(self, info, week_count=1):
-        today = datetime.now()
+        today = timezone.now()
         most_recent_monday = today - timedelta(days=(today.isoweekday()-1))
         start_date = most_recent_monday - timedelta(days=7*(week_count-1))
-        last_week = datetime.now() - timedelta(days=7)
         account = self.coinWallet
 
         data = (BlockTransaction.objects.filter(account=account)
@@ -130,13 +131,15 @@ class StudentSchema(DjangoObjectType):
 
         return data
 
-    def resolve_last_week_questions(self, info):
-        last_week = datetime.now() - timedelta(days=7)
+    def resolve_last_week_questions(self, info, week_count=1):
+        today = timezone.now()
+        most_recent_monday = today - timedelta(days=(today.isoweekday()-1))
+        start_date = most_recent_monday - timedelta(days=7*(week_count-1))
         data = (BlockQuestionPresentation.objects.filter(
             block_presentation__block__students=self
         )
             .filter(status="CORRECT")
-            .filter(create_timestamp__gt=last_week)
+            .filter(date__range=(start_date, today))
             .annotate(day=TruncDay("create_timestamp"))
             .values("day")
             .annotate(questions=Count("id"))
