@@ -139,7 +139,7 @@ class StudentSchema(DjangoObjectType):
             block_presentation__block__students=self
         )
             .filter(status="CORRECT")
-            .filter(date__range=(start_date, today))
+            .filter(create_timestamp__range=(start_date, today))
             .annotate(day=TruncDay("create_timestamp"))
             .values("day")
             .annotate(questions=Count("id"))
