@@ -374,6 +374,7 @@ class QuestionAdmin(
         'grade__audience',
         'topic__area_of_knowledge',
         'grade',
+        'question_type',
     )
     autocomplete_fields = ['topic']
     search_fields = ['translations__question_text', 'id']
