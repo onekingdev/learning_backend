@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'organization',
     'plans',
     'students',
+    'treasuretrack',
     'universals',
     'users',
     'wallets',
