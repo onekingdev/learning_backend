@@ -16,6 +16,15 @@ class CoinGraphType(graphene.ObjectType):
     day = graphene.Date()
     coins = graphene.Decimal()
 
+    class Meta:
+        model = BlockTransaction
+
+    def resolve_day(self, info):
+        return getattr(self, 'day', None)
+
+    def resolve_coins(self, info):
+        return getattr(self, 'coins', None)
+
 
 class StudentSchema(DjangoObjectType):
     class Meta:
@@ -30,7 +39,7 @@ class StudentSchema(DjangoObjectType):
     current_avatar_clothes = graphene.Field('avatars.schema.AvatarSchema')
     current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
     user = graphene.Field('users.schema.UserSchema')
-    last_week_coins = graphene.Field(CoinGraphType)
+    last_week_coins = graphene.List(CoinGraphType)
 
     def resolve_coin_wallet(self, info):
         return self.coinWallet
