@@ -47,7 +47,7 @@ class StudentSchema(DjangoObjectType):
     current_avatar_clothes = graphene.Field('avatars.schema.AvatarSchema')
     current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
     user = graphene.Field('users.schema.UserSchema')
-    last_week_coins = graphene.List(CoinGraphType)
+    last_week_coins = graphene.List(CoinGraphType, week_count=graphene.Int())
     last_week_questions = graphene.List(QuestionsGraphType)
 
     def resolve_coin_wallet(self, info):
@@ -112,12 +112,15 @@ class StudentSchema(DjangoObjectType):
     def resolve_user(self, info):
         return self.user
 
-    def resolve_last_week_coins(self, info):
+    def resolve_last_week_coins(self, info, week_count=1):
+        today = datetime.now()
+        most_recent_monday = today - timedelta(days=(today.isoweekday()-1))
+        start_date = most_recent_monday - timedelta(days=7*(week_count-1))
         last_week = datetime.now() - timedelta(days=7)
         account = self.coinWallet
 
         data = (BlockTransaction.objects.filter(account=account)
-                .filter(date__gt=last_week)
+                .filter(date__range=(start_date, today))
                 .annotate(day=TruncDay("date"))
                 .values("day")
                 .annotate(coins=Sum("amount"))
