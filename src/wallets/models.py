@@ -25,8 +25,17 @@ class CoinWallet(Account):
 
 class EngagementWallet(Account):
     student = models.OneToOneField(
-        'students.Student', on_delete=models.PROTECT, null=True)
+        'students.Student',
+        on_delete=models.PROTECT,
+    )
     current_level = models.PositiveSmallIntegerField(null=True, default=1)
+
+
+class DailyTreasureWallet(Account):
+    student = models.OneToOneField(
+        'students.Student',
+        on_delete=models.PROTECT,
+    )
 
 
 class Deposit(PositiveMovement):
