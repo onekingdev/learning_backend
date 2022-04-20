@@ -14,7 +14,7 @@ class DailyTreasureLevel(IsActiveModel):
         ordering = ['level']
 
     def get_previous_level(self):
-        return DailyTreasureLevel.objects.get(level=self.leve-1)
+        return DailyTreasureLevel.objects.get(level=self.level-1)
 
 
 class DailyTreasure(IsActiveModel):
