@@ -177,7 +177,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             date=today
         ).aggregate(
             Sum("amount")
-        )["amount__sum"]
+        )["amount__sum"] or 0
 
         for level in all_levels:
             if total_coins < level.coins_required:
