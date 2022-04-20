@@ -1,10 +1,13 @@
 from django.db import models
+from django.db.models import Sum
 from app.models import TimestampModel, UUIDModel, IsActiveModel
 from experiences.models import Level
 from engine.models import TopicMasterySettings
-from block.models import BlockQuestionPresentation
+from block.models import BlockQuestionPresentation, BlockTransaction
 from kb.models.topics import GradePrerequisite
+from treasuretrack import DailyTreasureLevel
 import datetime
+from django.utils import timezone
 
 TYPE_ACCESSORIES = 'ACCESSORIES'
 TYPE_HEAD = 'HEAD'
@@ -67,7 +70,8 @@ class StudentTopicMastery(TimestampModel, UUIDModel):
     @property
     def status(self):
         try:
-            status = StudentTopicStatus.objects.get(topic=self.topic, student=self.student).status
+            status = StudentTopicStatus.objects.get(
+                topic=self.topic, student=self.student).status
         except StudentTopicStatus.DoesNotExist:
             status = None
         return status
@@ -163,6 +167,25 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         if student_grade.count() != 0:
             return student_grade[0].grade
         return
+
+    @property
+    def current_daily_treasure_level(self):
+        today = timezone.now().date()
+        all_levels = DailyTreasureLevel.objects.all()
+        total_coins = BlockTransaction.objects.filter(
+            account=self.coinWallet,
+            date=today
+        ).aggregate(
+            Sum("amount")
+        )["amount__sum"]
+
+        for level in all_levels:
+            if total_coins < level.coins_required:
+                return level.previous_level()
+            else:
+                total_coins -= level.coins_required
+
+        return all_levels.last()
 
     def init_student_topic_mastery(self):
         from plans.models import GuardianStudentPlan

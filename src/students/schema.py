@@ -154,22 +154,7 @@ class StudentSchema(DjangoObjectType):
         return data
 
     def resolve_current_daily_treasure_level(self, info):
-        today = timezone.now().date()
-        all_levels = DailyTreasureLevel.objects.all()
-        total_coins = BlockTransaction.objects.filter(
-            account=self.coinWallet,
-            date=today
-        ).aggregate(
-            Sum("amount")
-        )["amount__sum"]
-
-        for level in all_levels:
-            if total_coins < level.coins_required:
-                return level.previous_level()
-            else:
-                total_coins -= level.coins_required
-
-        return all_levels.last()
+        return self.current_daily_treasure_level
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
