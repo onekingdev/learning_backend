@@ -5,7 +5,7 @@ from experiences.models import Level
 from engine.models import TopicMasterySettings
 from block.models import BlockQuestionPresentation, BlockTransaction
 from kb.models.topics import GradePrerequisite
-from treasuretrack import DailyTreasureLevel
+from treasuretrack.models import DailyTreasureLevel
 import datetime
 from django.utils import timezone
 
