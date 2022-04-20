@@ -23,7 +23,8 @@ class DailyTreasureLevel(IsActiveModel):
 class DailyTreasure(IsActiveModel):
     level = models.ForeignKey(DailyTreasureLevel, on_delete=models.PROTECT)
     coins_awarded = models.PositiveIntegerField(blank=True, null=True)
-    collectibles_awarded = models.ManyToManyField('collectibles.Collectible')
+    collectibles_awarded = models.ManyToManyField(
+        'collectibles.Collectible', blank=True)
 
 
 class StudentDailyTreasure(TimestampModel):
