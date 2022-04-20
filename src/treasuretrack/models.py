@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.validators import MinValueValidator
 from app.models import IsActiveModel, TimestampModel
 from wallets.models import Deposit
 
@@ -9,9 +8,7 @@ class DailyTreasureLevel(IsActiveModel):
     level = models.PositiveIntegerField(
         unique=True,
     )
-    coins_required = models.PositiveIntegerField(
-        validators=[MinValueValidator(1)]
-    )
+    coins_required = models.PositiveIntegerField()
 
     class Meta:
         ordering = ['level']
