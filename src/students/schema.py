@@ -156,7 +156,10 @@ class StudentSchema(DjangoObjectType):
     def resolve_current_daily_treasure_level(self, info):
         today = timezone.now().date()
         all_levels = DailyTreasureLevel.objects.all()
-        total_coins = BlockTransaction.objects.filter(date=today).aggregate(
+        total_coins = BlockTransaction.objects.filter(
+            account=self.coinWallet,
+            date=today
+        ).aggregate(
             Sum("amount")
         )["amount__sum"]
 
