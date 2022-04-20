@@ -16,6 +16,9 @@ class DailyTreasureLevel(IsActiveModel):
     def get_previous_level(self):
         return DailyTreasureLevel.objects.get(level=self.level-1)
 
+    def __str__(self):
+        return self.name
+
 
 class DailyTreasure(IsActiveModel):
     level = models.ForeignKey(DailyTreasureLevel, on_delete=models.PROTECT)
