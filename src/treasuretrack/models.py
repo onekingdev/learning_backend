@@ -13,8 +13,8 @@ class DailyTreasureLevel(IsActiveModel):
     class Meta:
         ordering = ['level']
 
-    def get_next_level(self):
-        pass
+    def get_previous_level(self):
+        return DailyTreasureLevel.objects.get(level=self.leve-1)
 
 
 class DailyTreasure(IsActiveModel):

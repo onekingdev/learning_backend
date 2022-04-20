@@ -161,10 +161,12 @@ class StudentSchema(DjangoObjectType):
         )["amount__sum"]
 
         for level in all_levels:
-            if total_coins <= level.coins_required:
-                return level
+            if total_coins < level.coins_required:
+                return level.previous_level()
             else:
                 total_coins -= level.coins_required
+
+        return all_levels.last()
 
 
 class StudentTopicMasterySchema(DjangoObjectType):
