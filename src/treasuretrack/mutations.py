@@ -1,7 +1,7 @@
 import graphene
 from django.utils import timezone
 from .models import DailyTreasure, StudentDailyTreasure, DailyTreasureTransaction
-from student.models import Student
+from students.models import Student
 
 
 class RedeemDailyTreasure(graphene.Mutation):
