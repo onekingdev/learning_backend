@@ -1,8 +1,6 @@
 import graphene
 import graphql_jwt
-from django.contrib.auth import get_user_model
 from graphql_jwt import ObtainJSONWebToken
-from students.models import Student
 
 import achievements.schema
 import api.schema
@@ -32,6 +30,8 @@ import payments.schema
 import games.mutations
 import games.schema
 import users.mutations
+import treasuretrack.schema
+import treasuretrack.mutations
 
 
 class CustomTokenAuth(ObtainJSONWebToken):
@@ -60,6 +60,7 @@ class Mutation(
     payments.mutations.Mutation,
     games.mutations.Mutation,
     users.mutations.Mutation,
+    treasuretrack.mutations.Mutation,
     graphene.ObjectType
 ):
     token_auth = CustomTokenAuth.Field()
@@ -68,24 +69,25 @@ class Mutation(
 
 
 class Query(
+        avatars.schema.Query,
         achievements.schema.Query,
-        payments.schema.Query,
         api.schema.Query,
         audiences.schema.Query,
         block.schema.Query,
         bank.schema.Query,
         collectibles.schema.Query,
         experiences.schema.Query,
+        games.schema.Query,
         guardians.schema.Query,
         kb.schema.Query,
         organization.schema.Query,
+        payments.schema.Query,
         plans.schema.Query,
-        users.schema.Query,
         students.schema.Query,
-        avatars.schema.Query,
+        treasuretrack.schema.Query,
+        users.schema.Query,
         universals.schema.Query,
         wallets.schema.Query,
-        games.schema.Query,
         graphene.ObjectType):
     pass
 
