@@ -10,6 +10,8 @@ from experiences.schema import LevelSchema
 from guardians.models import GuardianStudent
 from avatars.models import StudentAvatar
 from block.models import BlockTransaction, BlockQuestionPresentation
+from treasuretrack.models import DailyTreasureLevel
+from treasuretrack.schema import DailyTreasureLevelSchema
 
 
 class CoinGraphType(graphene.ObjectType):
@@ -48,7 +50,11 @@ class StudentSchema(DjangoObjectType):
     current_avatar_pants = graphene.Field('avatars.schema.AvatarSchema')
     user = graphene.Field('users.schema.UserSchema')
     last_week_coins = graphene.List(CoinGraphType, week_count=graphene.Int())
-    last_week_questions = graphene.List(QuestionsGraphType, week_count=graphene.Int())
+    last_week_questions = graphene.List(
+        QuestionsGraphType,
+        week_count=graphene.Int()
+    )
+    current_daily_treasure_level = graphene.Field(DailyTreasureLevelSchema)
 
     def resolve_coin_wallet(self, info):
         return self.coinWallet
@@ -146,6 +152,19 @@ class StudentSchema(DjangoObjectType):
         )
 
         return data
+
+    def resolve_current_daily_treasure_level(self, info):
+        today = timezone.now().date()
+        all_levels = DailyTreasureLevel.objects.all()
+        total_coins = BlockTransaction.objects.filter(date=today).aggregate(
+            Sum("amount")
+        )["amount__sum"]
+
+        for level in all_levels:
+            if total_coins <= level.coins_required:
+                return level
+            else:
+                total_coins -= level.coins_required
 
 
 class StudentTopicMasterySchema(DjangoObjectType):

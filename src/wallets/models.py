@@ -31,13 +31,6 @@ class EngagementWallet(Account):
     current_level = models.PositiveSmallIntegerField(null=True, default=1)
 
 
-class DailyTreasureWallet(Account):
-    student = models.OneToOneField(
-        'students.Student',
-        on_delete=models.PROTECT,
-    )
-
-
 class Deposit(PositiveMovement):
     pass
 
