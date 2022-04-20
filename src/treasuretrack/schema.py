@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from .models import DailyTreasure, DailyTreasureLevel, StudentDailyTreasure
+from .models import DailyTreasure, DailyTreasureLevel, StudentDailyTreasure, DailyTreasureTransaction
 
 
 class DailyTreasureSchema(DjangoObjectType):
@@ -18,6 +18,12 @@ class DailyTreasureLevelSchema(DjangoObjectType):
 class StudentDailyTreasureSchema(DjangoObjectType):
     class Meta:
         model = StudentDailyTreasure
+        fields = "__all__"
+
+
+class DailyTreasureTransactionSchema(DjangoObjectType):
+    class Meta:
+        model = DailyTreasureTransaction
         fields = "__all__"
 
 
@@ -64,3 +70,17 @@ class Query(graphene.ObjectType):
 
     def resolve_student_daily_treasure_by_id(root, info, id):
         return StudentDailyTreasure.objects.get(id=id)
+
+    # ----------------- DailyTreasureTransaction ----------------- #
+
+    daily_treasure_transactions = graphene.List(DailyTreasureTransactionSchema)
+    daily_treasure_transaction_by_id = graphene.Field(
+        DailyTreasureTransactionSchema,
+        id=graphene.ID()
+    )
+
+    def resolve_daily_treasure_transactions(root, info, **kwargs):
+        return DailyTreasureTransaction.objects.all()
+
+    def resolve_daily_treasure_transaction_by_id(root, info, id):
+        return DailyTreasureTransaction.objects.get(id=id)
