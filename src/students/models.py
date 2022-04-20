@@ -181,7 +181,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
 
         for level in all_levels:
             if total_coins < level.coins_required:
-                return level.previous_level()
+                return level.get_previous_level()
             else:
                 total_coins -= level.coins_required
 
