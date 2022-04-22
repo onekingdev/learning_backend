@@ -9,7 +9,7 @@ class RedeemDailyTreasure(graphene.Mutation):
         'treasuretrack.schema.StudentDailyTreasureSchema'
     )
     daily_treasure_transaction = graphene.Field(
-        'treasuretrack.schema.DailyTreasureTransaction'
+        'treasuretrack.schema.DailyTreasureTransactionSchema'
     )
 
     class Arguments:
