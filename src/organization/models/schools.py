@@ -76,7 +76,8 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     date_of_birth = models.DateField(null=True)
     identification_number = models.CharField(max_length=128, null=True)
     position = models.CharField(max_length=128, null=True)
-
+    zip = models.CharField(max_length=128, null=True)
+    country = models.CharField(max_length=128, null=True)
     def __str__(self):
         return self.name+' '+self.last_name
 

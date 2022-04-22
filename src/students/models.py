@@ -7,6 +7,7 @@ from block.models import BlockQuestionPresentation, BlockTransaction
 from kb.models.topics import GradePrerequisite
 from treasuretrack.models import DailyTreasureLevel
 import datetime
+from decimal import Decimal
 from django.utils import timezone
 
 TYPE_ACCESSORIES = 'ACCESSORIES'
