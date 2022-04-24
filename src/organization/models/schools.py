@@ -98,4 +98,5 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     language = models.CharField(max_length=128, null=True)
     audience = models.ForeignKey(
         'audiences.Audience', on_delete=models.PROTECT)
+    students = models.ManyToManyField('students.Student', blank=True)
     pass
