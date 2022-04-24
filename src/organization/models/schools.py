@@ -90,6 +90,7 @@ class Teacher(SchoolPersonnel):
     pass
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'classroom_'
     name = models.CharField(max_length=128, null=True)
     grade = models.ForeignKey(
         'kb.Grade', on_delete=models.PROTECT)
