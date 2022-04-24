@@ -46,7 +46,6 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
 
-
 class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     GENDER_MALE = 'MALE'
     GENDER_FEMALE = 'FEMALE'
@@ -81,16 +80,12 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     def __str__(self):
         return self.name+' '+self.last_name
 
-
 class AdministrativePersonnel(SchoolPersonnel):
-    teacher = models.ManyToManyField('organization.Teacher', blank=True)
-    pass
-
+    teachers = models.ManyToManyField('organization.Teacher', blank=True)
 
 class Teacher(SchoolPersonnel):
-    classroom = models.ManyToManyField(
+    classrooms = models.ManyToManyField(
         'organization.Classroom', blank=True)
-    pass
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'classroom_'
@@ -101,4 +96,3 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     audience = models.ForeignKey(
         'audiences.Audience', on_delete=models.PROTECT)
     students = models.ManyToManyField('students.Student', blank=True)
-    pass
