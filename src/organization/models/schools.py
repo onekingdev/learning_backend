@@ -83,10 +83,13 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
 
 
 class AdministrativePersonnel(SchoolPersonnel):
+    teacher = models.ManyToManyField('organization.Teacher', blank=True)
     pass
 
 
 class Teacher(SchoolPersonnel):
+    classroom = models.ManyToManyField(
+        'organization.Classroom', blank=True)
     pass
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
@@ -94,8 +97,6 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     name = models.CharField(max_length=128, null=True)
     grade = models.ForeignKey(
         'kb.Grade', on_delete=models.PROTECT)
-    teacher = models.ForeignKey(
-        Teacher, on_delete=models.PROTECT)
     language = models.CharField(max_length=128, null=True)
     audience = models.ForeignKey(
         'audiences.Audience', on_delete=models.PROTECT)
