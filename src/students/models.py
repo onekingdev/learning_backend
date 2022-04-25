@@ -131,6 +131,10 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         on_delete=models.PROTECT,
     )
     is_new = models.BooleanField(default=True)
+    classroom = models.ForeignKey(
+        'organization.Classroom',
+        on_delete=models.CASCADE,
+        null=True)
 
     def current_age(self):
         today = datetime.date.today()

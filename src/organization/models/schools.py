@@ -34,9 +34,9 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
     internal_code = models.CharField(max_length=128, null=True)
     type_of = models.CharField(max_length=100, null=True)
 
-    student_plan = models.ManyToManyField('plans.StudentPlan', blank=True)
+    student_plan = models.ManyToManyField('plans.StudentPlan', null=True)
     organization = models.ForeignKey(
-        'organization.Organization', on_delete=models.PROTECT, blank=True)
+        'organization.Organization', on_delete=models.PROTECT, null=True)
     # student = models.ManyToManyField('students.Student', blank=True)
     # group = models.ManyToManyField('organization.Group', blank=True)
 
@@ -92,7 +92,7 @@ class AdministrativePersonnel(SchoolPersonnel):
     pass
 
 class Teacher(SchoolPersonnel):
-    classroom = models.ForeignKey('organization.classroom', on_delete=models.PROTECT)
+    pass
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'classroom_'
@@ -102,5 +102,23 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     language = models.CharField(max_length=128, null=True)
     audience = models.ForeignKey(
         'audiences.Audience', on_delete=models.PROTECT)
-    school = models.ForeignKey(School, on_delete=models.PROTECT)
-    students = models.ManyToManyField('students.Student', blank=True)
+    school = models.ForeignKey(School, null=True, on_delete=models.PROTECT)
+    teacher = models.ForeignKey(Teacher, null=True, on_delete=models.PROTECT)
+    enable_games = models.BooleanField(default=True)
+    game_cost = models.IntegerField(blank=True, null=True)
+    time_zone = models.CharField(max_length=128, null=True)
+    monday_start = models.TimeField(null=True, editable=True)
+    monday_end = models.TimeField(null=True, editable=True)
+    tuesday_start = models.TimeField(null=True, editable=True)
+    tuesday_end = models.TimeField(null=True, editable=True)
+    wednesday_start = models.TimeField(null=True, editable=True)
+    wednesday_end = models.TimeField(null=True, editable=True)
+    thursday_start = models.TimeField(null=True, editable=True)
+    thursday_end = models.TimeField(null=True, editable=True)
+    friday_start = models.TimeField(null=True, editable=True)
+    friday_end = models.TimeField(null=True, editable=True)
+    saturday_start = models.TimeField(null=True, editable=True)
+    saturday_end = models.TimeField(null=True, editable=True)
+    sunday_start = models.TimeField(null=True, editable=True)
+    sunday_end = models.TimeField(null=True, editable=True)
+
