@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
+from payments.models import DiscountCode
 
 
 class Group(TimestampModel, RandomSlugModel, IsActiveModel):
@@ -66,6 +67,11 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     school = models.ForeignKey(
         'organization.School',
         on_delete=models.PROTECT,
+        null=True
+    )
+    discountCode = models.OneToOneField(
+        DiscountCode,
+        on_delete=models.CASCADE,
         null=True
     )
 

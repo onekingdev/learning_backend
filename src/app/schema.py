@@ -14,6 +14,7 @@ import experiences.schema
 import guardians.schema
 import kb.schema
 import organization.schema
+import organization.mutations
 import plans.schema
 import students.schema
 import students.mutations
@@ -61,6 +62,7 @@ class Mutation(
     games.mutations.Mutation,
     users.mutations.Mutation,
     treasuretrack.mutations.Mutation,
+    organization.mutations.Mutation,
     graphene.ObjectType
 ):
     token_auth = CustomTokenAuth.Field()
