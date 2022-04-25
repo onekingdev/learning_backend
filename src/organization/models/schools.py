@@ -1,3 +1,4 @@
+from msilib.schema import Class
 from django.db import models
 from django.utils.text import slugify
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
@@ -36,9 +37,8 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
     student_plan = models.ManyToManyField('plans.StudentPlan', blank=True)
     organization = models.ForeignKey(
         'organization.Organization', on_delete=models.PROTECT, blank=True)
-    # teacher =  models.ManyToManyField('organization.Teacher', blank=True , related_name='teachers')
-    student = models.ManyToManyField('students.Student', blank=True)
-    group = models.ManyToManyField('organization.Group', blank=True)
+    # student = models.ManyToManyField('students.Student', blank=True)
+    # group = models.ManyToManyField('organization.Group', blank=True)
 
     def __str__(self):
         return self.name
@@ -69,7 +69,7 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
         on_delete=models.PROTECT,
         null=True
     )
-    discountCode = models.OneToOneField(
+    discountCode = models.ForeignKey(
         DiscountCode,
         on_delete=models.CASCADE,
         null=True
@@ -83,15 +83,16 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     position = models.CharField(max_length=128, null=True)
     zip = models.CharField(max_length=128, null=True)
     country = models.CharField(max_length=128, null=True)
+    district = models.CharField(max_length=128, null=True)
+
     def __str__(self):
         return self.name+' '+self.last_name
 
 class AdministrativePersonnel(SchoolPersonnel):
-    teachers = models.ManyToManyField('organization.Teacher', blank=True)
+    pass
 
 class Teacher(SchoolPersonnel):
-    classrooms = models.ManyToManyField(
-        'organization.Classroom', blank=True)
+    classroom = models.ForeignKey('organization.classroom', on_delete=models.PROTECT)
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'classroom_'
@@ -101,4 +102,5 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     language = models.CharField(max_length=128, null=True)
     audience = models.ForeignKey(
         'audiences.Audience', on_delete=models.PROTECT)
+    school = models.ForeignKey(School, on_delete=models.PROTECT)
     students = models.ManyToManyField('students.Student', blank=True)

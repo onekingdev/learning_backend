@@ -6,14 +6,22 @@ from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from graphene import ID
 from users.schema import UserSchema, UserProfileSchema
-from organization.schema import ClassroomSchema, TeacherSchema
-from organization.models import School, Group, Teacher, Classroom
+from organization.schema import ClassroomSchema, SchoolSchema, TeacherSchema
+from organization.models import School, Group, Teacher, Classroom, AdministrativePersonnel
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from payments.models import DiscountCode
 from kb.models.grades import Grade
 from audiences.models import Audience
 from django.contrib.auth.models import User
 
+class CreateTeacherInput(graphene.InputObjectType):
+    email = graphene.String()
+    name = graphene.String()
+    last_name = graphene.String()
+    password = graphene.String()
+    gender = graphene.String()
+    user_type = graphene.String()
+    username = graphene.String()
 
 class CreateTeacher(graphene.Mutation):
     teacher = graphene.Field(TeacherSchema)
@@ -57,7 +65,7 @@ class CreateTeacher(graphene.Mutation):
                 user.email = email
                 user.save()
 
-                teacher, new = Teacher.objects.get_or_create(
+                teacher= Teacher.objects.create(
                     user=user,
                     name=first_name,
                     last_name=last_name,
@@ -141,5 +149,127 @@ class CreateClassroom(graphene.Mutation):
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
 
+class CreateSchool(graphene.Mutation):
+    user = graphene.Field(UserSchema)
+    school = graphene.Field(SchoolSchema)
+    token = graphene.String()
+    refresh_token = graphene.String()
+    class Arguments:
+        name = graphene.String(required=True)
+        district = graphene.String(required=True)
+        type = graphene.String(required=True)
+        zip = graphene.String(required=True)
+        country = graphene.String(required=True)
+        email = graphene.String(required=True)
+        password = graphene.String(required=True)
+        username = graphene.String(required=True)
+
+    def mutate(
+        self,
+        info,
+        name,
+        district,
+        type,
+        zip,
+        country,
+        email,
+        password,
+        username,
+    ):
+
+        try:
+            with transaction.atomic():
+
+                school, new = School.objects.create(
+                    name=name,
+                    type_of=type,
+                )
+                school.save()
+                user = get_user_model()(
+                    username = username,
+                )
+                user.set_password(password)
+                user.email = email
+                user.save()
+                principle = AdministrativePersonnel.objects.create(
+                    school = school,
+                    user = user,
+                    name = name,
+                    last_name = 'Principle',
+                    zip = zip,
+                    country = country,
+                    district = district
+                )
+                token = get_token(user)
+                refresh_token = create_refresh_token(user)
+                return CreateTeacher(
+                    user = user,
+                    school = school,
+                    principle = principle,
+                    token = token,
+                    refresh_token = refresh_token,
+                )
+
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
+class CreateTeachersInSchool(graphene.Mutation):
+    school = graphene.Field(SchoolSchema)
+    class Arguments:
+        teachers = graphene.List(CreateTeacherInput)
+
+    def mutate(
+        self,
+        info,
+        teachers
+    ):
+
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                school = user.schoolpersonnel.school
+                for teacher in teachers:
+                    user = get_user_model()(
+                        username = teacher.username,
+                    )
+                    user.set_password(teacher.password)
+                    user.email = teacher.email
+                    user.save()
+                    if(teacher.user_type == "Admin"):
+                        admin = AdministrativePersonnel.objects.create(
+                            school = school,
+                            user = user,
+                            name = teacher.name,
+                            last_name = teacher.last_name,
+                            gender = teacher.gender,
+                        )
+                    else : 
+                        teacher= Teacher.objects.create(
+                            school=school,
+                            user=user,
+                            name=teacher.name,
+                            last_name=teacher.last_name,
+                            gender = teacher.gender,
+                        )
+
+                return CreateTeachersInSchool(
+                    school = school
+                )
+
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
 class Mutation(graphene.ObjectType):
     create_teacher = CreateTeacher.Field()
+    create_classroom = CreateClassroom.Field()
+    create_school = CreateSchool.Field()
