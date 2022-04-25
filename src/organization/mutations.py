@@ -233,7 +233,7 @@ class CreateTeachersInSchool(graphene.Mutation):
                 user = info.context.user
                 if user.is_anonymous:
                     raise Exception('Authentication Required')
-                school = user.schoolpersonnel.school
+                school = user.organizationpersonnel.school
                 for teacher in teachers:
                     user = get_user_model()(
                         username = teacher.username,
