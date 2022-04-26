@@ -1,3 +1,4 @@
+from msilib.schema import Class
 from django.db import models
 from django.utils.text import slugify
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
