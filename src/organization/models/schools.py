@@ -17,14 +17,14 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel):
         'kb.Grade', on_delete=models.PROTECT, null=True, blank=True)
     area_of_knowledges = models.ManyToManyField(
         'kb.AreaOfKnowledge', blank=True)
-
+    school_personnel = models.ForeignKey(
+        'organization.SchoolPersonnel', on_delete=models.PROTECT, null=True, blank=True)
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
-
 
 class School(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'school_'

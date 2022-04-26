@@ -5,8 +5,9 @@ import graphene
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from graphene import ID
+from organization.models.schools import SchoolPersonnel
 from users.schema import UserSchema, UserProfileSchema
-from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolSchema, TeacherSchema
+from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolPersonnelSchema, SchoolSchema, TeacherSchema, GroupSchema
 from organization.models import School, Group, Teacher, Classroom, AdministrativePersonnel
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from payments.models import DiscountCode
@@ -464,6 +465,46 @@ class CreateStudentToClassroom(graphene.Mutation):
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
 
+class CreateGroup(graphene.Mutation):
+    group = graphene.Field(GroupSchema)
+    schoolPersonnel = graphene.Field(SchoolPersonnelSchema)
+    class Arguments:
+        name = graphene.String()
+        studentIds = graphene.List(graphene.String)
+
+    def mutate(
+        self,
+        info,
+        name,
+        studentIds,
+    ):
+
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                group = Group(
+                    name = name,
+                    school_personnel = user.schoolpersonnel,
+                )
+                group.save()
+                for studentId in studentIds:
+                    student = Student.objects.get(pk = studentId)
+                    group.student_set.add(student)
+
+                return CreateGroup(
+                    group = group,
+                    schoolPersonnel = group.school_personnel
+                )
+
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
 class Mutation(graphene.ObjectType):
     create_teacher = CreateTeacher.Field()
     create_classroom = CreateClassroom.Field()
@@ -472,3 +513,4 @@ class Mutation(graphene.ObjectType):
     update_classroom_settings = UpdateClassroomSettings.Field()
     import_student_to_classroom = ImportStudentToClassroom.Field()
     create_student_to_classroom = CreateStudentToClassroom.Field()
+    create_group = CreateGroup.Field()
