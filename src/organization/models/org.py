@@ -12,7 +12,7 @@ class Organization(MPTTModel, TimestampModel, RandomSlugModel, IsActiveModel):
     slug = models.SlugField(editable=False)
     parent = TreeForeignKey('self', on_delete=models.PROTECT,
                             null=True, blank=True, related_name='sub_organizations')
-    student_plan = models.ManyToManyField('plans.StudentPlan')
+    student_plan = models.ManyToManyField('plans.StudentPlan', blank=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

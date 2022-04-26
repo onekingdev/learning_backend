@@ -34,7 +34,7 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
     internal_code = models.CharField(max_length=128, null=True)
     type_of = models.CharField(max_length=100, null=True)
 
-    student_plan = models.ManyToManyField('plans.StudentPlan', null=True)
+    student_plan = models.ManyToManyField('plans.StudentPlan')
     organization = models.ForeignKey(
         'organization.Organization', on_delete=models.PROTECT, null=True)
     # student = models.ManyToManyField('students.Student', blank=True)
