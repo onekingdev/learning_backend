@@ -21,7 +21,7 @@ from plans.models import GuardianStudentPlan
 from users.models import User
 from avatars.models import Avatar, StudentAvatar
 from experiences.models import Battery
-
+from organization.models import Classroom
 
 class CreateStudent(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
@@ -391,6 +391,53 @@ class UpdateIsNew(graphene.Mutation):
 
         return UpdateIsNew(student=student)
 
+class UpdateStudent(graphene.Mutation):
+    student = graphene.Field('students.schema.StudentSchema')
+    class Arguments:
+        student_id = graphene.ID(required=True)
+        name = graphene.String(required=False)
+        grade_id = graphene.ID(required=False)
+        last_name = graphene.String(required=False)
+        classroom_id = graphene.ID(required=False)
+        username = graphene.String(required=False)
+        group_id = graphene.ID(required=False)
+        password = graphene.String(required=False)
+
+    def mutate(
+        self,
+        info,
+        student_id,
+        name=None,
+        grade_id=None,
+        last_name=None,
+        classroom_id=None,
+        username=None,
+        group_id=None,
+        password=None):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+
+        student = Student.objects.get(pk = student_id)
+        student.first_name = name
+        student.last_name = last_name
+        studentGrade = StudentGrade(
+            grade = Grade.objects.get(pk = grade_id),
+            student = student
+        )
+        studentGrade.save()
+        student.classroom = Classroom.objects.get(pk = classroom_id)
+        student.user.username = username
+        student.user.first_name = name
+        student.user.last_name = last_name
+        student.user.set_password(password)
+        student.user.save()
+        # group actions
+        student.save()
+
+        return UpdateIsNew(student=student)
+
 
 class Mutation(graphene.ObjectType):
     create_student = CreateStudent.Field()
@@ -399,3 +446,4 @@ class Mutation(graphene.ObjectType):
     level_up = LevelUp.Field()
     set_point = setPoint.Field()
     update_is_new = UpdateIsNew.Field()
+    update_student = UpdateStudent.Field()
