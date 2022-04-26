@@ -492,7 +492,7 @@ class CreateGroup(graphene.Mutation):
                 for studentId in studentIds:
                     student = Student.objects.get(pk = studentId)
                     group.student_set.add(student)
-
+                user.schoolpersonnel.group_set.add(group)
                 return CreateGroup(
                     group = group,
                     schoolPersonnel = group.school_personnel
