@@ -1,4 +1,3 @@
-from msilib.schema import Class
 import graphene
 from graphene_django import DjangoObjectType
 from organization.models import Organization, OrganizationPersonnel, Group, School, SchoolPersonnel, AdministrativePersonnel, Teacher, Classroom
