@@ -20,6 +20,7 @@ class StudentAdmin(admin.ModelAdmin):
     search_fields = ['user__username']
 
 
+
 @admin.register(StudentTopicStatus)
 class StudentTopicStatus(admin.ModelAdmin):
     search_fields = [

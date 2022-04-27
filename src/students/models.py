@@ -248,6 +248,62 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                     )
                     topic_mastery.save()
 
+    def init_student_topic_mastery_specific_aok(self, aok_id):
+        from plans.models import GuardianStudentPlan
+        from kb.models import AreaOfKnowledge
+        try:
+            available_aoks = AreaOfKnowledge.objects.filter(
+                id=aok_id).all()
+        except GuardianStudentPlan.DoesNotExist:
+            audience = self.get_active_audience
+            available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
+
+        grade = self.grade
+
+        for aok in available_aoks:
+            topics = aok.topic_set.all()
+            try:
+                grade_prerequisite = GradePrerequisite.objects.get(
+                    area_of_knowledge=aok,
+                    grade=grade,
+                )
+            except GradePrerequisite.DoesNotExist:
+                grade_prerequisite = None
+            if grade_prerequisite:
+                competence_topics = grade_prerequisite.competence.all()
+                mastery_topics = grade_prerequisite.mastery.all()
+                np_topics = topics.difference(
+                    competence_topics,
+                    mastery_topics
+                )
+                for topic in competence_topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                        mastery_level='C',
+                    )
+                    topic_mastery.save()
+                for topic in mastery_topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                        mastery_level='M',
+                    )
+                    topic_mastery.save()
+                for topic in np_topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                    )
+                    topic_mastery.save()
+            else:
+                for topic in topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                    )
+                    topic_mastery.save()
+
     def update_student_topic_mastery(self, topic):
         mastery_settings, new = TopicMasterySettings.objects.get_or_create(
             topic=topic
@@ -283,6 +339,43 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         try:
             available_aoks = GuardianStudentPlan.objects.get(
                 student=self).subject.all()
+        except GuardianStudentPlan.DoesNotExist:
+            audience = self.get_active_audience
+            available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
+
+        for aok in available_aoks:
+            topics = aok.topic_set.all()
+            for topic in topics:
+                if topic.prerequisites is None:
+                    status = 'A'
+                else:
+                    prerequisites = topic.prerequisites
+                    prerequisites_mastery = []
+                    for prerequisite in prerequisites:
+                        prerequisites_mastery.append(
+                            prerequisite.mastery_level(self)
+                        )
+                    if 'NP' in prerequisites_mastery:
+                        status = 'B'
+                    elif 'N' in prerequisites_mastery:
+                        status = 'B'
+                    elif 'C' in prerequisites_mastery:
+                        status = 'P'
+                    else:
+                        status = 'A'
+                topic_status, new = StudentTopicStatus.objects.get_or_create(
+                    student=self,
+                    topic=topic,
+                )
+                topic_status.status = status
+                topic_status.save()
+    
+    def init_student_topic_status_specific_aok(self, aok_id):
+        from plans.models import GuardianStudentPlan
+        from kb.models import AreaOfKnowledge
+        try:
+            available_aoks = AreaOfKnowledge.objects.filter(
+                id = aok_id)
         except GuardianStudentPlan.DoesNotExist:
             audience = self.get_active_audience
             available_aoks = AreaOfKnowledge.objects.filter(audience=audience)

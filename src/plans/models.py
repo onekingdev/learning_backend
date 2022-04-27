@@ -61,6 +61,9 @@ class GuardianStudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
     def __str__(self):
         return str(self.id)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.id)
         return super().save(*args, **kwargs)

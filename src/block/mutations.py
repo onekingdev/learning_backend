@@ -101,6 +101,8 @@ class CreateAIBlockPresentation(graphene.Mutation):
             student = user.student
         else:
             student = Student.objects.get(id=student_id)
+        if(len(student.guardianstudentplan.subject.filter(pk = aok_id)) < 1):
+            raise Exception("You don't have correct permission to use this subject")
 
         # Define weights for status and mastery
         mastery_weights = {'NP': 50, 'N': 30, 'C': 20, 'M': 0}
@@ -111,14 +113,19 @@ class CreateAIBlockPresentation(graphene.Mutation):
             area_of_knowledge = AreaOfKnowledge.objects.get(id=aok_id)
         except AreaOfKnowledge.DoesNotExist:
             raise Exception("Area of knowledge does not exist")
-
         topics = area_of_knowledge.topic_set.all().filter(lft=F("rght") - 1)
-
         qs1 = StudentTopicStatus.objects.filter(
             student=student,
             topic__in=topics,
         )
+        if(len(qs1) < 1):
+            student.init_student_topic_mastery_specific_aok(aok_id=aok_id)
+            student.init_student_topic_status_specific_aok(aok_id=aok_id)
 
+            qs1 = StudentTopicStatus.objects.filter(
+                student=student,
+                topic__in=topics,
+            )
         available_status = [
             status['status'] for status in qs1.values('status').distinct()
         ]
@@ -126,7 +133,7 @@ class CreateAIBlockPresentation(graphene.Mutation):
         available_status_weights = [
             status_weights[status] for status in available_status
         ]
-
+        
         status_selection = random.choices(
             population=available_status,
             weights=available_status_weights,
