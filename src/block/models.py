@@ -97,10 +97,14 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     MODALITY_AI = 'AI'
     MODALITY_PATH = 'PATH'
     MODALITY_PRACTICE = 'HOMEWORK'
+    MODALITY_TEST = 'TEST'
+
     MODALITY_CHOICES = (
         (MODALITY_AI, 'AI'),
         (MODALITY_PATH, 'Choose your path'),
         (MODALITY_PRACTICE, 'Homework'),
+        (MODALITY_TEST, 'Test'),
+
     )
 
     # FK's

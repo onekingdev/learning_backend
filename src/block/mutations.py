@@ -133,7 +133,7 @@ class CreateAIBlockPresentation(graphene.Mutation):
         available_status_weights = [
             status_weights[status] for status in available_status
         ]
-        
+
         status_selection = random.choices(
             population=available_status,
             weights=available_status_weights,
@@ -196,6 +196,50 @@ class CreateAIBlockPresentation(graphene.Mutation):
 
         return CreateAIBlockPresentation(block_presentation=block_presentation)
 
+class CreateBlockPresentationByQuestionId(graphene.Mutation):
+    block_presentation = graphene.Field(BlockPresentationSchema)
+
+    class Arguments:
+        student_id = graphene.ID()
+        question_ids = graphene.List(graphene.ID, required=True)
+
+    def mutate(self, info, question_ids, student_id=None):
+        if student_id is None:
+            user = info.context.user
+
+            if not user.is_authenticated:
+                raise Exception("Authentication credentials were not provided")
+            if not user.student:
+                raise Exception("Not found student")
+
+            student = user.student
+        else:
+            student = Student.objects.get(id=student_id)
+        questions = Question.objects.filter(
+            pk__in=question_ids
+        )
+        topic = questions.all()[0].topic
+        topicGrade = TopicGrade.objects.get(topic = topic)
+        print(topicGrade)
+        block, new = Block.objects.get_or_create(
+            topic_grade=topicGrade,
+            modality='TEST',
+        )
+        block.save()
+        block.students.add(student)
+        block.save()
+        
+        block.questions.add(*questions)
+        block.save()
+
+        # Create block presentation for block
+        block_presentation, new = BlockPresentation.objects.get_or_create(
+            block=block,
+            student=student,
+        )
+        block_presentation.save()
+
+        return CreateAIBlockPresentation(block_presentation=block_presentation)
 
 class FinishBlockPresentation(graphene.Mutation):
     block_presentation = graphene.Field(BlockPresentationSchema)
@@ -390,3 +434,4 @@ class Mutation(graphene.ObjectType):
     create_path_block_presentation = CreatePathBlockPresentation.Field()
     create_ai_block_presentation = CreateAIBlockPresentation.Field()
     finish_block_presentation = FinishBlockPresentation.Field()
+    create_block_presentation_by_question_id = CreateBlockPresentationByQuestionId.Field()
