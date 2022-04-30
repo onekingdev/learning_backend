@@ -9,7 +9,7 @@ from datetime import timedelta
 
 def giveWeeklyBonus():
     students = Student.objects.all()
-    print("starting give weekly bonus")
+    print("===========starting give weekly bonus=============")
     for student in students:
         today = timezone.now()
         most_recent_monday = today - timedelta(days=(today.isoweekday()-1))
@@ -71,4 +71,4 @@ def giveWeeklyBonus():
         weeklyTreasureTransaction = WeeklyTreasureTransaction(student_weekly_treasure=student_weekly_treasure,account=student.coinWallet)
         weeklyTreasureTransaction.save()
 
-    print("Finished giveWeeklyBonus")
+    print("==========Finished giveWeeklyBonus==========")
