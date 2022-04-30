@@ -41,7 +41,6 @@ def giveWeeklyBonus():
             # .query
             )
         if(len(available_levels.all()) < 1): continue
-        print(available_levels)
 
         if((StudentWeeklyTreasure.objects
                 .filter(student = student)
@@ -62,11 +61,14 @@ def giveWeeklyBonus():
         weekly_tresure = WeeklyTreasure(level=current_level)
         weekly_tresure.collectibles_awarded_set = bonus_collectibles
         weekly_tresure.coins_awarded = bonus_coins
-
         weekly_tresure.save()
+        print("Weekly Treasure ID : ", weekly_tresure.id, " Saved !")
+
 
         student_weekly_treasure = StudentWeeklyTreasure(student=student, weekly_treasure=weekly_tresure)
         student_weekly_treasure.save()
 
         weeklyTreasureTransaction = WeeklyTreasureTransaction(student_weekly_treasure=student_weekly_treasure,account=student.coinWallet)
         weeklyTreasureTransaction.save()
+
+    print("Finished giveWeeklyBonus")
