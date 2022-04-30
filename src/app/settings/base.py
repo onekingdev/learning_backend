@@ -259,8 +259,8 @@ IMPORT_EXPORT_CELERY_MODELS = {
 CRISPY_TEMPLATE_PACK = 'bootstrap'
 
 CRONJOBS = [
-    # ('59 23 * * SAT', 'treasuretrack.cron.giveWeeklyBonus'),
-    ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus','>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 '))
+    ('59 23 * * SAT', 'treasuretrack.cron.giveWeeklyBonus', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
+    # ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus','>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 '))
     # ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus')
 
 ]
