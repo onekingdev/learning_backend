@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'djmoney',
     'djstripe',
     'crispy_forms',
+    'django_crontab',
 
     'api',
     'avatars',
@@ -257,6 +258,9 @@ IMPORT_EXPORT_CELERY_MODELS = {
 
 CRISPY_TEMPLATE_PACK = 'bootstrap'
 
+CRONJOBS = [
+    ('*/5 * * * *', 'treasuretrack.cron.createTreasureTrack')
+]
 # SOCIALACCOUNT_PROVIDERS = {
 #     'google': {
 #         'APP': {

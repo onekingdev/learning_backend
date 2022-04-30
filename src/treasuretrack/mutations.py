@@ -1,22 +1,28 @@
 import graphene
 from django.utils import timezone
-from .models import DailyTreasure, StudentDailyTreasure, DailyTreasureTransaction
+
+from students.schema import StudentSchema
+from .models import WeeklyTreasure, StudentWeeklyTreasure, WeeklyTreasureTransaction, WeeklyTreasureLevel
 from students.models import Student
-
-
-class RedeemDailyTreasure(graphene.Mutation):
-    student_daily_treasure = graphene.Field(
-        'treasuretrack.schema.StudentDailyTreasureSchema'
+from datetime import timedelta
+from block.models import BlockTransaction, BlockQuestionPresentation
+from django.db.models.functions import TruncDay
+from django.db.models import Sum, Count
+from django.db.models import Max
+from .cron import giveWeeklyBonus
+class RedeemWeeklyTreasure(graphene.Mutation):
+    student_weekly_treasure = graphene.Field(
+        'treasuretrack.schema.StudentWeeklyTreasureSchema'
     )
-    daily_treasure_transaction = graphene.Field(
-        'treasuretrack.schema.DailyTreasureTransactionSchema'
+    weekly_treasure_transaction = graphene.Field(
+        'treasuretrack.schema.WeeklyTreasureTransactionSchema'
     )
 
     class Arguments:
         student_id = graphene.ID()
-        daily_treasure_id = graphene.ID(required=True)
+        weekly_treasure_id = graphene.ID(required=True)
 
-    def mutate(self, info, daily_treasure_id, student_id=None):
+    def mutate(self, info, weekly_treasure_id, student_id=None):
         if student_id is None:
             user = info.context.user
 
@@ -29,25 +35,36 @@ class RedeemDailyTreasure(graphene.Mutation):
         else:
             student = Student.objects.get(id=student_id)
 
-        daily_treasure = DailyTreasure.objects.get(id=daily_treasure_id)
+        weekly_treasure = WeeklyTreasure.objects.get(id=weekly_treasure_id)
 
-        student_daily_treasure, new = StudentDailyTreasure.objects.get_or_create(
+        student_weekly_treasure, new = StudentWeeklyTreasure.objects.get_or_create(
             student=student,
-            daily_treasure=daily_treasure,
+            weekly_treasure=weekly_treasure,
             create_timestamp=timezone.now().date()
         )
 
         if new:
-            daily_treasure_transaction = DailyTreasureTransaction(
-                daily_treasure=daily_treasure,
+            weekly_treasure_transaction = WeeklyTreasureTransaction(
+                weekly_treasure=weekly_treasure,
                 account=student.coinWallet
             )
 
-        return RedeemDailyTreasure(
-            student_daily_treasure=student_daily_treasure,
-            daily_treasure_transaction=daily_treasure_transaction
+        return RedeemWeeklyTreasure(
+            student_weekly_treasure=student_weekly_treasure,
+            weekly_treasure_transaction=weekly_treasure_transaction
         )
 
+class GiveWeeklyBonus(graphene.Mutation):
+    students = graphene.List(StudentSchema)
 
+    def mutate(self, info):
+        students = Student.objects.all()
+        giveWeeklyBonus()
+        return GiveWeeklyBonus(
+            students = students
+        )
+        
 class Mutation(graphene.ObjectType):
-    redeem_daily_treasure = RedeemDailyTreasure.Field()
+    redeem_weekly_treasure = RedeemWeeklyTreasure.Field()
+    GiveWeeklyBonus = GiveWeeklyBonus.Field()
+

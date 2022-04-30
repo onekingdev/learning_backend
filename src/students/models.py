@@ -5,7 +5,7 @@ from experiences.models import Level
 from engine.models import TopicMasterySettings
 from block.models import BlockQuestionPresentation, BlockTransaction
 from kb.models.topics import GradePrerequisite
-from treasuretrack.models import DailyTreasureLevel
+from treasuretrack.models import WeeklyTreasureLevel
 import datetime
 from decimal import Decimal
 from django.utils import timezone
@@ -174,9 +174,9 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
         return
 
     @property
-    def current_daily_treasure_level(self):
+    def current_weekly_treasure_level(self):
         today = timezone.now().date()
-        all_levels = DailyTreasureLevel.objects.all()
+        all_levels = WeeklyTreasureLevel.objects.all()
         total_coins = BlockTransaction.objects.filter(
             account=self.coinWallet,
             date=today

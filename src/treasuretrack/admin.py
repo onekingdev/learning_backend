@@ -1,8 +1,8 @@
 from django.contrib import admin
-from .models import DailyTreasureLevel
+from .models import WeeklyTreasureLevel
 
 
-@admin.register(DailyTreasureLevel)
-class DailyTreasureLevelAdmin(admin.ModelAdmin):
+@admin.register(WeeklyTreasureLevel)
+class WeeklyTreasureLevelAdmin(admin.ModelAdmin):
     ordering = ['level']
-    list_display = ['level', 'name', 'coins_required']
+    list_display = ['level', 'name', 'correct_questions_required', 'bonus_coins']

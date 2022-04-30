@@ -1,86 +1,86 @@
 import graphene
 from graphene_django import DjangoObjectType
-from .models import DailyTreasure, DailyTreasureLevel, StudentDailyTreasure, DailyTreasureTransaction
+from .models import WeeklyTreasure, WeeklyTreasureLevel, StudentWeeklyTreasure, WeeklyTreasureTransaction
 
 
-class DailyTreasureSchema(DjangoObjectType):
+class WeeklyTreasureSchema(DjangoObjectType):
     class Meta:
-        model = DailyTreasure
+        model = WeeklyTreasure
         fields = "__all__"
 
 
-class DailyTreasureLevelSchema(DjangoObjectType):
+class WeeklyTreasureLevelSchema(DjangoObjectType):
     class Meta:
-        model = DailyTreasureLevel
+        model = WeeklyTreasureLevel
         fields = "__all__"
 
 
-class StudentDailyTreasureSchema(DjangoObjectType):
+class StudentWeeklyTreasureSchema(DjangoObjectType):
     class Meta:
-        model = StudentDailyTreasure
+        model = StudentWeeklyTreasure
         fields = "__all__"
 
 
-class DailyTreasureTransactionSchema(DjangoObjectType):
+class WeeklyTreasureTransactionSchema(DjangoObjectType):
     class Meta:
-        model = DailyTreasureTransaction
+        model = WeeklyTreasureTransaction
         fields = "__all__"
 
 
 class Query(graphene.ObjectType):
 
-    # ----------------- DailyTreasure ----------------- #
+    # ----------------- WeeklyTreasure ----------------- #
 
-    daily_treasures = graphene.List(DailyTreasureSchema)
-    daily_treasure_by_id = graphene.Field(
-        DailyTreasureSchema,
+    weekly_treasures = graphene.List(WeeklyTreasureSchema)
+    weekly_treasure_by_id = graphene.Field(
+        WeeklyTreasureSchema,
         id=graphene.ID()
     )
 
-    def resolve_daily_treasures(root, info, **kwargs):
-        return DailyTreasure.objects.all()
+    def resolve_weekly_treasures(root, info, **kwargs):
+        return WeeklyTreasure.objects.all()
 
-    def resolve_daily_treasure_by_id(root, info, id):
-        return DailyTreasure.objects.get(id=id)
+    def resolve_weekly_treasure_by_id(root, info, id):
+        return WeeklyTreasure.objects.get(id=id)
 
-    # ----------------- DailyTreasureLevel ----------------- #
+    # ----------------- WeeklyTreasureLevel ----------------- #
 
-    daily_treasure_levels = graphene.List(DailyTreasureLevelSchema)
-    daily_treasure_level_by_id = graphene.Field(
-        DailyTreasureLevelSchema,
+    weekly_treasure_levels = graphene.List(WeeklyTreasureLevelSchema)
+    weekly_treasure_level_by_id = graphene.Field(
+        WeeklyTreasureLevelSchema,
         id=graphene.ID()
     )
 
-    def resolve_daily_treasure_levels(root, info, **kwargs):
-        return DailyTreasureLevel.objects.all()
+    def resolve_weekly_treasure_levels(root, info, **kwargs):
+        return WeeklyTreasureLevel.objects.all()
 
-    def resolve_daily_treasure_level_by_id(root, info, id):
-        return DailyTreasureLevel.objects.get(id=id)
+    def resolve_weekly_treasure_level_by_id(root, info, id):
+        return WeeklyTreasureLevel.objects.get(id=id)
 
-    # ----------------- StudentDailyTreasure ----------------- #
+    # ----------------- StudentWeeklyTreasure ----------------- #
 
-    student_daily_treasures = graphene.List(StudentDailyTreasureSchema)
-    student_daily_treasure_by_id = graphene.Field(
-        StudentDailyTreasureSchema,
+    student_weekly_treasures = graphene.List(StudentWeeklyTreasureSchema)
+    student_weekly_treasure_by_id = graphene.Field(
+        StudentWeeklyTreasureSchema,
         id=graphene.ID()
     )
 
-    def resolve_student_daily_treasures(root, info, **kwargs):
-        return StudentDailyTreasure.objects.all()
+    def resolve_student_weekly_treasures(root, info, **kwargs):
+        return StudentWeeklyTreasure.objects.all()
 
-    def resolve_student_daily_treasure_by_id(root, info, id):
-        return StudentDailyTreasure.objects.get(id=id)
+    def resolve_student_weekly_treasure_by_id(root, info, id):
+        return StudentWeeklyTreasure.objects.get(id=id)
 
-    # ----------------- DailyTreasureTransaction ----------------- #
+    # ----------------- WeeklyTreasureTransaction ----------------- #
 
-    daily_treasure_transactions = graphene.List(DailyTreasureTransactionSchema)
-    daily_treasure_transaction_by_id = graphene.Field(
-        DailyTreasureTransactionSchema,
+    weekly_treasure_transactions = graphene.List(WeeklyTreasureTransactionSchema)
+    weekly_treasure_transaction_by_id = graphene.Field(
+        WeeklyTreasureTransactionSchema,
         id=graphene.ID()
     )
 
-    def resolve_daily_treasure_transactions(root, info, **kwargs):
-        return DailyTreasureTransaction.objects.all()
+    def resolve_weekly_treasure_transactions(root, info, **kwargs):
+        return WeeklyTreasureTransaction.objects.all()
 
-    def resolve_daily_treasure_transaction_by_id(root, info, id):
-        return DailyTreasureTransaction.objects.get(id=id)
+    def resolve_weekly_treasure_transaction_by_id(root, info, id):
+        return WeeklyTreasureTransaction.objects.get(id=id)

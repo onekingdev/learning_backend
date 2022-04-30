@@ -3,44 +3,47 @@ from app.models import IsActiveModel, TimestampModel
 from wallets.models import Deposit
 
 
-class DailyTreasureLevel(IsActiveModel):
+class WeeklyTreasureLevel(IsActiveModel):
     name = models.CharField(max_length=128)
     level = models.PositiveIntegerField(
         unique=True,
     )
     coins_required = models.PositiveIntegerField()
-
+    correct_questions_required = models.PositiveIntegerField()
+    bonus_coins = models.PositiveIntegerField()
+    bonus_collectible = models.ManyToManyField(
+        'collectibles.Collectible', blank=True)
     class Meta:
         ordering = ['level']
 
     def get_previous_level(self):
-        return DailyTreasureLevel.objects.get(level=self.level-1)
+        return WeeklyTreasureLevel.objects.get(level=self.level-1)
 
     def __str__(self):
         return self.name
 
 
-class DailyTreasure(IsActiveModel):
-    level = models.ForeignKey(DailyTreasureLevel, on_delete=models.PROTECT)
+class WeeklyTreasure(IsActiveModel):
+    level = models.ForeignKey(WeeklyTreasureLevel, on_delete=models.PROTECT)
     coins_awarded = models.PositiveIntegerField(blank=True, null=True)
     collectibles_awarded = models.ManyToManyField(
         'collectibles.Collectible', blank=True)
 
 
-class StudentDailyTreasure(TimestampModel):
+class StudentWeeklyTreasure(TimestampModel):
     student = models.ForeignKey('students.Student', on_delete=models.CASCADE)
-    daily_treasure = models.ForeignKey(DailyTreasure, on_delete=models.CASCADE)
+    weekly_treasure = models.ForeignKey(WeeklyTreasure, on_delete=models.CASCADE)
 
 
-class DailyTreasureTransaction(Deposit):
-    daily_treasure = models.ForeignKey(
-        StudentDailyTreasure,
+class WeeklyTreasureTransaction(Deposit):
+    student_weekly_treasure = models.ForeignKey(
+        StudentWeeklyTreasure,
         on_delete=models.CASCADE
     )
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.amount = self.daily_treasure.coins_awarded
+            self.amount = self.student_weekly_treasure.weekly_treasure.coins_awarded
             self.comment = "Daiy Treasure Coins"
             # if not self.coins_awarded:
             #     self.amount = 0
