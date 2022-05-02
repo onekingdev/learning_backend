@@ -12,6 +12,8 @@ from parler.models import (
     TranslatableManager
 )
 from django.conf import settings
+from django.utils.html import strip_tags
+
 import os
 import lxml.html as LH
 
@@ -102,7 +104,12 @@ class GameCategory(
     objects = GameCategoryManager()
 
     def __str__(self):
-        return self.safe_translation_getter("name", any_language=True)
+        return strip_tags(
+            self.safe_translation_getter(
+                "name",
+                any_language=True
+            )
+        )[:100]
 
 
 class PlayGameTransaction(Withdraw):
@@ -113,3 +120,4 @@ class PlayGameTransaction(Withdraw):
         if not self.pk:
             self.amount = self.game.cost
         return super().save(*args, **kwargs)
+
