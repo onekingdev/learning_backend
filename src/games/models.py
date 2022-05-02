@@ -43,7 +43,9 @@ class Game(TimestampModel, TranslatableModel, RandomSlugModel, IsActiveModel):
     objects = GameManager()
 
     def __str__(self):
-        return self.safe_translation_getter("name", any_language=True)
+        return strip_tags(
+            self.safe_translation_getter("name", any_language=True)
+        )[:100]
 
     def get_game_content(self):
         path = settings.MEDIA_ROOT
