@@ -77,5 +77,6 @@ def game_loader(request, folder_name):
         contents =file.read()
         file.close()
         # --------------- Read Content of index.html file -E---------------------#   
-
+    else:
+        contents = "You don't have enough coins"
     return HttpResponse(contents)
