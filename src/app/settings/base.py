@@ -105,7 +105,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',     #Disabled to disable XFrame Deney
     'author.middlewares.AuthorDefaultBackendMiddleware',
 ]
 
@@ -257,6 +257,11 @@ IMPORT_EXPORT_CELERY_MODELS = {
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap'
+
+#---------------- Disable X-Frame-options Deney-S--------------------#
+X_FRAME_OPTIONS = 'ALLOWALL'
+XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
+#---------------- Disable X-Frame-options Deney-E--------------------#
 
 CRONJOBS = [
     ('59 23 * * SAT', 'treasuretrack.cron.giveWeeklyBonus', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
