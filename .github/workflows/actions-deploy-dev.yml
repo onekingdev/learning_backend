@@ -24,4 +24,3 @@ jobs:
         run: |
           cd /home/albert/django-apps/learning_backend
           pipenv run python ./src/manage.py migrate
-          pipenv run python ./src/manage.py runserver
