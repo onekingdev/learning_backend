@@ -19,6 +19,12 @@ jobs:
           username: ${{ secrets.DEV_SERVER_SSH_USERNAME }} # User of the server you want to ssh into
           password: ${{ secrets.DEV_SERVER_SSH_PASSWORD }} # User of the server you want to ssh into
           port: ${{ secrets.DEV_SERVER_SSH_PORT }} # User of the server you want to ssh into
+          script: |
+                    cd /home
+                    cd albert
+                    cd django-apps
+                    cd learning_backend
+                    cd ~django-apps
 
       - name: Migrate Schema and Run Django server     
         run: |
