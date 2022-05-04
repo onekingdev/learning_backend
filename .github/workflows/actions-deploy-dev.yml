@@ -22,6 +22,6 @@ jobs:
 
       - name: Migrate Schema and Run Django server     
         run: |
-          cd /home/albert/django-apps/learning-backend
+          cd /home/albert/django-apps/learning_backend
           pipenv run python ./src/manage.py migrate
           pipenv run python ./src/manage.py runserver
