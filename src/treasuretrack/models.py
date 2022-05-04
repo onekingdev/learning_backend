@@ -11,8 +11,11 @@ class WeeklyTreasureLevel(IsActiveModel):
     coins_required = models.PositiveIntegerField()
     correct_questions_required = models.PositiveIntegerField()
     bonus_coins = models.PositiveIntegerField()
+    bonus_badge = models.ForeignKey(
+        'badges.Badge', blank=True, on_delete=models.PROTECT, null=True)
     bonus_collectible = models.ManyToManyField(
         'collectibles.Collectible', blank=True)
+
     class Meta:
         ordering = ['level']
 
@@ -28,6 +31,7 @@ class WeeklyTreasure(IsActiveModel):
     coins_awarded = models.PositiveIntegerField(blank=True, null=True)
     collectibles_awarded = models.ManyToManyField(
         'collectibles.Collectible', blank=True)
+    badge_awarded = models.ForeignKey('badges.Badge', on_delete=models.PROTECT, null=True)
 
 
 class StudentWeeklyTreasure(TimestampModel):

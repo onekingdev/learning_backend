@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'accounting',
     'achievements',
     'bank',
+    'badges',
     'block',
     'collectibles',
     'emails',
@@ -89,7 +90,7 @@ INSTALLED_APPS = [
     'universals',
     'users',
     'wallets',
-    'payments'
+    'payments',
 ]
 
 

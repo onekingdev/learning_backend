@@ -60,6 +60,9 @@ def giveWeeklyBonus():
 
         weekly_tresure = WeeklyTreasure(level=current_level)
         weekly_tresure.collectibles_awarded_set = bonus_collectibles
+        print(current_level.id)
+        print(current_level.bonus_badge)
+        weekly_tresure.badge_awarded = current_level.bonus_badge
         weekly_tresure.coins_awarded = bonus_coins
         weekly_tresure.save()
         print("Weekly Treasure ID : ", weekly_tresure.id, " Saved !")

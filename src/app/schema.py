@@ -33,7 +33,7 @@ import games.schema
 import users.mutations
 import treasuretrack.schema
 import treasuretrack.mutations
-
+import badges.schema
 
 class CustomTokenAuth(ObtainJSONWebToken):
 
@@ -90,6 +90,7 @@ class Query(
         users.schema.Query,
         universals.schema.Query,
         wallets.schema.Query,
+        badges.schema.Query,
         graphene.ObjectType):
     pass
 
