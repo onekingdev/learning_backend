@@ -22,15 +22,7 @@ jobs:
           script: |
                     cd /home
                     cd albert
+                    ls
                     cd django-apps
                     cd learning_backend
                     cd ~django-apps
-
-      - name: Migrate Schema and Run Django server     
-        run: |
-          cd /home
-          cd albert
-          cd django-apps
-          cd learning_backend
-          cd ~django-apps
-          pipenv run python ./src/manage.py migrate
