@@ -21,15 +21,9 @@ jobs:
           port: ${{ secrets.DEV_SERVER_SSH_PORT }} # User of the server you want to ssh into
           script: |
                     cd /home/albert/django-apps/learning_backend
-      - name: Pull from github dev branch 
-        run: |
-          git pull origin dev
-      - name: Run Migration 
-        run: |
-          pipenv run python ./src/manage.py migrate
-      - name: Restart Gunicorn 
-        run: |
-          systemctl restart gunicorn
+                    git pull origin dev
+                    pipenv run python ./src/manage.py migrate
+                    systemctl restart gunicorn
 
 
                     
