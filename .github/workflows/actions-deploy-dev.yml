@@ -24,7 +24,6 @@ jobs:
                     git pull origin dev
                     pipenv run python ./src/manage.py migrate
                     sudo systemctl restart gunicorn
-                    123456789123456789
 
 
                     
