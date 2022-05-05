@@ -23,7 +23,7 @@ jobs:
                     cd /home/albert/django-apps/learning_backend
                     git pull origin dev
                     pipenv run python ./src/manage.py migrate
-                    systemctl restart gunicorn
+                    sudo systemctl restart gunicorn
 
 
                     
