@@ -134,6 +134,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
     classroom = models.ForeignKey(
         'organization.Classroom',
         on_delete=models.CASCADE,
+        blank=True,
         null=True)
 
     def current_age(self):
