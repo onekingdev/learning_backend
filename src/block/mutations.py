@@ -119,13 +119,13 @@ class CreateAIBlockPresentation(graphene.Mutation):
             topic__in=topics,
         )
 
-        # if(len(qs1) < 1):
-        #     student.init_student_topic_mastery_specific_aok(aok_id=aok_id)
-        #     student.init_student_topic_status_specific_aok(aok_id=aok_id)
-        #     qs1 = StudentTopicStatus.objects.filter(
-        #         student=student,
-        #         topic__in=topics,
-        #     )
+        if(len(qs1) < 1):
+            student.init_student_topic_mastery_specific_aok(aok_id=aok_id)
+            student.init_student_topic_status_specific_aok(aok_id=aok_id)
+            qs1 = StudentTopicStatus.objects.filter(
+                student=student,
+                topic__in=topics,
+            )
         
         available_status = [
             status['status'] for status in qs1.values('status').distinct()

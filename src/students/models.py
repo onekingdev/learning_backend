@@ -280,29 +280,35 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                     topic_mastery, new = StudentTopicMastery.objects.get_or_create(
                         student=self,
                         topic=topic,
-                        mastery_level='C',
+                        # mastery_level='C',
                     )
-                    topic_mastery.save()
+                    if(new):
+                        topic_mastery.mastery_level = 'C'
+                        topic_mastery.save()
                 for topic in mastery_topics:
                     topic_mastery, new = StudentTopicMastery.objects.get_or_create(
                         student=self,
                         topic=topic,
-                        mastery_level='M',
+                        # mastery_level='M',
                     )
-                    topic_mastery.save()
+                    if(new):
+                        topic_mastery.mastery_level = 'M'
+                        topic_mastery.save()
                 for topic in np_topics:
                     topic_mastery, new = StudentTopicMastery.objects.get_or_create(
                         student=self,
                         topic=topic,
                     )
-                    topic_mastery.save()
+                    if(new):
+                        topic_mastery.save()
             else:
                 for topic in topics:
                     topic_mastery, new = StudentTopicMastery.objects.get_or_create(
                         student=self,
                         topic=topic,
                     )
-                    topic_mastery.save()
+                    if(new):
+                        topic_mastery.save()
 
     def update_student_topic_mastery(self, topic):
         mastery_settings, new = TopicMasterySettings.objects.get_or_create(
@@ -404,8 +410,9 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                     student=self,
                     topic=topic,
                 )
-                topic_status.status = status
-                topic_status.save()
+                if( new): 
+                    topic_status.status = status
+                    topic_status.save()
 
     def update_student_topic_status(self, aok):
         topics = aok.topic_set.all()
@@ -433,6 +440,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                 student=self,
                 topic=topic,
             )
+            
             topic_status.status = status
             topic_status.save()
 
