@@ -222,10 +222,10 @@ class CreateBlockPresentationByQuestionId(graphene.Mutation):
         topic = questions.all()[0].topic
         topicGrade = TopicGrade.objects.get(topic = topic)
         print(topicGrade)
-        block, new = Block.objects.get_or_create(
-            topic_grade=topicGrade,
-            modality='TEST',
-        )
+        # block, new = Block.objects.get_or_create(
+        #     topic_grade=topicGrade,
+        #     modality='TEST',
+        # )
         block.save()
         block.students.add(student)
         block.save()
