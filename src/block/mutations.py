@@ -226,6 +226,10 @@ class CreateBlockPresentationByQuestionId(graphene.Mutation):
         #     topic_grade=topicGrade,
         #     modality='TEST',
         # )
+        block = Block.objects.create(
+            topic_grade=topicGrade,
+            modality='TEST',
+        )
         block.save()
         block.students.add(student)
         block.save()
