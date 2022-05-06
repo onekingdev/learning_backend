@@ -369,7 +369,6 @@ class QuestionAdmin(
         'topic',
         'grade',
         'grade_audience',
-        'question_type',
     )
     list_filter = (
         'question_type',
