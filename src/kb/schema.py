@@ -144,6 +144,7 @@ class QuestionSchema(DjangoObjectType):
     question_image_assets = graphene.List(QuestionImageAssetSchema)
     question_audio_assets = graphene.List(QuestionAudioAssetSchema)
     question_video_assets = graphene.List(QuestionVideoAssetSchema)
+
     question_audio_url = graphene.String()
     answer_options = graphene.List('kb.schema.AnswerOptionInterface')
 
@@ -161,12 +162,18 @@ class QuestionSchema(DjangoObjectType):
 
     def resolve_question_audio_url(self, info):
         try:
+            print("tts asset is", self.get_questionttsasset().id)
             tts_file = self.get_questionttsasset().tts_file.url
             tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
             print(e)
-            # self.save_gtts()
-            tts_string = None
+            try:
+                self.save_gtts()
+                tts_file = self.get_questionttsasset().tts_file.url
+                tts_string = f'{settings.DOMAIN}{tts_file}'
+            except Exception as e:
+                tts_string = None
+
         return tts_string
 
     def resolve_answer_options(self, info):

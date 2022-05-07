@@ -68,6 +68,7 @@ class Question(
         return QuestionAudioAsset.objects.filter(question=self)
 
     def get_questionttsasset(self):
+        print("filter",QuestionTTSAsset.objects.filter(question=self))
         return QuestionTTSAsset.objects.get(question=self)
 
     def save_gtts(self):
