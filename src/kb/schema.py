@@ -184,13 +184,30 @@ class AnswerOptionInterface(graphene.Interface):
     id = graphene.ID()
     question = graphene.Field(QuestionSchema)
     is_correct = graphene.Boolean()
+    answer_audio_url = graphene.String()
+
+    def resolve_answer_audio_url(self, info):
+        try:
+            tts_file = self.get_answeroptionttsasset().tts_file.url
+            tts_string = f'{settings.DOMAIN}{tts_file}'
+        except Exception as e:
+            print(e)
+            try:
+                self.save_gtts()
+                tts_file = self.get_answeroptionttsasset().tts_file.url
+                tts_string = f'{settings.DOMAIN}{tts_file}'
+            except Exception as e:
+                tts_string = None
+
+        return tts_string
 
 
 class AnswerOptionSchema(DjangoObjectType):
     class Meta:
         model = AnswerOption
-        fields = "__all__"
         interfaces = (AnswerOptionInterface,)
+        fields = "__all__"
+    
 
 
 class MultipleChoiceAnswerOptionSchema(DjangoObjectType):
@@ -204,6 +221,10 @@ class MultipleChoiceAnswerOptionSchema(DjangoObjectType):
     image = graphene.String()
     audio_file = graphene.String()
     video = graphene.String()
+    test  = graphene.String()
+
+    def resolve_test(self, info):
+        return "asre"
 
     def resolve_answer_text(self, info, language_code=None):
         return self.safe_translation_getter("answer_text", any_language=True)

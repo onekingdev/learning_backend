@@ -68,7 +68,6 @@ class Question(
         return QuestionAudioAsset.objects.filter(question=self)
 
     def get_questionttsasset(self):
-        print("filter",QuestionTTSAsset.objects.filter(question=self))
         return QuestionTTSAsset.objects.get(question=self)
 
     def save_gtts(self):
@@ -164,7 +163,6 @@ class QuestionVideoAsset(QuestionAsset):
     PREFIX = 'question_video_asset_'
     url = models.URLField()
 
-
 class AnswerOption(
     TimestampModel,
     RandomSlugModel,
@@ -177,6 +175,9 @@ class AnswerOption(
 
     objects = AnswerOptionManager()
 
+    def get_answeroptionttsasset(self):
+        return AnswerTTSAsset.objects.get(answer_option=self)
+
     @admin.display(description='Question type')
     def question_type(self):
         return self.question.question_type
@@ -186,28 +187,34 @@ class AnswerOption(
         return self.__str__
 
     def save_gtts(self):
+        if( not self.answer_text): return None
+
         answer_text = self.safe_translation_getter(
             "answer_text", any_language=True)
         if not answer_text:
             return None
 
         language = self.get_current_language()
-
+        print("self id is ",self.id)
+        print("answer option id is ", self.answeroption_ptr.id)
+        answer_option = self.answeroption_ptr
+        answer_tts_asset, new = AnswerTTSAsset.objects.get_or_create(
+            answer_option=self,
+        )
         try:
             tts_file = self.tts_file.file
         except Exception as e:
             tts_file = None
             print(e)
-
-        if tts_file is None:
-            answer_path = os.path.join(
+        if new or (tts_file is None):
+            question_path = os.path.join(
                 settings.MEDIA_ROOT, f'tts/{language}/{self.question.identifier}/')
 
-            Path(answer_path).mkdir(parents=True, exist_ok=True)
+            Path(question_path).mkdir(parents=True, exist_ok=True)
 
             tts_file_name = f'{self.identifier}.mp3'
 
-            tts_file_path = os.path.join(answer_path, tts_file_name)
+            tts_file_path = os.path.join(question_path, tts_file_name)
 
             with open(tts_file_path, 'wb') as f:
                 try:
@@ -216,12 +223,33 @@ class AnswerOption(
                 except Exception as e:
                     print("Exception on gtts", e)
 
-            self.tts_file = f'tts/{language}/{self.question.identifier}/{self.identifier}.mp3'
-            self.save()
+            answer_tts_asset.tts_file = f'tts/{language}/{self.question.identifier}/{self.identifier}.mp3'
+            answer_tts_asset.save()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
+class AnswerAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
+    
+    class Meta:
+        ordering = ['order']
+
+    answer_option = models.ForeignKey(AnswerOption, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(blank=True, null=True)
+
+    @ admin.display(description='Question identifier')
+    def answer_option_slug(self):
+        return self.answer_option.random_slug
+
+    def save(self, *args, **kwargs):
+        if self.order is None:
+            self.order = AnswerAsset.objects.filter(
+                answer_option=self.answer_option).count() + 1
+        return super().save(*args, **kwargs)
+
+class AnswerTTSAsset(AnswerAsset):
+    PREFIX = 'answer_tts_asset_'
+    tts_file = models.FileField(null=True, blank=True, upload_to='tts')
 
 class MultipleChoiceAnswerOption(AnswerOption):
     translations = TranslatedFields(
