@@ -24,9 +24,8 @@ jobs:
                     git checkout .
                     git pull origin dev
                     pipenv run python ./src/manage.py migrate
-      - name: Restart gunicorn
-        run: |
-          sudo systemctl restart gunicorn
+                    sudo systemctl restart gunicorn
+                    sudo systemctl restart gunicorn
 
 
                     
