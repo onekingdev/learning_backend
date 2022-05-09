@@ -189,7 +189,7 @@ class CreateAIBlockPresentation(graphene.Mutation):
             thislist = ["apple", "banana", "cherry"]
 
             if(len(available_questions) < 1):
-                raise Exception("Topic " + topic_grade.topic.id + " has no questions has answers")
+                raise Exception("Topic " + f'{topic_grade.topic.id}' + " has no questions has answers")
                 
             while len(available_questions) < block.block_size:
                 for question in available_questions:
