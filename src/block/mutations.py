@@ -163,8 +163,10 @@ class CreateAIBlockPresentation(graphene.Mutation):
 
         topic_choice = random.choice(qs2)
         selected_topic = Topic.objects.get(id=topic_choice['topic'])
-        topic_grade = TopicGrade.objects.get(topic=selected_topic)
-
+        topic_grade = TopicGrade.objects.filter(topic=selected_topic)
+        if(len(topic_grade) < 1):
+            raise Exception("Topic " + f'{selected_topic.id}' + " hasn't grade")
+        topic_grade = topic_grade[0]
         # Create block if it doesn't exist
         block, new = Block.objects.get_or_create(
             topic_grade=topic_grade,
@@ -189,7 +191,7 @@ class CreateAIBlockPresentation(graphene.Mutation):
             thislist = ["apple", "banana", "cherry"]
 
             if(len(available_questions) < 1):
-                raise Exception("Topic " + f'{topic_grade.topic.id}' + " has no questions has answers")
+                raise Exception("Topic " + f'{topic_grade.topic.id}' + " hasn't questions which has answers")
                 
             while len(available_questions) < block.block_size:
                 for question in available_questions:
