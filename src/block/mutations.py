@@ -7,7 +7,7 @@ from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPre
 from .schema import BlockPresentationSchema
 from students.models import StudentTopicMastery, StudentTopicStatus, Student
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
-from kb.models.content import Question
+from kb.models.content import AnswerOption, Question
 from kb.models.content import (
     MultipleChoiceAnswerOption,
     MultipleSelectAnswerOption,
@@ -19,7 +19,7 @@ from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
 from experiences.models import Battery
 from decimal import Decimal
 from wallets.models import CoinWallet
-
+from django.db.models import Q, Count
 
 class RelateAnswerOptionInput(graphene.InputObjectType):
     key = graphene.String()
@@ -173,11 +173,27 @@ class CreateAIBlockPresentation(graphene.Mutation):
         block.save()
         block.students.add(student)
         block.save()
+        print("before block", block.questions.all().count(), block.id)
         if block.questions.all().count() == 0:
+            QuestionQuerySet = (Question.objects
+                .filter(topic=topic_grade.topic)
+                .filter(grade=topic_grade.grade)
+                    # .filter(answeroption__len__gt=0)
+                .annotate(answeroption_count=Count('answeroption'))
+                .filter(answeroption_count__gt=0))
             available_questions = list(
-                Question.objects.filter(
-                    topic=topic_grade.topic).filter(
-                    grade=topic_grade.grade))
+                QuestionQuerySet
+                    
+            )
+            print("before")
+            print(available_questions)
+            # for question in available_questions:
+            #     print("count is ",available_questions.answeroption_count)
+            thislist = ["apple", "banana", "cherry"]
+            for question in available_questions:
+
+                print(question.answeroption_set)
+           
             if len(available_questions) < block.block_size:
                 for question in available_questions:
                     block.questions.add(question)

@@ -162,7 +162,6 @@ class QuestionSchema(DjangoObjectType):
 
     def resolve_question_audio_url(self, info):
         try:
-            print("tts asset is", self.get_questionttsasset().id)
             tts_file = self.get_questionttsasset().tts_file.url
             tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
