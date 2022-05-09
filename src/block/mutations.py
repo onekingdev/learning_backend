@@ -175,33 +175,30 @@ class CreateAIBlockPresentation(graphene.Mutation):
         block.save()
         print("before block", block.questions.all().count(), block.id)
         if block.questions.all().count() == 0:
-            QuestionQuerySet = (Question.objects
+            available_question_query_set = (Question.objects
                 .filter(topic=topic_grade.topic)
                 .filter(grade=topic_grade.grade)
                     # .filter(answeroption__len__gt=0)
                 .annotate(answeroption_count=Count('answeroption'))
                 .filter(answeroption_count__gt=0))
             available_questions = list(
-                QuestionQuerySet
-                    
+                available_question_query_set
             )
-            print("before")
-            print(available_questions)
             # for question in available_questions:
             #     print("count is ",available_questions.answeroption_count)
             thislist = ["apple", "banana", "cherry"]
-            for question in available_questions:
 
-                print(question.answeroption_set)
-           
-            if len(available_questions) < block.block_size:
+            if(len(available_questions) < 1):
+                raise Exception("Topic " + topic_grade.topic.id + " has no questions has answers")
+                
+            while len(available_questions) < block.block_size:
                 for question in available_questions:
                     block.questions.add(question)
-            else:
-                random_questions = random.sample(
-                    available_questions, block.block_size)
-                for question in random_questions:
-                    block.questions.add(question)
+
+            random_questions = random.sample(
+                available_questions, block.block_size)
+            for question in random_questions:
+                block.questions.add(question)
         block.save()
 
         # Create block presentation for block
