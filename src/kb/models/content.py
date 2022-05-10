@@ -73,7 +73,7 @@ class Question(
     def save_gtts(self):
 
         language = self.get_available_languages()[0]
-
+    
         question_text = self.safe_translation_getter(
             "question_text", language_code=language)
         
@@ -103,13 +103,14 @@ class Question(
 
             with open(tts_file_path, 'wb') as f:
                 try:
-                    tts = gTTS(text=question_text, lang=language)
+                    tts = gTTS(text=question_text, lang=("es-us" if language == "es-mx" else language))
                     tts.write_to_fp(f)
+                    question_tts_asset.tts_file = f'tts/{language}/{self.identifier}/{self.identifier}.mp3'
+                    question_tts_asset.save()
                 except Exception as e:
                     print("Exception on gtts", e)
 
-            question_tts_asset.tts_file = f'tts/{language}/{self.identifier}/{self.identifier}.mp3'
-            question_tts_asset.save()
+            
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -223,13 +224,14 @@ class AnswerOption(
 
             with open(tts_file_path, 'wb') as f:
                 try:
-                    tts = gTTS(text=answer_text, lang=language)
+                    tts = gTTS(text=answer_text, lang=("es-us" if language == "es-mx" else language))
                     tts.write_to_fp(f)
+                    answer_tts_asset.tts_file = f'tts/{language}/{self.question.identifier}/{self.identifier}.mp3'
+                    answer_tts_asset.save()
                 except Exception as e:
                     print("Exception on gtts", e)
 
-            answer_tts_asset.tts_file = f'tts/{language}/{self.question.identifier}/{self.identifier}.mp3'
-            answer_tts_asset.save()
+            
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
