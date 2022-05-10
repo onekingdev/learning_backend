@@ -163,14 +163,15 @@ class QuestionSchema(DjangoObjectType):
         return self.get_questionvideoasset_set()
 
     def resolve_question_audio_url(self, info):
+        language = self.get_available_languages()[0]
         try:
-            tts_file = self.get_questionttsasset().tts_file.url
+            tts_file = self.get_questionttsasset(language).tts_file.url
             tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
             print(e)
             try:
                 self.save_gtts()
-                tts_file = self.get_questionttsasset().tts_file.url
+                tts_file = self.get_questionttsasset(language).tts_file.url
                 tts_string = f'{settings.DOMAIN}{tts_file}'
             except Exception as e:
                 tts_string = None
@@ -188,14 +189,15 @@ class AnswerOptionInterface(graphene.Interface):
     answer_audio_url = graphene.String()
 
     def resolve_answer_audio_url(self, info):
+        language = self.get_available_languages()[0]
         try:
-            tts_file = self.get_answeroptionttsasset().tts_file.url
+            tts_file = self.get_answeroptionttsasset(language).tts_file.url
             tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
             print(e)
             try:
                 self.save_gtts()
-                tts_file = self.get_answeroptionttsasset().tts_file.url
+                tts_file = self.get_answeroptionttsasset(language).tts_file.url
                 tts_string = f'{settings.DOMAIN}{tts_file}'
             except Exception as e:
                 tts_string = None

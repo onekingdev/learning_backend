@@ -67,8 +67,8 @@ class Question(
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
 
-    def get_questionttsasset(self):
-        return QuestionTTSAsset.objects.get(question=self)
+    def get_questionttsasset(self, language):
+        return QuestionTTSAsset.objects.get(question=self, language=language)
 
     def save_gtts(self):
 
@@ -82,6 +82,7 @@ class Question(
 
         question_tts_asset, new = QuestionTTSAsset.objects.get_or_create(
             question=self,
+            language = language
         )
 
         try:
@@ -159,6 +160,7 @@ class QuestionAudioAsset(QuestionAsset):
 class QuestionTTSAsset(QuestionAsset):
     PREFIX = 'question_tts_asset_'
     tts_file = models.FileField(null=True, blank=True, upload_to='tts')
+    language = models.CharField(max_length=256, null=True, blank=True)
 
 
 class QuestionVideoAsset(QuestionAsset):
@@ -177,8 +179,8 @@ class AnswerOption(
 
     objects = AnswerOptionManager()
 
-    def get_answeroptionttsasset(self):
-        return AnswerTTSAsset.objects.get(answer_option=self)
+    def get_answeroptionttsasset(self, language):
+        return AnswerTTSAsset.objects.get(answer_option=self, language=language)
 
     @admin.display(description='Question type')
     def question_type(self):
@@ -202,6 +204,7 @@ class AnswerOption(
         answer_option = self.answeroption_ptr
         answer_tts_asset, new = AnswerTTSAsset.objects.get_or_create(
             answer_option=self,
+            language = language
         )
         try:
             tts_file = self.tts_file.file
@@ -252,6 +255,8 @@ class AnswerAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
 class AnswerTTSAsset(AnswerAsset):
     PREFIX = 'answer_tts_asset_'
     tts_file = models.FileField(null=True, blank=True, upload_to='tts')
+    language =models.CharField(max_length=256, null=True, blank=True)
+
 
 class MultipleChoiceAnswerOption(AnswerOption):
     translations = TranslatedFields(
