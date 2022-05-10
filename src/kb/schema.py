@@ -71,8 +71,10 @@ class TopicSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
+        # return self.safe_translation_getter(
+        #     "name", language_code=current_language)
         return self.safe_translation_getter(
-            "name", language_code=current_language)
+            "name", any_language=True)
 
     def resolve_report(self, info, student=None):
         if student is None:

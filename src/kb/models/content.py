@@ -71,12 +71,14 @@ class Question(
         return QuestionTTSAsset.objects.get(question=self)
 
     def save_gtts(self):
+
+        language = self.get_available_languages()[0]
+
         question_text = self.safe_translation_getter(
-            "question_text", any_language=True)
+            "question_text", language_code=language)
+        
         if not question_text:
             return None
-
-        language = self.get_current_language()
 
         question_tts_asset, new = QuestionTTSAsset.objects.get_or_create(
             question=self,
@@ -189,14 +191,14 @@ class AnswerOption(
     def save_gtts(self):
         if( not self.answer_text): return None
 
+        language = self.get_available_languages()[0]
+
         answer_text = self.safe_translation_getter(
-            "answer_text", any_language=True)
+            "question_text", language_code=language)
+        
         if not answer_text:
             return None
 
-        language = self.get_current_language()
-        print("self id is ",self.id)
-        print("answer option id is ", self.answeroption_ptr.id)
         answer_option = self.answeroption_ptr
         answer_tts_asset, new = AnswerTTSAsset.objects.get_or_create(
             answer_option=self,
