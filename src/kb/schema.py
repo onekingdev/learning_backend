@@ -515,6 +515,7 @@ class Query(graphene.ObjectType):
     topic_by_id = graphene.Field(TopicSchema, id=graphene.ID())
     root_topics = graphene.List(TopicSchema)
     root_topics_by_aok = graphene.List(TopicSchema, aok_id=graphene.ID())
+    root_topics_by_aok_and_grade = graphene.List(TopicSchema, aok_id=graphene.ID(), grade_id=graphene.ID())
 
     def resolve_topics(root, info, **kwargs):
         # Querying a list
@@ -530,7 +531,13 @@ class Query(graphene.ObjectType):
     def resolve_root_topics_by_aok(root, info, aok_id):
         return Topic.objects.filter(
             level=0,
+            area_of_knowledge=aok_id
+        )
+    def resolve_root_topics_by_aok_and_grade(root, info, aok_id, grade_id):
+        return Topic.objects.filter(
+            level=0,
             area_of_knowledge=aok_id,
+            topicgrade__grade__id=grade_id
         )
 
     # ----------------- TopicGrade ----------------- #
