@@ -197,7 +197,7 @@ class AnswerOption(
         language = self.get_available_languages()[0]
 
         answer_text = self.safe_translation_getter(
-            "question_text", language_code=language)
+            "answer_text", language_code=language)
         
         if not answer_text:
             return None
