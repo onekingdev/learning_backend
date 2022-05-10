@@ -8,7 +8,7 @@ from django.db.models.query_utils import Q
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-
+from app.settings.env import IS_PRODUCTION, DOMAIN_WITHOU_PRTC
 
 def password_reset_request(request):
     if request.method == "POST":
@@ -22,7 +22,7 @@ def password_reset_request(request):
                     email_template_name = "emails/password/password_reset_email.txt"
                     c = {
                         "email": user.email,
-                        'domain': 'apidev.withsocrates.com',
+                        'domain': DOMAIN_WITHOU_PRTC,
                         'site_name': 'Website',
                         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
                         "user": user,
