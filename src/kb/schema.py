@@ -71,10 +71,8 @@ class TopicSchema(DjangoObjectType):
         except AttributeError:
             current_language = settings.LANGUAGE_CODE
 
-        # return self.safe_translation_getter(
-        #     "name", language_code=current_language)
         return self.safe_translation_getter(
-            "name", any_language=True)
+            "name", language_code=current_language)
 
     def resolve_report(self, info, student=None):
         if student is None:
@@ -163,17 +161,15 @@ class QuestionSchema(DjangoObjectType):
         return self.get_questionvideoasset_set()
 
     def resolve_question_audio_url(self, info):
-        language = self.get_available_languages()[0]
         try:
-            tts_file = self.get_questionttsasset(language).tts_file.url
-            if not tts_file:
-                raise Exception("tts_file is empty")
+            print("tts asset is", self.get_questionttsasset().id)
+            tts_file = self.get_questionttsasset().tts_file.url
             tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
             print(e)
             try:
                 self.save_gtts()
-                tts_file = self.get_questionttsasset(language).tts_file.url
+                tts_file = self.get_questionttsasset().tts_file.url
                 tts_string = f'{settings.DOMAIN}{tts_file}'
             except Exception as e:
                 tts_string = None
@@ -191,17 +187,14 @@ class AnswerOptionInterface(graphene.Interface):
     answer_audio_url = graphene.String()
 
     def resolve_answer_audio_url(self, info):
-        language = self.get_available_languages()[0]
         try:
-            tts_file = self.get_answeroptionttsasset(language).tts_file.url
-            if not tts_file:
-                raise Exception("tts_file is empty")
+            tts_file = self.get_answeroptionttsasset().tts_file.url
             tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
             print(e)
             try:
                 self.save_gtts()
-                tts_file = self.get_answeroptionttsasset(language).tts_file.url
+                tts_file = self.get_answeroptionttsasset().tts_file.url
                 tts_string = f'{settings.DOMAIN}{tts_file}'
             except Exception as e:
                 tts_string = None
@@ -519,7 +512,6 @@ class Query(graphene.ObjectType):
     topic_by_id = graphene.Field(TopicSchema, id=graphene.ID())
     root_topics = graphene.List(TopicSchema)
     root_topics_by_aok = graphene.List(TopicSchema, aok_id=graphene.ID())
-    root_topics_by_aok_and_grade = graphene.List(TopicSchema, aok_id=graphene.ID(), grade_id=graphene.ID())
 
     def resolve_topics(root, info, **kwargs):
         # Querying a list
@@ -535,13 +527,7 @@ class Query(graphene.ObjectType):
     def resolve_root_topics_by_aok(root, info, aok_id):
         return Topic.objects.filter(
             level=0,
-            area_of_knowledge=aok_id
-        )
-    def resolve_root_topics_by_aok_and_grade(root, info, aok_id, grade_id):
-        return Topic.objects.filter(
-            level=0,
             area_of_knowledge=aok_id,
-            topicgrade__grade__id=grade_id
         )
 
     # ----------------- TopicGrade ----------------- #

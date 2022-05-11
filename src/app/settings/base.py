@@ -270,7 +270,6 @@ CRONJOBS = [
     # ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus')
 
 ]
-DATA_UPLOAD_MAX_NUMBER_FIELDS =None 
 # SOCIALACCOUNT_PROVIDERS = {
 #     'google': {
 #         'APP': {

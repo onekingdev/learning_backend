@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 from games.views import game_loader
 from django.contrib.auth import views as auth_views
 from . import views
+from payments import views as paymentsViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,5 +39,7 @@ urlpatterns = [
         template_name="emails/password/password_reset_confirm.html"), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
         template_name='emails/password/password_reset_complete.html'), name='password_reset_complete'),
-    path("password_reset/", views.password_reset_request, name="password_reset")
+    path("password_reset/", views.password_reset_request, name="password_reset"),
+    path("stripe-webhook/", paymentsViews.stripeWebHook, name="stripe_webhook")
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
