@@ -166,6 +166,8 @@ class QuestionSchema(DjangoObjectType):
         language = self.get_available_languages()[0]
         try:
             tts_file = self.get_questionttsasset(language).tts_file.url
+            if not tts_file:
+                raise Exception("tts_file is empty")
             tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
             print(e)
@@ -192,6 +194,8 @@ class AnswerOptionInterface(graphene.Interface):
         language = self.get_available_languages()[0]
         try:
             tts_file = self.get_answeroptionttsasset(language).tts_file.url
+            if not tts_file:
+                raise Exception("tts_file is empty")
             tts_string = f'{settings.DOMAIN}{tts_file}'
         except Exception as e:
             print(e)
