@@ -13,7 +13,7 @@ from pathlib import Path
 
 from parler.models import TranslatableModel, TranslatedFields
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
-
+import time
 
 class Question(
         TimestampModel,
@@ -67,19 +67,22 @@ class Question(
     def get_questionaudioasset_set(self):
         return QuestionAudioAsset.objects.filter(question=self)
 
-    def get_questionttsasset(self):
-        return QuestionTTSAsset.objects.get(question=self)
+    def get_questionttsasset(self, language):
+        return QuestionTTSAsset.objects.get(question=self, language=language)
 
     def save_gtts(self):
+
+        language = self.get_available_languages()[0]
+    
         question_text = self.safe_translation_getter(
-            "question_text", any_language=True)
+            "question_text", language_code=language)
+        
         if not question_text:
             return None
 
-        language = self.get_current_language()
-
         question_tts_asset, new = QuestionTTSAsset.objects.get_or_create(
             question=self,
+            language = language
         )
 
         try:
@@ -100,13 +103,15 @@ class Question(
 
             with open(tts_file_path, 'wb') as f:
                 try:
-                    tts = gTTS(text=question_text, lang=language)
+                    tts = gTTS(text=question_text, lang=("es-us" if language == "es-mx" else language))
                     tts.write_to_fp(f)
+                    question_tts_asset.tts_file = f'tts/{language}/{self.identifier}/{self.identifier}.mp3'
+                    question_tts_asset.save()
                 except Exception as e:
                     print("Exception on gtts", e)
+            time.sleep(15)
 
-            question_tts_asset.tts_file = f'tts/{language}/{self.identifier}/{self.identifier}.mp3'
-            question_tts_asset.save()
+            
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -157,6 +162,7 @@ class QuestionAudioAsset(QuestionAsset):
 class QuestionTTSAsset(QuestionAsset):
     PREFIX = 'question_tts_asset_'
     tts_file = models.FileField(null=True, blank=True, upload_to='tts')
+    language = models.CharField(max_length=256, null=True, blank=True)
 
 
 class QuestionVideoAsset(QuestionAsset):
@@ -175,8 +181,8 @@ class AnswerOption(
 
     objects = AnswerOptionManager()
 
-    def get_answeroptionttsasset(self):
-        return AnswerTTSAsset.objects.get(answer_option=self)
+    def get_answeroptionttsasset(self, language):
+        return AnswerTTSAsset.objects.get(answer_option=self, language=language)
 
     @admin.display(description='Question type')
     def question_type(self):
@@ -189,17 +195,18 @@ class AnswerOption(
     def save_gtts(self):
         if( not self.answer_text): return None
 
+        language = self.get_available_languages()[0]
+
         answer_text = self.safe_translation_getter(
-            "answer_text", any_language=True)
+            "answer_text", language_code=language)
+        
         if not answer_text:
             return None
 
-        language = self.get_current_language()
-        print("self id is ",self.id)
-        print("answer option id is ", self.answeroption_ptr.id)
         answer_option = self.answeroption_ptr
         answer_tts_asset, new = AnswerTTSAsset.objects.get_or_create(
             answer_option=self,
+            language = language
         )
         try:
             tts_file = self.tts_file.file
@@ -218,13 +225,13 @@ class AnswerOption(
 
             with open(tts_file_path, 'wb') as f:
                 try:
-                    tts = gTTS(text=answer_text, lang=language)
+                    tts = gTTS(text=answer_text, lang=("es-us" if language == "es-mx" else language))
                     tts.write_to_fp(f)
+                    answer_tts_asset.tts_file = f'tts/{language}/{self.question.identifier}/{self.identifier}.mp3'
+                    answer_tts_asset.save()
                 except Exception as e:
                     print("Exception on gtts", e)
-
-            answer_tts_asset.tts_file = f'tts/{language}/{self.question.identifier}/{self.identifier}.mp3'
-            answer_tts_asset.save()
+            time.sleep(15)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -250,6 +257,8 @@ class AnswerAsset(TimestampModel, RandomSlugModel, PolymorphicModel):
 class AnswerTTSAsset(AnswerAsset):
     PREFIX = 'answer_tts_asset_'
     tts_file = models.FileField(null=True, blank=True, upload_to='tts')
+    language =models.CharField(max_length=256, null=True, blank=True)
+
 
 class MultipleChoiceAnswerOption(AnswerOption):
     translations = TranslatedFields(

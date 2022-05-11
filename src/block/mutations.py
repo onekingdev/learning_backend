@@ -7,7 +7,7 @@ from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPre
 from .schema import BlockPresentationSchema
 from students.models import StudentTopicMastery, StudentTopicStatus, Student
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
-from kb.models.content import Question
+from kb.models.content import AnswerOption, Question
 from kb.models.content import (
     MultipleChoiceAnswerOption,
     MultipleSelectAnswerOption,
@@ -19,7 +19,7 @@ from engine.models import TopicStudentReport, AreaOfKnowledgeStudentReport
 from experiences.models import Battery
 from decimal import Decimal
 from wallets.models import CoinWallet
-
+from django.db.models import Q, Count
 
 class RelateAnswerOptionInput(graphene.InputObjectType):
     key = graphene.String()
@@ -163,8 +163,10 @@ class CreateAIBlockPresentation(graphene.Mutation):
 
         topic_choice = random.choice(qs2)
         selected_topic = Topic.objects.get(id=topic_choice['topic'])
-        topic_grade = TopicGrade.objects.get(topic=selected_topic)
-
+        topic_grade = TopicGrade.objects.filter(topic=selected_topic)
+        if(len(topic_grade) < 1):
+            raise Exception("Topic " + f'{selected_topic.id}' + " hasn't grade")
+        topic_grade = topic_grade[0]
         # Create block if it doesn't exist
         block, new = Block.objects.get_or_create(
             topic_grade=topic_grade,
@@ -173,19 +175,32 @@ class CreateAIBlockPresentation(graphene.Mutation):
         block.save()
         block.students.add(student)
         block.save()
+        print("before block", block.questions.all().count(), block.id)
         if block.questions.all().count() == 0:
+            available_question_query_set = (Question.objects
+                .filter(topic=topic_grade.topic)
+                .filter(grade=topic_grade.grade)
+                    # .filter(answeroption__len__gt=0)
+                .annotate(answeroption_count=Count('answeroption'))
+                .filter(answeroption_count__gt=0))
             available_questions = list(
-                Question.objects.filter(
-                    topic=topic_grade.topic).filter(
-                    grade=topic_grade.grade))
-            if len(available_questions) < block.block_size:
+                available_question_query_set
+            )
+            # for question in available_questions:
+            #     print("count is ",available_questions.answeroption_count)
+            thislist = ["apple", "banana", "cherry"]
+
+            if(len(available_questions) < 1):
+                raise Exception("Topic " + f'{topic_grade.topic.id}' + " hasn't questions which has answers")
+                
+            while len(available_questions) < block.block_size:
                 for question in available_questions:
                     block.questions.add(question)
-            else:
-                random_questions = random.sample(
-                    available_questions, block.block_size)
-                for question in random_questions:
-                    block.questions.add(question)
+
+            random_questions = random.sample(
+                available_questions, block.block_size)
+            for question in random_questions:
+                block.questions.add(question)
         block.save()
 
         # Create block presentation for block
