@@ -109,7 +109,7 @@ class Question(
                     question_tts_asset.save()
                 except Exception as e:
                     print("Exception on gtts", e)
-            time.sleep(15)
+            time.sleep(20)
 
             
 
@@ -231,7 +231,7 @@ class AnswerOption(
                     answer_tts_asset.save()
                 except Exception as e:
                     print("Exception on gtts", e)
-            time.sleep(15)
+            time.sleep(20)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
