@@ -26,7 +26,8 @@ class PurchaseAvatar(graphene.Mutation):
         if not student_avatar:
             account, new = CoinWallet.objects.get_or_create(student=student)
             if avatar.price > account.balance:
-                raise Exception("You don't have enough coins")
+                raise Exception('Your coin is not enough')
+
             avatar_purchase_transaction = AvatarPurchaseTransaction(
                 avatar=avatar,
                 account=account,
