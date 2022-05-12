@@ -17,8 +17,11 @@ import datetime
 from django.conf import settings
 from payments.models import OrderDetail
 from plans.models import GuardianStudentPlan
+from django.views.decorators.csrf import csrf_exempt
 User = get_user_model()
 stripe.api_key = settings.STRIPE_LIVE_SECRET_KEY if settings.STRIPE_LIVE_MODE == True else settings.STRIPE_TEST_SECRET_KEY
+
+@csrf_exempt
 def stripeWebHook(request):
     print("in stripe web hook")
     
