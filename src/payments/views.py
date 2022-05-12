@@ -16,10 +16,12 @@ from django.http import JsonResponse
 import datetime
 from django.conf import settings
 from payments.models import OrderDetail
+from plans.models import GuardianStudentPlan
 User = get_user_model()
 stripe.api_key = settings.STRIPE_LIVE_SECRET_KEY if settings.STRIPE_LIVE_MODE == True else settings.STRIPE_TEST_SECRET_KEY
 def stripeWebHook(request):
     print("in stripe web hook")
+    
     response_err = []
     try:
 
@@ -44,12 +46,16 @@ def stripeWebHook(request):
                 try :
                     subscription_status = subscription['status']
                     subscription_end_at = datetime.datetime.fromtimestamp(subscription['current_period_end'])
+                    print(subscription['current_period_end'])
                     # ---------- Get guardian student plan from subscription id -S----------------#
                     order_detail = OrderDetail.objects.get(subscription_id = subscription['id'])
+                    # order_detail = OrderDetail.objects.get(subscription_id = "sub_1KqOQNAfwM01sssKrJfXOzrb")
+                    # order_detail = OrderDetail.objects.get(pk=112)
                     # if(len(order_detail) < 1): 
                     #     continue;
                     # order_detail = order_detail[0]
-                    guardian_student_plans = order_detail.guardianstudentplan_set
+                    guardian_student_plans = order_detail.guardianstudentplan_set.all()
+                    print(guardian_student_plans, guardian_student_plans[0])
                     # ---------- Get guardian student plan from subscription id -E----------------#
 
                     # --------------- Get user by email from requedst -S---------------------#
@@ -63,18 +69,16 @@ def stripeWebHook(request):
                     # guardianStudentPlans = guardian.guardianstudentplan_set
 
                     # --------------- Update Expire Date to after period days -S----------------- #
-                    for i, guardian_student_plan in guardian_student_plans:
-                        print("inside")
-                        # period = 32 if guardian_student_plans[i].period == "MONTHLY" else 367
+                    for guardian_student_plan in guardian_student_plans:
+                        # period = 32 if guardian_student_plan.period == "MONTHLY" else 367
                         period =2
+                        guardian_student_plan.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        guardian_student_plan.expired_at = subscription_end_at + datetime.timedelta(days=period)
+                        guardian_student_plan.save()
 
-                        guardian_student_plans[i].is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
-                        guardian_student_plans[i].expired_at = subscription_end_at + datetime.timedelta(days=period)
-                        guardian_student_plans[i].save()
-
-                        guardian_student_plans[i].order_detail.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
-                        guardian_student_plans[i].order_detail.expiredAt = now + datetime.timedelta(days=period)
-                        guardian_student_plans[i].order_detail.save()
+                        guardian_student_plan.order_detail.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        guardian_student_plan.order_detail.expired_at = now + datetime.timedelta(days=period)
+                        guardian_student_plan.order_detail.save()
                     # --------------- Update Expire Date to after period days -E----------------- #
                 except Exception as e:
                     response_err.append("Subscription ID " + subscription['id'] + " : " + str(e))
