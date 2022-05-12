@@ -54,7 +54,7 @@ def stripeWebHook(request):
                     order_detail = OrderDetail.objects.get(subscription_id = subscription['id'])
                     # order_detail = OrderDetail.objects.get(subscription_id = "sub_1KqOQNAfwM01sssKrJfXOzrb")
                     # order_detail = OrderDetail.objects.get(pk=112)
-                    if(order_detail): 
+                    if(not order_detail): 
                         # --------------- Get user by email from request -S---------------------#
                         user = User.objects.filter(email = intent.charges.data[0].billing_details.email)
                         if(len(user) < 1) :
