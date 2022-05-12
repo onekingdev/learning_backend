@@ -28,12 +28,12 @@ def stripeWebHook(request):
     response_err = []
     try:
 
-        sig = request.headers["stripe-signature"];
-        
+        sig = request.headers.get("stripe-signature");
+
         event = stripe.Webhook.construct_event(
-            json.loads(request.body),
-            sig,
-            settings.STRIPE_LIVE_WEBHOOK_KEY if settings.STRIPE_LIVE_MODE == True else settings.STRIPE_TEST_WEBHOOK_KEY
+            payload = request.body,
+            sig_header = sig,
+            secret = settings.STRIPE_LIVE_WEBHOOK_KEY if settings.STRIPE_LIVE_MODE == True else settings.STRIPE_TEST_WEBHOOK_KEY
             )
         # event = json.loads(request.body)
 
