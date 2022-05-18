@@ -34,6 +34,7 @@ import users.mutations
 import treasuretrack.schema
 import treasuretrack.mutations
 import badges.schema
+from django.utils import timezone
 
 class CustomTokenAuth(ObtainJSONWebToken):
 
@@ -45,6 +46,8 @@ class CustomTokenAuth(ObtainJSONWebToken):
             student_plan = user.student.guardianstudentplan
             if student_plan.is_cancel:
                 raise Exception("Please reactive your plan")
+            if student_plan.expired_at < timezone.now():
+                raise Exception("Expiration date has expired")
 
         return cls()
 
