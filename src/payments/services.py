@@ -285,44 +285,31 @@ def change_order_detail_payment_method(guardian_id) -> Guardian:
 
 def payment_card_subscription(
         order_detail: OrderDetail,
-        email: str,
-        card_number: str,
-        card_exp_month: int,
-        card_exp_year: int,
-        card_cvc: str,
-        first_name: str,
-        last_name: str,
-        address1: str,
-        address2: str,
-        city: str,
-        country: str,
-        post_code: str,
-        state: str,
-        phone: str,
+        customer_id: str,
         has_order: bool
 ):
     card = Card()
-    payment_method = card.create_payment_method(
-        number=card_number,
-        exp_month=card_exp_month,
-        exp_year=card_exp_year,
-        cvc=card_cvc,
-        first_name=first_name,
-        last_name=last_name,
-        address1=address1,
-        address2=address2,
-        city=city,
-        country=country,
-        post_code=post_code,
-        state=state,
-        phone=phone,
-        email=email
-    )
+    # payment_method = card.create_payment_method(
+    #     number=card_number,
+    #     exp_month=card_exp_month,
+    #     exp_year=card_exp_year,
+    #     cvc=card_cvc,
+    #     first_name=first_name,
+    #     last_name=last_name,
+    #     address1=address1,
+    #     address2=address2,
+    #     city=city,
+    #     country=country,
+    #     post_code=post_code,
+    #     state=state,
+    #     phone=phone,
+    #     email=email
+    # )
 
-    customer = card.create_customer(
-        email,
-        payment_method_id=payment_method.id
-    )
+    # customer = card.create_customer(
+    #     email,
+    #     payment_method_id=payment_method.id
+    # )
 
     # get a coupon if has
     coupon_id = None
@@ -334,7 +321,7 @@ def payment_card_subscription(
             coupon_id = card.create_or_get_coupon(code=discount_code.code, percentage=discount_code.percentage)
 
     sub = card.create_subscription(
-        customer_id=customer.id,
+        customer_id=customer_id,
         plan_id=order_detail.payment_method_plan_id,
         quantity=order_detail.quantity,
         has_order=has_order,
@@ -471,23 +458,60 @@ def create_order(guardian_id,
         url_redirect = paypal_tx.approve_link
     elif order.payment_method.upper() == "CARD":
         order_details = OrderDetail.objects.filter(order_id=order.id)
-        for order_detail in order_details:
-            sub = payment_card_subscription(
-                order_detail=order_detail,
-                email=order.guardian.user.email,
-                card_number=card_number,
-                card_exp_month=card_exp_month,
-                card_exp_year=card_exp_year,
-                card_cvc=card_cvc,
+
+        card = Card()
+        
+        # --------------------- create Customer to parent and attach payment method -S-----------------#
+        guardian = Guardian.objects.get(pk = guardian_id)
+        user = guardian.user
+
+        if(not user.stripe_customer_id):
+            payment_method = card.create_payment_method(
+                number=card_number,
+                exp_month=card_exp_month,
+                exp_year=card_exp_year,
+                cvc=card_cvc,
                 first_name=card_first_name,
                 last_name=card_last_name,
                 address1=address1,
                 address2=address2,
                 city=city,
-                state=state,
                 country=country,
                 post_code=post_code,
+                state=state,
                 phone=phone,
+                email=order.guardian.user.email,
+            )    
+            customer = card.create_customer(
+                order.guardian.user.email,
+                payment_method_id=payment_method.id
+            )
+            user.stripe_customer_id = customer.id
+            user.save()
+        else:
+            card.change_payment_method(
+                customer_id=user.stripe_customer_id,
+                number=card_number,
+                exp_month=card_exp_month,
+                exp_year=card_exp_year,
+                cvc=card_cvc,
+                first_name=card_first_name,
+                last_name=card_last_name,
+                address1=address1,
+                address2=address2,
+                city=city,
+                country=country,
+                post_code=post_code,
+                state=state,
+                phone=phone,
+                email=order.guardian.user.email,
+            )
+        # --------------------- create Customer to parent and attach payment method -E-----------------#
+
+        for order_detail in order_details:
+            sub = payment_card_subscription(
+                order_detail=order_detail,
+                customer_id=user.stripe_customer_id,
                 has_order=order.guardian.has_order
             )
             order_detail.subscription_id = sub.id

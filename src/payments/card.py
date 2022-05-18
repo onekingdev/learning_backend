@@ -70,8 +70,13 @@ class Card:
         )
         return subscription
 
-    def change_payment_method(self, sub_id, number, exp_month, exp_year, cvc, first_name, last_name, address1, address2, city, country, post_code, state, email, phone):
-        sub = stripe.Subscription.retrieve(sub_id)
+    def change_payment_method(self,  number, exp_month, exp_year, cvc, first_name, last_name, address1, address2, city, country, post_code, state, email, phone, customer_id=None, sub_id=None):
+        customer = None
+        if(sub_id):
+            sub = stripe.Subscription.retrieve(sub_id)
+            customer = sub.customer
+        else:
+            customer = stripe.Customer.retrieve(customer_id)
         payment_method = self.create_payment_method(
             number=number,
             exp_month=exp_month,
@@ -88,22 +93,34 @@ class Card:
             email=email,
             phone=phone
         )
-
-        stripe.PaymentMethod.attach(
-            payment_method.id,
-            customer=sub.customer,
+        isOwnedMethod = False
+        registered_methods = stripe.Customer.list_payment_methods(
+            customer.id,
+            type="card",
         )
+        for registered_method in registered_methods.data:
+            if(registered_method.card.last4 == payment_method.card.last4):
+                payment_method = registered_method
+                isOwnedMethod = True
+                break
+
+        if(not isOwnedMethod):
+            stripe.PaymentMethod.attach(
+                payment_method.id,
+                customer=customer,
+            )
 
         stripe.Customer.modify(
-            sub.customer,
+            customer.id,
             invoice_settings={
-                'default_payment_method': payment_method.id
+                "default_payment_method": payment_method.id
             }
         )
-        stripe.Subscription.modify(
-            sub_id,
-            default_payment_method=payment_method.id,
-        )
+        if(sub_id):
+            stripe.Subscription.modify(
+                sub_id,
+                default_payment_method=payment_method.id,
+            )
         return
 
     def create_or_get_coupon(self, code, percentage):

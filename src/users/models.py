@@ -11,11 +11,16 @@ class User(AbstractUser):
         blank=True,
         null=True,
     )
-    stripe_customer = models.ForeignKey(
-        'djstripe.Customer',
-        on_delete=models.PROTECT,
-        blank=True,
+    # stripe_customer = models.ForeignKey(
+    #     'djstripe.Customer',
+    #     on_delete=models.PROTECT,
+    #     blank=True,
+    #     null=True,
+    # )
+    stripe_customer_id = models.CharField(
+        max_length=100,
         null=True,
+        blank=True
     )
     # email = models.EmailField(unique=True)
 
