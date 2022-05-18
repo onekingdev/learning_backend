@@ -63,7 +63,7 @@ class CreatePathBlockPresentation(graphene.Mutation):
             raise Exception("Topic does not exist")
 
         # Create block if it doesn't exist
-        block = Block.objects.get_or_create(
+        block, new = Block.objects.get_or_create(
             topic_grade=topic_grade,
             modality='PATH',
         )
@@ -72,7 +72,7 @@ class CreatePathBlockPresentation(graphene.Mutation):
         block.save()
 
         # Create block presentation for block
-        block_presentation = BlockPresentation.objects.get_or_create(
+        block_presentation, new = BlockPresentation.objects.get_or_create(
             block=block,
             student=student,
         )
