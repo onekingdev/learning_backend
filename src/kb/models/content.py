@@ -100,7 +100,6 @@ class Question(
             tts_file_name = f'{self.identifier}.mp3'
 
             tts_file_path = os.path.join(question_path, tts_file_name)
-            time.sleep(10)
             with open(tts_file_path, 'wb') as f:
                 try:
                     tts = gTTS(text=question_text, lang=("es-us" if language == "es-mx" else language))
@@ -109,9 +108,6 @@ class Question(
                     question_tts_asset.save()
                 except Exception as e:
                     print("Exception on gtts", e)
-            time.sleep(10)
-
-            
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
