@@ -3,7 +3,13 @@ import random
 from django.utils import timezone
 from django.db.models import F
 from students.schema import StudentSchema
-from .models import BlockPresentation, Block, BlockTransaction, BlockQuestionPresentation
+from .models import (
+    BlockPresentation,
+    Block,
+    BlockTransaction,
+    BlockQuestionPresentation,
+    StudentBlockQuestionPresentationHistory
+)
 from .schema import BlockPresentationSchema
 from students.models import StudentTopicMastery, StudentTopicStatus, Student
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
@@ -431,6 +437,12 @@ class FinishBlockPresentation(graphene.Mutation):
                     )
 
             block_question_presentation.save()
+
+            student_block_question_history = StudentBlockQuestionPresentationHistory.objects.get_or_create(
+                student=student,
+                block_question_presentation=block_question_presentation
+            )
+            student_block_question_history.save()
 
         # Create registers for report tables
         topic_report, new = TopicStudentReport.objects.get_or_create(

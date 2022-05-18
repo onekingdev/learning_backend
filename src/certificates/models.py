@@ -16,6 +16,8 @@ class StudentCertificates(TimestampModel, RandomSlugModel, IsActiveModel):
     title = models.CharField(max_length=128, null=True, blank=True)
     editableText = models.TextField(null=True)
     text = models.TextField(null=True)
+    certificate = models.ForeignKey(
+        'certificates.Certificates', on_delete=models.CASCADE, null=False, blank=False)
     fromWho = models.ForeignKey(
         'organization.Teacher', on_delete=models.CASCADE, null=False, blank=False)
     toWho = models.ForeignKey(

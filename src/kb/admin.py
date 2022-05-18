@@ -114,14 +114,9 @@ class PrerequisiteAdmin(
         import_export_admin.ImportExportModelAdmin,
 ):
     resource_class = resources.PrerequisiteResource
-    list_display = (
-        'id',
-        'topic',
-        'get_prerequisites',
-    )
-    list_filter = (
-        'topic__area_of_knowledge__universal_area_knowledge',
-    )
+    list_display = ('id', 'topic', 'get_prerequisites',)
+    search_fields = ('topic',)
+    list_filter = ('topic__area_of_knowledge__universal_area_knowledge',)
     autocomplete_fields = ['topic', 'prerequisites']
 
 
@@ -158,9 +153,11 @@ class AreaOfKnowledgeAdmin(
         'universal_area_knowledge',
         'is_active',
     )
+    search_fields = ('name', 'audience',)
     list_filter = (
         'is_active',
         'audience',
+        'universal_area_knowledge',
     )
 
 
@@ -209,12 +206,9 @@ class MultipleChoiceAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = [
-        'id',
-        'answer_text',
-        'question',
-        'is_correct',
-    ]
+    list_display = ('id', 'answer_text', 'question', 'is_correct')
+    search_fields = ('answer_text', 'question',)
+    list_filter = ('is_correct',)
 
 
 @admin.register(MultipleSelectAnswerOption)
@@ -231,12 +225,9 @@ class MultipleSelectAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = [
-        'id',
-        'answer_text',
-        'is_correct',
-        'question',
-    ]
+    list_display = ('id', 'answer_text', 'is_correct', 'question',)
+    search_fields = ('answer_text', 'question',)
+    list_filter = ('is_correct',)
 
 
 @admin.register(TypeInAnswerOption)
@@ -253,13 +244,9 @@ class TypeInAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = [
-        'id',
-        'answer_text',
-        'is_correct',
-        'question',
-    ]
-
+    list_display = ('id', 'answer_text', 'is_correct', 'question',)
+    search_fields = ('answer_text', 'question',)
+    list_filter = ('is_correct',)
 
 @admin.register(OrderAnswerOption)
 class OrderAnswerOptionAdmin(
@@ -275,13 +262,9 @@ class OrderAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = [
-        'id',
-        'answer_text',
-        'order',
-        'is_correct',
-        'question',
-    ]
+    list_display = ('id', 'answer_text', 'order', 'is_correct', 'question',)
+    search_fields = ('answer_text', 'question', 'order',)
+    list_filter = ('is_correct',)
 
 
 @admin.register(RelateAnswerOption)
@@ -298,28 +281,14 @@ class RelateAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = [
-        'id',
-        'key',
-        'value',
-        'is_correct',
-        'question',
-    ]
+    list_display = ('id', 'key', 'value', 'is_correct', 'question',)
+    search_fields = ('key', 'value', 'question',)
+    list_filter = ('is_correct',)
 
 
 @admin.register(AnswerOption)
-class AnswerOptionAdmin(
-    # parler_admin.TranslatableAdmin,
-    import_export_admin.ImportExportModelAdmin,
-    polymorphic_admin.PolymorphicParentModelAdmin,
-):
-    # Display settings
-    list_display = (
-        'id',
-        '__str__',
-        'question',
-        'question_type',
-    )
+class AnswerOptionAdmin(import_export_admin.ImportExportModelAdmin, polymorphic_admin.PolymorphicParentModelAdmin):
+    list_display = ('id', '__str__', 'question', 'question_type')
 
     # Import-Export settings
     resource_class = resources.AnswerOptionResource
@@ -377,7 +346,7 @@ class QuestionAdmin(
         'grade__audience',
     )
     autocomplete_fields = ['topic']
-    search_fields = ['translations__question_text', 'id']
+    search_fields = ['translations__question_text', 'id', 'question']
 
 
 @admin.register(QuestionImageAsset)
@@ -388,6 +357,7 @@ class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
         'identifier',
         'image',
     )
+    search_fields = ('question_slug',)
     autocomplete_fields = ['question']
 
 
@@ -399,4 +369,17 @@ class QuestionAudioAssetAdmin(import_export_admin.ImportExportModelAdmin):
         'identifier',
         'audio_file',
     )
+    search_fields = ('question_slug',)
     autocomplete_fields = ['question']
+
+
+@admin.register(QuestionTTSAsset)
+class QuestionTTSAssetAdmin(import_export_admin.ImportExportModelAdmin):
+    list_display = ('id', 'question', 'tts_file')
+    search_fields = ('question', 'tts_file',)
+
+
+@admin.register(QuestionVideoAsset)
+class QuestionVideoAssetAdmin(import_export_admin.ImportExportModelAdmin):
+    list_display = ('id', 'question', 'url')
+    search_fields = ('question', 'url',)

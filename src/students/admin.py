@@ -1,6 +1,6 @@
 from django.contrib import admin
 from admin_auto_filters.filters import AutocompleteFilter
-from .models import Student, StudentTopicStatus, StudentTopicMastery
+from .models import Student, StudentTopicStatus, StudentTopicMastery, StudentAchievement, StudentGrade
 
 
 class StudentFilter(AutocompleteFilter):
@@ -10,15 +10,9 @@ class StudentFilter(AutocompleteFilter):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'user',
-        'first_name',
-        'last_name',
-        'create_timestamp',
-    )
+    list_display = ('id', 'user', 'first_name', 'last_name', 'create_timestamp')
     search_fields = ['user__username']
-
+    list_filter = ('create_timestamp',)
 
 
 @admin.register(StudentTopicStatus)
@@ -49,6 +43,7 @@ class StudentTopicMastery(admin.ModelAdmin):
     list_filter = (
         'student',
         'topic__area_of_knowledge__universal_area_knowledge',
+        'mastery_level'
     )
     list_display = (
         'id',
@@ -58,3 +53,17 @@ class StudentTopicMastery(admin.ModelAdmin):
         'mastery_level',
         'status',
     )
+
+
+@admin.register(StudentAchievement)
+class StudentAchievementAdmin(admin.ModelAdmin):
+    list_display = ('id', 'achivement', 'student', 'is_liberate', 'liberation_date')
+    search_fields = ('student__user__username',)
+    list_filter = ('achivement', 'is_liberate', 'liberation_date')
+
+
+@admin.register(StudentGrade)
+class StudentGrade(admin.ModelAdmin):
+    list_display = ('id', 'grade', 'student', 'is_finished', 'percentage', 'complete_date')
+    search_fields = ('student__user__username',)
+    list_filter = ('grade', 'is_finished', 'percentage', 'complete_date')

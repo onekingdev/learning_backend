@@ -47,10 +47,10 @@ class BlockConfigurationKeyword(TimestampModel, IsActiveModel):
 
 
 class BlockType(
-        TimestampModel,
-        RandomSlugModel,
-        IsActiveModel,
-        TranslatableModel):
+    TimestampModel,
+    RandomSlugModel,
+    IsActiveModel,
+    TranslatableModel):
     """
     Model for types of blocks.
     These take some config values and are copied to blocks upon block creation.
@@ -269,6 +269,11 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
                     self.status = self.STATUS_PENDING
 
         super(BlockQuestionPresentation, self).save(*args, **kwargs)
+
+
+class StudentBlockQuestionPresentationHistory(TimestampModel):
+    student = models.ForeignKey('students.Student', on_delete=models.CASCADE, blank=False, null=False)
+    block_question_presentation = models.ManyToManyField(BlockQuestionPresentation, blank=False)
 
 
 class BlockAssignment(TimestampModel):

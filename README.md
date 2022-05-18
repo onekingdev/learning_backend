@@ -7,6 +7,8 @@ This project contains the backend for Learn With Socrates
 - Python 3.8
 - [Pipenv](https://github.com/pypa/pipenv#installation)
 
+
+
 ## Basic Installation
 
 1. Clone the repository:

@@ -77,13 +77,13 @@ class Movement(RandomSlugModel, TimestampModel):
         ordering = ['-date', '-pk']
 
     account = models.ForeignKey(
-        'wallets.CoinWallet', on_delete=models.CASCADE, verbose_name='Cuenta')
-    date = models.DateField('Fecha Movimiento', auto_now_add=True)
-    side = models.CharField('Lado', max_length=1,
+        'wallets.CoinWallet', on_delete=models.CASCADE, verbose_name='account')
+    date = models.DateField('movement date', auto_now_add=True)
+    side = models.CharField('side', max_length=1,
                             choices=Account.SIDE_CHOICE_SET)
     comment = models.CharField(
-        'Comentario', max_length=128, null=True, blank=True, )
-    amount = models.DecimalField('Monto', decimal_places=2, max_digits=11)
+        'comment', max_length=128, null=True, blank=True, )
+    amount = models.DecimalField('amount', decimal_places=2, max_digits=11)
     objects = InheritanceManager()
 
     def save(self, *args, **kwargs):
@@ -139,13 +139,13 @@ class BankMovement(RandomSlugModel, TimestampModel):
         ordering = ['-date', '-pk']
 
     account = models.ForeignKey(
-        'bank.BankWallet', on_delete=models.CASCADE, verbose_name='Cuenta')
-    date = models.DateField('Fecha Movimiento', auto_now_add=True)
-    side = models.CharField('Lado', max_length=1,
+        'bank.BankWallet', on_delete=models.CASCADE, verbose_name='account')
+    date = models.DateField('movement date', auto_now_add=True)
+    side = models.CharField('side', max_length=1,
                             choices=Account.SIDE_CHOICE_SET)
     comment = models.CharField(
-        'Comentario', max_length=128, null=True, blank=True, )
-    amount = models.FloatField(null=False)
+        'comment', max_length=128, null=True, blank=True, )
+    amount = models.FloatField('amount', null=False)
     objects = BankManager()
 
     def save(self, *args, **kwargs):

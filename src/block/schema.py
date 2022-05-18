@@ -2,7 +2,8 @@ import graphene
 from django.conf import settings
 from graphene_django import DjangoObjectType
 from block.models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block
-from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPresentation
+from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPresentation, \
+    StudentBlockQuestionPresentationHistory
 from block.models import BlockAssignment
 from kb.schema import QuestionSchema
 
@@ -55,6 +56,12 @@ class BlockConfigurationSchema(DjangoObjectType):
 class BlockPresentationSchema(DjangoObjectType):
     class Meta:
         model = BlockPresentation
+        fields = "__all__"
+
+
+class StudentBlockQuestionPresentationHistorySchema(DjangoObjectType):
+    class Meta:
+        model = StudentBlockQuestionPresentationHistory
         fields = "__all__"
 
 
@@ -190,6 +197,20 @@ class Query(graphene.ObjectType):
     def resolve_block_question_presentation_by_id(root, info, id):
         # Querying a single question
         return BlockQuestionPresentation.objects.get(pk=id)
+
+    # ----------------- StudentBlockQuestionPresentationHistory ----------------- #
+    block_question_presentation_history = graphene.List(
+        StudentBlockQuestionPresentationHistorySchema
+    )
+    block_question_presentation_history_by_id = graphene.List(
+        StudentBlockQuestionPresentationHistorySchema, id=graphene.ID()
+    )
+
+    def resolve_block_question_presentation_history(root, info, **kwargs):
+        return StudentBlockQuestionPresentationHistory.objects.all();
+
+    def resolve_block_question_presentation_history_by_id(root, info, id):
+        return StudentBlockQuestionPresentationHistory.objects.filter(student=id);
 
     # ----------------- BlockAssignment ----------------- #
 
