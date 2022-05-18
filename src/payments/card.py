@@ -9,7 +9,7 @@ from app import settings
 import requests
 from payments.models import CardTransaction
 
-secret_key = settings.STRIPE_TEST_SECRET_KEY
+secret_key = settings.STRIPE_LIVE_SECRET_KEY if settings.STRIPE_LIVE_MODE == True else settings.STRIPE_TEST_SECRET_KEY
 
 
 class Card:
