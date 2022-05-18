@@ -88,9 +88,9 @@ INSTALLED_APPS = [
     'students',
     'treasuretrack',
     'universals',
+    'payments',
     'users',
     'wallets',
-    'payments',
 ]
 
 
