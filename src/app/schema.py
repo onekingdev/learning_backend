@@ -46,7 +46,7 @@ class CustomTokenAuth(ObtainJSONWebToken):
             student_plan = user.student.guardianstudentplan
             if student_plan.is_cancel:
                 raise Exception("Please reactive your plan")
-            if student_plan.expired_at < timezone.now():
+            if student_plan.expired_at and student_plan.expired_at < timezone.now():
                 raise Exception("Expiration date has expired")
 
         return cls()
