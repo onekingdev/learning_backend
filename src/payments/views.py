@@ -54,21 +54,20 @@ def stripeWebHook(request):
                     order_detail = OrderDetail.objects.get(subscription_id = subscription['id'])
                     # order_detail = OrderDetail.objects.get(subscription_id = "sub_1KqOQNAfwM01sssKrJfXOzrb")
                     # order_detail = OrderDetail.objects.get(pk=112)
-                    if(not order_detail): 
-                        # --------------- Get user by email from request -S---------------------#
-                        user = User.objects.filter(email = intent.charges.data[0].billing_details.email)
-                        if(len(user) < 1) :
-                            return JsonResponse({"status": "error", "message": "Current user was deleted on database" })
-                        user = user[0]
-                        guardian_student_plans = user.guardian.guardianstudentplan_set.all()
-                        # --------------- Get user by email from request -E---------------------#
-                    # order_detail = order_detail[0]
-                    else:
-                        guardian_student_plans = order_detail.guardianstudentplan_set.all()
+                    # if(not order_detail): 
+                    #     # --------------- Get user by email from request -S---------------------#
+                    #     user = User.objects.filter(email = intent.charges.data[0].billing_details.email)
+                    #     if(len(user) < 1) :
+                    #         return JsonResponse({"status": "error", "message": "Current user was deleted on database" })
+                    #     user = user[0]
+                    #     guardian_student_plans = user.guardian.guardianstudentplan_set.all()
+                    #     # --------------- Get user by email from request -E---------------------#
+                    # # order_detail = order_detail[0]
+                    # else:
+                    #     guardian_student_plans = order_detail.guardianstudentplan_set.all()
+                    guardian_student_plans = order_detail.guardianstudentplan_set.all()
                     print(guardian_student_plans, guardian_student_plans[0])
                     # ---------- Get guardian student plan from subscription id -E----------------#
-
-                    
 
                     # guardian = user.guardian
                     # guardianStudentPlans = guardian.guardianstudentplan_set
