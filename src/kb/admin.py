@@ -306,7 +306,7 @@ class AnswerOptionAdmin(
     polymorphic_admin.PolymorphicParentModelAdmin,
     polymorphic_admin.PolymorphicInlineSupportMixin,
     ):
-    list_display = ('id', '__str__', 'question', 'question_type')
+    list_display = ('id', '__str__', 'question', 'question_type', 'tts_audio_url')
 
     # Import-Export settings
     resource_class = resources.AnswerOptionResource
