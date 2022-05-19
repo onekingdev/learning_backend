@@ -15,7 +15,7 @@ from kb.models.content import QuestionImageAsset, QuestionAudioAsset, QuestionVi
 from engine.models import TopicStudentReport
 from engine.schema import TopicStudentReportSchema
 from students.models import StudentTopicMastery
-
+from django.db.models import Q
 
 class AreaOfKnowledgeSchema(DjangoObjectType):
     class Meta:
@@ -64,7 +64,10 @@ class TopicSchema(DjangoObjectType):
     mastery = graphene.String(
         student=graphene.ID()
     )
-
+    sub_topics_by_grade = graphene.List(
+        'kb.schema.TopicSchema',
+        grade_id=graphene.ID()
+    )
     def resolve_name(self, info, language_code=None):
         try:
             current_language = info.context.user.language
@@ -99,6 +102,8 @@ class TopicSchema(DjangoObjectType):
         except StudentTopicMastery.DoesNotExist:
             mastery = None
         return mastery
+    def resolve_sub_topics_by_grade(self, info, grade_id):
+        return self.sub_topics.all().filter(topicgrade__grade__id=grade_id)
 
 
 class TopicGradeSchema(DjangoObjectType):
@@ -517,6 +522,8 @@ class Query(graphene.ObjectType):
 
     topics = graphene.List(TopicSchema)
     topic_by_id = graphene.Field(TopicSchema, id=graphene.ID())
+    topics_by_aok = graphene.List(TopicSchema, aok_id=graphene.ID())
+    topics_by_aok_and_grade = graphene.List(TopicSchema, aok_id=graphene.ID(), grade_id=graphene.ID())
     root_topics = graphene.List(TopicSchema)
     root_topics_by_aok = graphene.List(TopicSchema, aok_id=graphene.ID())
     root_topics_by_aok_and_grade = graphene.List(TopicSchema, aok_id=graphene.ID(), grade_id=graphene.ID())
@@ -528,7 +535,20 @@ class Query(graphene.ObjectType):
     def resolve_topic_by_id(root, info, id):
         # Querying a single question
         return Topic.objects.get(pk=id)
+    
+    def resolve_topics_by_aok(root, info, aok_id):
+        return Topic.objects.filter(
+            area_of_knowledge=aok_id
+        )
 
+    def resolve_topics_by_aok_and_grade(root, info, aok_id, grade_id):
+        return Topic.objects.filter(
+            area_of_knowledge=aok_id,
+        ).filter(
+            # Q(topicgrade__grade__id=grade_id) | Q(level=0)
+            topicgrade__grade__id=grade_id
+        )
+    
     def resolve_root_topics(root, info):
         return Topic.objects.filter(level=0)
 
