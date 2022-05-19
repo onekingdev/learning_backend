@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.utils import timezone
 
 from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
@@ -106,7 +107,11 @@ class CreateGuardian(graphene.Mutation):
 
                 if coupon:
                     coupon = coupon.upper()
-                    discount = DiscountCode.objects.get(code=coupon)
+                    discount = DiscountCode.objects.get(code=coupon, is_active=True)
+                    if((not discount.expried_at) and discount.expired_at < timezone.now()):
+                        discount.is_active = False
+                        discount.save()
+                        raise Exception("Your discount code had been expired!")
                     guardian.coupon_code_id = discount.id
                     guardian.save()
 
