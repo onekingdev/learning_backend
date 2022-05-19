@@ -188,7 +188,7 @@ class AnswerOption(
     def answer_display(self):
         return self.__str__
 
-    @admin.display(description="Tts Audio Url")
+    @property
     def tts_audio_url(self):
         if(not self.get_available_languages):  return None
         language = self.get_available_languages()[0]
