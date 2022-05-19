@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Topic, AreaOfKnowledge, Grade, TopicGrade, Prerequisite, GradePrerequisite
 from .models.content import Question, QuestionImageAsset, QuestionVideoAsset, QuestionAudioAsset, QuestionTTSAsset
 from .models.content import (
+    AnswerTTSAsset,
     AnswerOption,
     MultipleChoiceAnswerOption,
     MultipleSelectAnswerOption,
@@ -61,6 +62,11 @@ class AnswerOptionInline(
         RelateAnswerOptionInline,
     )
 
+
+
+class AnswerTTSAssetInline(admin.TabularInline):
+    model = AnswerTTSAsset
+    extra = 0
 
 class QuestionImageAssetInline(admin.TabularInline):
     model = QuestionImageAsset
@@ -201,6 +207,9 @@ class MultipleChoiceAnswerOptionAdmin(
     # Import-Export settings
     resource_class = resources.MultipleChoiceAnswerOptionResource
 
+    #Inline
+    inlines = [AnswerTTSAssetInline]
+
     # Polymorphic settings
     base_model = MultipleChoiceAnswerOption
     show_in_index = True
@@ -216,9 +225,14 @@ class MultipleSelectAnswerOptionAdmin(
     parler_admin.TranslatableAdmin,
     import_export_admin.ImportExportModelAdmin,
     polymorphic_admin.PolymorphicChildModelAdmin,
+    polymorphic_admin.PolymorphicInlineSupportMixin,
+
 ):
     # Import-Export settings
     resource_class = resources.MultipleSelectAnswerOptionResource
+
+    #Inline
+    inlines = [AnswerTTSAssetInline]
 
     # Polymorphic settings
     base_model = MultipleSelectAnswerOption
@@ -287,12 +301,19 @@ class RelateAnswerOptionAdmin(
 
 
 @admin.register(AnswerOption)
-class AnswerOptionAdmin(import_export_admin.ImportExportModelAdmin, polymorphic_admin.PolymorphicParentModelAdmin):
+class AnswerOptionAdmin(
+    import_export_admin.ImportExportModelAdmin,
+    polymorphic_admin.PolymorphicParentModelAdmin,
+    polymorphic_admin.PolymorphicInlineSupportMixin,
+    ):
     list_display = ('id', '__str__', 'question', 'question_type')
 
     # Import-Export settings
     resource_class = resources.AnswerOptionResource
-
+    
+    #Inline
+    inlines = [AnswerTTSAssetInline]
+    
     # Polymorphic settings
     polymorphic_list = True
     base_model = AnswerOption
