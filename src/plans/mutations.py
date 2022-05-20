@@ -119,6 +119,15 @@ class UpdateGuardianPlan(graphene.Mutation):
 
                 order_detail = OrderDetail.objects.get(pk=order_detail_id)
 
+                old_payment = order_detail.order.payment_method
+
+                if old_payment == "CARD":
+                    card = Card()
+                    sub = card.cancel_subscription(sub_id=order_detail.subscription_id)
+
+                if sub.status != "canceled":
+                    raise Exception(f"cannot unsub order_detail_id {order_detail.id} from stripe")
+                    
                 if order_detail.is_cancel:
                     raise Exception(f"order detail id {order_detail.id} already cancel")
 
@@ -130,6 +139,20 @@ class UpdateGuardianPlan(graphene.Mutation):
 
                 payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, is_default=True)
 
+                
+                order_detail.status = "canceled"
+                order_detail.cancel_reason = "Update plan"
+                order_detail.is_cancel = True
+                order_detail.update_timestamp = timezone.now()
+                order_detail.save()
+
+                guardian_student_plans = GuardianStudentPlan.objects.filter(order_detail_id=order_detail.id)
+                for guardian_student_plan in guardian_student_plans:
+                    guardian_student_plan.is_cancel = True
+                    guardian_student_plan.cancel_reason = "Update plan"
+                    guardian_student_plan.update_timestamp = timezone.now()
+                    guardian_student_plan.save()
+                
                 # create new subscribe
                 order_resp = payment_services.create_order(
                     guardian_id=guardian_id,
