@@ -177,7 +177,7 @@ class QuestionSchema(DjangoObjectType):
         except Exception as e:
             print(e)
             try:
-                self.save_gtts()
+                # self.save_gtts()
                 tts_file = self.get_questionttsasset(language).tts_file.url
                 tts_string = f'{settings.DOMAIN}{tts_file}'
             except Exception as e:
@@ -205,7 +205,7 @@ class AnswerOptionInterface(graphene.Interface):
         except Exception as e:
             print(e)
             try:
-                self.save_gtts()
+                # self.save_gtts()
                 tts_file = self.get_answeroptionttsasset(language).tts_file.url
                 tts_string = f'{settings.DOMAIN}{tts_file}'
             except Exception as e:
