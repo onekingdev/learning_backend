@@ -74,7 +74,8 @@ class Card:
         customer = None
         if(sub_id):
             sub = stripe.Subscription.retrieve(sub_id)
-            customer = sub.customer
+            customer_id = sub.customer
+            customer = stripe.Customer.retrieve(customer_id)
         else:
             customer = stripe.Customer.retrieve(customer_id)
         payment_method = self.create_payment_method(
@@ -103,25 +104,26 @@ class Card:
                 payment_method = registered_method
                 isOwnedMethod = True
                 break
+        try:
+            if(not isOwnedMethod):
+                stripe.PaymentMethod.attach(
+                    payment_method.id,
+                    customer=customer,
+                )
 
-        if(not isOwnedMethod):
-            stripe.PaymentMethod.attach(
-                payment_method.id,
-                customer=customer,
+            stripe.Customer.modify(
+                customer.id,
+                invoice_settings={
+                    "default_payment_method": payment_method.id
+                }
             )
-
-        stripe.Customer.modify(
-            customer.id,
-            invoice_settings={
-                "default_payment_method": payment_method.id
-            }
-        )
-        if(sub_id):
-            stripe.Subscription.modify(
-                sub_id,
-                default_payment_method=payment_method.id,
-            )
-        return
+            if(sub_id):
+                stripe.Subscription.modify(
+                    sub_id,
+                    default_payment_method=payment_method.id,
+                )
+        except Exception as e:
+            return
 
     def create_or_get_coupon(self, code, percentage):
         try:
