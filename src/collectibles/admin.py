@@ -23,8 +23,9 @@ class CollectibleCategoryForm(MPTTAdminForm, TranslatableModelForm):
 class CollectibleCategoryAdmin(TranslatableAdmin, DraggableMPTTAdmin):
     form = CollectibleCategoryForm
     list_display = ('indented_title', 'description', 'parent', 'front_image', 'back_image', 'price', 'firebase_name')
-    search_fields = ('indented_title', 'description', 'parent',)
-    list_filter = ('price',)
+    search_fields = ('id', 'translations__name', 'translations__description',
+                     'front_image', 'back_image', 'firebase_name', 'random_slug')
+    list_filter = ('price', 'is_active', 'create_timestamp', 'update_timestamp')
 
     def get_prepopulated_fields(self, request, obj=None):
         return {'name': ('description',)}
@@ -34,41 +35,47 @@ class CollectibleCategoryAdmin(TranslatableAdmin, DraggableMPTTAdmin):
 class CollectibleAdmin(TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
     resource_class = CollectibleResource
     list_display = ('id', 'name', 'image', 'category', 'tier')
-    search_fields = ('name',)
-    list_filter = ('category', 'tier',)
+    search_fields = ('id', 'translations__name', 'description__translations__key', 'description__translations__value')
+    list_filter = ('category', 'tier', 'is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(Description)
 class DescriptionAdmin(TranslatableAdmin, import_export_admin.ImportExportModelAdmin):
     resource_class = DescriptionResource
     list_display = ('id', 'key', 'value')
-    search_fields = ('key', 'value',)
+    search_fields = ('id', 'translations__key', 'translations__value')
 
 
 @admin.register(CollectibleDescription)
 class CollectibleDescriptionAdmin(import_export_admin.ImportExportModelAdmin):
     resource_class = CollectibleDescriptionResource
-    list_display = ('id', 'collectible_id', 'description_id')
-    search_fields = ('collectible', 'description',)
+    list_display = ('id', 'collectible', 'description')
+    search_fields = ('id', 'collectible__translations__name', 'description__translations__key',
+                     'description__translations__value')
+    list_filter = ('collectible__category', 'collectible__tier')
 
 
 @admin.register(CollectiblePurchaseTransaction)
 class CollectiblePurchaseTransactionAdmin(admin.ModelAdmin):
     exclude = ('amount',)
-    list_display = ('id', 'account', 'side', 'comment', 'amount', 'collectible', 'date')
-    search_fields = ('account', 'comment',)
-    list_filter = ('side', 'side', 'collectible', 'date',)
+    list_display = ('id', 'collectible')
+    search_fields = ('id', 'collectible__translations__name')
+    list_filter = ('side', 'collectible__category', 'collectible__tier', 'collectible__is_active', 'date')
 
 
 @admin.register(StudentCollectible)
 class StudentCollectibleAdmin(admin.ModelAdmin):
     list_display = ('id', 'collectible', 'student', 'amount', 'is_active')
-    search_fields = ('collectible', 'student',)
-    list_filter = ('amount', 'is_active',)
+    search_fields = ('id', 'collectible__translations__name', 'collectible__description__translations__key',
+                     'collectible__description__translations__value', 'student__first_name',
+                     'student__last_name', 'student__full_name', 'amount')
+    list_filter = ('collectible__category', 'collectible__tier', 'amount', 'is_active',)
     actions = [hard_delete_selected]
 
 
 @admin.register(CollectiblePackPurchaseTransaction)
 class CollectiblePackPurchaseTransactionAdmin(admin.ModelAdmin):
-    search_fields = ('collectible_category',)
-    list_filter = ('collectible_category',)
+    list_display = ('id', 'collectible_category')
+    search_fields = ('id', 'collectibles__translations__name', 'collectible_category__translations__name',
+                     'collectible_category__translations__name')
+    list_filter = ('collectible_category__translations__name', 'collectibles__category', 'collectibles__tier')

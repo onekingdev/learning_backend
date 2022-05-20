@@ -20,16 +20,16 @@ from parler import admin as parler_admin
 # Register your models here.
 @admin.register(BlockType)
 class BlockTypeAdmin(parler_admin.TranslatableAdmin):
-    list_display = ('id', 'name', 'is_active',)
-    search_fields = ('name',)
-    list_filter = ('is_active',)
+    list_display = ('id', 'name', 'is_active')
+    search_fields = ('translations__name',)
+    list_filter = ('is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(BlockAssignment)
 class BlockAssignmentAdmin(SortableAdminMixin, admin.ModelAdmin):
-    list_display = ('id', 'order_number', 'student', 'block_identifier', 'block_topic_grade', 'block_modality', 'order')
-    search_fields = ('order_number', 'student', 'block_identifier')
-    list_filter = ('block__modality',)
+    list_display = ('id', 'student', 'block_identifier', 'block_topic_grade', 'block_modality', 'order')
+    search_fields = ('id', 'student__full_name', 'order')
+    list_filter = ('student__gender', 'block__modality', 'block__topic_grade')
 
     @admin.display(description='Block identifier')
     def block_identifier(self, obj):
@@ -50,9 +50,9 @@ class BlockAssignmentAdmin(SortableAdminMixin, admin.ModelAdmin):
 
 @admin.register(Block)
 class BlockAdmin(admin.ModelAdmin):
-    list_display = ('id', 'topic_grade', 'modality', 'random_slug',)
-    search_fields = ('topic_grade', 'modality')
-    list_filter = ('modality', 'random_slug',)
+    list_display = ('id', 'type_of', 'topic_grade', 'modality', 'block_size', 'random_slug')
+    search_fields = ('id', 'random_slug')
+    list_filter = ('modality', 'type_of', 'topic_grade', 'block_size', 'random_slug')
     autocomplete_fields = ['questions', 'topic_grade']
 
     def save_related(self, request, form, formsets, change):
@@ -79,47 +79,56 @@ class BlockAdmin(admin.ModelAdmin):
 
 @admin.register(BlockQuestionPresentation)
 class BlockQuestionPresentationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'create_timestamp', 'block_presentation', 'question', 'typed_answer', 'topic', 'status')
-    search_fields = ('block_presentation', 'question', 'typed_answer', 'topic',)
-    list_filter = ('create_timestamp', 'status',)
+    list_display = ('id', 'block_presentation', 'question', 'typed_answer', 'topic', 'status')
+    search_fields = ('id', 'typed_answer')
+    list_filter = ('question__question_type', 'question__grade', 'topic__area_of_knowledge',
+                   'status', 'chosen_answer__is_correct', 'create_timestamp', 'update_timestamp')
     autocomplete_fields = ['question', 'topic', 'chosen_answer']
 
 
 @admin.register(BlockConfiguration)
 class BlockConfigurationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'block', 'key', 'value')
-    search_fields = ('block', 'key', 'value',)
+    list_display = ('id', 'block', 'key', 'value', 'create_timestamp', 'update_timestamp')
+    search_fields = ('key__name', 'value')
+    list_filter = ('block__type_of', 'block__topic_grade', 'block__modality', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(BlockConfigurationKeyword)
 class BlockConfigurationKeywordAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'is_active')
+    list_display = ('id', 'name', 'is_active', 'create_timestamp', 'update_timestamp')
     search_fields = ('name',)
-    list_filter = ('is_active',)
+    list_filter = ('is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(BlockTypeConfiguration)
 class BlockTypeConfigurationAdmin(admin.ModelAdmin):
     list_display = ('id', 'block_type', 'key', 'value', 'is_active')
-    search_fields = ('block_type', 'key', 'value',)
-    list_filter = ('is_active',)
+    search_fields = ('block_type__translations__name', 'key__name', 'value')
+    list_filter = ('is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(BlockPresentation)
 class BlockPresentationAdmin(admin.ModelAdmin):
     list_display = ('id', 'block', 'student', 'hits', 'errors', 'total', 'points', 'bonusCoins',
                     'coins', 'start_timestamp', 'end_timestamp', 'is_active')
-    search_fields = ('block', 'student',)
-    list_filter = ('start_timestamp', 'end_timestamp', 'is_active',)
+    search_fields = ('id', 'student__full_name')
+    list_filter = ('block__type_of', 'block__topic_grade', 'is_active', 'start_timestamp', 'end_timestamp')
 
 
 @admin.register(StudentBlockQuestionPresentationHistory)
 class StudentBlockQuestionPresentationHistory(admin.ModelAdmin):
     list_display = ('id', 'student')
-    search_fields = ('student',)
+    search_fields = ('id', 'student__first_name', 'student__last_name', 'student__full_name',
+                     'block_question_presentation__topic__translations__name',
+                     'block_question_presentation__topic__standard_topic')
+    list_filter = ('block_question_presentation__topic__area_of_knowledge', 'block_question_presentation__status',
+                   'create_timestamp', 'update_timestamp')
 
 
 @admin.register(BlockTransaction)
 class BlockTransactionAdmin(admin.ModelAdmin):
     list_display = ('id', 'blockPresentation')
-    search_fields = ('blockPresentation',)
+    search_fields = ('id',)
+    list_filter = ('blockPresentation__block__type_of', 'blockPresentation__block__topic_grade',
+                   'blockPresentation__block__modality', 'blockPresentation__start_timestamp',
+                   'blockPresentation__end_timestamp')
