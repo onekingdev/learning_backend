@@ -108,7 +108,7 @@ class CreateGuardian(graphene.Mutation):
                 if coupon:
                     coupon = coupon.upper()
                     discount = DiscountCode.objects.get(code=coupon, is_active=True)
-                    if((not discount.expried_at) and discount.expired_at < timezone.now()):
+                    if((not discount.expired_at) and discount.expired_at < timezone.now()):
                         discount.is_active = False
                         discount.save()
                         raise Exception("Your discount code had been expired!")
