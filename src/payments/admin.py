@@ -21,7 +21,7 @@ class PaymentMethodAdmin(
             card_leng = len(obj.card_number)
             first_4 = obj.card_number[0:4]
             last_4 = obj.card_number[card_leng-4:card_leng]
-            str = f"{first_4}***{last_4}"
+            str = f"{first_4} *** {last_4}"
         return str
 
 @admin.register(CardTransaction)
@@ -44,7 +44,7 @@ class CardTransactionAdmin(
             card_leng = len(obj.card_number)
             first_4 = obj.card_number[0:4]
             last_4 = obj.card_number[card_leng-4:card_leng]
-            str = f"{first_4}***{last_4}"
+            str = f"{first_4} *** {last_4}"
         return str
 
 @admin.register(DiscountCode)

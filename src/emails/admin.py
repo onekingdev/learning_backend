@@ -10,6 +10,5 @@ class SubscriptionTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user')
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'subscription_type__name')
-    list_filter = ('subscription_type__name',)
+    search_fields = ('user',)
+    list_filter = ('subscription_type',)

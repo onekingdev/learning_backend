@@ -167,6 +167,7 @@ class BankPositiveMovement(BankMovement):
 
 
 class BankNegativeMovement(BankMovement):
+
     def save(self, *args, **kwargs):
         self.side = self.account.get_negative_side
         return super().save(*args, **kwargs)

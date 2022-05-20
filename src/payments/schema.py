@@ -14,6 +14,16 @@ class PaymentMethodSchema(DjangoObjectType):
         model = PaymentMethod
         fields = "__all__"
 
+    card_number = graphene.String()
+    
+    def resolve_card_number(self, info, language_code=None):
+        str = None
+        if(self.card_number):
+            card_leng = len(self.card_number)
+            first_4 = self.card_number[0:4]
+            last_4 = self.card_number[card_leng-4:card_leng]
+            str = f"{first_4} *** {last_4}"
+        return str
 
 class OrderDetailSchema(DjangoObjectType):
     class Meta:

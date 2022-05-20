@@ -6,17 +6,15 @@ from .models import Plan, GuardianStudentPlan, StudentPlan
 @admin.register(Plan)
 class PlanAdmin(import_export_admin.ImportExportModelAdmin):
     list_display = ('id', 'name', 'description', 'area_of_knowledge', 'price_month', 'price_year', 'currency')
-    search_fields = ('id', 'name', 'description')
-    list_filter = ('area_of_knowledge', 'currency', 'price_month', 'price_year',
-                   'is_active', 'create_timestamp', 'update_timestamp')
+    search_fields = ('name', 'description',)
+    list_filter = ('area_of_knowledge', 'currency', 'price_month', 'price_year',)
 
 
 @admin.register(GuardianStudentPlan)
 class GuardianStudentPlanAdmin(admin.ModelAdmin):
     list_display = ('id', 'student', 'guardian', 'plan', 'is_cancel', 'is_paid', 'expired_at')
-    search_fields = ('id', 'student__first_name', 'student__last_name', 'student__full_name',
-                     'guardian__first_name', 'guardian__last_name', 'order_detail__id')
-    list_filter = ('plan', 'is_paid', 'is_cancel', 'expired_at', 'is_active', 'create_timestamp', 'update_timestamp')
+    search_fields = ('student', 'guardian',)
+    list_filter = ('plan', 'is_paid', 'is_cancel', 'expired_at',)
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
@@ -25,5 +23,5 @@ class GuardianStudentPlanAdmin(admin.ModelAdmin):
 @admin.register(StudentPlan)
 class StudentPlanAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'slug', 'audience')
-    search_fields = ('id', 'name', 'audience__translations__name')
-    list_filter = ('topic_grade', 'is_active', 'create_timestamp', 'update_timestamp')
+    search_fields = ('name', 'audience',)
+    list_filter = ('topic_grade',)

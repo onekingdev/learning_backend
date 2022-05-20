@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
+from app.models import RandomSlugModel, TimestampModel, IsActiveModel, ActiveManager
 
 
 PAYMENT_METHOD = (("CARD", "CARD"), ("PAYPAL", "PAYPAL"), ("APPLEPAY", "APPLEPAY"), ("FREE", "FREE"))
@@ -49,6 +50,7 @@ class OrderDetail(TimestampModel, RandomSlugModel, IsActiveModel):
     cancel_reason = models.TextField(blank=True)
     is_cancel = models.BooleanField(default=False)
     slug = models.SlugField(editable=False)
+    error_message = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
@@ -105,6 +107,8 @@ class CardTransaction(TimestampModel, RandomSlugModel, IsActiveModel):
         self.slug = slugify(self.id)
         return super().save(*args, **kwargs)
 
+class PaymentMethodManager(ActiveManager):
+    pass
 
 class PaymentMethod(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'payment_method_'
@@ -126,6 +130,8 @@ class PaymentMethod(TimestampModel, RandomSlugModel, IsActiveModel):
     phone = models.CharField(max_length=255, blank=True, null=True)
     is_default = models.BooleanField(default=False)
     slug = models.SlugField(editable=False)
+    
+    objects = PaymentMethodManager()
 
     def __str__(self):
         return str(self.id)

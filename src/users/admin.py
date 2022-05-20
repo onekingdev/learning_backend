@@ -12,8 +12,8 @@ from mptt.admin import DraggableMPTTAdmin
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     model = User
-    list_display = ('id', 'username', 'email', 'is_staff', 'is_active', 'language')
-    list_filter = ('is_staff', 'is_active', 'date_joined')
+    list_display = ('id', 'username', 'email', 'is_staff', 'is_active', 'language',)
+    list_filter = ('is_staff', 'is_active',)
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password', 'language')}),
         ('Permissions', {'fields': ('is_staff', 'is_active',
