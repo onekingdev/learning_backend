@@ -197,7 +197,11 @@ class ConfirmUpdateGuardianPlan(graphene.Mutation):
 
                 for guardian_student_plan in guardian_student_plans:
                     guardian_student_plan.order_detail_id = new_order_detail.id
+                    guardian_student_plan.is_paid = new_order_detail.is_paid
+                    guardian_student_plan.is_cancel = new_order_detail.is_cancel
+                    guardian_student_plan.expired_at = new_order_detail.expired_at
                     guardian_student_plan.save()
+
 
                 # cancel old order_detail
                 old_payment = old_order_detail.order.payment_method
