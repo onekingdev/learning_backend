@@ -57,6 +57,7 @@ def stripeWebHook(request):
                     # --------------- Update Expire Date to after period days -S----------------- #
                     for guardian_student_plan in guardian_student_plans:
                         period =2
+                        
                         guardian_student_plan.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
                         guardian_student_plan.expired_at = subscription_end_at + datetime.timedelta(days=period)
                         guardian_student_plan.save()
@@ -64,6 +65,9 @@ def stripeWebHook(request):
                         guardian_student_plan.order_detail.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
                         guardian_student_plan.order_detail.expired_at = subscription_end_at + datetime.timedelta(days=period)
                         guardian_student_plan.order_detail.save()
+
+                        guardian_student_plan.order_detail.order.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        guardian_student_plan.order_detail.order.save()
                     # --------------- Update Expire Date to after period days -E----------------- #
                 except Exception as e:
                     response_err.append("Subscription ID " + subscription['id'] + " : " + str(e))
@@ -96,6 +100,9 @@ def stripeWebHook(request):
                         guardian_student_plan.order_detail.expired_at = subscription_end_at
                         guardian_student_plan.error_message = message if guardian_student_plan.order_detail.is_paid == False else ""
                         guardian_student_plan.order_detail.save()
+
+                        guardian_student_plan.order_detail.order.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        guardian_student_plan.order_detail.order.save()
                     # --------------- Update Expire Date to after period days -E----------------- #
                 except Exception as e:
                     response_err.append("Subscription ID " + subscription['id'] + " : " + str(e))
