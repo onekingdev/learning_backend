@@ -6,12 +6,12 @@ from .models.areas_of_knowledge import UniversalAreaOfKnowledge
 @admin.register(UniversalTopic)
 class UniversalTopicAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'slug', 'area_of_knowledge', 'parent', 'standard_code')
-    search_fields = ('name', 'area_of_knowledge', 'standard_code')
-    list_filter = ('area_of_knowledge', 'slug')
+    search_fields = ('id', 'name', 'standard_code')
+    list_filter = ('area_of_knowledge', 'slug', 'is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(UniversalAreaOfKnowledge)
 class UniversalAreaOfKnowledgeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'slug')
-    search_fields = ('id', 'slug',)
-    list_filter = ('slug',)
+    list_display = ('id', 'name', 'slug')
+    search_fields = ('id', 'name', 'slug')
+    list_filter = ('slug', 'is_active', 'create_timestamp', 'update_timestamp')

@@ -95,24 +95,13 @@ def hard_delete_selected(modeladmin, request, queryset):
 
 
 @admin.register(Topic)
-class TopicAdmin(
-        parler_admin.TranslatableAdmin,
-        import_export_admin.ImportExportModelAdmin,
-        DraggableMPTTAdmin,
-):
+class TopicAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExportModelAdmin, DraggableMPTTAdmin):
     resource_class = resources.TopicResource
-    list_display = (
-        'tree_actions',
-        'indented_title',
-        'area_of_knowledge',
-        'id',
-        'standard_topic',
-    )
-    list_filter = (
-        'area_of_knowledge',
-    )
+    list_display = ('id', 'tree_actions', 'indented_title', 'area_of_knowledge', 'standard_topic',)
+    search_fields = ('id', 'translations__name')
+    list_filter = ('area_of_knowledge', 'is_active', 'create_timestamp', 'update_timestamp')
     actions = [hard_delete_selected]
-    search_fields = ['translations__name', 'id']
+
 
 
 @admin.register(Prerequisite)
@@ -120,9 +109,10 @@ class PrerequisiteAdmin(
         import_export_admin.ImportExportModelAdmin,
 ):
     resource_class = resources.PrerequisiteResource
-    list_display = ('id', 'topic', 'get_prerequisites',)
-    search_fields = ('topic',)
-    list_filter = ('topic__area_of_knowledge__universal_area_knowledge',)
+    list_display = ('id', 'topic', 'information')
+    search_fields = ('id', 'topic__translations__name', 'prerequisites__translations__name',
+                     'information', 'random_slug')
+    list_filter = ('topic__area_of_knowledge__universal_area_knowledge', 'random_slug')
     autocomplete_fields = ['topic', 'prerequisites']
 
 
@@ -136,14 +126,16 @@ class GradePrerequisiteAdmin(
         'grade',
         'id',
     )
+    search_fields = ('id', 'area_of_knowledge__translations__name', 'area_of_knowledge__audience__translations__name')
     list_filter = (
+        'grade',
         'area_of_knowledge__universal_area_knowledge',
         'area_of_knowledge__audience',
     )
     autocomplete_fields = [
         'grade',
-        # 'mastery',
-        # 'competence'
+        'mastery',
+        'competence'
     ]
 
 
@@ -159,7 +151,7 @@ class AreaOfKnowledgeAdmin(
         'universal_area_knowledge',
         'is_active',
     )
-    search_fields = ('name', 'audience',)
+    search_fields = ('id', 'translations__name', 'audience__translations__name')
     list_filter = (
         'is_active',
         'audience',
@@ -172,29 +164,18 @@ class GradeAdmin(
         parler_admin.TranslatableAdmin,
         import_export_admin.ImportExportModelAdmin):
     resource_class = resources.GradeResource
-    list_display = (
-        'name',
-        'id',
-        'audience',
-    )
-    search_fields = (
-        'translations__name',
-    )
+    list_display = ('name', 'id', 'audience')
+    search_fields = ('id', 'translations__name', 'slug', 'audience__translations__name')
+    list_filter = ('translations__name', 'audience', 'is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(TopicGrade)
 class TopicGradeAdmin(
         import_export_admin.ImportExportModelAdmin):
     resource_class = resources.TopicGradeResource
-    list_display = (
-        'topic',
-        'grade',
-        'grade_audience'
-    )
-    list_filter = (
-        'grade__audience',
-    )
-    search_fields = ['topic__translations__name']
+    list_display = ('id', 'topic', 'grade', 'grade_audience', 'standard_code')
+    search_fields = ('id', 'topic__translations__name', 'grade__translations__name', 'standard_code')
+    list_filter = ('grade', 'grade__audience', 'is_active', 'create_timestamp', 'update_timestamp')
     autocomplete_fields = ['topic']
 
 
@@ -215,9 +196,10 @@ class MultipleChoiceAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = ('id', 'answer_text', 'question', 'is_correct')
-    search_fields = ('answer_text', 'question',)
-    list_filter = ('is_correct',)
+    list_display = ('id', 'question', 'answer_text', 'explanation', 'is_correct')
+    search_fields = ('id', 'question__translations__question_text', 'translations__answer_text',
+                     'translations__explanation')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(MultipleSelectAnswerOption)
@@ -239,9 +221,10 @@ class MultipleSelectAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = ('id', 'answer_text', 'is_correct', 'question',)
-    search_fields = ('answer_text', 'question',)
-    list_filter = ('is_correct',)
+    list_display = ('id', 'question', 'answer_text', 'explanation', 'is_correct')
+    search_fields = ('id', 'question__translations__question_text', 'translations__answer_text',
+                     'translations__explanation')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(TypeInAnswerOption)
@@ -258,9 +241,10 @@ class TypeInAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = ('id', 'answer_text', 'is_correct', 'question',)
-    search_fields = ('answer_text', 'question',)
-    list_filter = ('is_correct',)
+    list_display = ('id', 'question', 'answer_text', 'explanation', 'is_correct')
+    search_fields = ('id', 'translations__answer_text', 'translations__explanation',
+                     'question__translations__question_text')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 @admin.register(OrderAnswerOption)
 class OrderAnswerOptionAdmin(
@@ -276,9 +260,9 @@ class OrderAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = ('id', 'answer_text', 'order', 'is_correct', 'question',)
-    search_fields = ('answer_text', 'question', 'order',)
-    list_filter = ('is_correct',)
+    list_display = ('id', 'question', 'answer_text', 'order', 'is_correct')
+    search_fields = ('id', 'question__translations__question_text', 'order')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(RelateAnswerOption)
@@ -295,18 +279,17 @@ class RelateAnswerOptionAdmin(
     show_in_index = True
 
     autocomplete_fields = ['question']
-    list_display = ('id', 'key', 'value', 'is_correct', 'question',)
-    search_fields = ('key', 'value', 'question',)
-    list_filter = ('is_correct',)
+    list_display = ('id', 'question', 'key', 'value', 'key_image', 'value_image', 'is_correct')
+    search_fields = ('id', 'translations__key', 'translations__value', 'question__translations__question_text')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(AnswerOption)
-class AnswerOptionAdmin(
-    import_export_admin.ImportExportModelAdmin,
-    polymorphic_admin.PolymorphicParentModelAdmin,
-    polymorphic_admin.PolymorphicInlineSupportMixin,
-    ):
-    list_display = ('id', '__str__', 'question', 'question_type', 'tts_audio_url')
+class AnswerOptionAdmin(import_export_admin.ImportExportModelAdmin, polymorphic_admin.PolymorphicParentModelAdmin):
+    list_display = ('id', '__str__', 'question', 'question_type')
+    list_display = ('id', 'key', 'value', 'is_correct', 'question')
+    search_fields = ('key', 'value', 'question',)
+    list_filter = ('is_correct',)
 
     # Import-Export settings
     resource_class = resources.AnswerOptionResource
@@ -346,61 +329,40 @@ class QuestionAdmin(
         QuestionTTSAssetInline,
         QuestionAudioAssetInline
     ]
-    fields = (
-        'question_text',
-        'topic',
-        'grade',
-        'question_type',
-    )
-    list_display = (
-        'id',
-        'question',
-        'question_type',
-        'topic',
-        'grade',
-        'grade_audience',
-    )
-    list_filter = (
-        'question_type',
-        'topic__area_of_knowledge',
-        'grade',
-        'grade__audience',
-    )
+    fields = ('question_text', 'topic', 'grade', 'question_type')
+    list_display = ('id', 'question', 'question_type', 'topic', 'grade', 'grade_audience', 'question_type')
+    search_fields = ('id', 'translations__question_text')
+    list_filter = ('question_type', 'topic__area_of_knowledge', 'grade', 'grade__audience')
     autocomplete_fields = ['topic']
-    search_fields = ['translations__question_text', 'id', 'question']
 
 
 @admin.register(QuestionImageAsset)
 class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
     resource_class = resources.QuestionImageAssetResource
-    list_display = (
-        'question_slug',
-        'identifier',
-        'image',
-    )
-    search_fields = ('question_slug',)
+    list_display = ('id', 'question', 'image')
+    search_fields = ('id', 'image', 'order', 'random_slug')
+    list_filter = ('random_slug', 'create_timestamp', 'update_timestamp')
     autocomplete_fields = ['question']
 
 
 @admin.register(QuestionAudioAsset)
 class QuestionAudioAssetAdmin(import_export_admin.ImportExportModelAdmin):
     resource_class = resources.QuestionAudioAssetResource
-    list_display = (
-        'question_slug',
-        'identifier',
-        'audio_file',
-    )
-    search_fields = ('question_slug',)
+    list_display = ('id', 'question', 'audio_file')
+    search_fields = ('id', 'audio_file', 'order', 'random_slug')
+    list_filter = ('random_slug', 'create_timestamp', 'update_timestamp')
     autocomplete_fields = ['question']
 
 
 @admin.register(QuestionTTSAsset)
 class QuestionTTSAssetAdmin(import_export_admin.ImportExportModelAdmin):
     list_display = ('id', 'question', 'tts_file')
-    search_fields = ('question', 'tts_file',)
+    search_fields = ('id', 'tts_file', 'order', 'random_slug')
+    list_filter = ('random_slug', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(QuestionVideoAsset)
 class QuestionVideoAssetAdmin(import_export_admin.ImportExportModelAdmin):
     list_display = ('id', 'question', 'url')
-    search_fields = ('question', 'url',)
+    search_fields = ('id', 'url', 'order', 'random_slug')
+    list_filter = ('random_slug', 'create_timestamp', 'update_timestamp')

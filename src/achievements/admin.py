@@ -7,9 +7,9 @@ from parler import admin as parler_admin
 class AchievementAdmin(parler_admin.TranslatableAdmin):
     list_display = ('id', 'name', 'slug', 'image', 'hex_color', 'level_required',
                     'engangement_points', 'coins_earned', 'is_active')
-    search_fields = ('name', 'positive_side',)
+    search_fields = ('id', 'translations__name', 'hex_color')
     readonly_fields = ()
 
     filter_horizontal = ()
-    list_filter = ('id', 'slug', 'level_required', 'engangement_points', 'coins_earned', 'is_active')
+    list_filter = ('slug', 'level_required', 'engangement_points', 'coins_earned', 'is_active')
     fieldsets = ()

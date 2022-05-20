@@ -1,12 +1,19 @@
 from django.contrib import admin
-from .models import Account, Movement, PositiveMovement, NegativeMovement, \
-    BankMovement, BankPositiveMovement, BankNegativeMovement
+from .models import (
+    Account,
+    Movement,
+    PositiveMovement,
+    NegativeMovement,
+    BankMovement,
+    BankPositiveMovement,
+    BankNegativeMovement
+)
 
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
     list_display = ('name', 'positive_side', 'balance')
-    search_fields = ('name', 'positive_side',)
+    search_fields = ('id', 'name', 'positive_side')
     ordering = ('name',)
     readonly_fields = ()
 
@@ -18,7 +25,7 @@ class AccountAdmin(admin.ModelAdmin):
 @admin.register(Movement)
 class MovementAdmin(admin.ModelAdmin):
     list_display = ('account', 'date', 'side', 'comment', 'amount')
-    search_fields = ('account', 'comment', 'amount')
+    search_fields = ('id', 'account__student__full_name', 'comment', 'amount')
     ordering = ('-date', '-pk')
     readonly_fields = ('date',)
 
@@ -30,7 +37,7 @@ class MovementAdmin(admin.ModelAdmin):
 @admin.register(BankMovement)
 class BankMovementAdmin(admin.ModelAdmin):
     list_display = ('account', 'date', 'side', 'comment', 'amount')
-    search_fields = ('account', 'comment', 'amount')
+    search_fields = ('id', 'account__student__full_name', 'comment', 'amount')
     ordering = ('-date', '-pk')
     readonly_fields = ('date',)
 
@@ -42,7 +49,7 @@ class BankMovementAdmin(admin.ModelAdmin):
 @admin.register(PositiveMovement)
 class PositiveMovementAdmin(admin.ModelAdmin):
     list_display = ('account', 'date', 'side', 'comment', 'amount')
-    search_fields = ('account', 'comment', 'amount')
+    search_fields = ('id', 'account__student__full_name', 'comment', 'amount')
     ordering = ('-date', '-pk')
     readonly_fields = ('date',)
 
@@ -54,7 +61,7 @@ class PositiveMovementAdmin(admin.ModelAdmin):
 @admin.register(NegativeMovement)
 class NegativeMovementAdmin(admin.ModelAdmin):
     list_display = ('account', 'date', 'side', 'comment', 'amount')
-    search_fields = ('account', 'comment', 'amount')
+    search_fields = ('id', 'account__student__full_name', 'comment', 'amount')
     ordering = ('-date', '-pk')
     readonly_fields = ('date',)
 
@@ -66,7 +73,7 @@ class NegativeMovementAdmin(admin.ModelAdmin):
 @admin.register(BankPositiveMovement)
 class BankPositiveMovementAdmin(admin.ModelAdmin):
     list_display = ('account', 'date', 'side', 'comment', 'amount')
-    search_fields = ('account', 'comment', 'amount')
+    search_fields = ('id', 'account__student__full_name', 'comment', 'amount')
     ordering = ('-date', '-pk')
     readonly_fields = ('date',)
 
@@ -78,7 +85,7 @@ class BankPositiveMovementAdmin(admin.ModelAdmin):
 @admin.register(BankNegativeMovement)
 class BankNegativeMovementAdmin(admin.ModelAdmin):
     list_display = ('account', 'date', 'side', 'comment', 'amount')
-    search_fields = ('account', 'comment', 'amount')
+    search_fields = ('id', 'account__student__full_name', 'comment', 'amount')
     ordering = ('-date', '-pk')
     readonly_fields = ('date',)
 

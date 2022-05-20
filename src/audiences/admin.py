@@ -10,6 +10,9 @@ class AudienceAdmin(ImportExportModelAdmin, parler_admin.TranslatableAdmin):
     resource_class = AudienceResource
 
     list_display = ('id', 'name', 'slug', 'standard_code')
-    search_fields = ('name', 'slug',)
+    search_fields = ('id', 'translations__name', 'slug', 'standard_code')
+    readonly_fields = ()
+
+    filter_horizontal = ()
     list_filter = ('standard_code', 'slug')
     fieldsets = ()
