@@ -202,7 +202,10 @@ class Query(graphene.ObjectType):
     block_question_presentation_history = graphene.List(
         StudentBlockQuestionPresentationHistorySchema
     )
-    block_question_presentation_history_by_id = graphene.List(
+    block_question_presentation_history_by_id = graphene.Field(
+        StudentBlockQuestionPresentationHistorySchema, id=graphene.ID()
+    )
+    block_question_presentation_history_by_student_id = graphene.Field(
         StudentBlockQuestionPresentationHistorySchema, id=graphene.ID()
     )
 
@@ -213,7 +216,7 @@ class Query(graphene.ObjectType):
         return StudentBlockQuestionPresentationHistory.objects.get(pk=id);
 
     def resolve_block_question_presentation_history_by_student_id(root, info, id):
-        return StudentBlockQuestionPresentationHistory.objects.filter(student=id);
+        return StudentBlockQuestionPresentationHistory.objects.get(student=id)
 
     # ----------------- BlockAssignment ----------------- #
 
