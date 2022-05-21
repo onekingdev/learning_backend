@@ -29,8 +29,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^media/games/(?P<folder_name>.*)/gamePlay', game_loader),
     path('hidden-admin/', hidden_admin.urls),
-    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
-    path('', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=settings.DEBUG))),
+    path('', csrf_exempt(GraphQLView.as_view(graphiql=settings.DEBUG))),
     path('stripe/', csrf_exempt(include("djstripe.urls", namespace="djstripe"))),
     # path('accounts/', include('django.contrib.auth.urls')),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(
