@@ -50,6 +50,7 @@ def stripeWebHook(request):
                 try :
                     subscription_status = subscription['status']
                     subscription_end_at = datetime.datetime.fromtimestamp(subscription['current_period_end'])
+                    print(subscription['current_period_end'])
                     # ---------- Get guardian student plan from subscription id -S----------------#
                     order_detail = OrderDetail.objects.get(subscription_id = subscription['id'])
                     guardian_student_plans = order_detail.guardianstudentplan_set.all()
