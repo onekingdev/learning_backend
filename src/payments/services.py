@@ -9,6 +9,7 @@ from payments.models import Order, OrderDetail, PaypalTransaction, PaymentMethod
 from payments.paypal import Paypal
 from plans.models import Plan, GuardianStudentPlan
 from app.utils import add_months
+import datetime
 
 
 class TmpOrderDetail:
@@ -608,14 +609,15 @@ def confirm_order_payment(
                 country=card_tx.country,
                 phone=card_tx.phone
             )
+            period = 2
             order_detail.status = result_sub["status"]
-            order_detail.expired_at = result_sub["expired_at"]
+            order_detail.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
             order_detail.is_paid = True
             order_detail.save()
             order_detail.order.is_paid = True
             for guardianstudentplan in order_detail.guardianstudentplan_set.all():
                 guardianstudentplan.is_paid = True
-                guardianstudentplan.is_paid = result_sub["expired_at"]
+                guardianstudentplan.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
                 guardianstudentplan.save()
 
                 
