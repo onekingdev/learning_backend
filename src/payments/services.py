@@ -612,6 +612,12 @@ def confirm_order_payment(
             order_detail.expired_at = result_sub["expired_at"]
             order_detail.is_paid = True
             order_detail.save()
+            order_detail.order.is_paid = True
+            for guardianstudentplan in order_detail.guardianstudentplanSet:
+                guardianstudentplan.is_paid = True
+                guardianstudentplan.is_paid = result_sub["expired_at"]
+
+                
     elif order.payment_method.upper() == "FREE":
         order_details = OrderDetail.objects.filter(order_id=order_id)
         for order_detail in order_details:
