@@ -42,7 +42,7 @@ def stripeWebHook(request):
 
         # -------------- If payment is succeeded on stripe -S----------------#
         if(event['type'] == "payment_intent.succeeded"):
-            message = intent['last_payment_error'] if intent['last_payment_error'] else intent['last_payment_error']['message'];
+            # message = intent['last_payment_error'] if intent['last_payment_error'] else intent['last_payment_error']['message'];
             customer_id = intent['charges']['data'][0]['customer']
             subscriptions = stripe.Subscription.list(customer=customer_id)['data']
 
@@ -66,7 +66,7 @@ def stripeWebHook(request):
 
                         guardian_student_plan.order_detail.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
                         guardian_student_plan.order_detail.expired_at = subscription_end_at + datetime.timedelta(days=period)
-                        guardian_student_plan.error_message = message if guardian_student_plan.order_detail.is_paid == False else ""
+                        # guardian_student_plan.error_message = message if guardian_student_plan.order_detail.is_paid == False else ""
                         guardian_student_plan.order_detail.save()
 
                         guardian_student_plan.order_detail.order.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
