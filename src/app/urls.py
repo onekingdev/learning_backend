@@ -24,7 +24,8 @@ from games.views import game_loader
 from django.contrib.auth import views as auth_views
 from . import views
 from payments import views as paymentsViews
-
+from django.views.static import serve
+from django.conf.urls import url
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^media/games/(?P<folder_name>.*)/gamePlay', game_loader),
@@ -40,6 +41,7 @@ urlpatterns = [
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
         template_name='emails/password/password_reset_complete.html'), name='password_reset_complete'),
     path("password_reset/", views.password_reset_request, name="password_reset"),
-    path("stripe-webhook/", paymentsViews.stripeWebHook, name="stripe_webhook")
-
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path("stripe-webhook/", paymentsViews.stripeWebHook, name="stripe_webhook"),
+    url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
+    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
+]
