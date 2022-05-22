@@ -616,6 +616,7 @@ def confirm_order_payment(
             for guardianstudentplan in order_detail.guardianstudentplan_set.all():
                 guardianstudentplan.is_paid = True
                 guardianstudentplan.is_paid = result_sub["expired_at"]
+                guardianstudentplan.save()
 
                 
     elif order.payment_method.upper() == "FREE":
