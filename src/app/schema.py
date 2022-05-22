@@ -44,6 +44,10 @@ class CustomTokenAuth(ObtainJSONWebToken):
 
         if hasattr(user, 'student'):
             student_plan = user.student.guardianstudentplan
+            student_plan.is_paid = student_plan.order_detail.is_paid
+            student_plan.expired_at = student_plan.order_detail.expired_at
+            student_plan.save()
+
             if student_plan.is_cancel:
                 raise Exception("Please reactive your plan")
             if student_plan.expired_at and student_plan.expired_at < timezone.now():
