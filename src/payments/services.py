@@ -613,7 +613,7 @@ def confirm_order_payment(
             order_detail.is_paid = True
             order_detail.save()
             order_detail.order.is_paid = True
-            for guardianstudentplan in order_detail.guardianstudentplan_set:
+            for guardianstudentplan in order_detail.guardianstudentplan_set.all():
                 guardianstudentplan.is_paid = True
                 guardianstudentplan.is_paid = result_sub["expired_at"]
 
