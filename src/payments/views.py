@@ -15,7 +15,7 @@ import lxml.html as LH
 from django.http import JsonResponse
 import datetime
 from django.conf import settings
-from payments.models import OrderDetail
+from payments.models import OrderDetail, PaymentHistory
 from plans.models import GuardianStudentPlan
 from django.views.decorators.csrf import csrf_exempt
 User = get_user_model()
@@ -30,11 +30,18 @@ def stripeWebHook(request):
 
         sig = request.headers.get("stripe-signature");
 
-        event = stripe.Webhook.construct_event(
-            payload = request.body,
-            sig_header = sig,
-            secret = settings.STRIPE_LIVE_WEBHOOK_KEY if settings.STRIPE_LIVE_MODE == True else settings.STRIPE_TEST_WEBHOOK_KEY
+        try:
+            event = stripe.Webhook.construct_event(
+                payload = request.body,
+                sig_header = sig,
+                secret = settings.STRIPE_LIVE_WEBHOOK_KEY if settings.STRIPE_LIVE_MODE == True else settings.STRIPE_TEST_WEBHOOK_KEY
             )
+        except Exception as e:
+            PaymentHistory.objects.create(
+                type = "payment_action_webhook_construct_error",
+            )
+            raise Exception(e)
+
         # event = json.loads(request.body)
 
         intent = event['data']['object']
@@ -45,7 +52,10 @@ def stripeWebHook(request):
             # message = intent['last_payment_error'] if intent['last_payment_error'] else intent['last_payment_error']['message'];
             customer_id = intent['charges']['data'][0]['customer']
             subscriptions = stripe.Subscription.list(customer=customer_id)['data']
-
+            PaymentHistory.objects.create(
+                type = "payment_action_intent_succeeded",
+                user = User.objects.get(stripe_customer_id=customer_id),
+            )
             for subscription in subscriptions:
                 try :
                     subscription_status = subscription['status']
@@ -82,7 +92,11 @@ def stripeWebHook(request):
             message = intent['last_payment_error'] if intent['last_payment_error'] else intent['last_payment_error']['message'];
             customer_id = intent['charges']['data'][0]['customer']
             subscriptions = stripe.Subscription.list(customer=customer_id)
-
+            PaymentHistory.objects.create(
+                type = "payment_action_intent_failed",
+                user = User.objects.get(stripe_customer_id=customer_id),
+                message = message
+            )
             for subscription in subscriptions:
                 try :
                     subscription_status = subscription['status']

@@ -7,7 +7,8 @@ from django.utils import timezone
 
 from app import settings
 import requests
-from payments.models import CardTransaction
+from payments.models import CardTransaction, PaymentHistory
+from users.models import User
 
 secret_key = settings.STRIPE_LIVE_SECRET_KEY if settings.STRIPE_LIVE_MODE == True else settings.STRIPE_TEST_SECRET_KEY
 
@@ -21,53 +22,91 @@ class Card:
         stripe.api_key = secret_key
 
     def create_payment_method(self, number, exp_month, exp_year, cvc, first_name, last_name, address1, address2, city, country, post_code, state, email, phone):
-        payment_method = stripe.PaymentMethod.create(
-            type="card",
-            card={
-                "number": number,
-                "exp_month": exp_month,
-                "exp_year": exp_year,
-                "cvc": cvc,
-            },
-            billing_details={
-                "address": {
-                    "city": city,
-                    "country": country,
-                    "line1": address1,
-                    "line2": address2,
-                    "postal_code": post_code,
-                    "state": state
+        try:
+            payment_method = stripe.PaymentMethod.create(
+                type="card",
+                card={
+                    "number": number,
+                    "exp_month": exp_month,
+                    "exp_year": exp_year,
+                    "cvc": cvc,
                 },
-                "email": email,
-                "name": f"{first_name} {last_name}",
-                "phone": phone
-            }
-        )
+                billing_details={
+                    "address": {
+                        "city": city,
+                        "country": country,
+                        "line1": address1,
+                        "line2": address2,
+                        "postal_code": post_code,
+                        "state": state
+                    },
+                    "email": email,
+                    "name": f"{first_name} {last_name}",
+                    "phone": phone
+                }
+            )
+            PaymentHistory.objects.create(
+                type = "payment_action_payment_method_create",
+                user = User.objects.get(email=email),
+                card_number = number,
+            )
+        except Exception as e:
+            PaymentHistory.objects.create(
+                type = "payment_action_payment_method_create_error",
+                user = User.objects.get(email=email),
+                card_number = number,
+                message = str(e)
+            )
+            raise Exception(e)
         return payment_method
 
     def create_customer(self, email, payment_method_id):
-        customer = stripe.Customer.create(
-            email=email,
-            payment_method=payment_method_id,
-            invoice_settings={
-                'default_payment_method': payment_method_id
-            }
-        )
+        try:
+            customer = stripe.Customer.create(
+                email=email,
+                payment_method=payment_method_id,
+                invoice_settings={
+                    'default_payment_method': payment_method_id
+                }
+            )
+            PaymentHistory.objects.create(
+                type = "payment_action_customer_create",
+                user = User.objects.get(email=email),
+            )
+        except Exception as e:
+            PaymentHistory.objects.create(
+                type = "payment_action_customer_create_error",
+                user = User.objects.get(email=email),
+                message = str(e)
+            )
+            raise Exception(e)
         return customer
 
     def create_subscription(self, customer_id, plan_id, quantity, has_order, coupon_id, trial_day=0):
-        subscription = stripe.Subscription.create(
-            customer=customer_id,
-            items=[
-                {
-                    'plan': plan_id,
-                    'quantity': quantity
-                },
-            ],
-            coupon=coupon_id,
-            trial_period_days=trial_day,
-            payment_behavior="error_if_incomplete"
-        )
+        try:
+            subscription = stripe.Subscription.create(
+                customer=customer_id,
+                items=[
+                    {
+                        'plan': plan_id,
+                        'quantity': quantity
+                    },
+                ],
+                coupon=coupon_id,
+                trial_period_days=trial_day,
+                payment_behavior="error_if_incomplete"
+            )
+            PaymentHistory.objects.create(
+                type = "payment_action_subscription_create",
+                user = User.objects.get(stripe_customer_id=customer_id),
+            )
+        except Exception as e:
+            PaymentHistory.objects.create(
+                type = "payment_action_subscription_create_error",
+                user = User.objects.get(stripe_customer_id=customer_id),
+                message = str(e)
+            )
+            raise Exception(e)
         return subscription
 
     def change_payment_method(self,  number, exp_month, exp_year, cvc, first_name, last_name, address1, address2, city, country, post_code, state, email, phone, customer_id=None, sub_id=None):
@@ -110,6 +149,10 @@ class Card:
                     payment_method.id,
                     customer=customer,
                 )
+                PaymentHistory.objects.create(
+                    type = "payment_action_payment_method_attach",
+                    user = User.objects.get(stripe_customer_id=customer.id),
+                )
 
             stripe.Customer.modify(
                 customer.id,
@@ -117,13 +160,23 @@ class Card:
                     "default_payment_method": payment_method.id
                 }
             )
+            PaymentHistory.objects.create(
+                type = "payment_action_payment_method_modify",
+                user = User.objects.get(stripe_customer_id=customer.id),
+                message = str(e)
+            )
             if(sub_id):
                 stripe.Subscription.modify(
                     sub_id,
                     default_payment_method=payment_method.id,
                 )
         except Exception as e:
-            return
+            PaymentHistory.objects.create(
+                type = "payment_action_payment_method_modify_error",
+                user = User.objects.get(stripe_customer_id=customer.id),
+                message = str(e)
+            )
+            raise Exception(e)
 
     def create_or_get_coupon(self, code, percentage):
         try:
@@ -131,6 +184,9 @@ class Card:
                 duration="once",
                 id=code,
                 percent_off=percentage
+            )
+            PaymentHistory.objects.create(
+                type = "payment_action_coupon_create",
             )
         except Exception as e:
             coupon = stripe.Coupon.retrieve(code)

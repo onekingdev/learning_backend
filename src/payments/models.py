@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel, ActiveManager
+from users.models import User
 
 
 PAYMENT_METHOD = (("CARD", "CARD"), ("PAYPAL", "PAYPAL"), ("APPLEPAY", "APPLEPAY"), ("FREE", "FREE"))
@@ -157,3 +158,44 @@ class DiscountCode(TimestampModel, RandomSlugModel, IsActiveModel):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.id)
         return super().save(*args, **kwargs)
+
+class PaymentHistory(TimestampModel, RandomSlugModel):
+    PREFIX = 'payment_history_'
+    PAYMENT_EVENT_TYPE = (
+        ("payment_action_intent_succeeded", "payment_action_intent_succeeded"),
+        ("payment_action_intent_failed", "payment_action_intent_failed"),
+        ("payment_action_customer_create", "payment_action_customer_create"),
+        ("payment_action_customer_create_error", "payment_action_customer_create_error"),
+        ("payment_action_customer_delete", "payment_action_customer_delete"),
+        ("payment_action_customer_delete_error", "payment_action_customer_delete_error"),
+        ("payment_action_subscription_create", "payment_action_subscription_create"),
+        ("payment_action_subscription_create_error", "payment_action_subscription_create_error"),
+        ("payment_action_subscription_cancel", "payment_action_subscription_cancel"),
+        ("payment_action_coupon_create", "payment_action_coupon_create"),
+        ("payment_action_coupon_create_error", "payment_action_coupon_create_error"),
+        ("payment_action_subscription_cancel_error", "payment_action_subscription_cancel_error"),
+        ("payment_action_payment_method_create", "payment_action_payment_method_create"),
+        ("payment_action_payment_method_create_error", "payment_action_payment_method_create_error"),
+        ("payment_action_payment_method_update", "payment_action_payment_method_update"),
+        ("payment_action_payment_method_attach", "payment_action_payment_method_attach"),
+        ("payment_action_payment_method_attach_error", "payment_action_payment_method_attach_error"),
+        ("payment_action_payment_method_modify", "payment_action_payment_method_modify"),
+        ("payment_action_payment_method_modify_error", "payment_action_payment_method_modify_error"),
+        ("payment_action_webhook_construct_error", "payment_action_webhook_construct_error"),
+        ("backend_anction_order_create", "backend_anction_order_create"),
+        ("backend_anction_order_create_error", "backend_anction_order_create_error"),
+        ("backend_anction_confirm_payment_order", "backend_anction_confirm_payment_order"),
+        ("backend_anction_confirm_payment_order_error", "backend_anction_confirm_payment_order_error"),
+        ("backend_anction_change_default_payment_method", "backend_anction_change_default_payment_method"),
+        ("backend_anction_edit_payment_method", "backend_anction_edit_payment_method"),
+        ("backend_anction_edit_payment_method_error", "backend_anction_edit_payment_method_error"),
+        ("backend_anction_create_order_without_pay", "backend_anction_create_order_without_pay"),
+        ("backend_anction_create_order_without_pay_error", "backend_anction_create_order_without_pay_error"),
+    )
+    type = models.CharField(max_length=255, choices=PAYMENT_EVENT_TYPE, null=True, blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255, null=True, blank=True)
+    card_number = models.CharField(max_length=255, null=True, blank=True)
+
+

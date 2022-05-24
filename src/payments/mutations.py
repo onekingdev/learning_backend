@@ -2,9 +2,10 @@ import os
 import sys
 import graphene
 from django.db import transaction, DatabaseError
+from guardians.models import Guardian
 from payments import services
 from plans import services as plan_services
-
+from .models import Order, PaymentHistory, PaymentMethod
 
 class OrderDetailInput(graphene.InputObjectType):
     plan_id = graphene.ID()
@@ -87,7 +88,11 @@ class CreateOrder(graphene.Mutation):
                     country=country,
                     phone=phone
                 )
-
+                PaymentHistory.objects.create(
+                    type = "backend_anction_order_create",
+                    user = create_order_resp.order.guardian.user,
+                    order = create_order_resp.order
+                )
                 return CreateOrder(
                     guardian=create_order_resp.order.guardian,
                     order=create_order_resp.order,
@@ -96,6 +101,14 @@ class CreateOrder(graphene.Mutation):
                 )
         except (Exception, AssertionError, DatabaseError) as e:
             transaction.rollback()
+            try:
+                PaymentHistory.objects.create(
+                    type = "backend_anction_order_create_error",
+                    user = Guardian.objects.get(pk=guardian_id).user,
+                    message = str(e)
+                )
+            except Exception as e:
+                return e
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
@@ -121,7 +134,11 @@ class ConfirmPaymentOrder(graphene.Mutation):
 
                 order = services.confirm_order_payment(order_id)
                 plan_services.create_guardian_student_plan(order)
-
+                PaymentHistory.objects.create(
+                    type = "backend_anction_confirm_payment_order",
+                    user = order.guardian.user,
+                    order = order
+                )
                 return ConfirmPaymentOrder(
                     guardian=order.guardian,
                     order=order,
@@ -129,6 +146,16 @@ class ConfirmPaymentOrder(graphene.Mutation):
                 )
         except (Exception, DatabaseError) as e:
             transaction.rollback()
+            try:
+                order = Order.objects.get(pk = order_id)
+                PaymentHistory.objects.create(
+                    type = "backend_anction_confirm_payment_order_error",
+                    user = order.guardian,
+                    order = order,
+                    message = str(e)
+                )
+            except Exception as e:
+                return e
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
@@ -197,13 +224,26 @@ class ChangePaymentMethod(graphene.Mutation):
                 )
 
                 guardian = services.change_order_detail_payment_method(guardian_id=guardian_id)
-
+                PaymentHistory.objects.create(
+                    type = "backend_anction_change_default_payment_method",
+                    user = guardian.user,
+                    card_number = card_number
+                )
                 return ChangePaymentMethod(
                     guardian=guardian,
                     status="success"
                 )
         except (Exception, DatabaseError) as e:
             transaction.rollback()
+            try:
+                PaymentHistory.objects.create(
+                    type = "backend_anction_change_default_payment_method_error",
+                    user = Guardian.objects.get(pk=guardian_id).user,
+                    card_number = card_number,
+                    message = str(e)
+                )
+            except Exception as e:
+                return e
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
@@ -271,13 +311,26 @@ class EditPaymentMethod(graphene.Mutation):
                 )
 
                 guardian = services.change_order_detail_payment_method(guardian_id=guardian_id)
-
+                PaymentHistory.objects.create(
+                    type = "backend_anction_edit_payment_method",
+                    user = guardian.user,
+                    card_number = card_number
+                )
                 return ChangePaymentMethod(
                     guardian=guardian,
                     status="success"
                 )
         except (Exception, DatabaseError) as e:
             transaction.rollback()
+            try:
+                PaymentHistory.objects.create(
+                    type = "backend_anction_edit_payment_method_error",
+                    user = PaymentMethod.objects.get(pk=payment_method_id).guardian.user,
+                    card_number = card_number,
+                    message = str(e)
+                )
+            except Exception as e:
+                return e
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
@@ -337,7 +390,11 @@ class CreateOrderWithOutPay(graphene.Mutation):
                     phone=phone
                 )
                 plan_services.create_guardian_student_plan(create_order_resp.order)
-
+                PaymentHistory.objects.create(
+                    type = "backend_anction_create_order_without_pay",
+                    user = create_order_resp.order.guardian.user,
+                    order = create_order_resp.order,
+                )
                 return CreateOrder(
                     guardian=create_order_resp.order.guardian,
                     order=create_order_resp.order,
@@ -345,6 +402,14 @@ class CreateOrderWithOutPay(graphene.Mutation):
                 )
         except (Exception, AssertionError, DatabaseError) as e:
             transaction.rollback()
+            try:
+                PaymentHistory.objects.create(
+                    type = "backend_anction_create_order_without_pay_error",
+                    user = Guardian.objects.get(pk=guardian_id).user,
+                    message = str(e)
+                )
+            except Exception as e:
+                return e
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
