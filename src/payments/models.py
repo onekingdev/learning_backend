@@ -197,5 +197,6 @@ class PaymentHistory(TimestampModel, RandomSlugModel):
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
     message = models.CharField(max_length=255, null=True, blank=True)
     card_number = models.CharField(max_length=255, null=True, blank=True)
+    amount = models.IntegerField(blank=True, null=True)
 
 

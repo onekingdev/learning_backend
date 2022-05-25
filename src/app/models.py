@@ -119,9 +119,9 @@ class UUIDModel(BaseModel):
 class TimestampModel(models.Model):
 
     create_timestamp = models.DateTimeField(
-        'Created timestamp', auto_now_add=True, editable=False)
+        'Created timestamp', auto_now_add=True, editable=False, null=True)
     update_timestamp = models.DateTimeField(
-        'Updated timestamp', auto_now=True, editable=False)
+        'Updated timestamp', auto_now=True, editable=False, null=True)
 
     class Meta:
         abstract = True

@@ -55,6 +55,7 @@ def stripeWebHook(request):
             PaymentHistory.objects.create(
                 type = "payment_action_intent_succeeded",
                 user = User.objects.get(stripe_customer_id=customer_id),
+                amount = intent.amount,
             )
             for subscription in subscriptions:
                 try :
@@ -95,7 +96,9 @@ def stripeWebHook(request):
             PaymentHistory.objects.create(
                 type = "payment_action_intent_failed",
                 user = User.objects.get(stripe_customer_id=customer_id),
-                message = message
+                message = message,
+                amount = intent.amount,
+
             )
             for subscription in subscriptions:
                 try :

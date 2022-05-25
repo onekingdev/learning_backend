@@ -3,8 +3,10 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.sites.models import Site
 
+from app.models import TimestampModel
 
-class User(AbstractUser):
+
+class User(AbstractUser, TimestampModel):
     language = models.CharField(
         max_length=64,
         choices=settings.LANGUAGES,

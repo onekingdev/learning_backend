@@ -40,6 +40,7 @@ urlpatterns = [
         template_name="emails/password/password_reset_confirm.html"), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
         template_name='emails/password/password_reset_complete.html'), name='password_reset_complete'),
+    path('report/send/', views.send_report_request, name='send_report'),
     path("password_reset/", views.password_reset_request, name="password_reset"),
     path("stripe-webhook/", paymentsViews.stripeWebHook, name="stripe_webhook"),
     url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
