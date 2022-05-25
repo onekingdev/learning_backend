@@ -68,7 +68,6 @@ def send_report_request(request):
             coin_wallet = user.student.coinWallet
             game_transactions = PlayGameTransaction.objects.filter(account = coin_wallet, update_timestamp__gt = yesterday, update_timestamp__lte = today)
             game_transactions_count = game_transactions.count()
-            print(game_transactions_count)
             user.num_played_games = game_transactions_count
         except Exception as e:
             user.num_played_games = 0

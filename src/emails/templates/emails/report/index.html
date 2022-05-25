@@ -67,7 +67,11 @@
                     </td>
                 </tr>
                 {% endfor %}
-              
+                {% if userHistories|length < 1 %}
+                <tr class="table__tr">
+                  <td class="table__td" colspan="10"><center>No Datas</center></td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
 
@@ -110,7 +114,11 @@
                 </td>
             </tr>
             {% endfor %}
-            
+            {% if paymentHistory|length < 1 %}
+              <tr class="table__tr">
+                <td class="table__td" colspan="6"><center>No Datas</center></td>
+              </tr>
+            {% endif %}
           </tbody>
         </table>
       </div>
