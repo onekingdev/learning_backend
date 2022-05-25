@@ -81,10 +81,10 @@ def send_report_request(request):
     email = render_to_string(email_template_name, {"project_name": project_name, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory})
     email_content = strip_tags(email)
 
-    # try:
-    #     send_mail(email_title, email_content, 'Learn With Socrates',
-    #                 email_receivers, fail_silently=False, html_message=email)
-    # except BadHeaderError:
-    #     return HttpResponse('Invalid header found.')
+    try:
+        send_mail(email_title, email_content, 'Learn With Socrates',
+                    email_receivers, fail_silently=False, html_message=email)
+    except BadHeaderError:
+        return HttpResponse('Invalid header found.')
 
     return HttpResponse(email)
