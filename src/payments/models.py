@@ -193,8 +193,8 @@ class PaymentHistory(TimestampModel, RandomSlugModel):
         ("backend_anction_create_order_without_pay_error", "backend_anction_create_order_without_pay_error"),
     )
     type = models.CharField(max_length=255, choices=PAYMENT_EVENT_TYPE, null=True, blank=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
     message = models.CharField(max_length=255, null=True, blank=True)
     card_number = models.CharField(max_length=255, null=True, blank=True)
     amount = models.IntegerField(blank=True, null=True)

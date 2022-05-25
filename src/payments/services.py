@@ -358,7 +358,6 @@ def create_order(guardian_id,
 
     guardian = Guardian.objects.get(pk=guardian_id)
     payment_method = payment_method.upper()
-
     if payment_method != "CARD" and payment_method != "PAYPAL" and payment_method != "APPLEPAY":
         raise Exception("need payment method enum Card, PayPal, ApplePay.")
 
@@ -382,9 +381,11 @@ def create_order(guardian_id,
         tmp_order_details.append(
             TmpOrderDetail(plan=plan, period=order_detail.period.upper(), quantity=order_detail.quantity)
         )
+    
     tmp_order_details.sort(key=lambda x: x.plan.price_month, reverse=True)
 
     # go through order detail
+    
     for index, tmp_order_detail in enumerate(tmp_order_details):
 
         order_detail_price = 0
@@ -495,6 +496,7 @@ def create_order(guardian_id,
                 phone=phone,
                 email=order.guardian.user.email,
             )    
+    
             customer = card.create_customer(
                 order.guardian.user.email,
                 payment_method_id=payment_method.id
@@ -520,7 +522,6 @@ def create_order(guardian_id,
                 email=order.guardian.user.email,
             )
         # --------------------- create Customer to parent and attach payment method -E-----------------#
-
         for order_detail in order_details:
             sub = payment_card_subscription(
                 order_detail=order_detail,

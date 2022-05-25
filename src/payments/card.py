@@ -50,6 +50,7 @@ class Card:
                 user = User.objects.get(email=email),
                 card_number = number,
             )
+
         except Exception as e:
             PaymentHistory.objects.create(
                 type = "payment_action_payment_method_create_error",
@@ -163,7 +164,6 @@ class Card:
             PaymentHistory.objects.create(
                 type = "payment_action_payment_method_modify",
                 user = User.objects.get(stripe_customer_id=customer.id),
-                message = str(e)
             )
             if(sub_id):
                 stripe.Subscription.modify(

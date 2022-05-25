@@ -107,8 +107,8 @@ class CreateOrder(graphene.Mutation):
                     user = Guardian.objects.get(pk=guardian_id).user,
                     message = str(e)
                 )
-            except Exception as e:
-                return e
+            except Exception as err:
+                print(err)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
@@ -154,8 +154,8 @@ class ConfirmPaymentOrder(graphene.Mutation):
                     order = order,
                     message = str(e)
                 )
-            except Exception as e:
-                return e
+            except Exception as err:
+                return err
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
@@ -242,8 +242,8 @@ class ChangePaymentMethod(graphene.Mutation):
                     card_number = card_number,
                     message = str(e)
                 )
-            except Exception as e:
-                return e
+            except Exception as err:
+                return err
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
@@ -329,8 +329,8 @@ class EditPaymentMethod(graphene.Mutation):
                     card_number = card_number,
                     message = str(e)
                 )
-            except Exception as e:
-                return e
+            except Exception as err:
+                return err
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
@@ -408,8 +408,8 @@ class CreateOrderWithOutPay(graphene.Mutation):
                     user = Guardian.objects.get(pk=guardian_id).user,
                     message = str(e)
                 )
-            except Exception as e:
-                return e
+            except Exception as err:
+                print(err)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
