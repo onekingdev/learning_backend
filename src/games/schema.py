@@ -98,3 +98,10 @@ class Query(graphene.ObjectType):
             current_language = settings.LANGUAGE_CODE
 
         return Game.objects.filter(category__translations__name=category_name, category__translations__language_code=current_language)
+
+    # ----------------- Play game transactions ------------------------#
+    play_game_transactions = graphene.List(PlayGameTransactionSchema)
+
+    def resolve_play_game_transactions(root, info):
+        # Querying a game list by category Name
+        return PlayGameTransaction.objects.all()

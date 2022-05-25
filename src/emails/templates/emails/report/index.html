@@ -7,7 +7,7 @@
 <div class="page">
     <div class="page__demo">
       <div class="main-container page__container">
-        <center><h1>{{project_name}} Report In {{yesterday}} ~ {{today}}</h1></center>
+        <center><h1>{{project_name}} Report In {{yesterday|date:'Y-m-d H:i'}} ~ {{today|date:'Y-m-d H:i'}}</h1></center>
         <table class="table">
             <thead class="table__thead">
               <tr class="table__head">
@@ -16,6 +16,9 @@
                 <th class="table__th">Create Time</th>
                 <th class="table__th">Login Time</th>
                 <th class="table__th">Coupon Code</th>
+                <th class="table__th">Coin Wallet Balance</th>
+                <th class="table__th">Played Games</th>
+                <th class="table__th">Purchased Collectibles</th>
                 <th class="table__th">Correct Answered Questions</th>
                 <th class="table__th">Wrong Answered Questions</th>
               </tr>
@@ -43,12 +46,24 @@
                         <span class="table__value">{{userHistory.student.guardianstudentplan.order_detail.order.discount_code.id}}</span>
                     </td>
                     <td class="table__td">
+                      <span class="table__mobile-caption">Coin Wallet Balance</span>
+                      <span class="table__value">{{userHistory.student.coinWallet.balance | default:""}}</span>
+                  </td>
+                    <td class="table__td">
+                      <span class="table__mobile-caption">Played Games</span>
+                      <span class="table__value">{{userHistory.num_played_games | default:""}}</span>
+                    </td>
+                    <td class="table__td">
+                      <span class="table__mobile-caption">Purchased Collectibles</span>
+                      <span class="table__value">{{userHistory.num_purchased_collectibles | default:""}}</span>
+                    </td>
+                    <td class="table__td">
                         <span class="table__mobile-caption">Correct Answered Questions</span>
-                        <span class="table__value">{{userHistory.num_correct_questions}}</span>
+                        <span class="table__value">{{userHistory.num_correct_questions | default:""}}</span>
                     </td>
                     <td class="table__td">
                         <span class="table__mobile-caption">Wrong Answered Questions</span>
-                        <span class="table__value">{{userHistory.num_wrong_questions}}</span>
+                        <span class="table__value">{{userHistory.num_wrong_questions | default:""}}</span>
                     </td>
                 </tr>
                 {% endfor %}
