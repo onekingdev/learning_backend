@@ -504,8 +504,6 @@ def create_order(guardian_id,
             )
             user.stripe_customer_id = customer.id
             user.save()
-            print("customer created",)
-            print(User.objects.get(stripe_customer_id = customer.id))
         else:
             card.change_payment_method(
                 customer_id=user.stripe_customer_id,
@@ -531,7 +529,6 @@ def create_order(guardian_id,
                 customer_id=user.stripe_customer_id,
                 has_order=order.guardian.has_order
             )
-            print("subscription created")
             order_detail.subscription_id = sub.id
             order_detail.save()
 
