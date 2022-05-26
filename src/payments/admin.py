@@ -98,9 +98,9 @@ class PaymentHistoryAdmin(
                 'type',
                 'user',
                 'order',
-                'message',
                 'card',
                 'amount',
+                'message',
         )
         @admin.display(description='Card Number')
         def card(self, obj):
