@@ -94,27 +94,27 @@
                 </td>
                 <td class="table__td">
                   <span class="table__mobile-caption">User</span>
-                  <span class="table__value">{{paymentHistory.user}}</span>
+                  <span class="table__value">{{paymentHistory.user | default:""}}</span>
                 </td>
                 <td class="table__td">
                   <span class="table__mobile-caption">Amount</span>
-                  <span class="table__value">{{paymentHistory.amount}}</span>
+                  <span class="table__value">{{paymentHistory.amount | default:""}}</span>
                 </td>
                 <td class="table__td">
                   <span class="table__mobile-caption">Subscription Id</span>
-                  <span class="table__value">{{paymentHistory.subscription_id}}</span>
+                  <span class="table__value">{{paymentHistory.subscription_id | default:""}}</span>
                 </td>
                 <td class="table__td">
                     <span class="table__mobile-caption">Card Number</span>
-                    <span class="table__value">{{paymentHistory.card_number}}</span>
+                    <span class="table__value">{{paymentHistory.card_number | default:""}}</span>
                 </td>
                 <td class="table__td">
                     <span class="table__mobile-caption">Message</span>
-                    <span class="table__value">{{paymentHistory.message}}</span>
+                    <span class="table__value">{{paymentHistory.message | default:""}}</span>
                 </td>
             </tr>
             {% endfor %}
-            {% if paymentHistory|length < 1 %}
+            {% if paymentHistories|length < 1 %}
               <tr class="table__tr">
                 <td class="table__td" colspan="6"><center>No Datas</center></td>
               </tr>
