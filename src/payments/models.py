@@ -199,4 +199,11 @@ class PaymentHistory(TimestampModel, RandomSlugModel):
     card_number = models.CharField(max_length=255, null=True, blank=True)
     amount = models.IntegerField(blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        if not self.card_number:
+            payment_method = PaymentMethod.objects.filter(is_default=True, guardian__user_id=self.id)
+            if payment_method.count() != 0:
+                self.card_number = payment_method[0].card_number
+        return super().save(*args, **kwargs)
+
 

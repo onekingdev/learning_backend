@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Order, OrderDetail, PaypalTransaction, CardTransaction, PaymentMethod, DiscountCode
+from .models import Order, OrderDetail, PaymentHistory, PaypalTransaction, CardTransaction, PaymentMethod, DiscountCode
 from import_export import admin as import_export_admin
 
 @admin.register(PaymentMethod)
@@ -90,4 +90,25 @@ class OrderAdmin(
             'is_paid',
     )
 
+@admin.register(PaymentHistory)
+class PaymentHistoryAdmin(
+         import_export_admin.ImportExportModelAdmin,
+):
+        list_display = (
+                'type',
+                'user',
+                'order',
+                'message',
+                'card',
+                'amount',
+        )
+        @admin.display(description='Card Number')
+        def card(self, obj):
+                str = None
+                if(obj.card_number):
+                        card_leng = len(obj.card_number)
+                        first_4 = obj.card_number[0:4]
+                        last_4 = obj.card_number[card_leng-4:card_leng]
+                        str = f"{first_4} *** {last_4}"
+                return str
 
