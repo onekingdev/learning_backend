@@ -64,6 +64,7 @@ class CreateGuardian(graphene.Mutation):
         first_name = graphene.String(required=True)
         last_name = graphene.String(required=True)
         coupon = graphene.String(required=True)
+        language = graphene.String(required=False)
 
     def mutate(
             self,
@@ -73,11 +74,13 @@ class CreateGuardian(graphene.Mutation):
             email,
             first_name,
             last_name,
-            coupon):
+            coupon,
+            language='en-us'):
         try:
             with transaction.atomic():
                 user = get_user_model()(
                     username=username,
+                    language=language,
                 )
                 user.set_password(password)
                 if email is not None:
