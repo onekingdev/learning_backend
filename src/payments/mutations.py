@@ -61,7 +61,7 @@ class CreateOrder(graphene.Mutation):
             phone=None
     ):
         try:
-            with transaction.atomic():
+            # with transaction.atomic():
                 sub_total = 0
                 discount = 0
                 total = 0
@@ -100,7 +100,7 @@ class CreateOrder(graphene.Mutation):
                     url_redirect=create_order_resp.url_redirect
                 )
         except (Exception, AssertionError, DatabaseError) as e:
-            transaction.rollback()
+            # transaction.rollback()
             try:
                 PaymentHistory.objects.create(
                     type = "backend_anction_order_create_error",
