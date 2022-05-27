@@ -48,7 +48,7 @@ def password_reset_request(request):
     return render(request=request, template_name="emails/password/password_reset.html", context={"password_reset_form": password_reset_form})
 
 def send_report_request(request):
-
+    print("start send report request")
     email_title = "Report"
     email_template_name = "emails/report/index.html"
     email_receivers = ["armin@learnwithsocrates.com"]
