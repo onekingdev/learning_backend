@@ -17,8 +17,8 @@ from django.utils import timezone
 from django.db.models import Count
 from django.utils.html import strip_tags
 from django.http import HttpResponse, HttpResponseRedirect
-def sendReportMail():
-    print("===========starting sendReportMail/"+timezone.now().strftime("%m/%d/%Y, %H:%M:%S")+"=============" )
+def send_report_mail():
+    print("===========Starting sendReportMail/"+timezone.now().strftime("%m/%d/%Y, %H:%M:%S")+"=============" )
     email_title = "Report"
     email_template_name = "emails/report/index.html"
     email_receivers = ["armin@learnwithsocrates.com"]
@@ -55,4 +55,5 @@ def sendReportMail():
                     email_receivers, fail_silently=False, html_message=email)
     except BadHeaderError:
         return ('Invalid header found.')
+    print("===========Finishing sendReportMail/"+timezone.now().strftime("%m/%d/%Y, %H:%M:%S")+"=============" )
     return email

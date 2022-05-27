@@ -270,7 +270,7 @@ CRONJOBS = [
     # ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus','>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 '))
     # ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus')
     ('59 23 * * *', 'app.views.send_report_request', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
-    ('*/2 * * * *', 'app.cron.sendReportMail', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
+    ('*/2 * * * *', 'app.cron.send_report_mail', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
 
 
 ]
