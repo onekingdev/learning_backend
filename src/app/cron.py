@@ -27,7 +27,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.http import HttpResponse, HttpResponseRedirect
 def sendReportMail():
-    print("sendReportMail")
+    print("start send report request")
     email_title = "Report"
     email_template_name = "emails/report/index.html"
     email_receivers = ["armin@learnwithsocrates.com"]
@@ -64,3 +64,4 @@ def sendReportMail():
                     email_receivers, fail_silently=False, html_message=email)
     except BadHeaderError:
         return HttpResponse('Invalid header found.')
+    return email
