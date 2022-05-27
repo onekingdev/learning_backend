@@ -33,6 +33,7 @@ def send_report_mail():
         .annotate(num_purchased_collectibles=Count('student__studentcollectible__id', filter=Q(student__studentcollectible__update_timestamp__gt=yesterday) & Q(student__studentcollectible__update_timestamp__lte=today)))
         .all()
     )
+    print(userHistory.query)
     for user in userHistory:
         try:
             coin_wallet = user.student.coinWallet
