@@ -67,7 +67,8 @@ INSTALLED_APPS = [
     'djstripe',
     'crispy_forms',
     'django_crontab',
-
+    
+    'app'
     'api',
     'avatars',
     'audiences',
