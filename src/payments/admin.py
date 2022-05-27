@@ -95,14 +95,27 @@ class PaymentHistoryAdmin(
          import_export_admin.ImportExportModelAdmin,
 ):
         list_display = (
+                'id',
                 'type',
                 'user',
                 'order',
                 'card',
                 'amount',
                 'message',
+                'create_timestamp',
         )
-        @admin.display(description='Card Number')
+        #--------------- Disable Editing -----------------------#
+        list_display_links = None
+        #--------------- Add Filter ----------------------------#
+        list_filter = ('type',)
+        #--------------- ADD Date Hierarcy ---------------------#
+        date_hierarchy = 'create_timestamp'
+        #--------------- ADD Search Field ----------------------#
+        search_fields = ['user__email', 'card_number', 'type']
+        #---------------#
+        search_help_text = "Search by email, card number and type"
+
+        @admin.display(description='Card Number', ordering='card_number')
         def card(self, obj):
                 str = None
                 if(obj.card_number):
