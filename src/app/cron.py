@@ -1,4 +1,3 @@
-from .models import WeeklyTreasure, StudentWeeklyTreasure, WeeklyTreasureTransaction, WeeklyTreasureLevel
 from students.models import Student
 from block.models import BlockQuestionPresentation
 
@@ -27,7 +26,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.http import HttpResponse, HttpResponseRedirect
 def sendReportMail():
-    print("start send report request")
+    print("===========starting sendReportMail/"+timezone.now()+"=============" )
     email_title = "Report"
     email_template_name = "emails/report/index.html"
     email_receivers = ["armin@learnwithsocrates.com"]

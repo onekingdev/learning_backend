@@ -9,7 +9,7 @@ from datetime import timedelta
 
 def giveWeeklyBonus():
     students = Student.objects.all()
-    print("===========starting give weekly bonus=============")
+    print("===========starting give weekly bonus/"+timezone.now()+"=============" )
     for student in students:
         today = timezone.now()
         most_recent_monday = today - timedelta(days=(today.isoweekday()-1))
