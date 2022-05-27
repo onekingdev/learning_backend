@@ -28,8 +28,8 @@ def send_report_mail():
     yesterday = today - timedelta(days=1)
     userHistory = (User.objects
         .filter((Q(create_timestamp__gt = yesterday) & Q(create_timestamp__lte = today)) | (Q(last_login__gt = yesterday) & Q(last_login__lte = today)))
-        .annotate(num_correct_questions=Count('student__studentblockquestionpresentationhistory__block_question_presentation__id', filter=Q(student__studentblockquestionpresentationhistory__block_question_presentation__status=BlockQuestionPresentation.STATUS_CORRECT)))
-        .annotate(num_wrong_questions=Count('student__studentblockquestionpresentationhistory__block_question_presentation__id', filter=Q(student__studentblockquestionpresentationhistory__block_question_presentation__status=BlockQuestionPresentation.STATUS_INCORRECT)))
+        .annotate(num_correct_questions=Count('student__studentblockquestionpresentationhistory__block_question_presentation__id', filter=(Q(student__studentblockquestionpresentationhistory__block_question_presentation__status=BlockQuestionPresentation.STATUS_CORRECT) & Q(student__studentblockquestionpresentationhistory_update_timestamp__gt=yesterday) & Q(student__studentblockquestionpresentationhistory_update_timestamp__lte=today))))
+        .annotate(num_wrong_questions=Count('student__studentblockquestionpresentationhistory__block_question_presentation__id', filter=(Q(student__studentblockquestionpresentationhistory__block_question_presentation__status=BlockQuestionPresentation.STATUS_INCORRECT) & Q(student__studentblockquestionpresentationhistory_update_timestamp__gt=yesterday) & Q(student__studentblockquestionpresentationhistory_update_timestamp__lte=today))))
         .annotate(num_purchased_collectibles=Count('student__studentcollectible__id', filter=Q(student__studentcollectible__update_timestamp__gt=yesterday) & Q(student__studentcollectible__update_timestamp__lte=today)))
         .all()
     )
