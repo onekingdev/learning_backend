@@ -43,8 +43,25 @@
             --default-button-bg: #6777ef;
             --default-button-hover-bg: #394eea;
         }
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 15px;
+        }
+        ::-webkit-scrollbar-track {
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background-image: linear-gradient(45deg, #00aeff, #a68eff);
+            border-radius: 10px;
+            -webkit-box-shadow: rgba(0,0,0,.12) 0 3px 13px 1px;
+        }
         .body{
-            background-color: #F7FAF8;
+            /* background-color: #F7FAF8; */
+            background-image:    url(https://wallpapercave.com/download/office-administration-wallpapers-wp10701745) !important;
+            background-size:     cover !important;                      /* <------ */
+            background-repeat:   repeat-y !important;
+            background-position: center center !important;              /* optional, center the image */
         }
         #header{
             background-color: #6777ef;
