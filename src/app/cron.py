@@ -2,31 +2,23 @@ from students.models import Student
 from block.models import BlockQuestionPresentation
 
 from django.utils import timezone
-from django.db.models.functions import TruncDay
 from django.db.models import Count
 from datetime import timedelta
 from django.conf import settings
-from django.shortcuts import render, redirect
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
-from django.contrib.auth.forms import PasswordResetForm
 from games.models import PlayGameTransaction
 from payments.models import PaymentHistory
 from users.models import User
 from django.template.loader import render_to_string
 from django.db.models.query_utils import Q
-from django.utils.http import urlsafe_base64_encode
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.encoding import force_bytes
-from app.settings.env import IS_PRODUCTION, DOMAIN_WITHOU_PRTC
 from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Count
-from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.http import HttpResponse, HttpResponseRedirect
 def sendReportMail():
-    print("===========starting sendReportMail/"+timezone.now()+"=============" )
+    print("===========starting sendReportMail/"+timezone.now().strftime("%m/%d/%Y, %H:%M:%S")+"=============" )
     email_title = "Report"
     email_template_name = "emails/report/index.html"
     email_receivers = ["armin@learnwithsocrates.com"]
@@ -62,5 +54,5 @@ def sendReportMail():
         send_mail(email_title, email_content, 'Learn With Socrates',
                     email_receivers, fail_silently=False, html_message=email)
     except BadHeaderError:
-        return HttpResponse('Invalid header found.')
+        return ('Invalid header found.')
     return email
