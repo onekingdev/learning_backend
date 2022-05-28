@@ -1,6 +1,6 @@
 from students.models import Student
 from block.models import BlockQuestionPresentation
-
+from django.db.models import Count, F, Value
 from django.utils import timezone
 from django.db.models import Count
 from datetime import timedelta
@@ -28,9 +28,9 @@ def send_report_mail():
     yesterday = today - timedelta(days=1)
     userHistory = (User.objects
         .filter((Q(create_timestamp__gt = yesterday) & Q(create_timestamp__lte = today)) | (Q(last_login__gt = yesterday) & Q(last_login__lte = today)))
-        .annotate(num_correct_questions=Count('student__studentblockquestionpresentationhistory__block_question_presentation__id', filter=(Q(student__studentblockquestionpresentationhistory__block_question_presentation__status=BlockQuestionPresentation.STATUS_CORRECT) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__update_timestamp__gt=yesterday) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__update_timestamp__lte=today))))
-        .annotate(num_wrong_questions=Count('student__studentblockquestionpresentationhistory__block_question_presentation__id', filter=(Q(student__studentblockquestionpresentationhistory__block_question_presentation__status=BlockQuestionPresentation.STATUS_INCORRECT) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__update_timestamp__gt=yesterday) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__update_timestamp__lte=today))))
-        .annotate(num_purchased_collectibles=Count('student__studentcollectible__id', filter=Q(student__studentcollectible__update_timestamp__gt=yesterday) & Q(student__studentcollectible__update_timestamp__lte=today)))
+        .annotate(num_correct_questions=Count('student__studentblockquestionpresentationhistory__block_question_presentation__id', distinct=True, filter=(Q(student__user__id=F("id")) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__status=BlockQuestionPresentation.STATUS_CORRECT) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__status=BlockQuestionPresentation.STATUS_CORRECT) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__update_timestamp__gt=yesterday) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__update_timestamp__lte=today))))
+        .annotate(num_wrong_questions=Count('student__studentblockquestionpresentationhistory__block_question_presentation__id', distinct=True, filter=(Q(student__user__id=F("id")) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__status=BlockQuestionPresentation.STATUS_INCORRECT) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__update_timestamp__gt=yesterday) & Q(student__studentblockquestionpresentationhistory__block_question_presentation__update_timestamp__lte=today))))
+        .annotate(num_purchased_collectibles=Count('student__studentcollectible__id', distinct=True, filter=Q(student__user__id=F("id")) & Q(student__studentcollectible__update_timestamp__gt=yesterday) & Q(student__studentcollectible__update_timestamp__lte=today)))
         .all()
     )
     print(userHistory.query)
