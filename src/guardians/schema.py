@@ -28,7 +28,7 @@ class GuardianSchema(DjangoObjectType):
         return None
 
     def resolve_available_guardianstudentplan(self, inof):
-        available = GuardianStudentPlan.objects.filter(guardian = self, student = not None)
+        available = GuardianStudentPlan.objects.filter(guardian = self, student = None)
         return available
 
 
