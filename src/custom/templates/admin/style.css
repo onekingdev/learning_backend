@@ -30,8 +30,9 @@
     /* background-color: #F7FAF8; */
     background-image:    url(https://wallpapercave.com/download/office-administration-wallpapers-wp10701745) !important;
     background-size:     cover !important;                      /* <------ */
-    background-repeat:   repeat-y !important;
+    background-repeat:   no-repeat !important;
     background-position: center center !important;              /* optional, center the image */
+    background-attachment: fixed;
 }
 #header{
     background-color: var(--primary);
