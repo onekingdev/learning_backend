@@ -26,6 +26,5 @@ jobs:
                     pipenv run python ./src/manage.py migrate
                     sudo systemctl restart gunicorn
                     sudo systemctl restart gunicorn
-                    pipenv run python ./src/manage.py crontab add
 
 
