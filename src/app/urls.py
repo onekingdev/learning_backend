@@ -26,6 +26,12 @@ from . import views
 from payments import views as paymentsViews
 from django.views.static import serve
 from django.conf.urls import url
+
+from django.contrib import admin
+from custom.admin import CustomAdmin
+
+admin.site.__class__ = CustomAdmin
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^media/games/(?P<folder_name>.*)/gamePlay', game_loader),

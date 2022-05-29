@@ -17,7 +17,7 @@ from django.utils import timezone
 from django.db.models import Count
 from django.utils.html import strip_tags
 from django.http import HttpResponse, HttpResponseRedirect
-def send_report_mail():
+def send_report_mail(send=True):
     print("===========Starting Send Report Email / "+timezone.now().strftime("%Y/%m/%d, %H:%M:%S")+"=============" )
     email_title = "Report"
     email_template_name = "emails/report/index.html"
@@ -33,7 +33,6 @@ def send_report_mail():
         .annotate(num_purchased_collectibles=Count('student__studentcollectible__id', distinct=True, filter=Q(student__user__id=F("id")) & Q(student__studentcollectible__update_timestamp__gt=yesterday) & Q(student__studentcollectible__update_timestamp__lte=today)))
         .all()
     )
-    print(userHistory.query)
     for user in userHistory:
         try:
             coin_wallet = user.student.coinWallet
@@ -51,11 +50,13 @@ def send_report_mail():
     email = render_to_string(email_template_name, {"project_name": project_name, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory})
     email_content = strip_tags(email)
 
-    try:
-        send_mail(email_title, email_content, 'Learn With Socrates',
-                    email_receivers, fail_silently=False, html_message=email)
-    except BadHeaderError:
-        return ('Invalid header found.')
+    if(send == True):
+        try:
+            send_mail(email_title, email_content, 'Learn With Socrates',
+                        email_receivers, fail_silently=False, html_message=email)
+        except Exception as e:
+            return {"email":email, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": False, "message": [{"tags":"error","message":str(e)}]}
+
     print("===========Finishing Send Report Email / "+timezone.now().strftime("%Y/%m/%d, %H:%M:%S")+"=============" )
 
-    return email
+    return {"email":email, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": True, "message": [{"message":"Report Email has been successfully sent!"}],}

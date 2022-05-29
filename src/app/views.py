@@ -50,4 +50,4 @@ def password_reset_request(request):
 
 def send_report_request(request):
     print("start send report request")
-    return HttpResponse(send_report_mail())
+    return HttpResponse(send_report_mail()['email'])
