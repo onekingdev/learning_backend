@@ -35,7 +35,7 @@ class CustomAdmin(admin.AdminSite):
             "paymentHistories": report_context['paymentHistories']
         }
         # return TemplateResponse(request, "admin/custom_page.html", context)
-        return TemplateResponse(request, "admin/report_admin.html", context)
+        return TemplateResponse(request, "report/index.html", context)
 
         # return HttpResponse(send_report_mail())
     def sendReportPage(self, request):
@@ -55,7 +55,7 @@ class CustomAdmin(admin.AdminSite):
             "success": report_context['success'],
             "messages":report_context['message']
         }
-        return TemplateResponse(request, "admin/report_admin.html", context)
+        return TemplateResponse(request, "report/index.html", context)
        
     def get_urls(
         self,
