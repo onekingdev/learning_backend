@@ -12,7 +12,7 @@ from django.views.static import serve
 from django.conf.urls import url
 from django.contrib import admin
 from django.template.response import TemplateResponse
-from app.cron import send_report_mail
+from custom.cron import send_report_mail
 from django.http import HttpResponse, HttpResponseRedirect
 
 class CustomAdmin(admin.AdminSite):

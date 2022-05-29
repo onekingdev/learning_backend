@@ -18,7 +18,6 @@ from django.db.models import Count
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.http import HttpResponse, HttpResponseRedirect
-from .cron import send_report_mail
 def password_reset_request(request):
     if request.method == "POST":
         password_reset_form = PasswordResetForm(request.POST)
@@ -47,7 +46,3 @@ def password_reset_request(request):
                     return redirect("/password_reset/done/")
     password_reset_form = PasswordResetForm()
     return render(request=request, template_name="emails/password/password_reset.html", context={"password_reset_form": password_reset_form})
-
-def send_report_request(request):
-    print("start send report request")
-    return HttpResponse(send_report_mail()['email'])
