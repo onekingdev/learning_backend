@@ -5,6 +5,7 @@ from django.contrib.auth.backends import ModelBackend
 class CustomBackend(ModelBackend):
 
     def authenticate(self, request, username=None, password=None, **kwargs):
+        print("authenticate")
         if username is not None:
             UserModel = get_user_model()
 
