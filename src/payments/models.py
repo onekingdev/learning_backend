@@ -198,6 +198,15 @@ class PaymentHistory(TimestampModel, RandomSlugModel):
     message = models.CharField(max_length=255, null=True, blank=True)
     card_number = models.CharField(max_length=255, null=True, blank=True)
     amount = models.IntegerField(blank=True, null=True)
+    @property
+    def card_number_encrypted(self):
+        str = None
+        if(self.card_number):
+            card_leng = len(self.card_number)
+            first_4 = self.card_number[0:4]
+            last_4 = self.card_number[card_leng-4:card_leng]
+            str = f"{first_4} *** {last_4}"
+        return str
 
     def save(self, *args, **kwargs):
         if not self.card_number and self.user:
