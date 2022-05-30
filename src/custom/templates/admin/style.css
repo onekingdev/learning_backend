@@ -28,8 +28,8 @@
 }
 .body{
     /* background-color: #F7FAF8; */
-    background-image:    url(https://wallpapercave.com/download/office-administration-wallpapers-wp10701745) !important;
-    background-size:     cover !important;                      /* <------ */
+    background-image:    url(https://firebasestorage.googleapis.com/v0/b/learningwithsocrates-frontend.appspot.com/o/assets%2Fadmin%2Fbackground.png?alt=media) !important;
+    background-size:     contain !important;                      /* <------ */
     background-repeat:   no-repeat !important;
     background-position: center center !important;              /* optional, center the image */
     background-attachment: fixed;
