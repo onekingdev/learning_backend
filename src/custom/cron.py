@@ -21,7 +21,7 @@ def send_report_mail(send=True):
     print("===========Starting Send Report Email / "+timezone.now().strftime("%Y/%m/%d, %H:%M:%S")+"=============" )
     email_title = "Report"
     email_template_name = "emails/report/index.html"
-    email_receivers = ["armin@learnwithsocrates.com"]
+    email_receivers = settings.REPORT_EMAIL_RECEIVERS
     project_name = "Prod Server" if settings.IS_PRODUCTION else "Dev Server"
 
     today = timezone.now()

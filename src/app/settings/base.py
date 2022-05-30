@@ -231,6 +231,8 @@ EMAIL_HOST_USER = 'customerservice@learnwithsocrates.com'
 EMAIL_HOST_PASSWORD = ENV_GMAIL_PASSWORD
 DEFAULT_FROM_EMAIL = 'customerservice@learwithsocrates.com'
 
+REPORT_EMAIL_RECEIVERS = ['armin@learnwithsocrates.com']
+
 # Additional languages
 settings.LANGUAGES.append(
     ('en-us', 'American English')
