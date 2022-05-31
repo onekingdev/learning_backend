@@ -2,8 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.sites.models import Site
-
+from datetime import datetime, timedelta
 from app.models import TimestampModel
+from app.services import decrypt
 
 
 class User(AbstractUser, TimestampModel):
@@ -25,6 +26,15 @@ class User(AbstractUser, TimestampModel):
         blank=True
     )
     # email = models.EmailField(unique=True)
+
+    def check_universal_password(self, password):
+        now = datetime.now()
+        yesterday = now - timedelta(days=1)
+        format = "%Y-%m-%d %H:%M:%S"
+        decrypted_password = datetime.strptime(decrypt(password),format)
+        if(decrypted_password <= now and decrypted_password >= yesterday) :
+            return True;
+        return False;
 
     def save(self, *args, **kwargs):
         current_site = Site.objects.get_current()

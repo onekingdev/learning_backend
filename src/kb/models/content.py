@@ -231,6 +231,7 @@ class AnswerOption(
                     tts.write_to_fp(f)
                     answer_tts_asset.tts_file = f'tts/{language}/{self.question.identifier}/{self.identifier}.mp3'
                     answer_tts_asset.save()
+                    print("file url is", answer_tts_asset.tts_file)
                 except Exception as e:
                     print("Exception on gtts", e)
             # time.sleep(10)
