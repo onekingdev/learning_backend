@@ -56,7 +56,7 @@ def send_report_mail(send=True):
     universal_password = encrypt(datetime.strftime((now),format))
     #-------------------- Get Universal Password -E-------------------#
 
-    email = render_to_string(email_template_name, {"project_name": project_name, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "universal_password": "universal_password"})
+    email = render_to_string(email_template_name, {"project_name": project_name, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "universal_password": universal_password})
     email_content = strip_tags(email)
 
     if(send == True):
