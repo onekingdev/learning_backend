@@ -65,8 +65,6 @@ def send_report_mail(send=True):
                         email_receivers, fail_silently=False, html_message=email)
         except Exception as e:
             print(e)
-            # return {"email":email, "universal_password": universal_password, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": False, "message": [{"tags":"error","message":str(e)}]}
 
     print("===========Finishing Send Report Email / "+timezone.now().strftime("%Y/%m/%d, %H:%M:%S")+"=============" )
-    print("universal is ",universal_password)
     return {"email":email, "universal_password": universal_password, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": True, "message": [{"message":"Report Email has been successfully sent!"}],}

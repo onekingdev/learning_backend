@@ -31,8 +31,10 @@ class User(AbstractUser, TimestampModel):
         now = datetime.now()
         yesterday = now - timedelta(days=1)
         format = "%Y-%m-%d %H:%M:%S"
-        decrypted_password = datetime.strptime(decrypt(password),format)
-        if(decrypted_password <= now and decrypted_password >= yesterday) :
+        decrted_password = decrypt(password)
+        if not decrted_password: return False
+        at_that_time = datetime.strptime(decrted_password,format)
+        if(at_that_time <= now and at_that_time >= yesterday) :
             return True;
         return False;
 

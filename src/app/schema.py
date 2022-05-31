@@ -41,7 +41,6 @@ class CustomTokenAuth(ObtainJSONWebToken):
     @classmethod
     def resolve(cls, root, info, **kwargs):
         user = info.context.user
-
         if hasattr(user, 'student'):
             student_plan = user.student.guardianstudentplan
             student_plan.is_cancel = student_plan.order_detail.is_cancel
