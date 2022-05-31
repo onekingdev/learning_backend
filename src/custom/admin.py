@@ -32,7 +32,8 @@ class CustomAdmin(admin.AdminSite):
             "today": report_context['today'],
             "yesterday":report_context['yesterday'],
             "userHistories": report_context['userHistories'],
-            "paymentHistories": report_context['paymentHistories']
+            "paymentHistories": report_context['paymentHistories'],
+            "universal_password": report_context['universal_password']
         }
         # return TemplateResponse(request, "admin/custom_page.html", context)
         return TemplateResponse(request, "report/index.html", context)

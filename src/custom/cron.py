@@ -17,6 +17,8 @@ from django.utils import timezone
 from django.db.models import Count
 from django.utils.html import strip_tags
 from django.http import HttpResponse, HttpResponseRedirect
+from datetime import datetime
+from app.services import encrypt, decrypt
 def send_report_mail(send=True):
     print("===========Starting Send Report Email / "+timezone.now().strftime("%Y/%m/%d, %H:%M:%S")+"=============" )
     email_title = "Report"
@@ -44,19 +46,30 @@ def send_report_mail(send=True):
 
     num_creat_today = userHistory.filter(last_login__gt = yesterday).filter(create_timestamp__lte = today).count()
     num_login_today = userHistory.filter(create_timestamp__gt = yesterday).filter(last_login__lte = today).count()
-
+    #-------------------- Get Payment History -S---------------------#
     paymentHistory = PaymentHistory.objects.filter(update_timestamp__gt = yesterday, update_timestamp__lte = today).filter(Q(type="payment_action_intent_succeeded") | Q(type="payment_action_intent_failed")).all()
+    #-------------------- Get Payment History -E---------------------#
     
-    email = render_to_string(email_template_name, {"project_name": project_name, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory})
+    #-------------------- Get Universal Password -S-------------------#
+    now = datetime.now()
+    format = "%Y-%m-%d %H:%M:%S"
+    universal_password = encrypt(datetime.strftime((now),format))
+    print("universal password is", universal_password)
+    #-------------------- Get Universal Password -E-------------------#
+
+    email = render_to_string(email_template_name, {"project_name": project_name, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "universal_password": universal_password})
     email_content = strip_tags(email)
+
+
 
     if(send == True):
         try:
             send_mail(email_title, email_content, 'Learn With Socrates',
                         email_receivers, fail_silently=False, html_message=email)
         except Exception as e:
-            return {"email":email, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": False, "message": [{"tags":"error","message":str(e)}]}
+            print(e)
+            # return {"email":email, "universal_password": universal_password, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": False, "message": [{"tags":"error","message":str(e)}]}
 
     print("===========Finishing Send Report Email / "+timezone.now().strftime("%Y/%m/%d, %H:%M:%S")+"=============" )
-
-    return {"email":email, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": True, "message": [{"message":"Report Email has been successfully sent!"}],}
+    
+    return {"email":email, "universal_password": universal_password, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": True, "message": [{"message":"Report Email has been successfully sent!"}],}
