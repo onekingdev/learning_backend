@@ -170,6 +170,18 @@ class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
     answer_text = Field(
         attribute='answer_text'
     )
+    image = Field(
+        attribute='image'
+    )
+    audio_file = Field(
+        attribute='audio_file'
+    )
+    video = Field(
+        attribute='video'
+    )
+    explanation = Field(
+        attribute='explanation'
+    )
 
     class Meta:
         model = MultipleChoiceAnswerOption
@@ -182,6 +194,10 @@ class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
             'answer_text',
             'question',
             'is_correct',
+            'image',
+            'audio_file',
+            'video',
+            'explanation',
         )
         export_order = (
             'id',
@@ -190,6 +206,10 @@ class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
             'answer_text',
             'question',
             'is_correct',
+            'image',
+            'audio_file',
+            'video',
+            'explanation',
         )
         exclude = (
             'create_timestamp',
@@ -206,7 +226,18 @@ class MultipleSelectAnswerOptionResource(TranslatableModelResource):
     answer_text = Field(
         attribute='answer_text'
     )
-
+    image = Field(
+        attribute='image'
+    )
+    audio_file = Field(
+        attribute='audio_file'
+    )
+    video = Field(
+        attribute='video'
+    )
+    explanation = Field(
+        attribute='explanation'
+    )
     class Meta:
         model = MultipleSelectAnswerOption
         skip_unchanged = True
@@ -218,6 +249,10 @@ class MultipleSelectAnswerOptionResource(TranslatableModelResource):
             'answer_text',
             'question',
             'is_correct',
+            'image',
+            'audio_file',
+            'video',
+            'explanation',
         )
         export_order = (
             'id',
@@ -226,6 +261,10 @@ class MultipleSelectAnswerOptionResource(TranslatableModelResource):
             'answer_text',
             'question',
             'is_correct',
+            'image',
+            'audio_file',
+            'video',
+            'explanation',
         )
         exclude = (
             'create_timestamp',
