@@ -54,7 +54,8 @@ class CustomAdmin(admin.AdminSite):
             "userHistories": report_context['userHistories'],
             "paymentHistories": report_context['paymentHistories'],
             "success": report_context['success'],
-            "messages":report_context['message']
+            "messages":report_context['message'],
+            "universal_password": report_context['universal_password']
         }
         return TemplateResponse(request, "report/index.html", context)
        

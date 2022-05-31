@@ -54,13 +54,10 @@ def send_report_mail(send=True):
     now = datetime.now()
     format = "%Y-%m-%d %H:%M:%S"
     universal_password = encrypt(datetime.strftime((now),format))
-    print("universal password is", universal_password)
     #-------------------- Get Universal Password -E-------------------#
 
-    email = render_to_string(email_template_name, {"project_name": project_name, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "universal_password": universal_password})
+    email = render_to_string(email_template_name, {"project_name": project_name, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "universal_password": "universal_password"})
     email_content = strip_tags(email)
-
-
 
     if(send == True):
         try:
@@ -71,5 +68,5 @@ def send_report_mail(send=True):
             # return {"email":email, "universal_password": universal_password, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": False, "message": [{"tags":"error","message":str(e)}]}
 
     print("===========Finishing Send Report Email / "+timezone.now().strftime("%Y/%m/%d, %H:%M:%S")+"=============" )
-    
+    print("universal is ",universal_password)
     return {"email":email, "universal_password": universal_password, "num_creat_today": num_creat_today, "num_login_today": num_login_today,"today": today, "yesterday": yesterday, "userHistories": userHistory, "paymentHistories": paymentHistory, "success": True, "message": [{"message":"Report Email has been successfully sent!"}],}
