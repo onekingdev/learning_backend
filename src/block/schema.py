@@ -225,7 +225,7 @@ class Query(graphene.ObjectType):
         return StudentBlockQuestionPresentationHistory.objects.get(pk=id);
 
     def resolve_block_question_presentation_history_by_student_id(root, info, id):
-        return StudentBlockQuestionPresentationHistory.objects.get(student=id);
+        return StudentBlockQuestionPresentationHistory.objects.filter(student=id);
 
     # ----------------- BlockAssignment ----------------- #
 
