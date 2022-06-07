@@ -37,6 +37,7 @@ django-model-utils = "*"
 django-admin-autocomplete-filter = "*"
 django-crispy-forms = "*"
 django-crontab = "*"
+django-dbbackup = "*"
 
 [dev-packages]
 

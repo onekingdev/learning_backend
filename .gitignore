@@ -371,12 +371,17 @@ tags
 [._]*.un~
 
 ### vscode ###
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+
+### database backup
+src/backups/database_backup/*
+src/backups/database_backup/**
 
 # End of https://www.toptal.com/developers/gitignore/api/linux,python,pycharm,atom,vim,django,vscode
 n

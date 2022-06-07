@@ -1,6 +1,7 @@
 from app.resources import TranslatableModelResource
 from app.widgets import TranslatableForeignKeyWidget
 from import_export.fields import Field
+from import_export.widgets import ForeignKeyWidget
 from import_export.resources import ModelResource
 from .models import Topic, Grade, TopicGrade, Prerequisite, GradePrerequisite
 from .models.content import (
@@ -331,6 +332,7 @@ class OrderAnswerOptionResource(TranslatableModelResource):
             'answer_text',
             'question',
             'order',
+            'is_correct',
         )
         export_order = (
             'id',
@@ -339,6 +341,7 @@ class OrderAnswerOptionResource(TranslatableModelResource):
             'answer_text',
             'question',
             'order',
+            'is_correct',
         )
         exclude = (
             'create_timestamp',
@@ -360,6 +363,8 @@ class RelateAnswerOptionResource(TranslatableModelResource):
         attribute='value'
     )
 
+    is_correct = ForeignKeyWidget(AnswerOption, 'is_correct')
+
     class Meta:
         model = RelateAnswerOption
         skip_unchanged = True
@@ -371,6 +376,7 @@ class RelateAnswerOptionResource(TranslatableModelResource):
             'key',
             'value',
             'question',
+            'is_correct',
         )
         export_order = (
             'id',
@@ -379,6 +385,7 @@ class RelateAnswerOptionResource(TranslatableModelResource):
             'key',
             'value',
             'question',
+            'is_correct',
         )
         exclude = (
             'create_timestamp',
