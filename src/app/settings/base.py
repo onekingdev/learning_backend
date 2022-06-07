@@ -67,7 +67,6 @@ INSTALLED_APPS = [
     'djstripe',
     'crispy_forms',
     'django_crontab',
-    'dbbackup',
 
     'app',
     'api',
@@ -76,7 +75,6 @@ INSTALLED_APPS = [
     'accounting',
     'achievements',
     'bank',
-    'backups',
     'badges',
     'block',
     'collectibles',
@@ -115,6 +113,7 @@ MIDDLEWARE = [
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 
 ROOT_URLCONF = 'app.urls'
 
@@ -244,7 +243,6 @@ settings.LANGUAGES.append(
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media/')
 
-DBBACKUP_STORAGE_OPTIONS = { 'location': BASE_DIR / 'backups' / 'database_backup' }
 
 PARLER_ENABLE_CACHING = False
 
@@ -271,7 +269,6 @@ XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 
 CRONJOBS = [
     ('59 23 * * SAT', 'treasuretrack.cron.giveWeeklyBonus', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
-    ('0 2 * * FRI', 'app.cron.backup_database', '>> ' + os.path.join(BASE_DIR,'log/cron_dbbackup_job.log' + ' 2>&1 ')),
     # ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus','>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 '))
     # ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus')
     ('59 23 * * *', 'custom.cron.send_report_mail', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
