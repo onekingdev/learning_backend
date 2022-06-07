@@ -176,7 +176,7 @@ class TopicGradeAdmin(
     list_display = ('id', 'topic', 'grade', 'grade_audience', 'standard_code')
     search_fields = ('id', 'topic__translations__name', 'grade__translations__name', 'standard_code')
     list_filter = ('grade', 'grade__audience', 'is_active', 'topic__area_of_knowledge__translations__name',
-    'topic__area_of_knowledge__translations__name', 'create_timestamp', 'update_timestamp')
+    'topic__area_of_knowledge__universal_area_knowledge', 'create_timestamp', 'update_timestamp')
     autocomplete_fields = ['topic']
 
 
@@ -290,7 +290,7 @@ class AnswerOptionAdmin(import_export_admin.ImportExportModelAdmin, polymorphic_
     list_display = ('id', '__str__', 'question', 'question_type')
     # list_display = ('id', 'key', 'value', 'is_correct', 'question')
     search_fields = ('key', 'value', 'question',)
-    list_filter = ('is_correct',)
+    list_filter = ('question_type', 'is_correct', 'topic__area_of_knowledge', 'grade', 'grade_audience')
 
     # Import-Export settings
     resource_class = resources.AnswerOptionResource
