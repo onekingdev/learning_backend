@@ -6,6 +6,7 @@ from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPre
     StudentBlockQuestionPresentationHistory
 from block.models import BlockAssignment
 from kb.schema import QuestionSchema, AnswerOptionSchema
+from kb.models.content import Question, AnswerOption
 from datetime import date
 
 class BlockConfigurationKeywordSchema(DjangoObjectType):
