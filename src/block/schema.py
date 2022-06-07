@@ -81,6 +81,15 @@ class BlockQuestionPresentationSchema(DjangoObjectType):
         model = BlockQuestionPresentation
         fields = "__all__"
 
+    question = graphene.Field(QuestionSchema)
+    answer = graphene.List(AnswerOptionSchema)
+
+    def resolve_question(self, info, **kwargs):
+        return Question.objects.all()
+
+    def resolve_answer(self, info, **kwargs):
+        return AnswerOption.objects.all()
+
 
 class Query(graphene.ObjectType):
     # ----------------- Block Configuration Keyword ----------------- #
