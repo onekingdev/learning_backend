@@ -175,7 +175,8 @@ class TopicGradeAdmin(
     resource_class = resources.TopicGradeResource
     list_display = ('id', 'topic', 'grade', 'grade_audience', 'standard_code')
     search_fields = ('id', 'topic__translations__name', 'grade__translations__name', 'standard_code')
-    list_filter = ('grade', 'grade__audience', 'is_active', 'create_timestamp', 'update_timestamp')
+    list_filter = ('grade', 'grade__audience', 'is_active', 'topic__area_of_knowledge__translations__name',
+    'topic__area_of_knowledge__translations__name', 'create_timestamp', 'update_timestamp')
     autocomplete_fields = ['topic']
 
 
