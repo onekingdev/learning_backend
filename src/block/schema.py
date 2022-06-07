@@ -64,15 +64,6 @@ class StudentBlockQuestionPresentationHistorySchema(DjangoObjectType):
         model = StudentBlockQuestionPresentationHistory
         fields = "__all__"
 
-    question = graphene.Field(QuestionSchema)
-    chosen_answer = graphene.List(AnswerOptionSchema)
-
-    def resolve_questions(self, info):
-        return self.block_question_presentation.question
-
-    def resolve_chosen_answer(self, info):
-        return self.block_question_presentation.chosen_answer
-
 class BlockAssignmentSchema(DjangoObjectType):
     class Meta:
         model = BlockAssignment
@@ -224,7 +215,7 @@ class Query(graphene.ObjectType):
         return StudentBlockQuestionPresentationHistory.objects.get(pk=id);
 
     def resolve_block_question_presentation_history_by_student_id(
-        root, info, id: int, size: int, today: bool, isIncorrect: bool
+        root, info, id: int, size=None, today=None, isIncorrect=None
     ):
         if today:
             return StudentBlockQuestionPresentationHistory.objects.filter(
