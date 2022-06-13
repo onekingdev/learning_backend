@@ -81,27 +81,13 @@ class BlockAssignmentSchema(DjangoObjectType):
 #         model = BlockQuestion
 #         fields = "__all__"
 
-
-class AnswerOptionUnion(Union):
-    class Meta:
-        models = AnswerOption
-        types = (OrderAnswerOptionSchema, TypeInAnswerOptionSchema,
-            RelateAnswerOptionSchema, MultipleChoiceAnswerOptionSchema,
-            MultipleSelectAnswerOptionSchema)
-
 class BlockQuestionPresentationSchema(DjangoObjectType):
     class Meta:
         model = BlockQuestionPresentation
         fields = "__all__"
 
     question = graphene.Field(QuestionSchema)
-    chosen_answer = graphene.List(AnswerOptionUnion)
-    
-    # order_answer = graphene.List(OrderAnswerOptionSchema)
-    # typein_answer = graphene.List(TypeInAnswerOptionSchema)
-    # relate_answer = graphene.List(RelateAnswerOptionSchema)
-    # multiplechoice_answer = graphene.List(MultipleChoiceAnswerOptionSchema)
-    # multipleselect_answer = graphene.List(MultipleSelectAnswerOptionSchema)
+    chosen_answer = graphene.List('kb.schema.AnswerOptionInterface')
     
     def resolve_question(self, info, **kwargs):
         return self.question
