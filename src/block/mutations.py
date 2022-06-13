@@ -360,6 +360,7 @@ class FinishBlockPresentation(graphene.Mutation):
         block_topic = block_presentation.block.topic_grade.topic
         block_aok = block_topic.area_of_knowledge
 
+        student_block_question_history = StudentBlockQuestionPresentationHistory.objects.create(student=student)
         for question in questions:
             question_object = Question.objects.get(id=question['question'])
             question_type = question_object.question_type
@@ -371,7 +372,6 @@ class FinishBlockPresentation(graphene.Mutation):
                 question=question_object,
                 topic=block_topic,
             )
-            student_block_question_history = StudentBlockQuestionPresentationHistory.objects.get_or_create(student=student)
             block_question_presentation.save()
 
             if question_type == 'MC':
@@ -439,8 +439,8 @@ class FinishBlockPresentation(graphene.Mutation):
                     )
 
             block_question_presentation.save()
-            student_block_question_history.block_question_presentation.set(block_question_presentation)
-            student_block_question_history.save()
+            student_block_question_history.block_question_presentation.add(block_question_presentation)
+        student_block_question_history.save()
 
         # Create registers for report tables
         topic_report, new = TopicStudentReport.objects.get_or_create(
