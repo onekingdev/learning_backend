@@ -82,7 +82,7 @@ class BlockQuestionPresentationSchema(DjangoObjectType):
         fields = "__all__"
 
     question = graphene.Field(QuestionSchema)
-    chosen_answer = graphene.List('kb.schema.QuestionSchema')
+    chosen_answer = graphene.List('kb.schema.AnswerOptionSchema')
     
     def resolve_question(self, info,**kwargs):
         return self.question
