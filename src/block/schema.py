@@ -70,6 +70,14 @@ class BlockAssignmentSchema(DjangoObjectType):
         model = BlockAssignment
         fields = "__all__"
 
+    question = graphene.Field(QuestionSchema)
+    chosen_answer = graphene.List('kb.schema.AnswerOptionInterface')
+
+    def resolve_question(self, info,**kwargs):
+        return self.question
+
+    def resolve_chosen_answer(self, info,**kwargs):
+        return self.chosen_answer.all()
 
 # class BlockQuestionSchema(DjangoObjectType):
 #     class Meta:
