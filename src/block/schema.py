@@ -1,11 +1,17 @@
 import graphene
 from django.conf import settings
 from graphene_django import DjangoObjectType
+from graphene.types.union import Union
 from block.models import BlockConfigurationKeyword, BlockType, BlockTypeConfiguration, Block
-from block.models import BlockConfiguration, BlockPresentation, BlockQuestionPresentation, \
-    StudentBlockQuestionPresentationHistory
+from block.models import (
+    BlockConfiguration, BlockPresentation, BlockQuestionPresentation, 
+    StudentBlockQuestionPresentationHistory)
 from block.models import BlockAssignment
-from kb.schema import QuestionSchema, AnswerOptionSchema
+from kb.schema import (
+    QuestionSchema, AnswerOptionSchema, OrderAnswerOptionSchema,
+    TypeInAnswerOptionSchema, RelateAnswerOptionSchema,
+    MultipleChoiceAnswerOptionSchema, MultipleSelectAnswerOptionSchema)
+
 from kb.models.content import Question, AnswerOption
 from datetime import date
 
@@ -76,19 +82,33 @@ class BlockAssignmentSchema(DjangoObjectType):
 #         fields = "__all__"
 
 
+class AnswerOptionUnion(Union):
+    class Meta:
+        models = AnswerOption
+        types = (OrderAnswerOptionSchema, TypeInAnswerOptionSchema,
+            RelateAnswerOptionSchema, MultipleChoiceAnswerOptionSchema,
+            MultipleSelectAnswerOptionSchema)
+
 class BlockQuestionPresentationSchema(DjangoObjectType):
     class Meta:
         model = BlockQuestionPresentation
         fields = "__all__"
 
     question = graphene.Field(QuestionSchema)
-    chosen_answer = graphene.List('kb.schema.AnswerOptionInterface')
+    chosen_answer = graphene.List(AnswerOptionUnion)
     
-    def resolve_question(self, info,**kwargs):
+    # order_answer = graphene.List(OrderAnswerOptionSchema)
+    # typein_answer = graphene.List(TypeInAnswerOptionSchema)
+    # relate_answer = graphene.List(RelateAnswerOptionSchema)
+    # multiplechoice_answer = graphene.List(MultipleChoiceAnswerOptionSchema)
+    # multipleselect_answer = graphene.List(MultipleSelectAnswerOptionSchema)
+    
+    def resolve_question(self, info, **kwargs):
         return self.question
     
-    def resolve_chosen_answer(self, info,**kwargs):
+    def resolve_chosen_answer(self, info, **kwargs):
         return self.chosen_answer.all()
+
 
 class Query(graphene.ObjectType):
     # ----------------- Block Configuration Keyword ----------------- #
