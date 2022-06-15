@@ -66,8 +66,10 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     school = models.ForeignKey(
         'organization.School',
         on_delete=models.PROTECT,
+        blank=True,
         null=True
     )
+    school_name = models.CharField(max_length=128, null=True)
     discountCode = models.ForeignKey(
         DiscountCode,
         on_delete=models.CASCADE,
