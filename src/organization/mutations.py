@@ -62,8 +62,8 @@ class CreateTeacher(graphene.Mutation):
             with transaction.atomic():
                 school = School.objects.get(pk=school_id)
                 user = get_user_model()(
-                    first_name = first_name,
-                    last_name = last_name,
+                    first_name=first_name,
+                    last_name=last_name,
                     username=username,
                 )
                 user.set_password(password)
@@ -165,6 +165,8 @@ class CreateSchool(graphene.Mutation):
     refresh_token = graphene.String()
     class Arguments:
         name = graphene.String(required=True)
+        first_name = graphene.String(required=True)
+        last_name = graphene.String(required=True)
         district = graphene.String(required=True)
         type = graphene.String(required=True)
         zip = graphene.String(required=True)
@@ -177,6 +179,8 @@ class CreateSchool(graphene.Mutation):
         self,
         info,
         name,
+        first_name,
+        last_name,
         district,
         type,
         zip,
@@ -195,8 +199,8 @@ class CreateSchool(graphene.Mutation):
                 )
                 school.save()
                 user = get_user_model()(
-                    first_name = name,
-                    last_name = 'Principle',
+                    first_name = first_name,
+                    last_name = last_name,
                     username = username,
                     email = email,
                 )
