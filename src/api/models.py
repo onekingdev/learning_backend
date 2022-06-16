@@ -10,7 +10,8 @@ active_roles = (
     ("user", "user"),
     ("manager", "manager"),
     ("guardian", "guardian"),
-    ("student", "student")
+    ("student", "student"),
+    ("principal", "principal"),
 )
 
 
