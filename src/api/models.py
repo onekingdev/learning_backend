@@ -11,6 +11,7 @@ active_roles = (
     ("manager", "manager"),
     ("guardian", "guardian"),
     ("student", "student"),
+    ("principal", "principal"),
 )
 
 
@@ -32,6 +33,7 @@ def create_user_profile(sender, instance, created, **kwargs):
             role = "manager"
 
         profile.objects.create(user=instance, role=role)
+
 
 @receiver(post_save, sender=Guardian)
 def create_guardian_profile(sender, instance, created, **kwargs):
