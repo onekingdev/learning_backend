@@ -240,12 +240,13 @@ class Query(graphene.ObjectType):
         today = timezone.now()
         fromDate = today - timedelta(days=period)
         fromDate = fromDate.strptime(f'{fromDate.year}/{fromDate.month}/{fromDate.day}', "%Y/%m/%d")
-        # answerStatus = BlockQuestionPresentation.STATUS_CORRECT if isCorrect else BlockQuestionPresentation.STATUS_INCORRECT
+
         result = (StudentBlockQuestionPresentationHistory.objects.filter(student=id)
                 .filter(create_timestamp__gt = fromDate))
         if answerState != "All":
-            result.filter(block_question_presentation__status = answerState)
-        result.order_by('-create_timestamp')
+            result = result.filter(block_question_presentation__status = answerState)
+        result = result.order_by('-create_timestamp')
+
         return result;
 
     # ----------------- BlockAssignment ----------------- #
