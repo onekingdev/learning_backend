@@ -11,7 +11,9 @@ from kb.schema import (
     QuestionSchema, AnswerOptionSchema, OrderAnswerOptionSchema,
     TypeInAnswerOptionSchema, RelateAnswerOptionSchema,
     MultipleChoiceAnswerOptionSchema, MultipleSelectAnswerOptionSchema)
-
+from django.db.models.query_utils import Q
+from datetime import timedelta
+from django.utils import timezone
 from kb.models.content import Question, AnswerOption
 from datetime import date
 
@@ -221,6 +223,9 @@ class Query(graphene.ObjectType):
     block_question_presentation_history_by_student_id = graphene.List(
         StudentBlockQuestionPresentationHistorySchema, id=graphene.ID()
     )
+    block_question_presentation_history_by_student_id_and_period_and_answerState = graphene.List(
+        StudentBlockQuestionPresentationHistorySchema, id=graphene.ID(), period=graphene.Int(), answerState=graphene.String()
+    )
 
     def resolve_block_question_presentation_history(root, info, **kwargs):
         return StudentBlockQuestionPresentationHistory.objects.all();
@@ -230,6 +235,18 @@ class Query(graphene.ObjectType):
 
     def resolve_block_question_presentation_history_by_student_id(root, info, id):
         return StudentBlockQuestionPresentationHistory.objects.filter(student=id).order_by('-create_timestamp');
+
+    def resolve_block_question_presentation_history_by_student_id_and_period_and_answerState(root, info, id, period, answerState):
+        today = timezone.now()
+        fromDate = today - timedelta(days=period)
+        fromDate = fromDate.strptime(f'{fromDate.year}/{fromDate.month}/{fromDate.day}', "%Y/%m/%d")
+        # answerStatus = BlockQuestionPresentation.STATUS_CORRECT if isCorrect else BlockQuestionPresentation.STATUS_INCORRECT
+        result = (StudentBlockQuestionPresentationHistory.objects.filter(student=id)
+                .filter(create_timestamp__gt = fromDate))
+        if answerState != "All":
+            result.filter(block_question_presentation__status = answerState)
+        result.order_by('-create_timestamp')
+        return result;
 
     # ----------------- BlockAssignment ----------------- #
 
