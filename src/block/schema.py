@@ -243,7 +243,7 @@ class Query(graphene.ObjectType):
 
         result = (StudentBlockQuestionPresentationHistory.objects.filter(student=id)
                 .filter(create_timestamp__gt = fromDate))
-        if answerState != "All":
+        if answerState != "ALL":
             result = result.filter(block_question_presentation__status = answerState)
         result = result.order_by('-create_timestamp')
 
