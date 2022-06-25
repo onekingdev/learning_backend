@@ -52,7 +52,7 @@ class AddGuardianPlan(graphene.Mutation):
             coupon=None
     ):
         try:
-            with transaction.atomic():
+            # with transaction.atomic():
 
                 payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, is_default=True)
 
@@ -87,7 +87,7 @@ class AddGuardianPlan(graphene.Mutation):
                     status="success"
                 )
         except (Exception, DatabaseError) as e:
-            transaction.rollback()
+            # transaction.rollback()
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
