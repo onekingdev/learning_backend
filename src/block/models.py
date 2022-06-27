@@ -273,7 +273,7 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
 
 class StudentBlockQuestionPresentationHistory(TimestampModel):
     student = models.ForeignKey('students.Student', on_delete=models.CASCADE, blank=False, null=False)
-    block_question_presentation = models.ManyToManyField(BlockQuestionPresentation, blank=False)
+    block_question_presentation = models.ForeignKey(BlockQuestionPresentation, on_delete=models.CASCADE, blank=True, null=True)
 
 
 class BlockAssignment(TimestampModel):
