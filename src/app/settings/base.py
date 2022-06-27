@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'djstripe',
     'crispy_forms',
     'django_crontab',
+    'dbbackup',
 
     'app',
     'api',
@@ -74,6 +75,7 @@ INSTALLED_APPS = [
     'audiences',
     'accounting',
     'achievements',
+    'backups',
     'bank',
     'badges',
     'block',
@@ -238,8 +240,10 @@ settings.LANGUAGES.append(
     ('en-us', 'American English')
 )
 
-# Media files
+# Database Backup Directory
+DBBACKUP_STORAGE_OPTIONS = { 'location': BASE_DIR / 'backups' / 'database_backup' }
 
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media/')
 
@@ -273,6 +277,7 @@ CRONJOBS = [
     # ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus')
     ('59 23 * * *', 'custom.cron.send_report_mail', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
     # ('*/2 * * * *', 'custom.cron.send_report_mail', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
+    ('0 2 * * FRI', 'app.cron.backup_database', '>> ' + os.path.join(BASE_DIR,'log/cron_dbbackup_job.log' + ' 2>&1 ')),
 
 
 ]

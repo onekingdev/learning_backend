@@ -384,4 +384,3 @@ src/backups/database_backup/*
 src/backups/database_backup/**
 
 # End of https://www.toptal.com/developers/gitignore/api/linux,python,pycharm,atom,vim,django,vscode
-n
