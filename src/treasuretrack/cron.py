@@ -1,3 +1,4 @@
+from badges.models import StudentBadge
 from .models import WeeklyTreasure, StudentWeeklyTreasure, WeeklyTreasureTransaction, WeeklyTreasureLevel
 from students.models import Student
 from block.models import BlockQuestionPresentation
@@ -66,8 +67,8 @@ def giveWeeklyBonus():
         weekly_tresure.coins_awarded = bonus_coins
         weekly_tresure.save()
         print("Weekly Treasure ID : ", weekly_tresure.id, " Saved !")
-
-
+        if(current_level.bonus_badge) :
+            StudentBadge.objects.create(badge = current_level.bonus_badge, student=student, weekly_tresure=weekly_tresure)
         student_weekly_treasure = StudentWeeklyTreasure(student=student, weekly_treasure=weekly_tresure)
         student_weekly_treasure.save()
 

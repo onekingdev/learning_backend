@@ -5,6 +5,7 @@ from parler.models import TranslatableModel, TranslatedFields, TranslatableManag
 from parler.managers import TranslatableQuerySet
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel, ActiveManager
 from students.models import Student
+from treasuretrack.models import WeeklyTreasure
 from wallets.models import Withdraw
 from django.utils.html import strip_tags
 
@@ -49,3 +50,4 @@ class StudentBadge(
         Badge, on_delete=models.PROTECT, null=True)
     student = models.ForeignKey(
         Student, on_delete=models.PROTECT, null=True)
+    weekley_treasure = models.OneToOneField(WeeklyTreasure, on_delete=models.CASCADE, null=True, blank=True)
