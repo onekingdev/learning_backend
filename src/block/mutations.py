@@ -439,7 +439,7 @@ class FinishBlockPresentation(graphene.Mutation):
                     )
 
             block_question_presentation.save()
-            student_block_question_history.block_question_presentation.add(block_question_presentation)
+            student_block_question_history(block_question_presentation=block_question_presentation)
         student_block_question_history.save()
 
         # Create registers for report tables
