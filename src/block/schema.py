@@ -246,8 +246,8 @@ class Query(graphene.ObjectType):
         if answerState != "ALL":
             result = result.filter(block_question_presentation__status = answerState)
         result = result.order_by('-create_timestamp')
-
-        return result;
+        print(result.all().query)
+        return result.all();
 
     # ----------------- BlockAssignment ----------------- #
 
