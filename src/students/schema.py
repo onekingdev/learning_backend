@@ -1,10 +1,11 @@
 import graphene
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, F
 from django.db.models.functions import TruncDay
 from django.utils import timezone
 from datetime import timedelta
 from graphene_django import DjangoObjectType
 from students.models import Student, StudentTopicMastery, StudentGrade, StudentAchievement
+from wallets.models import CoinWallet
 from wallets.schema import CoinWalletSchema
 from experiences.schema import LevelSchema
 from guardians.models import GuardianStudent
@@ -174,6 +175,9 @@ class StudentAchievementSchema(DjangoObjectType):
         model = StudentAchievement
         fields = "__all__"
 
+class HonorRollWithCurrentGradeSchema(graphene.ObjectType):
+    students = graphene.List(StudentSchema)
+    grade = graphene.Int()
 
 class Query(graphene.ObjectType):
 
@@ -183,6 +187,8 @@ class Query(graphene.ObjectType):
     student_by_id = graphene.Field(StudentSchema, id=graphene.ID())
     students_by_guardian_id = graphene.List(
         StudentSchema, guardian_id=graphene.ID())
+    students_for_honor_roll_by_student_id = graphene.Field(
+        HonorRollWithCurrentGradeSchema, student_id=graphene.ID())
 
     def resolve_students(root, info, **kwargs):
         # Querying a list
@@ -198,6 +204,16 @@ class Query(graphene.ObjectType):
             obj.student for obj in GuardianStudent.objects.filter(
                 guardian_id=guardian_id)]
         return student_list
+    def resolve_students_for_honor_roll_by_student_id(root, info, student_id):
+        student = Student.objects.get(pk=student_id)
+        balance_of_positive_movement = student.coinWallet.block_transaction_aggregate
+        students_of_honor_roll = (Student.objects.filter(coinWallet__movement__side=F('coinWallet__positive_side'),coinWallet__movement__comment="Answer the questions.")
+                                                 .annotate(amount_answer_question=Sum('coinWallet__movement__amount')).order_by('-amount_answer_question').all())
+        student_position_in_honor_roll = students_of_honor_roll.filter(amount_answer_question__gte = balance_of_positive_movement).count()
+        students_of_honor_roll_limit_by_5 = students_of_honor_roll[:5].all()
+        return HonorRollWithCurrentGradeSchema(students=students_of_honor_roll_limit_by_5, grade = student_position_in_honor_roll)
+
+
 
     # ----------------- StudentTopicMastery ----------------- #
 

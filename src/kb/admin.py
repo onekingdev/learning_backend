@@ -200,8 +200,7 @@ class MultipleChoiceAnswerOptionAdmin(
     list_display = ('id', 'question', 'answer_text', 'explanation', 'is_correct')
     search_fields = ('id', 'question__translations__question_text', 'translations__answer_text',
                      'translations__explanation')
-    list_filter = ('question__question_type', 'question__topic__area_of_knowledge',
-                   'question__grade', 'is_correct', 'create_timestamp', 'update_timestamp')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(MultipleSelectAnswerOption)
@@ -226,8 +225,7 @@ class MultipleSelectAnswerOptionAdmin(
     list_display = ('id', 'question', 'answer_text', 'explanation', 'is_correct')
     search_fields = ('id', 'question__translations__question_text', 'translations__answer_text',
                      'translations__explanation')
-    list_filter = ('question__question_type', 'question__topic__area_of_knowledge',
-                   'question__grade', 'is_correct', 'create_timestamp', 'update_timestamp')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(TypeInAnswerOption)
@@ -247,8 +245,7 @@ class TypeInAnswerOptionAdmin(
     list_display = ('id', 'question', 'answer_text', 'explanation', 'is_correct')
     search_fields = ('id', 'translations__answer_text', 'translations__explanation',
                      'question__translations__question_text')
-    list_filter = ('question__question_type', 'question__topic__area_of_knowledge',
-                   'question__grade', 'is_correct', 'create_timestamp', 'update_timestamp')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 @admin.register(OrderAnswerOption)
 class OrderAnswerOptionAdmin(
@@ -266,8 +263,7 @@ class OrderAnswerOptionAdmin(
     autocomplete_fields = ['question']
     list_display = ('id', 'question', 'answer_text', 'order', 'is_correct')
     search_fields = ('id', 'question__translations__question_text', 'order')
-    list_filter = ('question__question_type', 'question__topic__area_of_knowledge',
-                   'question__grade', 'is_correct', 'create_timestamp', 'update_timestamp')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(RelateAnswerOption)
@@ -286,8 +282,7 @@ class RelateAnswerOptionAdmin(
     autocomplete_fields = ['question']
     list_display = ('id', 'question', 'key', 'value', 'key_image', 'value_image', 'is_correct')
     search_fields = ('id', 'translations__key', 'translations__value', 'question__translations__question_text')
-    list_filter = ('question__question_type', 'question__topic__area_of_knowledge',
-                   'question__grade', 'is_correct', 'create_timestamp', 'update_timestamp')
+    list_filter = ('is_correct', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(AnswerOption)
