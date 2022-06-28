@@ -67,22 +67,6 @@ class BlockPresentationSchema(DjangoObjectType):
         model = BlockPresentation
         fields = "__all__"
 
-
-class StudentBlockQuestionPresentationHistorySchema(DjangoObjectType):
-    class Meta:
-        model = StudentBlockQuestionPresentationHistory
-        fields = "__all__"
-
-class BlockAssignmentSchema(DjangoObjectType):
-    class Meta:
-        model = BlockAssignment
-        fields = "__all__"
-
-# class BlockQuestionSchema(DjangoObjectType):
-#     class Meta:
-#         model = BlockQuestion
-#         fields = "__all__"
-
 class BlockQuestionPresentationSchema(DjangoObjectType):
     class Meta:
         model = BlockQuestionPresentation
@@ -96,6 +80,35 @@ class BlockQuestionPresentationSchema(DjangoObjectType):
     
     def resolve_chosen_answer(self, info, **kwargs):
         return self.chosen_answer.all()
+
+class StudentBlockQuestionPresentationHistorySchema(DjangoObjectType):
+    class Meta:
+        model = StudentBlockQuestionPresentationHistory
+        fields = "__all__"
+
+    block_question_presentation = graphene.List(BlockQuestionPresentationSchema, period=graphene.Int(), answerState=graphene.String())
+
+    def resolve_block_question_presentation(self, info, period=-1, answerState="ALL"):
+        query_set = self.block_question_presentation.all()
+        if(answerState != "ALL") : query_set = query_set.filter(status=answerState)
+        if(period >= 0): 
+            today = timezone.now()
+            fromDate = today - timedelta(days=period)
+            fromDate = fromDate.strptime(f'{fromDate.year}/{fromDate.month}/{fromDate.day}', "%Y/%m/%d")
+            query_set = query_set.filter(create_timestamp__gt = fromDate)
+        return query_set
+
+
+class BlockAssignmentSchema(DjangoObjectType):
+    class Meta:
+        model = BlockAssignment
+        fields = "__all__"
+
+# class BlockQuestionSchema(DjangoObjectType):
+#     class Meta:
+#         model = BlockQuestion
+#         fields = "__all__"
+
 
 
 class Query(graphene.ObjectType):
@@ -243,10 +256,11 @@ class Query(graphene.ObjectType):
 
         result = (StudentBlockQuestionPresentationHistory.objects.filter(student=id)
                 .filter(create_timestamp__gt = fromDate))
+
         if answerState != "ALL":
-            result = result.filter(block_question_presentation__status = answerState)
+            result = result.filter(block_question_presentation__status = answerState).distinct()
         result = result.order_by('-create_timestamp')
-        print(result.all().query)
+        
         return result.all();
 
     # ----------------- BlockAssignment ----------------- #
