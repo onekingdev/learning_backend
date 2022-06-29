@@ -86,16 +86,11 @@ class StudentBlockQuestionPresentationHistorySchema(DjangoObjectType):
         model = StudentBlockQuestionPresentationHistory
         fields = "__all__"
 
-    block_question_presentation = graphene.List(BlockQuestionPresentationSchema, period=graphene.Int(), answerState=graphene.String())
+    block_question_presentation = graphene.List(BlockQuestionPresentationSchema, answerState=graphene.String())
 
-    def resolve_block_question_presentation(self, info, period=-1, answerState="ALL"):
+    def resolve_block_question_presentation(self, info, answerState="ALL"):
         query_set = self.block_question_presentation.all()
         if(answerState != "ALL") : query_set = query_set.filter(status=answerState)
-        if(period >= 0): 
-            today = timezone.now()
-            fromDate = today - timedelta(days=period)
-            fromDate = fromDate.strptime(f'{fromDate.year}/{fromDate.month}/{fromDate.day}', "%Y/%m/%d")
-            query_set = query_set.filter(create_timestamp__gt = fromDate)
         return query_set
 
 
