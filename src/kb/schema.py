@@ -554,12 +554,12 @@ class Query(graphene.ObjectType):
 
     def resolve_root_topics_by_aok(root, info, aok_id):
         return Topic.objects.filter(
-            level=0,
+            parent__isnull=True,
             area_of_knowledge=aok_id
         )
     def resolve_root_topics_by_aok_and_grade(root, info, aok_id, grade_id):
         return Topic.objects.filter(
-            level=0,
+            parent__isnull=True,
             area_of_knowledge=aok_id,
             topicgrade__grade__id=grade_id
         )
