@@ -40,7 +40,7 @@ class User(AbstractUser, TimestampModel):
 
     def save(self, *args, **kwargs):
         current_site = Site.objects.get_current()
-        if (self.pk is None and len(User.objects.filter(email = self.email).all() > 0)) or (self.pk is not None and len(User.objects.filter(email = self.email).all() > 1)) :
+        if ((self.pk is None and len(User.objects.filter(email = self.email).all()) > 0) or (self.pk is not None and len(User.objects.filter(email = self.email).all()) > 1)) :
             raise Exception("The email address you entered had been duplicated. Please enter another email address")
         if not self.language:
             self.language = settings.PARLER_LANGUAGES[current_site.id][0]['code']
