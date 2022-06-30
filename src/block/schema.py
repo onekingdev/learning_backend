@@ -67,6 +67,14 @@ class BlockPresentationSchema(DjangoObjectType):
         model = BlockPresentation
         fields = "__all__"
 
+    blockquestionpresentation_set = graphene.List('block.schema.BlockQuestionPresentationSchema', answerState=graphene.String())
+
+    def resolve_blockquestionpresentation_set(self, info, answerState="ALL"):
+        query_set = self.blockquestionpresentation_set.all()
+        if(answerState != "ALL") : query_set = query_set.filter(status=answerState)
+        return query_set
+
+
 class BlockQuestionPresentationSchema(DjangoObjectType):
     class Meta:
         model = BlockQuestionPresentation
@@ -234,6 +242,9 @@ class Query(graphene.ObjectType):
     block_question_presentation_history_by_student_id_and_period_and_answerState = graphene.List(
         StudentBlockQuestionPresentationHistorySchema, id=graphene.ID(), period=graphene.Int(), answerState=graphene.String()
     )
+    block_presentations_by_student_id_and_period_and_answerState = graphene.List(
+        BlockPresentationSchema, id=graphene.ID(), period=graphene.Int(), answerState=graphene.String()
+    )
 
     def resolve_block_question_presentation_history(root, info, **kwargs):
         return StudentBlockQuestionPresentationHistory.objects.all();
@@ -257,6 +268,21 @@ class Query(graphene.ObjectType):
         result = result.order_by('-create_timestamp')
         
         return result.all();
+    
+    def resolve_block_presentations_by_student_id_and_period_and_answerState(root, info, id, period, answerState):
+        today = timezone.now()
+        fromDate = today - timedelta(days=period)
+        fromDate = fromDate.strptime(f'{fromDate.year}/{fromDate.month}/{fromDate.day}', "%Y/%m/%d")
+
+        result = (BlockPresentation.all_objects.filter(student=id)
+                .filter(blockquestionpresentation__update_timestamp__gt = fromDate))
+
+        if answerState != "ALL":
+            result = result.filter(blockquestionpresentation__status = answerState).distinct()
+        result = result.order_by('-create_timestamp')
+        
+        # return result.all();
+        return result.all()
 
     # ----------------- BlockAssignment ----------------- #
 
