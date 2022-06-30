@@ -281,7 +281,7 @@ class Query(graphene.ObjectType):
             result = result.filter(blockquestionpresentation__status = answerState).distinct()
         else:
             result = result.filter(blockquestionpresentation__isnull = False).distinct()
-        result = result.order_by('-create_timestamp')
+        result = result.order_by('-update_timestamp')
         
         # return result.all();
         return result.all()
