@@ -73,7 +73,6 @@ class CreatePathBlockPresentation(graphene.Mutation):
             topic_grade=topic_grade,
             modality='PATH',
         )
-        block.save()
         block.students.add(student)
         block.save()
         if block.questions.all().count() == 0:
@@ -91,11 +90,9 @@ class CreatePathBlockPresentation(graphene.Mutation):
 
             if(len(available_questions) < 1):
                 raise Exception("Topic " + f'{topic_grade.topic.id}' + " hasn't questions which has answers")
-                
             while len(available_questions) < block.block_size:
                 for question in available_questions:
-                    block.questions.add(question)
-
+                    available_questions.add(question)
             random_questions = random.sample(
                 available_questions, block.block_size)
             for question in random_questions:
@@ -202,7 +199,6 @@ class CreateAIBlockPresentation(graphene.Mutation):
             topic_grade=topic_grade,
             modality='AI',
         )
-        block.save()
         block.students.add(student)
         block.save()
         print("before block", block.questions.all().count(), block.id)
@@ -225,7 +221,7 @@ class CreateAIBlockPresentation(graphene.Mutation):
                 
             while len(available_questions) < block.block_size:
                 for question in available_questions:
-                    block.questions.add(question)
+                    available_questions.add(question)
 
             random_questions = random.sample(
                 available_questions, block.block_size)
@@ -275,7 +271,6 @@ class CreateBlockPresentationByQuestionId(graphene.Mutation):
             topic_grade=topicGrade,
             modality='TEST',
         )
-        block.save()
         block.students.add(student)
         block.save()
         

@@ -216,7 +216,7 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
     # FK's
     block_presentation = models.ForeignKey(
         BlockPresentation,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
     question = models.ForeignKey(
         'kb.Question',
