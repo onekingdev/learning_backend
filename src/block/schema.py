@@ -275,7 +275,7 @@ class Query(graphene.ObjectType):
         fromDate = fromDate.strptime(f'{fromDate.year}/{fromDate.month}/{fromDate.day}', "%Y/%m/%d")
 
         result = (BlockPresentation.all_objects.filter(student=id)
-                .filter(blockquestionpresentation__update_timestamp__gt = fromDate))
+                .filter(update_timestamp__gt = fromDate))
 
         if answerState != "ALL":
             result = result.filter(blockquestionpresentation__status = answerState).distinct()
