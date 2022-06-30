@@ -561,7 +561,7 @@ class Query(graphene.ObjectType):
         return Topic.objects.filter(
             parent__isnull=True,
             area_of_knowledge=aok_id,
-            topicgrade__grade__id=grade_id
+            # topicgrade__grade__id=grade_id
         )
 
     # ----------------- TopicGrade ----------------- #
