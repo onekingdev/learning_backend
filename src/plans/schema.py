@@ -61,7 +61,9 @@ class Query(graphene.ObjectType):
 
     def resolve_guardian_student_plan_by_guardian_id(self, info, guardian_id):
         # Querying a single question that has guardian_id
-        return GuardianStudentPlan.objects.all().filter(guardian_id=guardian_id, order_detail__is_paid=True, order_detail__is_cancel=False)
+        # return GuardianStudentPlan.objects.all().filter(guardian_id=guardian_id, order_detail__is_paid=True, order_detail__is_cancel=False)
+        return GuardianStudentPlan.objects.all().filter(guardian_id=guardian_id)
+
 
     def resolve_guardian_student_plan_by_id(self, info, id):
         # Querying a single question
