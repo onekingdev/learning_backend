@@ -407,14 +407,16 @@ class FinishBlockPresentation(graphene.Mutation):
                     block_question_presentation.status = 'INCORRECT'
             elif question_type == 'O':
                 answer_options = question['order_answer_options']
+                block_question_presentation.status = 'CORRECT'
                 for order, answer_option in enumerate(answer_options):
-                    order_answer_option, new = OrderAnswerOption.objects.get_or_create(
+                    order_answer_option = OrderAnswerOption.objects.filter(
                         question=question_object,
                         translations__answer_text=answer_option,
-                        order=order+1,
-                    )
-                    order_answer_option.answer_text = answer_option
-                    order_answer_option.save()
+                    )[0]
+                    if(order_answer_option.order != order + 1):
+                        block_question_presentation.status = 'INCORRECT'
+                    # order_answer_option.answer_text = answer_option
+                    # order_answer_option.save()
                     block_question_presentation.chosen_answer.add(
                         order_answer_option
                     )
