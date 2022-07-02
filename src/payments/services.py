@@ -405,9 +405,9 @@ def create_order(guardian_id,
         #         order_detail_price += tmp_order_detail.quantity * (tmp_order_detail.plan.price_year / 2)
 
         if tmp_order_detail.period == "MONTHLY":
-            order_detail_price += tmp_order_detail.plan.price_month if(tmp_order_detail.quantity == 1) else tmp_order_detail.quantity * (tmp_order_detail.plan.price_month / 2)
+            order_detail_price += tmp_order_detail.plan.price_month if(tmp_order_detail.quantity == 1) else (tmp_order_detail.quantity - 1) * (tmp_order_detail.plan.price_month / 2) + tmp_order_detail.plan.price_month
         else:
-            order_detail_price += tmp_order_detail.plan.price_year if(tmp_order_detail.quantity == 1) else tmp_order_detail.quantity * (tmp_order_detail.plan.price_year / 2)
+            order_detail_price += tmp_order_detail.plan.price_year if(tmp_order_detail.quantity == 1) else (tmp_order_detail.quantity - 1) * (tmp_order_detail.plan.price_year / 2) + tmp_order_detail.plan.price_year
 
         # # check plan payment id by payment_method
         # payment_method_plan_id = ""
