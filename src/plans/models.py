@@ -9,7 +9,7 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255, blank=True)
     area_of_knowledge = models.CharField(max_length=255, choices=(
-        ("ALL", "ALL"), ("ONE", "ONE"), ("TWO", "TWO")), default="ALL")
+        ("ALL", "ALL"), ("ONE", "ONE"), ("TWO", "TWO")), default="ALL", blank=True, null=True)
     slug = models.SlugField(editable=False)
     price_month = models.DecimalField(
         max_digits=15, decimal_places=2, default=0)
