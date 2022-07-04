@@ -21,10 +21,10 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
         max_digits=15, decimal_places=2, default=0)
     currency = models.CharField(max_length=4)
     stripe_monthly_plan_id = models.CharField(max_length=255, blank=True)
-    stripe_monthly_plan_half_price_id = models.CharField(
+    stripe_monthly_plan_preferential_price_id = models.CharField(
         max_length=255, blank=True)
     stripe_yearly_plan_id = models.CharField(max_length=255, blank=True)
-    stripe_yearly_plan_half_price_id = models.CharField(
+    stripe_yearly_plan_preferential_price_id = models.CharField(
         max_length=255, blank=True)
     is_cancel = models.BooleanField(default=False)
 

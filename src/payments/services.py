@@ -419,15 +419,15 @@ def create_order(guardian_id,
         #             payment_method_plan_id = tmp_order_detail.plan.stripe_yearly_plan_id
         #     else:
         #         if tmp_order_detail.period == "MONTHLY":
-        #             payment_method_plan_id = tmp_order_detail.plan.stripe_monthly_plan_half_price_id
+        #             payment_method_plan_id = tmp_order_detail.plan.stripe_monthly_plan_preferential_price_id
         #         else:
-        #             payment_method_plan_id = tmp_order_detail.plan.stripe_yearly_plan_half_price_id
+        #             payment_method_plan_id = tmp_order_detail.plan.stripe_yearly_plan_preferential_price_id
 
         if order.payment_method == "CARD":
             if tmp_order_detail.period == "MONTHLY":
-                payment_method_plan_id = tmp_order_detail.plan.stripe_monthly_plan_id if(tmp_order_detail.quantity == 1) else tmp_order_detail.plan.stripe_monthly_plan_half_price_id
+                payment_method_plan_id = tmp_order_detail.plan.stripe_monthly_plan_id if(tmp_order_detail.quantity == 1) else tmp_order_detail.plan.stripe_monthly_plan_preferential_price_id
             else:
-                payment_method_plan_id = tmp_order_detail.plan.stripe_yearly_plan_id if(tmp_order_detail.quantity == 1) else tmp_order_detail.plan.stripe_yearly_plan_half_price_id
+                payment_method_plan_id = tmp_order_detail.plan.stripe_yearly_plan_id if(tmp_order_detail.quantity == 1) else tmp_order_detail.plan.stripe_yearly_plan_preferential_price_id
 
 
         # calculate sub_total and total price before add to order
