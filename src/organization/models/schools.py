@@ -85,6 +85,8 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     zip = models.CharField(max_length=128, null=True)
     country = models.CharField(max_length=128, null=True)
     district = models.CharField(max_length=128, null=True)
+    coupon_code = models.ForeignKey('payments.DiscountCode', on_delete=models.CASCADE, blank=True, null=True)
+    has_order = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name+' '+self.last_name
@@ -93,6 +95,9 @@ class AdministrativePersonnel(SchoolPersonnel):
     pass
 
 class Teacher(SchoolPersonnel):
+    pass
+
+class Principal(SchoolPersonnel):
     pass
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):

@@ -1,4 +1,5 @@
 from django.db import models
+from organization.models.schools import AdministrativePersonnel, Principal, Teacher
 from users.models import User
 from students.models import Student
 from guardians.models import Guardian
@@ -44,6 +45,27 @@ def create_guardian_profile(sender, instance, created, **kwargs):
         student_profile = profile.objects.get(user=instance.user)
         student_profile.role = "guardian"
         student_profile.save()
+
+@receiver(post_save, sender=Teacher)
+def create_teacher_profile(sender, instance, created, **kwargs):
+    if created:
+        teacher_profile = profile.objects.get(user=instance.user)
+        teacher_profile.role = "teacher"
+        teacher_profile.save()
+
+@receiver(post_save, sender=AdministrativePersonnel)
+def create_administrative_personnel_profile(sender, instance, created, **kwargs):
+    if created:
+        administrative_personnel_profile = profile.objects.get(user=instance.user)
+        administrative_personnel_profile.role = "adminTeacher"
+        administrative_personnel_profile.save()
+
+@receiver(post_save, sender=Principal)
+def create_principal_profile(sender, instance, created, **kwargs):
+    if created:
+        principal_profile = profile.objects.get(user=instance.user)
+        principal_profile.role = "principal"
+        principal_profile.save()
 
 
 @receiver(post_save, sender=Student)
