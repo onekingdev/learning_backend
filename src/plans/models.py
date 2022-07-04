@@ -13,7 +13,11 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
     slug = models.SlugField(editable=False)
     price_month = models.DecimalField(
         max_digits=15, decimal_places=2, default=0)
+    price_preferential_month = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0)
     price_year = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0)
+    price_preferential_year = models.DecimalField(
         max_digits=15, decimal_places=2, default=0)
     currency = models.CharField(max_length=4)
     stripe_monthly_plan_id = models.CharField(max_length=255, blank=True)
