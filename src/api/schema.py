@@ -86,7 +86,6 @@ class CreateGuardian(graphene.Mutation):
                 if email is not None:
                     user.email = email
                 user.save()
-
                 guardian = Guardian(
                     user=user,
                     first_name=first_name,

@@ -35,12 +35,10 @@ def create_user_profile(sender, instance, created, **kwargs):
         if instance.is_staff:
             role = "manager"
 
-            profile.objects.create(user=instance, role=role)
-
+        profile.objects.create(user=instance, role=role)
 
 @receiver(post_save, sender=Guardian)
 def create_guardian_profile(sender, instance, created, **kwargs):
-    print("created guardian")
     if created:
         student_profile = profile.objects.get(user=instance.user)
         student_profile.role = "guardian"
@@ -76,6 +74,7 @@ def create_student_profile(sender, instance, created, **kwargs):
         student_profile.save()
 
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+# @receiver(post_save, sender=User)
+# def save_user_profile(sender, instance, **kwargs):
+#     instance.profile.save()
+
