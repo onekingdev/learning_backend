@@ -42,7 +42,8 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
     coupon_code = models.ForeignKey(
         DiscountCode,
         on_delete=models.CASCADE,
-        null=True
+        null=True,
+        blank=True,
     )
     
     # student = models.ManyToManyField('students.Student', blank=True)
