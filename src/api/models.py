@@ -59,11 +59,11 @@ def create_administrative_personnel_profile(sender, instance, created, **kwargs)
         administrative_personnel_profile.save()
 
 @receiver(post_save, sender=Subscriber)
-def create_principal_profile(sender, instance, created, **kwargs):
+def create_subscriber_profile(sender, instance, created, **kwargs):
     if created:
-        principal_profile = profile.objects.get(user=instance.user)
-        principal_profile.role = "subscriber"
-        principal_profile.save()
+        subscriber_profile = profile.objects.get(user=instance.user)
+        subscriber_profile.role = "subscriber"
+        subscriber_profile.save()
 
 
 @receiver(post_save, sender=Student)

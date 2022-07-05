@@ -10,7 +10,6 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel):
     name = models.CharField(max_length=128, null=True)
     teacher = models.ForeignKey(
         'organization.Teacher', on_delete=models.PROTECT, null=True, blank=True)
-    students = models.ManyToManyField('students.Student', null=True, blank=True)
 
     def __str__(self):
         return self.name

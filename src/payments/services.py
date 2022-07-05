@@ -4,7 +4,7 @@ from django.utils import timezone
 from app import settings
 from app.utils import add_months
 from guardians.models import Guardian
-from organization.models.schools import Principal, Teacher
+from organization.models.schools import Subscriber, Teacher
 from payments.card import Card
 from payments.models import Order, OrderDetail, PaypalTransaction, PaymentMethod, CardTransaction, DiscountCode
 from payments.paypal import Paypal
@@ -41,7 +41,7 @@ def check_is_duplicate(
         method: str,
         guardian_id = None,
         teacher_id = None,
-        principal_id = None,
+        subscriber_id = None,
         card_number=None,
         card_cvc=None,
         card_first_name=None,
@@ -78,8 +78,8 @@ def check_is_duplicate(
         payment_methods.filter(guardian_id = guardian_id)
     elif teacher_id is not None:
         payment_methods.filter(teacher_id = teacher_id)
-    elif principal_id is not None:
-        payment_methods.filter(principal_id = principal_id)
+    elif subscriber_id is not None:
+        payment_methods.filter(subscriber_id = subscriber_id)
 
     has_info = False
     obj_id = 0
@@ -98,7 +98,7 @@ def add_or_update_payment_method(
     method: str,
     guardian_id = None,
     teacher_id = None,
-    principal_id = None,
+    subscriber_id = None,
     card_first_name=None,
     card_last_name=None,
     card_number=None,
@@ -123,15 +123,15 @@ def add_or_update_payment_method(
         payment_methods = PaymentMethod.objects.filter(guardian_id=guardian_id)
     elif teacher_id is not None :
         payment_methods = PaymentMethod.objects.filter(teacher_id=teacher_id)
-    elif principal_id is not None:
-        payment_methods = PaymentMethod.objects.filter(principal_id=principal_id)
+    elif subscriber_id is not None:
+        payment_methods = PaymentMethod.objects.filter(subscriber_id=subscriber_id)
 
     is_default = False
     has_info = check_is_duplicate(
         method=method,
         guardian_id=guardian_id,
         teacher_id = teacher_id,
-        principal_id = principal_id,
+        subscriber_id = subscriber_id,
         card_number=card_number,
         card_cvc=card_cvc,
         card_exp_month=card_exp_month,
@@ -155,7 +155,7 @@ def add_or_update_payment_method(
     PaymentMethod.objects.create(
         guardian_id=guardian_id,
         teacher_id = teacher_id,
-        principal_id = principal_id,
+        subscriber_id = subscriber_id,
         method=method,
         card_first_name=card_first_name,
         card_last_name=card_last_name,
@@ -179,7 +179,7 @@ def change_default_payment_method(
         method: str,
         guardian_id = None,
         teacher_id = None,
-        principal_id = None,
+        subscriber_id = None,
         card_first_name=None,
         card_last_name=None,
         card_number=None,
@@ -199,7 +199,7 @@ def change_default_payment_method(
         method=method,
         guardian_id=guardian_id,
         teacher_id = teacher_id,
-        principal_id = principal_id,
+        subscriber_id = subscriber_id,
         card_first_name=card_first_name,
         card_last_name=card_last_name,
         card_number=card_number,
@@ -228,7 +228,7 @@ def change_default_payment_method(
     PaymentMethod.objects.create(
         guardian_id=guardian_id,
         teacher_id = teacher_id,
-        principal_id = principal_id,
+        subscriber_id = subscriber_id,
         method=method,
         card_first_name=card_first_name,
         card_last_name=card_last_name,
@@ -286,18 +286,18 @@ def edit_payment_method(
 def change_order_detail_payment_method(
         guardian_id=None,
         teacher_id = None,
-        principal_id = None,
+        subscriber_id = None,
     ) -> User:
     user = None
     if guardian_id is not None:
         user = Guardian.objects.get(pk = guardian_id).user
     elif teacher_id is not None:
         user = Teacher.objects.get(pk = teacher_id).user
-    elif principal_id is not None:
-        user = Principal.objects.get(pk = principal_id).user
+    elif subscriber_id is not None:
+        user = Principal.objects.get(pk = subscriber_id).user
 
-    payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, teacher_id = teacher_id, principal_id = principal_id, is_default=True)
-    order_details = OrderDetail.objects.filter(order__guardian_id=guardian_id, order__teacher_id=teacher_id, order__principal_id=principal_id, is_cancel=False)
+    payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, teacher_id = teacher_id, subscriber_id = subscriber_id, is_default=True)
+    order_details = OrderDetail.objects.filter(order__guardian_id=guardian_id, order__teacher_id=teacher_id, order__subscriber_id=subscriber_id, is_cancel=False)
     for order_detail in order_details:
         if order_detail.order.payment_method == "CARD":
             card = Card()
@@ -382,7 +382,7 @@ def create_order(
                  return_url,
                  guardian_id=None,
                  teacher_id=None,
-                 principal_id=None,
+                 subscriber_id=None,
                  card_first_name=None,
                  card_last_name=None,
                  card_number=None,
@@ -400,7 +400,7 @@ def create_order(
                  ) -> CreateOrderResp:
     guardian = None
     teacher = None
-    principal = None
+    subscriber = None
     person = None
     if guardian_id is not None:
         guardian = Guardian.objects.get(pk = guardian_id)
@@ -408,9 +408,9 @@ def create_order(
     elif teacher_id is not None:
         teacher = Teacher.objects.get(pk = teacher_id)
         person = teacher
-    elif principal_id is not None:
-        principal = Principal.objects.get(pk = principal_id)
-        person = principal
+    elif subscriber_id is not None:
+        subscriber = Principal.objects.get(pk = subscriber_id)
+        person = subscriber
     user = person.user
 
     payment_method = payment_method.upper()
@@ -432,8 +432,8 @@ def create_order(
         order.guardian = guardian
     elif teacher_id is not None:
         order.teacher = teacher
-    elif principal_id is not None:
-        order.principal = principal
+    elif subscriber_id is not None:
+        order.subscriber = subscriber
     order.save()
     #---------------------- create order -E-------------------------#
 
@@ -658,19 +658,19 @@ def confirm_order_payment(
                 raise Exception(f"unpaid for card in sub_id: {order_detail.subscription_id}")
             
             guardian_id = None
-            principal_id = None
+            subscriber_id = None
             teacher_id = None
             if order_detail.order.guardian:
                 guardian_id = order_detail.order.guardian.id,
-            if order_detail.order.principal:
-                principal_id = order_detail.order.principal.id,
+            if order_detail.order.subscriber:
+                subscriber_id = order_detail.order.subscriber.id,
             if order_detail.order.teacher:
                 teacher_id = order_detail.order.teacher.id,
 
             result = add_or_update_payment_method(
                 method="CARD",
                 guardian_id=guardian_id,
-                principal_id=principal_id,
+                subscriber_id=subscriber_id,
                 teacher_id=teacher_id,
                 card_first_name=card_tx.card_first_name,
                 card_last_name=card_tx.card_last_name,
@@ -702,12 +702,12 @@ def confirm_order_payment(
         order_details = OrderDetail.objects.filter(order_id=order_id)
         for order_detail in order_details:
             guardian_id = None
-            principal_id = None
+            subscriber_id = None
             teacher_id = None
             if order_detail.order.guardian:
                 guardian_id = order_detail.order.guardian.id,
-            if order_detail.order.principal:
-                principal_id = order_detail.order.principal.id,
+            if order_detail.order.subscriber:
+                subscriber_id = order_detail.order.subscriber.id,
             if order_detail.order.teacher:
                 teacher_id = order_detail.order.teacher.id,
             order_detail.status = "active"
@@ -715,7 +715,7 @@ def confirm_order_payment(
             add_or_update_payment_method(
                 method="FREE",
                 guardian_id=guardian_id,
-                principal_id=principal_id,
+                subscriber_id=subscriber_id,
                 teacher_id=teacher_id,
                 card_first_name=first_name,
                 card_last_name=last_name,
@@ -753,11 +753,11 @@ def confirm_order_payment(
         teacher.coupon_code = None
         teacher.has_order = True
         teacher.save()
-    elif order.principal:
-        principal = Principal.objects.get(pk=order.principal.id)
-        principal.coupon_code = None
-        principal.has_order = True
-        principal.save()
+    elif order.subscriber:
+        subscriber = Principal.objects.get(pk=order.subscriber.id)
+        subscriber.coupon_code = None
+        subscriber.has_order = True
+        subscriber.save()
     return order
 
 
@@ -788,7 +788,7 @@ def check_order_detail(order_detail_id) -> OrderDetail:
 def create_order_with_out_pay(
         order_detail_list,
         guardian_id = None,
-        principal_id = None,
+        subscriber_id = None,
         teacher_id = None,
 ) -> CreateOrderResp:
 
@@ -800,14 +800,14 @@ def create_order_with_out_pay(
     person = None
     if guardian_id is not None:
         person = Guardian.objects.get(pk=guardian_id)
-    elif principal_id is not None:
-        person = Principal.objects.get(pk=principal_id)
+    elif subscriber_id is not None:
+        person = Principal.objects.get(pk=subscriber_id)
     elif teacher_id is not None:
-        person = Teacher.objects.get(pk=principal_id)
+        person = Teacher.objects.get(pk=subscriber_id)
     order = Order.objects.create(
         discount_code='',
         guardian_id=guardian_id,
-        principal_id = principal_id,
+        subscriber_id = subscriber_id,
         teacher_id = teacher_id,
         payment_method="FREE"
     )

@@ -20,60 +20,56 @@ class OrganizationPersonnelAdmin(admin.ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'internal_code', 'population', 'slug',
-                    'grade', 'school_personnel')
-    search_fields = ('id', 'name', 'internal_code', 'school_personnel__user__username',
-                     'school_personnel__user__first_name', 'school_personnel__user__last_name')
-    list_filter = ('area_of_knowledges', 'grade', 'slug', 'population',
+    list_display = ('id', 'name',)
+    search_fields = ('id', 'name',
+                     )
+    list_filter = (
                    'is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'slug', 'internal_code', 'type_of', 'organization')
-    search_fields = ('id', 'name', 'internal_code', 'organization__name')
-    list_filter = ('student_plan', 'type_of', 'slug', 'is_active', 'create_timestamp', 'update_timestamp')
+    list_display = ('id', 'name', 'slug', 'internal_code', 'type_of',)
+    search_fields = ('id', 'name', 'internal_code',)
+    list_filter = ('type_of', 'slug', 'is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(SchoolPersonnel)
 class SchoolPersonnelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'school', 'coupon_code', 'name', 'last_name',
-                    'gender', 'date_of_birth', 'identification_number',
-                    'position', 'zip', 'country', 'district')
-    search_fields = ('id', 'user__username', 'school__name', 'name', 'last_name',
-                     'identification_number', 'position', 'zip', 'country', 'district',)
-    list_filter = ('school', 'position', 'identification_number', 'gender', 'district', 'country', 'zip')
+    list_display = ('id', 'user', 'school', 'last_name',
+                    'gender')
+    search_fields = ('id', 'user__username', 'last_name',
+                     )
+    list_filter = ('school', 'gender')
 
 
 @admin.register(AdministrativePersonnel)
 class AdministrativePersonnelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'school', 'coupon_code', 'name', 'last_name',
-                    'gender', 'date_of_birth', 'identification_number',
-                    'position', 'zip', 'country', 'district')
-    search_fields = ('id', 'user__username', 'school__name', 'name', 'last_name', 'identification_number',
-                     'position', 'zip', 'country', 'district')
-    list_filter = ('identification_number', 'position', 'gender', 'school__name', 'zip', 'country', 'district',
-                   'is_active', 'create_timestamp', 'update_timestamp')
+    list_display = ('id', 'user', 'school', 'last_name',
+                    'gender')
+    search_fields = ('id', 'user__username', 'school__name', 'last_name',
+                    )
+    list_filter = ('gender', 'school__name', 'is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'school', 'school_name', 'coupon_code', 'name', 'last_name',
-                    'gender', 'date_of_birth', 'identification_number',
-                    'position', 'zip', 'country', 'district')
-    search_fields = ('id', 'user__username', 'school__name', 'school_name', 'name', 'last_name',
-                     'identification_number', 'position', 'zip', 'country', 'district')
-    list_filter = ('school', 'position', 'identification_number', 'gender', 'district', 'country', 'zip',
+    list_display = ('id', 'user', 'school', 'last_name',
+                    'gender', 
+                    )
+    search_fields = ('id', 'user__username', 'name', 'last_name',
+                     'position', )
+    list_filter = ('school', 'gender', 
                    'is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(Classroom)
 class ClassroomAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'language', 'audience', 'school', 'teacher', 'enable_games', 'game_cost', 'time_zone',
+    list_display = ('id', 'name', 'language', 'audience', 'enable_games', 'game_cost', 'time_zone',
                     'monday_start', 'monday_end', 'tuesday_start', 'tuesday_end', 'wednesday_start', 'wednesday_end',
                     'thursday_start', 'thursday_end', 'friday_start', 'friday_end', 'saturday_start', 'saturday_end',
                     'sunday_start', 'sunday_end')
     search_fields = ('id', 'name', 'audience__translations__name',
                      'school__name', 'teacher__name', 'teacher__last_name')
-    list_filter = ('grade', 'language', 'audience', 'school', 'game_cost',
+    list_filter = ('grade', 'language', 'audience', 'game_cost',
                    'time_zone', 'is_active', 'create_timestamp', 'update_timestamp')

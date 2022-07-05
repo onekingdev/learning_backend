@@ -13,7 +13,7 @@ class Order(TimestampModel, RandomSlugModel, IsActiveModel):
 
     guardian = models.ForeignKey('guardians.Guardian', on_delete=models.CASCADE, null=True)
     teacher = models.ForeignKey('organization.Teacher', on_delete=models.CASCADE, null=True)
-    principal = models.ForeignKey('organization.Principal', on_delete=models.CASCADE, null=True)
+    subscriber = models.ForeignKey('organization.Subscriber', on_delete=models.CASCADE, null=True)
     sub_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     discount_code = models.CharField(max_length=255, blank=True)
     discount = models.DecimalField(max_digits=15, decimal_places=2, default=0)
@@ -118,7 +118,7 @@ class PaymentMethod(TimestampModel, RandomSlugModel, IsActiveModel):
 
     guardian = models.ForeignKey('guardians.Guardian', on_delete=models.CASCADE, null=True)
     teacher = models.ForeignKey('organization.Teacher', on_delete=models.CASCADE, null=True)
-    principal = models.ForeignKey('organization.Principal', on_delete=models.CASCADE, null=True)
+    subscriber = models.ForeignKey('organization.Subscriber', on_delete=models.CASCADE, null=True)
     method = models.CharField(max_length=255, choices=PAYMENT_METHOD, default="CARD")
     card_first_name = models.CharField(max_length=255, blank=True, null=True)
     card_last_name = models.CharField(max_length=255, blank=True, null=True)
