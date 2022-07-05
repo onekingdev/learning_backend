@@ -176,13 +176,13 @@ class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
         on_delete=models.CASCADE,
     )
 
-class SchoolClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
-    PREFIX = 'school_classroom_'
+class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'school_teacher_'
     school = models.OneToOneField(
         School,
         on_delete=models.CASCADE,
     )
-    classroom = models.ForeignKey(
+    teacher = models.ForeignKey(
         Classroom,
         on_delete=models.CASCADE,
     )
