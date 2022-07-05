@@ -29,9 +29,9 @@ class GroupAdmin(admin.ModelAdmin):
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'slug', 'internal_code', 'type_of',)
-    search_fields = ('id', 'name', 'internal_code',)
-    list_filter = ('type_of', 'slug', 'is_active', 'create_timestamp', 'update_timestamp')
+    list_display = ('id', 'name', 'type_of',)
+    search_fields = ('id', 'name',)
+    list_filter = ('type_of', 'is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(SchoolPersonnel)
