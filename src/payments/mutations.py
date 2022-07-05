@@ -223,7 +223,8 @@ class ChangePaymentMethod(graphene.Mutation):
                     phone=phone
                 )
 
-                guardian = services.change_order_detail_payment_method(guardian_id=guardian_id)
+                user = services.change_order_detail_payment_method(guardian_id=guardian_id)
+                guardian = user.guardian
                 PaymentHistory.objects.create(
                     type = "backend_anction_change_default_payment_method",
                     user = guardian.user,
@@ -310,7 +311,8 @@ class EditPaymentMethod(graphene.Mutation):
                     phone=phone
                 )
 
-                guardian = services.change_order_detail_payment_method(guardian_id=guardian_id)
+                user = services.change_order_detail_payment_method(guardian_id=guardian_id)
+                guardian = user.guardian
                 PaymentHistory.objects.create(
                     type = "backend_anction_edit_payment_method",
                     user = guardian.user,

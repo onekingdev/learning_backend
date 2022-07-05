@@ -70,11 +70,12 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
         null=True
     )
     school_name = models.CharField(max_length=128, null=True)
-    discountCode = models.ForeignKey(
+    coupon_code = models.ForeignKey(
         DiscountCode,
         on_delete=models.CASCADE,
         null=True
     )
+    has_order = models.BooleanField(default=False)
 
     name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)
@@ -127,3 +128,12 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     sunday_start = models.TimeField(null=True, editable=True)
     sunday_end = models.TimeField(null=True, editable=True)
 
+class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.CASCADE,
+    )
+    classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.CASCADE,
+    )

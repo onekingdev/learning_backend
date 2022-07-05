@@ -11,7 +11,9 @@ PAYMENT_METHOD = (("CARD", "CARD"), ("PAYPAL", "PAYPAL"), ("APPLEPAY", "APPLEPAY
 class Order(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'order_'
 
-    guardian = models.ForeignKey('guardians.Guardian', on_delete=models.CASCADE)
+    guardian = models.ForeignKey('guardians.Guardian', on_delete=models.CASCADE, null=True)
+    teacher = models.ForeignKey('organization.Teacher', on_delete=models.CASCADE, null=True)
+    principal = models.ForeignKey('organization.Principal', on_delete=models.CASCADE, null=True)
     sub_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     discount_code = models.CharField(max_length=255, blank=True)
     discount = models.DecimalField(max_digits=15, decimal_places=2, default=0)
@@ -114,7 +116,9 @@ class PaymentMethodManager(ActiveManager):
 class PaymentMethod(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'payment_method_'
 
-    guardian = models.ForeignKey('guardians.Guardian', on_delete=models.CASCADE)
+    guardian = models.ForeignKey('guardians.Guardian', on_delete=models.CASCADE, null=True)
+    teacher = models.ForeignKey('organization.Teacher', on_delete=models.CASCADE, null=True)
+    principal = models.ForeignKey('organization.Principal', on_delete=models.CASCADE, null=True)
     method = models.CharField(max_length=255, choices=PAYMENT_METHOD, default="CARD")
     card_first_name = models.CharField(max_length=255, blank=True, null=True)
     card_last_name = models.CharField(max_length=255, blank=True, null=True)

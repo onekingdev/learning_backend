@@ -37,7 +37,7 @@ class SchoolAdmin(admin.ModelAdmin):
 
 @admin.register(SchoolPersonnel)
 class SchoolPersonnelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'school', 'discountCode', 'name', 'last_name',
+    list_display = ('id', 'user', 'school', 'coupon_code', 'name', 'last_name',
                     'gender', 'date_of_birth', 'identification_number',
                     'position', 'zip', 'country', 'district')
     search_fields = ('id', 'user__username', 'school__name', 'name', 'last_name',
@@ -47,7 +47,7 @@ class SchoolPersonnelAdmin(admin.ModelAdmin):
 
 @admin.register(AdministrativePersonnel)
 class AdministrativePersonnelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'school', 'discountCode', 'name', 'last_name',
+    list_display = ('id', 'user', 'school', 'coupon_code', 'name', 'last_name',
                     'gender', 'date_of_birth', 'identification_number',
                     'position', 'zip', 'country', 'district')
     search_fields = ('id', 'user__username', 'school__name', 'name', 'last_name', 'identification_number',
@@ -58,7 +58,7 @@ class AdministrativePersonnelAdmin(admin.ModelAdmin):
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'school', 'school_name', 'discountCode', 'name', 'last_name',
+    list_display = ('id', 'user', 'school', 'school_name', 'coupon_code', 'name', 'last_name',
                     'gender', 'date_of_birth', 'identification_number',
                     'position', 'zip', 'country', 'district')
     search_fields = ('id', 'user__username', 'school__name', 'school_name', 'name', 'last_name',
