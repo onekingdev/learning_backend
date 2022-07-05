@@ -30,8 +30,8 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
     )
 
     name = models.CharField(max_length=128, null=True)
-    slug = models.SlugField(editable=False)
-    internal_code = models.CharField(max_length=128, null=True)
+    # slug = models.SlugField(editable=False)
+    # internal_code = models.CharField(max_length=128, null=True)
     type_of = models.CharField(max_length=15, null=True,  choices=SCHOOL_CHOICES)
 
     # student_plan = models.ManyToManyField('plans.StudentPlan')
