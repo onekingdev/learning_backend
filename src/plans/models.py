@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
+from organization.models.schools import Classroom, Teacher, TeacherClassroom
 
 
 class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
@@ -37,7 +38,7 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
 
 
 class GuardianStudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
-    PREFIX = 'guardian_plan_'
+    PREFIX = 'guardian_student_plan_'
 
     guardian = models.ForeignKey(
         'guardians.Guardian', on_delete=models.PROTECT)
@@ -91,4 +92,35 @@ class StudentPlan(TimestampModel, RandomSlugModel, IsActiveModel):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
+
+class TeacherClassroomPlan(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'teacher_classroom_plan_'
+    teacher = models.OneToOneField(
+        Teacher, on_delete=models.PROTECT, blank=True, null=True)
+    classroom = models.OneToOneField(
+        Classroom, on_delete=models.PROTECT, blank=True, null=True)
+    order_detail = models.ForeignKey(
+        'payments.OrderDetail', on_delete=models.CASCADE)
+    slug = models.SlugField(editable=False)
+    plan = models.ForeignKey('Plan', on_delete=models.PROTECT, blank=True)
+    cancel_reason = models.TextField(blank=True)
+    is_cancel = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
+    expired_at = models.DateTimeField(null=True)
+    period = models.CharField(
+        max_length=100,
+        choices=(("MONTHLY", "Monthly"), ("YEARLY", "Yearly")),
+        default="MONTHLY"
+    )
+    price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+
+    def __str__(self):
+        return str(self.id)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.id)
         return super().save(*args, **kwargs)

@@ -5,7 +5,8 @@ import graphene
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from graphene import ID
-from organization.models.schools import SchoolPersonnel
+from organization.models.schools import SchoolPersonnel, TeacherClassroom
+from plans.models import TeacherClassroomPlan
 from users.schema import UserSchema, UserProfileSchema
 from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolPersonnelSchema, SchoolSchema, TeacherSchema, GroupSchema
 from organization.models import School, Group, Teacher, Classroom, AdministrativePersonnel
@@ -135,15 +136,28 @@ class CreateClassroom(graphene.Mutation):
                     teacher = Teacher.objects.get(pk=teacher_id)
                 else:
                     teacher = user.schoolpersonnel.teacher;
-                user.save()
+                
                 classroom = Classroom(
                     name=name,
                     grade=grade,
                     language=language,
                     audience=audience,
                 )
-                classroom.teacher = teacher
+                # classroom.teacher = teacher
                 classroom.save()
+                
+                teacher_classroom = TeacherClassroom(teacher = teacher, classroom = classroom)
+                teacher_classroom.save()
+
+                #----------------- When create by teacher, add teacher_classroom to teacher_classroom_plan -S-----------------------#
+                if teacher_id is None:
+                    available_teacher_classroom_plans = TeacherClassroomPlan.objects.filter(teacher = teacher, classroom = None)
+                    if(len(available_teacher_classroom_plans) > 0):
+                        available_teacher_classroom_plan = available_teacher_classroom_plans[0]
+                        available_teacher_classroom_plan.classroom = classroom
+                        available_teacher_classroom_plan.save()
+                #----------------- When create by teacher, add teacher_classroom to teacher_classroom_plan -E-----------------------#
+
                 return CreateClassroom(
                     user = user,
                     classroom = classroom,
@@ -399,8 +413,13 @@ class ImportStudentToClassroom(graphene.Mutation):
                 if (pwdChkResult == False) :
                     raise Exception('Password of Student is wrong')
                 classroom = Classroom.objects.get(pk=classroom_id)
-                student.classroom = classroom;
+                student.classroom = classroom
+                student.audience = classroom.audience
                 student.save()
+                studentGrade = StudentGrade.objects.get_or_create(
+                    student = student,
+                    grade = classroom.grade 
+                )
                 return ImportStudentToClassroom(
                     classroom = classroom
                 )
@@ -455,11 +474,10 @@ class CreateStudentToClassroom(graphene.Mutation):
                     audience = classroom.audience,
                 )
                 student.save()
-                studentGrade = StudentGrade(
+                studentGrade = StudentGrade.objects.get_or_create(
                     student = student,
                     grade = classroom.grade 
                 )
-                studentGrade.save()
                 return CreateStudentToClassroom(
                     classroom = classroom,
                     student = student

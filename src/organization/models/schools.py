@@ -92,12 +92,15 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
         return self.name+' '+self.last_name
 
 class AdministrativePersonnel(SchoolPersonnel):
+    PREFIX = 'administrative_personnel_'
     pass
 
 class Teacher(SchoolPersonnel):
+    PREFIX = 'teacher_personnel_'
     pass
 
 class Principal(SchoolPersonnel):
+    PREFIX = 'principal_personnel_'
     pass
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
@@ -109,7 +112,7 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     audience = models.ForeignKey(
         'audiences.Audience', on_delete=models.PROTECT)
     school = models.ForeignKey(School, null=True, on_delete=models.PROTECT)
-    teacher = models.ForeignKey(Teacher, null=True, on_delete=models.PROTECT)
+    # teacher = models.ForeignKey(Teacher, null=True, on_delete=models.PROTECT)
     enable_games = models.BooleanField(default=True)
     game_cost = models.IntegerField(blank=True, null=True)
     time_zone = models.CharField(max_length=128, null=True)
@@ -129,6 +132,7 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     sunday_end = models.TimeField(null=True, editable=True)
 
 class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'teacher_classroom_'
     teacher = models.ForeignKey(
         Teacher,
         on_delete=models.CASCADE,
