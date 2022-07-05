@@ -8,16 +8,10 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'group_'
 
     name = models.CharField(max_length=128, null=True)
-    internal_code = models.CharField(max_length=128, null=True)
-    population = models.IntegerField(blank=True, null=True)
-    slug = models.SlugField(editable=False)
+    teacher = models.ForeignKey(
+        'organization.Teacher', on_delete=models.PROTECT, null=True, blank=True)
+    students = models.ManyToManyField('students.Student', null=True, blank=True)
 
-    grade = models.ForeignKey(
-        'kb.Grade', on_delete=models.PROTECT, null=True, blank=True)
-    area_of_knowledges = models.ManyToManyField(
-        'kb.AreaOfKnowledge', blank=True)
-    school_personnel = models.ForeignKey(
-        'organization.SchoolPersonnel', on_delete=models.PROTECT, null=True, blank=True)
     def __str__(self):
         return self.name
 
@@ -27,15 +21,31 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class School(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'school_'
+    SCHOOL_PUBLIC = 'PUBLIC'
+    SCHOOL_PRIVATE = 'PRIVATE'
+    SCHOOL_CHARTER = 'CHARTER'
+    SCHOOL_CHOICES = (
+        (SCHOOL_PUBLIC, 'Public'),
+        (SCHOOL_PRIVATE, 'Private'),
+        (SCHOOL_CHARTER, 'Charter'),
+    )
 
     name = models.CharField(max_length=128, null=True)
     slug = models.SlugField(editable=False)
     internal_code = models.CharField(max_length=128, null=True)
-    type_of = models.CharField(max_length=100, null=True)
+    type_of = models.CharField(max_length=15, null=True,  choices=SCHOOL_CHOICES)
 
-    student_plan = models.ManyToManyField('plans.StudentPlan')
-    organization = models.ForeignKey(
-        'organization.Organization', on_delete=models.PROTECT, null=True)
+    # student_plan = models.ManyToManyField('plans.StudentPlan')
+    # organization = models.ForeignKey(
+    #     'organization.Organization', on_delete=models.PROTECT, null=True)
+    zip = models.CharField(max_length=128, null=True)
+    country = models.CharField(max_length=128, null=True)
+    coupon_code = models.ForeignKey(
+        DiscountCode,
+        on_delete=models.CASCADE,
+        null=True
+    )
+    
     # student = models.ManyToManyField('students.Student', blank=True)
     # group = models.ManyToManyField('organization.Group', blank=True)
 
@@ -47,6 +57,49 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
         return super().save(*args, **kwargs)
 
 class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'school_personnel_'
+    GENDER_MALE = 'MALE'
+    GENDER_FEMALE = 'FEMALE'
+    GENDER_OTHER = 'OTHER'
+    GENDER_CHOICES = (
+        (GENDER_MALE, 'Male'),
+        (GENDER_FEMALE, 'Female'),
+        (GENDER_OTHER, 'Other'),
+    )
+
+
+    user = models.OneToOneField(
+        'users.User',
+        on_delete=models.PROTECT,
+        null=True
+    )
+    school = models.ForeignKey(
+        'organization.School',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True
+    )
+
+    has_order = models.BooleanField(default=False)
+
+    first_name = models.CharField(max_length=128, null=True)
+    last_name = models.CharField(max_length=128, null=True)
+    gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
+    has_order = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.first_name+' '+self.last_name
+
+class AdministrativePersonnel(SchoolPersonnel):
+    PREFIX = 'administrative_personnel_'
+    pass
+
+class Teacher(SchoolPersonnel):
+    PREFIX = 'teacher_personnel_'
+    pass
+
+class Subscriber(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'subscriber_'
     GENDER_MALE = 'MALE'
     GENDER_FEMALE = 'FEMALE'
     GENDER_OTHER = 'OTHER'
@@ -63,45 +116,26 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
         on_delete=models.PROTECT,
         null=True
     )
-    school = models.ForeignKey(
-        'organization.School',
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True
-    )
-    school_name = models.CharField(max_length=128, null=True)
-    coupon_code = models.ForeignKey(
-        DiscountCode,
+
+    has_order = models.BooleanField(default=False)
+
+    first_name = models.CharField(max_length=128, null=True)
+    last_name = models.CharField(max_length=128, null=True)
+    gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
+    has_order = models.BooleanField(default=False)
+
+class SubscriberSchool(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'subscriber_school_'
+
+    subscriber = models.ForeignKey(
+        Subscriber,
         on_delete=models.CASCADE,
         null=True
     )
-    has_order = models.BooleanField(default=False)
-
-    name = models.CharField(max_length=128, null=True)
-    last_name = models.CharField(max_length=128, null=True)
-    gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
-    date_of_birth = models.DateField(null=True)
-    identification_number = models.CharField(max_length=128, null=True)
-    position = models.CharField(max_length=128, null=True)
-    zip = models.CharField(max_length=128, null=True)
-    country = models.CharField(max_length=128, null=True)
-    district = models.CharField(max_length=128, null=True)
-    has_order = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name+' '+self.last_name
-
-class AdministrativePersonnel(SchoolPersonnel):
-    PREFIX = 'administrative_personnel_'
-    pass
-
-class Teacher(SchoolPersonnel):
-    PREFIX = 'teacher_personnel_'
-    pass
-
-class Principal(SchoolPersonnel):
-    PREFIX = 'principal_personnel_'
-    pass
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+    )
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'classroom_'
@@ -111,7 +145,7 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     language = models.CharField(max_length=128, null=True)
     audience = models.ForeignKey(
         'audiences.Audience', on_delete=models.PROTECT)
-    school = models.ForeignKey(School, null=True, on_delete=models.PROTECT)
+    # school = models.ForeignKey(School, null=True, on_delete=models.PROTECT)
     # teacher = models.ForeignKey(Teacher, null=True, on_delete=models.PROTECT)
     enable_games = models.BooleanField(default=True)
     game_cost = models.IntegerField(blank=True, null=True)
@@ -135,6 +169,17 @@ class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'teacher_classroom_'
     teacher = models.ForeignKey(
         Teacher,
+        on_delete=models.CASCADE,
+    )
+    classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.CASCADE,
+    )
+
+class SchoolClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'school_classroom_'
+    school = models.OneToOneField(
+        School,
         on_delete=models.CASCADE,
     )
     classroom = models.ForeignKey(

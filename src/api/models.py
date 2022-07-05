@@ -1,5 +1,5 @@
 from django.db import models
-from organization.models.schools import AdministrativePersonnel, Principal, Teacher
+from organization.models.schools import AdministrativePersonnel, Subscriber, Teacher
 from users.models import User
 from students.models import Student
 from guardians.models import Guardian
@@ -12,7 +12,7 @@ active_roles = (
     ("manager", "manager"),
     ("guardian", "guardian"),
     ("student", "student"),
-    ("principal", "principal"),
+    ("subscriber", "subscriber"),
     ("teacher", "teacher"),
     ("adminTeacher", "adminTeacher"),
 )
@@ -58,11 +58,11 @@ def create_administrative_personnel_profile(sender, instance, created, **kwargs)
         administrative_personnel_profile.role = "adminTeacher"
         administrative_personnel_profile.save()
 
-@receiver(post_save, sender=Principal)
+@receiver(post_save, sender=Subscriber)
 def create_principal_profile(sender, instance, created, **kwargs):
     if created:
         principal_profile = profile.objects.get(user=instance.user)
-        principal_profile.role = "principal"
+        principal_profile.role = "subscriber"
         principal_profile.save()
 
 
