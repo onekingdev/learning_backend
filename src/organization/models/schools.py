@@ -124,20 +124,16 @@ class Subscriber(TimestampModel, RandomSlugModel, IsActiveModel):
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     has_order = models.BooleanField(default=False)
 
-class SubscriberSchool(TimestampModel, RandomSlugModel, IsActiveModel):
+class SchoolSubscriber(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'subscriber_school_'
 
     subscriber = models.OneToOneField(
         Subscriber,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
     )
     school = models.ForeignKey(
         School,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
     )
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
@@ -210,8 +206,6 @@ class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
     teacher = models.ForeignKey(
         Classroom,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True
     )
     plan = models.ForeignKey(
         'plans.Plan',
