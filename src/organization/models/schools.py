@@ -139,7 +139,6 @@ class SubscriberSchool(TimestampModel, RandomSlugModel, IsActiveModel):
         null=True,
         blank=True,
     )
-    
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'classroom_'
@@ -171,7 +170,7 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'teacher_classroom_'
-    teacher = models.ForeignKey(
+    teacher = models.OneToOneField(
         Teacher,
         on_delete=models.CASCADE,
     )
@@ -179,6 +178,28 @@ class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
         Classroom,
         on_delete=models.CASCADE,
     )
+    plan = models.ForeignKey(
+        'plans.Plan',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    order_detail = models.ForeignKey(
+        'payments.OrderDetail',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    cancel_reason = models.TextField(blank=True)
+    is_cancel = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
+    expired_at = models.DateTimeField(null=True)
+    period = models.CharField(
+        max_length=100,
+        choices=(("MONTHLY", "Monthly"), ("YEARLY", "Yearly")),
+        default="MONTHLY"
+    )
+    price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
 class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'school_teacher_'
