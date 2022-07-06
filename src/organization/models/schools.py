@@ -183,7 +183,7 @@ class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
     cancel_reason = models.TextField(blank=True)
     is_cancel = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
-    expired_at = models.DateTimeField(null=True)
+    expired_at = models.DateTimeField(null=True, blank=True)
     period = models.CharField(
         max_length=100,
         choices=(("MONTHLY", "Monthly"), ("YEARLY", "Yearly")),
@@ -216,7 +216,7 @@ class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
     cancel_reason = models.TextField(blank=True)
     is_cancel = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
-    expired_at = models.DateTimeField(null=True)
+    expired_at = models.DateTimeField(null=True, blank=True)
     period = models.CharField(
         max_length=100,
         choices=(("MONTHLY", "Monthly"), ("YEARLY", "Yearly")),

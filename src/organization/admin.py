@@ -31,6 +31,18 @@ class SchoolTeacherInline(admin.StackedInline):
     model = SchoolTeacher
     extra = 0
 
+class AssignSchoolToTeacherInline(admin.StackedInline):
+    model = SchoolTeacher
+    extra = 0
+    verbose_name = "Assign School With Plan"
+    verbose_name_plural = "Assign Schools With Plan"
+
+class AssingClassroomToTeacherInline(admin.StackedInline):
+    model = SchoolTeacher
+    extra = 0
+    verbose_name = "Assign Clasroom With Plan"
+    verbose_name_plural = "Assign Clasrooms With Plan"
+
 class SchoolSubscriberInline(admin.StackedInline):
     model = SchoolSubscriber
     extra = 0
@@ -80,7 +92,8 @@ class TeacherAdmin(admin.ModelAdmin):
     list_filter = ('gender', 
                    'is_active', 'create_timestamp', 'update_timestamp')
     inlines = [
-        SchoolTeacherInline,
+        AssignSchoolToTeacherInline,
+        AssingClassroomToTeacherInline,
     ]
 
 @admin.register(Classroom)
