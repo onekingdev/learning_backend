@@ -187,7 +187,9 @@ class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
     period = models.CharField(
         max_length=100,
         choices=(("MONTHLY", "Monthly"), ("YEARLY", "Yearly")),
-        default="MONTHLY"
+        default="MONTHLY",
+        null=True,
+        blank=True,
     )
     price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
@@ -220,6 +222,8 @@ class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
     period = models.CharField(
         max_length=100,
         choices=(("MONTHLY", "Monthly"), ("YEARLY", "Yearly")),
-        default="MONTHLY"
+        default="MONTHLY",
+        null=True,
+        blank=True,
     )
     price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
