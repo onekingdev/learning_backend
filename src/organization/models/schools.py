@@ -121,11 +121,11 @@ class Subscriber(TimestampModel, RandomSlugModel, IsActiveModel):
 class SchoolSubscriber(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'subscriber_school_'
 
-    subscriber = models.OneToOneField(
+    subscriber = models.ForeignKey(
         Subscriber,
         on_delete=models.CASCADE,
     )
-    school = models.ForeignKey(
+    school = models.OneToOneField(
         School,
         on_delete=models.CASCADE,
     )
@@ -164,7 +164,7 @@ class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
         Teacher,
         on_delete=models.CASCADE,
     )
-    classroom = models.ForeignKey(
+    classroom = models.OneToOneField(
         Classroom,
         on_delete=models.CASCADE,
     )
@@ -195,11 +195,11 @@ class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'school_teacher_'
-    school = models.OneToOneField(
+    school = models.ForeignKey(
         School,
         on_delete=models.CASCADE,
     )
-    teacher = models.ForeignKey(
+    teacher = models.OneToOneField(
         Teacher,
         on_delete=models.CASCADE,
     )
@@ -230,11 +230,11 @@ class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class SchoolAdministrativePersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'school_administrative_personnel_'
-    school = models.OneToOneField(
+    school = models.ForeignKey(
         School,
         on_delete=models.CASCADE,
     )
-    administrativePersonnel = models.ForeignKey(
+    administrativePersonnel = models.OneToOneField(
         AdministrativePersonnel,
         on_delete=models.CASCADE,
     )

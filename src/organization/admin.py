@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models.org import Organization, OrganizationPersonnel
-from .models.schools import Group, School, SchoolPersonnel, AdministrativePersonnel, SchoolTeacher, SchoolSubscriber, Teacher, Classroom
+from .models.schools import Group, School, SchoolAdministrativePersonnel, SchoolPersonnel, AdministrativePersonnel, SchoolTeacher, SchoolSubscriber, Teacher, Classroom
 
 
 @admin.register(Organization)
@@ -47,6 +47,10 @@ class SchoolSubscriberInline(admin.StackedInline):
     model = SchoolSubscriber
     extra = 0
 
+class SchoolAdministrativePersonnelInline(admin.StackedInline):
+    model = SchoolAdministrativePersonnel
+    extra = 0
+
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
@@ -56,6 +60,7 @@ class SchoolAdmin(admin.ModelAdmin):
     inlines = [
         SchoolTeacherInline,
         SchoolSubscriberInline,
+        SchoolAdministrativePersonnelInline,
     ]
 
 @admin.register(SchoolTeacher)
