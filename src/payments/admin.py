@@ -86,6 +86,8 @@ class OrderAdmin(
     list_display = (
             'id',
             'guardian',
+            'teacher',
+            'subscriber',
             'discount_code',
             'total',
             'payment_method',

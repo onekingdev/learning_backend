@@ -293,7 +293,7 @@ def change_order_detail_payment_method(
     elif teacher_id is not None:
         user = Teacher.objects.get(pk = teacher_id).user
     elif subscriber_id is not None:
-        user = Principal.objects.get(pk = subscriber_id).user
+        user = Subscriber.objects.get(pk = subscriber_id).user
 
     payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, teacher_id = teacher_id, subscriber_id = subscriber_id, is_default=True)
     order_details = OrderDetail.objects.filter(order__guardian_id=guardian_id, order__teacher_id=teacher_id, order__subscriber_id=subscriber_id, is_cancel=False)
@@ -408,7 +408,7 @@ def create_order(
         teacher = Teacher.objects.get(pk = teacher_id)
         person = teacher
     elif subscriber_id is not None:
-        subscriber = Principal.objects.get(pk = subscriber_id)
+        subscriber = Subscriber.objects.get(pk = subscriber_id)
         person = subscriber
     user = person.user
 
@@ -690,12 +690,11 @@ def confirm_order_payment(
             order_detail.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
             order_detail.is_paid = True
             order_detail.save()
-            order_detail.order.is_paid = True
             for guardianstudentplan in order_detail.guardianstudentplan_set.all():
                 guardianstudentplan.is_paid = True
                 guardianstudentplan.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
+                guardianstudentplan.period = order_detail.period
                 guardianstudentplan.save()
-
                 
     elif order.payment_method.upper() == "FREE":
         order_details = OrderDetail.objects.filter(order_id=order_id)
@@ -738,7 +737,7 @@ def confirm_order_payment(
 
 
     # change order paid status to true
-    order.is_paid = True
+    order.is_paid = all_paid
     order.save()
 
     # update guardian status order
@@ -753,7 +752,7 @@ def confirm_order_payment(
         teacher.has_order = True
         teacher.save()
     elif order.subscriber:
-        subscriber = Principal.objects.get(pk=order.subscriber.id)
+        subscriber = Subscriber.objects.get(pk=order.subscriber.id)
         subscriber.coupon_code = None
         subscriber.has_order = True
         subscriber.save()
@@ -800,7 +799,7 @@ def create_order_with_out_pay(
     if guardian_id is not None:
         person = Guardian.objects.get(pk=guardian_id)
     elif subscriber_id is not None:
-        person = Principal.objects.get(pk=subscriber_id)
+        person = Subscriber.objects.get(pk=subscriber_id)
     elif teacher_id is not None:
         person = Teacher.objects.get(pk=subscriber_id)
     order = Order.objects.create(

@@ -39,12 +39,7 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
     #     'organization.Organization', on_delete=models.PROTECT, null=True)
     zip = models.CharField(max_length=128, null=True)
     country = models.CharField(max_length=128, null=True)
-    coupon_code = models.ForeignKey(
-        DiscountCode,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
+
     
     # student = models.ManyToManyField('students.Student', blank=True)
     # group = models.ManyToManyField('organization.Group', blank=True)
@@ -86,7 +81,12 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     last_name = models.CharField(max_length=128, null=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     has_order = models.BooleanField(default=False)
-
+    coupon_code = models.ForeignKey(
+        DiscountCode,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     def __str__(self):
         return self.first_name+' '+self.last_name
 
