@@ -58,7 +58,6 @@ def check_is_duplicate(
 ):
     # get all guardian payment method
     payment_methods = PaymentMethod.objects.filter(
-        guardian_id=guardian_id,
         method=method,
         card_number=card_number,
         card_cvc=card_cvc,

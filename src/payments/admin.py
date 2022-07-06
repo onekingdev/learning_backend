@@ -9,6 +9,8 @@ class PaymentMethodAdmin(
     list_display = (
             'id',
             'guardian',
+            'teacher',
+            'subscriber',
             'card',
             'country',
             'phone',
