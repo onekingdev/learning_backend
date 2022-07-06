@@ -68,12 +68,6 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
         on_delete=models.PROTECT,
         null=True
     )
-    school = models.ForeignKey(
-        'organization.School',
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True
-    )
 
     has_order = models.BooleanField(default=False)
 
@@ -204,7 +198,7 @@ class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
         on_delete=models.CASCADE,
     )
     teacher = models.ForeignKey(
-        Classroom,
+        Teacher,
         on_delete=models.CASCADE,
     )
     plan = models.ForeignKey(

@@ -54,32 +54,34 @@ class SchoolTeacherAdmin(admin.ModelAdmin):
 
 @admin.register(SchoolPersonnel)
 class SchoolPersonnelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'school', 'last_name',
+    list_display = ('id', 'user', 'last_name',
                     'gender')
     search_fields = ('id', 'user__username', 'last_name',
                      )
-    list_filter = ('school', 'gender')
+    list_filter = ('gender',)
 
 
 @admin.register(AdministrativePersonnel)
 class AdministrativePersonnelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'school', 'last_name',
+    list_display = ('id', 'user', 'last_name',
                     'gender')
-    search_fields = ('id', 'user__username', 'school__name', 'last_name',
+    search_fields = ('id', 'user__username', 'last_name',
                     )
-    list_filter = ('gender', 'school__name', 'is_active', 'create_timestamp', 'update_timestamp')
+    list_filter = ('gender', 'is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'school', 'last_name',
+    list_display = ('id', 'user', 'last_name',
                     'gender', 
                     )
     search_fields = ('id', 'user__username', 'name', 'last_name',
                      'position', )
-    list_filter = ('school', 'gender', 
+    list_filter = ('gender', 
                    'is_active', 'create_timestamp', 'update_timestamp')
-
+    inlines = [
+        SchoolTeacherInline,
+    ]
 
 @admin.register(Classroom)
 class ClassroomAdmin(admin.ModelAdmin):
