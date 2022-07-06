@@ -22,8 +22,8 @@ class CreateOrder(graphene.Mutation):
 
     class Arguments:
         guardian_id = graphene.ID(required=False)
-        teacher_id = graphene.ID(required=False),
-        subscriber_id = graphene.ID(required=False),
+        teacher_id = graphene.ID(required=False)
+        subscriber_id = graphene.ID(required=False)
         payment_method = graphene.String(required=True)
         order_detail_input = graphene.List(OrderDetailInput)
         return_url = graphene.String(required=True)
