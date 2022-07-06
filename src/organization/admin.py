@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models.org import Organization, OrganizationPersonnel
-from .models.schools import Group, School, SchoolPersonnel, AdministrativePersonnel, Teacher, Classroom
+from .models.schools import Group, School, SchoolPersonnel, AdministrativePersonnel, SchoolTeacher, SubscriberSchool, Teacher, Classroom
 
 
 @admin.register(Organization)
@@ -27,12 +27,28 @@ class GroupAdmin(admin.ModelAdmin):
                    'is_active', 'create_timestamp', 'update_timestamp')
 
 
+class SchoolTeacherInline(admin.TabularInline):
+    model = SchoolTeacher
+
+class SchoolSubscriberInline(admin.TabularInline):
+    model = SubscriberSchool
+
+
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'type_of',)
     search_fields = ('id', 'name',)
     list_filter = ('type_of', 'is_active', 'create_timestamp', 'update_timestamp')
+    inlines = [
+        SchoolTeacherInline,
+        SchoolSubscriberInline,
+    ]
 
+@admin.register(SchoolTeacher)
+class SchoolTeacherAdmin(admin.ModelAdmin):
+    list_display = ('id', 'school', 'teacher')
+    search_fields = ('id', 'school', 'teacher')
+    list_filter = ('is_active', 'create_timestamp', 'update_timestamp')
 
 @admin.register(SchoolPersonnel)
 class SchoolPersonnelAdmin(admin.ModelAdmin):
