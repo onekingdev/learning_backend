@@ -227,3 +227,38 @@ class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
         blank=True,
     )
     price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+
+class SchoolAdministrativePersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
+    PREFIX = 'school_administrative_personnel_'
+    school = models.OneToOneField(
+        School,
+        on_delete=models.CASCADE,
+    )
+    administrativePersonnel = models.ForeignKey(
+        AdministrativePersonnel,
+        on_delete=models.CASCADE,
+    )
+    plan = models.ForeignKey(
+        'plans.Plan',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    order_detail = models.ForeignKey(
+        'payments.OrderDetail',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    cancel_reason = models.TextField(blank=True)
+    is_cancel = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
+    expired_at = models.DateTimeField(null=True, blank=True)
+    period = models.CharField(
+        max_length=100,
+        choices=(("MONTHLY", "Monthly"), ("YEARLY", "Yearly")),
+        default="MONTHLY",
+        null=True,
+        blank=True,
+    )
+    price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
