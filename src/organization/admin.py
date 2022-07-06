@@ -1,7 +1,41 @@
 from django.contrib import admin
-from .models.org import Organization, OrganizationPersonnel
-from .models.schools import Group, School, SchoolAdministrativePersonnel, SchoolPersonnel, AdministrativePersonnel, SchoolTeacher, SchoolSubscriber, Teacher, Classroom
 
+from students.models import Student
+from .models.org import Organization, OrganizationPersonnel
+from .models.schools import Group, School, SchoolAdministrativePersonnel, SchoolPersonnel, AdministrativePersonnel, SchoolTeacher, SchoolSubscriber, Teacher, Classroom, TeacherClassroom
+
+class SchoolTeacherInline(admin.StackedInline):
+    model = SchoolTeacher
+    extra = 0
+
+class AssignSchoolToTeacherInline(admin.StackedInline):
+    model = SchoolTeacher
+    extra = 0
+    verbose_name = "Assign School With Plan"
+    verbose_name_plural = "Assign Schools With Plan"
+
+class AssingClassroomToTeacherInline(admin.StackedInline):
+    model = TeacherClassroom
+    extra = 0
+    verbose_name = "Assign Clasroom With Plan"
+    verbose_name_plural = "Assign Clasrooms With Plan"
+
+class AssignTeacherToClassroomInline(admin.StackedInline):
+    model = TeacherClassroom
+    extra = 0
+    verbose_name = "Assign Teacher With Plan"
+    verbose_name_plural = "Assign Teacher With Plan"
+
+class SchoolSubscriberInline(admin.StackedInline):
+    model = SchoolSubscriber
+    extra = 0
+
+class SchoolAdministrativePersonnelInline(admin.StackedInline):
+    model = SchoolAdministrativePersonnel
+    extra = 0
+
+class StudentInline(admin.StackedInline):
+    model = Student
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
@@ -25,32 +59,6 @@ class GroupAdmin(admin.ModelAdmin):
                      )
     list_filter = (
                    'is_active', 'create_timestamp', 'update_timestamp')
-
-
-class SchoolTeacherInline(admin.StackedInline):
-    model = SchoolTeacher
-    extra = 0
-
-class AssignSchoolToTeacherInline(admin.StackedInline):
-    model = SchoolTeacher
-    extra = 0
-    verbose_name = "Assign School With Plan"
-    verbose_name_plural = "Assign Schools With Plan"
-
-class AssingClassroomToTeacherInline(admin.StackedInline):
-    model = SchoolTeacher
-    extra = 0
-    verbose_name = "Assign Clasroom With Plan"
-    verbose_name_plural = "Assign Clasrooms With Plan"
-
-class SchoolSubscriberInline(admin.StackedInline):
-    model = SchoolSubscriber
-    extra = 0
-
-class SchoolAdministrativePersonnelInline(admin.StackedInline):
-    model = SchoolAdministrativePersonnel
-    extra = 0
-
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
@@ -111,3 +119,5 @@ class ClassroomAdmin(admin.ModelAdmin):
                      'school__name', 'teacher__name', 'teacher__last_name')
     list_filter = ('grade', 'language', 'audience', 'game_cost',
                    'time_zone', 'is_active', 'create_timestamp', 'update_timestamp')
+
+    inlines = [AssignTeacherToClassroomInline]
