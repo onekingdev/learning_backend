@@ -189,6 +189,8 @@ class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
     teacher = models.ForeignKey(
         Classroom,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
     plan = models.ForeignKey(
         'plans.Plan',
