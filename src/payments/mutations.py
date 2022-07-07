@@ -156,7 +156,7 @@ class ConfirmPaymentOrder(graphene.Mutation):
                 order = Order.objects.get(pk = order_id)
                 PaymentHistory.objects.create(
                     type = "backend_anction_confirm_payment_order_error",
-                    user = order.guardian,
+                    user = order.guardian.user,
                     order = order,
                     message = str(e)
                 )

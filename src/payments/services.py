@@ -143,13 +143,13 @@ def add_or_update_payment_method(
         country=country,
         phone=phone
     )
+    
 
     if has_info["status"]:
         return "has already"
 
     if len(payment_methods) == 0:
         is_default = True
-
     # create payment method
     PaymentMethod.objects.create(
         guardian_id=guardian_id,
@@ -171,6 +171,7 @@ def add_or_update_payment_method(
         phone=phone,
         is_default=is_default
     )
+    
     return "created"
 
 
@@ -649,8 +650,10 @@ def confirm_order_payment(
     elif order.payment_method.upper() == "CARD":
         card = Card()
         order_details = OrderDetail.objects.filter(order_id=order_id)
+
         for order_detail in order_details:
             card_tx = CardTransaction.objects.get(order_detail_id=order_detail.id)
+
             result_sub = card.check_subscription(order_detail.subscription_id)
             if result_sub["status"] != "active" and result_sub["status"] != "trialing":
                 all_paid = False
@@ -660,11 +663,11 @@ def confirm_order_payment(
             subscriber_id = None
             teacher_id = None
             if order_detail.order.guardian:
-                guardian_id = order_detail.order.guardian.id,
+                guardian_id = order_detail.order.guardian.id
             if order_detail.order.subscriber:
-                subscriber_id = order_detail.order.subscriber.id,
+                subscriber_id = order_detail.order.subscriber.id
             if order_detail.order.teacher:
-                teacher_id = order_detail.order.teacher.id,
+                teacher_id = order_detail.order.teacher.id
 
             result = add_or_update_payment_method(
                 method="CARD",
@@ -685,6 +688,7 @@ def confirm_order_payment(
                 country=card_tx.country,
                 phone=card_tx.phone
             )
+            
             period = 2
             order_detail.status = result_sub["status"]
             order_detail.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
