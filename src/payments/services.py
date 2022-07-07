@@ -694,11 +694,22 @@ def confirm_order_payment(
             order_detail.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
             order_detail.is_paid = True
             order_detail.save()
+            
             for guardianstudentplan in order_detail.guardianstudentplan_set.all():
                 guardianstudentplan.is_paid = True
                 guardianstudentplan.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
                 guardianstudentplan.period = order_detail.period
                 guardianstudentplan.save()
+            for teacherclassroom in order_detail.teacherclassroom_set.all():
+                teacherclassroom.is_paid = True
+                teacherclassroom.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
+                teacherclassroom.period = order_detail.period
+                teacherclassroom.save()
+            for schooladministrativepersonnel in order_detail.schooladministrativepersonnel_set.all():
+                schooladministrativepersonnel.is_paid = True
+                schooladministrativepersonnel.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
+                schooladministrativepersonnel.period = order_detail.period
+                schooladministrativepersonnel.save()
                 
     elif order.payment_method.upper() == "FREE":
         order_details = OrderDetail.objects.filter(order_id=order_id)
