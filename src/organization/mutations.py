@@ -483,6 +483,45 @@ class CreateStudentToClassroom(graphene.Mutation):
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
 
+class RemoveStudentFromClassroom(graphene.Mutation):
+    classroom = graphene.Field(ClassroomSchema)
+    class Arguments:
+        classroom_id = graphene.ID()
+        student_id = graphene.ID()
+
+    def mutate(
+        self,
+        info,
+        classroom_id,
+        student_id,
+    ):
+
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                
+                student = Student.objects.get(pk = student_id)
+                if(str(student.classroom.id) != str(classroom_id)):
+                    raise Exception('Classroom does not exist in this student')
+                
+                student.classroom = None
+                student.save()
+                
+                classroom = Classroom.objects.get(pk=classroom_id)
+                return CreateStudentToClassroom(
+                    classroom = classroom,
+                )
+
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
+
 class CreateGroup(graphene.Mutation):
     group = graphene.Field(GroupSchema)
     teacher = graphene.Field(TeacherSchema)
@@ -536,3 +575,4 @@ class Mutation(graphene.ObjectType):
     import_student_to_classroom = ImportStudentToClassroom.Field()
     create_student_to_classroom = CreateStudentToClassroom.Field()
     create_group = CreateGroup.Field()
+    remove_student_from_classroom = RemoveStudentFromClassroom.Field()
