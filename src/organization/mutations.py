@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from graphene import ID
 from organization.models.schools import SchoolPersonnel, SchoolTeacher, TeacherClassroom
-from plans.models import TeacherClassroomPlan
 from users.schema import UserSchema, UserProfileSchema
 from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolPersonnelSchema, SchoolSchema, TeacherSchema, GroupSchema
 from organization.models import School, Group, Teacher, Classroom, AdministrativePersonnel
@@ -14,7 +13,7 @@ from graphql_jwt.shortcuts import create_refresh_token, get_token
 from payments.models import DiscountCode
 from kb.models.grades import Grade
 from audiences.models import Audience
-from django.contrib.auth.models import User
+from users.models import User
 from students.models import Student, StudentGrade
 from students.schema import StudentSchema
 class CreateTeacherInput(graphene.InputObjectType):
@@ -110,17 +109,15 @@ class CreateClassroom(graphene.Mutation):
     teacher = graphene.Field(TeacherSchema)
     class Arguments:
         name = graphene.String(required=True)
-        grade_id = graphene.ID(required=True)
+        # grade_id = graphene.ID(required=True)
         teacher_id = graphene.ID(required=False)
-        language = graphene.String(required=True)
+        # language = graphene.String(required=True)
         audience_id = graphene.ID(required=True)
 
     def mutate(
         self,
         info,
         name,
-        grade_id,
-        language,
         audience_id,
         teacher_id=None,
     ):
@@ -130,7 +127,7 @@ class CreateClassroom(graphene.Mutation):
                 user = info.context.user
                 if user.is_anonymous:
                     raise Exception('Authentication Required')
-                grade = Grade.objects.get(pk=grade_id)
+                # grade = Grade.objects.get(pk=grade_id)
                 audience = Audience.objects.get(pk=audience_id)
                 if teacher_id:
                     teacher = Teacher.objects.get(pk=teacher_id)
@@ -139,24 +136,19 @@ class CreateClassroom(graphene.Mutation):
                 
                 classroom = Classroom(
                     name=name,
-                    grade=grade,
-                    language=language,
+                    # grade=grade,
+                    # language=language,
                     audience=audience,
                 )
                 # classroom.teacher = teacher
                 classroom.save()
                 
-                teacher_classroom = TeacherClassroom(teacher = teacher, classroom = classroom)
-                teacher_classroom.save()
+                teacher_classrooms = TeacherClassroom.objects.filter(teacher = teacher, classroom = None)
 
-                #----------------- When create by teacher, add teacher_classroom to teacher_classroom_plan -S-----------------------#
-                if teacher_id is None:
-                    available_teacher_classroom_plans = TeacherClassroomPlan.objects.filter(teacher = teacher, classroom = None)
-                    if(len(available_teacher_classroom_plans) > 0):
-                        available_teacher_classroom_plan = available_teacher_classroom_plans[0]
-                        available_teacher_classroom_plan.classroom = classroom
-                        available_teacher_classroom_plan.save()
-                #----------------- When create by teacher, add teacher_classroom to teacher_classroom_plan -E-----------------------#
+                if(len(teacher_classrooms) < 1):
+                    raise Exception("The number of Classrooms has been exceeded! Please buy a new classroom")
+                teacher_classrooms[0].classroom = classroom
+                teacher_classrooms[0].save()
 
                 return CreateClassroom(
                     user = user,
@@ -416,10 +408,6 @@ class ImportStudentToClassroom(graphene.Mutation):
                 student.classroom = classroom
                 student.audience = classroom.audience
                 student.save()
-                studentGrade = StudentGrade.objects.get_or_create(
-                    student = student,
-                    grade = classroom.grade 
-                )
                 return ImportStudentToClassroom(
                     classroom = classroom
                 )
@@ -440,6 +428,7 @@ class CreateStudentToClassroom(graphene.Mutation):
         username = graphene.String()
         password = graphene.String()
         classroom_id = graphene.ID()
+        grade_id = graphene.ID()
 
     def mutate(
         self,
@@ -449,6 +438,7 @@ class CreateStudentToClassroom(graphene.Mutation):
         username,
         password,
         classroom_id,
+        grade_id,
     ):
 
         try:
@@ -465,6 +455,8 @@ class CreateStudentToClassroom(graphene.Mutation):
                 user.set_password(password)
                 user.save()
                 classroom = Classroom.objects.get(pk=classroom_id)
+                if(len(classroom.student_set.all()) > Classroom.LIMIT_STUDENTS):
+                    raise Exception("Number of students exceeded in this classroom")
                 student = Student(
                     first_name=name,
                     last_name=last_name,
@@ -476,7 +468,7 @@ class CreateStudentToClassroom(graphene.Mutation):
                 student.save()
                 studentGrade = StudentGrade.objects.get_or_create(
                     student = student,
-                    grade = classroom.grade 
+                    grade_id = grade_id
                 )
                 return CreateStudentToClassroom(
                     classroom = classroom,

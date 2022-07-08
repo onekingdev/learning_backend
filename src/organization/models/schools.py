@@ -134,9 +134,10 @@ class SchoolSubscriber(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'classroom_'
+    LIMIT_STUDENTS = 40
     name = models.CharField(max_length=128, null=True)
     grade = models.ForeignKey(
-        'kb.Grade', on_delete=models.PROTECT)
+        'kb.Grade', on_delete=models.PROTECT, null=True)
     language = models.CharField(max_length=128, null=True)
     audience = models.ForeignKey(
         'audiences.Audience', on_delete=models.PROTECT)
