@@ -6,6 +6,7 @@ from guardians.models import Guardian
 from payments import services
 from plans import services as plan_services
 from .models import Order, PaymentHistory, PaymentMethod
+from users.models import User
 
 class OrderDetailInput(graphene.InputObjectType):
     plan_id = graphene.ID()
@@ -64,6 +65,12 @@ class CreateOrder(graphene.Mutation):
             country=None,
             phone=None
     ):
+        if guardian_id is not None :
+            user = User.objects.get(guardian__id = guardian_id)
+        elif teacher_id is not None:
+            user = User.objects.get(schoolpersonnel__teacher__id = teacher_id)
+        elif subscriber_id is not None:
+            user = User.objects.get(schoolpersonnel__subscriber__id = subscriber_id)
         try:
             # with transaction.atomic():
                 sub_total = 0
@@ -94,9 +101,11 @@ class CreateOrder(graphene.Mutation):
                     country=country,
                     phone=phone
                 )
+                print("after create services")
+                
                 PaymentHistory.objects.create(
                     type = "backend_anction_order_create",
-                    user = create_order_resp.order.guardian.user,
+                    user = user,
                     order = create_order_resp.order
                 )
                 return CreateOrder(
@@ -110,7 +119,7 @@ class CreateOrder(graphene.Mutation):
             try:
                 PaymentHistory.objects.create(
                     type = "backend_anction_order_create_error",
-                    user = Guardian.objects.get(pk=guardian_id).user,
+                    user = user,
                     message = str(e)
                 )
             except Exception as err:
@@ -139,10 +148,19 @@ class ConfirmPaymentOrder(graphene.Mutation):
             with transaction.atomic():
 
                 order = services.confirm_order_payment(order_id)
-                plan_services.create_guardian_student_plan(order)
+                print("finish confirm order")
+                # plan_services.create_guardian_student_plan(order)
+                print("finish create plan services")
+                if order.guardian is not None:
+                    user = order.guardian.user
+                elif order.teacher is not None:
+                    user = order.teacher.user
+                elif order.subscriber is not None:
+                    user = order.subscriber.user
+
                 PaymentHistory.objects.create(
                     type = "backend_anction_confirm_payment_order",
-                    user = order.guardian.user,
+                    user = user,
                     order = order
                 )
                 return ConfirmPaymentOrder(
@@ -154,9 +172,16 @@ class ConfirmPaymentOrder(graphene.Mutation):
             transaction.rollback()
             try:
                 order = Order.objects.get(pk = order_id)
+                if order.guardian is not None:
+                    user = order.guardian.user
+                elif order.teacher is not None:
+                    user = order.teacher.user
+                elif order.subscriber is not None:
+                    user = order.subscriber.user
+                print("user is ", user, str(e))
                 PaymentHistory.objects.create(
                     type = "backend_anction_confirm_payment_order_error",
-                    user = order.guardian.user,
+                    user = user,
                     order = order,
                     message = str(e)
                 )
@@ -352,7 +377,9 @@ class CreateOrderWithOutPay(graphene.Mutation):
     status = graphene.String()
 
     class Arguments:
-        guardian_id = graphene.ID(required=True)
+        guardian_id = graphene.ID(required=False)
+        teacher_id = graphene.ID(required=False)
+        subscriber_id = graphene.ID(required=False)
         order_detail_input = graphene.List(OrderDetailInput)
         first_name = graphene.String(required=False)
         last_name = graphene.String(required=False)
@@ -367,8 +394,10 @@ class CreateOrderWithOutPay(graphene.Mutation):
     def mutate(
             self,
             info,
-            guardian_id,
             order_detail_input,
+            guardian_id=None,
+            teacher_id=None,
+            subscriber_id=None,
             first_name=None,
             last_name=None,
             address1=None,
@@ -379,10 +408,18 @@ class CreateOrderWithOutPay(graphene.Mutation):
             country=None,
             phone=None
     ):
+        if guardian_id is not None :
+            user = User.objects.get(guardian__id = guardian_id)
+        elif teacher_id is not None:
+            user = User.objects.get(schoolpersonnel__teacher__id = teacher_id)
+        elif subscriber_id is not None:
+            user = User.objects.get(schoolpersonnel__subscriber__id = subscriber_id)
         try:
             with transaction.atomic():
                 create_order_resp = services.create_order_with_out_pay(
                     guardian_id=guardian_id,
+                    teacher_id = teacher_id,
+                    subscriber_id = subscriber_id,
                     order_detail_list=order_detail_input,
                 )
                 services.confirm_order_payment(
@@ -397,13 +434,12 @@ class CreateOrderWithOutPay(graphene.Mutation):
                     country=country,
                     phone=phone
                 )
-                plan_services.create_guardian_student_plan(create_order_resp.order)
                 PaymentHistory.objects.create(
                     type = "backend_anction_create_order_without_pay",
-                    user = create_order_resp.order.guardian.user,
+                    user = user,
                     order = create_order_resp.order,
                 )
-                return CreateOrder(
+                return CreateOrderWithOutPay(
                     guardian=create_order_resp.order.guardian,
                     order=create_order_resp.order,
                     status="success",
@@ -411,9 +447,10 @@ class CreateOrderWithOutPay(graphene.Mutation):
         except (Exception, AssertionError, DatabaseError) as e:
             transaction.rollback()
             try:
+                
                 PaymentHistory.objects.create(
                     type = "backend_anction_create_order_without_pay_error",
-                    user = Guardian.objects.get(pk=guardian_id).user,
+                    user = user,
                     message = str(e)
                 )
             except Exception as err:

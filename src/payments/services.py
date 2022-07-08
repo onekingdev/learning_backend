@@ -4,7 +4,7 @@ from django.utils import timezone
 from app import settings
 from app.utils import add_months
 from guardians.models import Guardian
-from organization.models.schools import Subscriber, Teacher
+from organization.models.schools import SchoolAdministrativePersonnel, Subscriber, Teacher, TeacherClassroom
 from payments.card import Card
 from payments.models import Order, OrderDetail, PaypalTransaction, PaymentMethod, CardTransaction, DiscountCode
 from payments.paypal import Paypal
@@ -657,7 +657,7 @@ def confirm_order_payment(
             result_sub = card.check_subscription(order_detail.subscription_id)
             if result_sub["status"] != "active" and result_sub["status"] != "trialing":
                 all_paid = False
-                raise Exception(f"unpaid for card in sub_id: {order_detail.subscription_id}")
+                # raise Exception(f"unpaid for card in sub_id: {order_detail.subscription_id}")
             
             guardian_id = None
             subscriber_id = None
@@ -692,24 +692,52 @@ def confirm_order_payment(
             period = 2
             order_detail.status = result_sub["status"]
             order_detail.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
-            order_detail.is_paid = True
+            order_detail.is_paid = all_paid
             order_detail.save()
-            
-            for guardianstudentplan in order_detail.guardianstudentplan_set.all():
-                guardianstudentplan.is_paid = True
-                guardianstudentplan.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
-                guardianstudentplan.period = order_detail.period
-                guardianstudentplan.save()
-            for teacherclassroom in order_detail.teacherclassroom_set.all():
-                teacherclassroom.is_paid = True
-                teacherclassroom.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
-                teacherclassroom.period = order_detail.period
-                teacherclassroom.save()
-            for schooladministrativepersonnel in order_detail.schooladministrativepersonnel_set.all():
-                schooladministrativepersonnel.is_paid = True
-                schooladministrativepersonnel.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
-                schooladministrativepersonnel.period = order_detail.period
-                schooladministrativepersonnel.save()
+            for package_amount in range(0, order_detail.quantity):
+                if guardian_id is not None:
+                    guardian_student_plan = GuardianStudentPlan.objects.create(
+                        order_detail_id=order_detail.id,
+                        guardian_id=order.guardian.id,
+                        plan_id=order_detail.plan.id,
+                        is_paid = all_paid,
+                        expired_at = result_sub["expired_at"] + datetime.timedelta(days=period),
+                        period = order_detail.period,
+                    )
+                elif teacher_id is not None:
+                    print("before create teacher classroom")
+                    TeacherClassroom.objects.create(
+                        order_detail_id=order_detail.id,
+                        teacher_id=order.teacher.id,
+                        plan_id=order_detail.plan.id,
+                        is_paid = all_paid,
+                        expired_at = result_sub["expired_at"] + datetime.timedelta(days=period),
+                        period = order_detail.period,
+                    )
+                # elif order.subscriber is not None:
+                #     SchoolAdministrativePersonnel.objects.create(
+                #         order_detail_id=order_detail.id,
+                #         administrative_personnel=order.subscriber.id,
+                #         plan_id=order_detail.plan.id,
+                #         is_paid = True,
+                #         expired_at = result_sub["expired_at"] + datetime.timedelta(days=period),
+                #         period = order_detail.period,
+                #     )
+            # for guardianstudentplan in order_detail.guardianstudentplan_set.all():
+            #     guardianstudentplan.is_paid = True
+            #     guardianstudentplan.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
+            #     guardianstudentplan.period = order_detail.period
+            #     guardianstudentplan.save()
+            # for teacherclassroom in order_detail.teacherclassroom_set.all():
+            #     teacherclassroom.is_paid = True
+            #     teacherclassroom.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
+            #     teacherclassroom.period = order_detail.period
+            #     teacherclassroom.save()
+            # for schooladministrativepersonnel in order_detail.schooladministrativepersonnel_set.all():
+            #     schooladministrativepersonnel.is_paid = True
+            #     schooladministrativepersonnel.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
+            #     schooladministrativepersonnel.period = order_detail.period
+            #     schooladministrativepersonnel.save()
                 
     elif order.payment_method.upper() == "FREE":
         order_details = OrderDetail.objects.filter(order_id=order_id)
@@ -746,9 +774,29 @@ def confirm_order_payment(
             else:
                 expired_date = add_months(order_detail.create_timestamp, 1)
 
-            order_detail.expired_at = expired_date
+            order_detail.expired_at = None
             order_detail.is_paid = True
             order_detail.save()
+            for package_amount in range(0, order_detail.quantity):
+                if guardian_id is not None:
+                    guardian_student_plan = GuardianStudentPlan.objects.create(
+                        order_detail_id=order_detail.id,
+                        guardian_id=order.guardian.id,
+                        plan_id=order_detail.plan.id,
+                        is_paid = all_paid,
+                        expired_at = None,
+                        period = order_detail.period,
+                    )
+                elif teacher_id is not None:
+                    print("before create teacher classroom")
+                    TeacherClassroom.objects.create(
+                        order_detail_id=order_detail.id,
+                        teacher_id=order.teacher.id,
+                        plan_id=order_detail.plan.id,
+                        is_paid = all_paid,
+                        expired_at = None,
+                        period = order_detail.period,
+                    )
 
 
     # change order paid status to true
@@ -816,7 +864,7 @@ def create_order_with_out_pay(
     elif subscriber_id is not None:
         person = Subscriber.objects.get(pk=subscriber_id)
     elif teacher_id is not None:
-        person = Teacher.objects.get(pk=subscriber_id)
+        person = Teacher.objects.get(pk=teacher_id)
     order = Order.objects.create(
         discount_code='',
         guardian_id=guardian_id,
@@ -841,17 +889,7 @@ def create_order_with_out_pay(
         more_than_two = tmp_order_detail.quantity - 1
 
         # check if first index then calculate normal
-        if index == 0:
-            if tmp_order_detail.period == "MONTHLY":
-                order_detail_price += (tmp_order_detail.plan.price_month + more_than_two * (tmp_order_detail.plan.price_month / 2))
-            else:
-                order_detail_price += (tmp_order_detail.plan.price_year + more_than_two * (tmp_order_detail.plan.price_year / 2))
-        else:
-            if tmp_order_detail.period == "MONTHLY":
-                order_detail_price += tmp_order_detail.quantity * (tmp_order_detail.plan.price_month / 2)
-            else:
-                order_detail_price += tmp_order_detail.quantity * (tmp_order_detail.plan.price_year / 2)
-
+       
         # check plan payment id by payment_method
         payment_method_plan_id = ""
 

@@ -162,13 +162,15 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'teacher_classroom_'
-    teacher = models.OneToOneField(
+    teacher = models.ForeignKey(
         Teacher,
         on_delete=models.CASCADE,
     )
-    classroom = models.OneToOneField(
+    classroom = models.ForeignKey(
         Classroom,
         on_delete=models.CASCADE,
+        null = True,
+        blank = True,
     )
     plan = models.ForeignKey(
         'plans.Plan',
@@ -236,7 +238,7 @@ class SchoolAdministrativePersonnel(TimestampModel, RandomSlugModel, IsActiveMod
         School,
         on_delete=models.CASCADE,
     )
-    administrativePersonnel = models.OneToOneField(
+    administrative_personnel = models.OneToOneField(
         AdministrativePersonnel,
         on_delete=models.CASCADE,
     )
