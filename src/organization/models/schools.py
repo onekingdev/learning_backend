@@ -8,8 +8,8 @@ class Group(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'group_'
 
     name = models.CharField(max_length=128, null=True)
-    teacher = models.ForeignKey(
-        'organization.Teacher', on_delete=models.PROTECT, null=True, blank=True)
+    classroom = models.ForeignKey(
+        'organization.Classroom', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
