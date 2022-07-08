@@ -17,6 +17,7 @@ class OrderDetailInput(graphene.InputObjectType):
 # Create new order
 class CreateOrder(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
+    teacher = graphene.Field('organization.schema.TeacherSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
     url_redirect = graphene.String()
@@ -110,6 +111,7 @@ class CreateOrder(graphene.Mutation):
                 )
                 return CreateOrder(
                     guardian=create_order_resp.order.guardian,
+                    teacher = create_order_resp.order.teacher,
                     order=create_order_resp.order,
                     status="success",
                     url_redirect=create_order_resp.url_redirect
@@ -133,6 +135,7 @@ class CreateOrder(graphene.Mutation):
 # Confirm order have been paid
 class ConfirmPaymentOrder(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
+    teacher = graphene.Field('organization.schema.TeacherSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
 
@@ -165,6 +168,7 @@ class ConfirmPaymentOrder(graphene.Mutation):
                 )
                 return ConfirmPaymentOrder(
                     guardian=order.guardian,
+                    teacher=order.teacher,
                     order=order,
                     status="success"
                 )
@@ -375,6 +379,7 @@ class CreateOrderWithOutPay(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
+    teacher = graphene.Field('organization.schema.TeacherSchema')
 
     class Arguments:
         guardian_id = graphene.ID(required=False)
@@ -441,6 +446,7 @@ class CreateOrderWithOutPay(graphene.Mutation):
                 )
                 return CreateOrderWithOutPay(
                     guardian=create_order_resp.order.guardian,
+                    teacher=create_order_resp.order.teacher,
                     order=create_order_resp.order,
                     status="success",
                 )
