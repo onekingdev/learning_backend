@@ -503,6 +503,8 @@ class RemoveStudentFromClassroom(graphene.Mutation):
                     raise Exception('Authentication Required')
                 
                 student = Student.objects.get(pk = student_id)
+                if(student.classroom is None):
+                    raise Exception("This student doesn not have a classroom")
                 if(str(student.classroom.id) != str(classroom_id)):
                     raise Exception('Classroom does not exist in this student')
                 
