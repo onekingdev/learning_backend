@@ -36,7 +36,6 @@ class CreateTeacher(graphene.Mutation):
         first_name = graphene.String(required=True)
         last_name = graphene.String(required=True)
         school_id = graphene.ID(required=False)
-        school_name = graphene.String(required=False)
         zip = graphene.String(required=True)
         country = graphene.String(required=True)
         username = graphene.String(required=True)
@@ -50,7 +49,6 @@ class CreateTeacher(graphene.Mutation):
         first_name,
         last_name,
         school_id,
-        school_name,
         zip,
         country,
         email,
@@ -66,17 +64,16 @@ class CreateTeacher(graphene.Mutation):
                     first_name=first_name,
                     last_name=last_name,
                     username=username,
+                    email = email,
                 )
                 user.set_password(password)
-                user.email = email
                 user.save()
 
-                teacher= Teacher.objects.create(
+                teacher= Teacher(
                     user=user,
-                    name=first_name,
+                    first_name=first_name,
                     last_name=last_name,
                     school=school,
-                    school_name=school_name,
                     zip=zip,
                     country=country,
                 )

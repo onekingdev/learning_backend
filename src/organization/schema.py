@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from organization.models import Organization, OrganizationPersonnel, Group, School, SchoolPersonnel, AdministrativePersonnel, Teacher, Classroom
+from organization.models.schools import SchoolAdministrativePersonnel, SchoolTeacher, Subscriber, TeacherClassroom
 
 
 class OrganizationSchema(DjangoObjectType):
@@ -42,10 +43,31 @@ class TeacherSchema(DjangoObjectType):
         model = Teacher
         fields = "__all__"
 
+class SubscriberSchema(DjangoObjectType):
+    class Meta:
+        model = Subscriber
+        fields = "__all__"
+
 class ClassroomSchema(DjangoObjectType):
     class Meta:
         model = Classroom
         fields = "__all__"
+
+class TeacherClassroomSchema(DjangoObjectType):
+    class Meta:
+        model = TeacherClassroom
+        fields = "__all__"
+
+class SchoolTeacherSchema(DjangoObjectType):
+    class Meta:
+        model = SchoolTeacher
+        fields = "__all__"
+
+class SchoolAdministrativePersonnelSchema(DjangoObjectType):
+    class Meta:
+        model = SchoolAdministrativePersonnel
+        fields = "__all__"
+
 
 class Query(graphene.ObjectType):
     # ----------------- Organization ----------------- #
