@@ -322,10 +322,8 @@ class UpdateClassroomSettings(graphene.Mutation):
         self,
         info,
         classroom_id,
-        language,
         enable_game,
         game_cost,
-        time_zone,
         monday_start,
         monday_end,
         tuesday_start,
@@ -340,6 +338,8 @@ class UpdateClassroomSettings(graphene.Mutation):
         saturday_end,
         sunday_start,
         sunday_end,
+        time_zone = None,
+        language = None,
     ):
 
         try:

@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
 from payments.models import DiscountCode
-
+import datetime
 
 class Group(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'group_'
@@ -146,16 +146,16 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     enable_games = models.BooleanField(default=True)
     game_cost = models.IntegerField(blank=True, null=True)
     time_zone = models.CharField(max_length=128, null=True)
-    monday_start = models.TimeField(null=True, editable=True)
-    monday_end = models.TimeField(null=True, editable=True)
-    tuesday_start = models.TimeField(null=True, editable=True)
-    tuesday_end = models.TimeField(null=True, editable=True)
-    wednesday_start = models.TimeField(null=True, editable=True)
-    wednesday_end = models.TimeField(null=True, editable=True)
-    thursday_start = models.TimeField(null=True, editable=True)
-    thursday_end = models.TimeField(null=True, editable=True)
-    friday_start = models.TimeField(null=True, editable=True)
-    friday_end = models.TimeField(null=True, editable=True)
+    monday_start = models.TimeField(null=True, editable=True, default=datetime.time(7, 0, 0))
+    monday_end = models.TimeField(null=True, editable=True, default=datetime.time(17, 0, 0))
+    tuesday_start = models.TimeField(null=True, editable=True, default=datetime.time(7, 0, 0))
+    tuesday_end = models.TimeField(null=True, editable=True, default=datetime.time(17, 0, 0))
+    wednesday_start = models.TimeField(null=True, editable=True, default=datetime.time(7, 0, 0))
+    wednesday_end = models.TimeField(null=True, editable=True, default=datetime.time(17, 0, 0))
+    thursday_start = models.TimeField(null=True, editable=True, default=datetime.time(7, 0, 0))
+    thursday_end = models.TimeField(null=True, editable=True, default=datetime.time(17, 0, 0))
+    friday_start = models.TimeField(null=True, editable=True, default=datetime.time(7, 0, 0))
+    friday_end = models.TimeField(null=True, editable=True, default=datetime.time(17, 0, 0))
     saturday_start = models.TimeField(null=True, editable=True)
     saturday_end = models.TimeField(null=True, editable=True)
     sunday_start = models.TimeField(null=True, editable=True)
