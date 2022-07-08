@@ -167,7 +167,7 @@ class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
         Teacher,
         on_delete=models.CASCADE,
     )
-    classroom = models.ForeignKey(
+    classroom = models.OneToOneField(
         Classroom,
         on_delete=models.CASCADE,
         null = True,

@@ -1,3 +1,4 @@
+from msilib.schema import Class
 import os
 import random
 import sys
@@ -484,15 +485,18 @@ class CreateStudentToClassroom(graphene.Mutation):
 
 class CreateGroup(graphene.Mutation):
     group = graphene.Field(GroupSchema)
-    schoolPersonnel = graphene.Field(SchoolPersonnelSchema)
+    teacher = graphene.Field(TeacherSchema)
+    classroom = graphene.Field(ClassroomSchema)
     class Arguments:
         name = graphene.String()
-        studentIds = graphene.List(graphene.String)
+        classroom_id = graphene.ID()
+        studentIds = graphene.List(graphene.ID)
 
     def mutate(
         self,
         info,
         name,
+        classroom_id,
         studentIds,
     ):
 
@@ -501,18 +505,19 @@ class CreateGroup(graphene.Mutation):
                 user = info.context.user
                 if user.is_anonymous:
                     raise Exception('Authentication Required')
+                classroom = Classroom.objects.get(pk = classroom_id)
                 group = Group(
                     name = name,
-                    school_personnel = user.schoolpersonnel,
+                    classroom = classroom
                 )
                 group.save()
                 for studentId in studentIds:
-                    student = Student.objects.get(pk = studentId)
+                    student = Student.objects.get(pk = studentId, classroom = classroom)
                     group.student_set.add(student)
-                user.schoolpersonnel.group_set.add(group)
                 return CreateGroup(
                     group = group,
-                    schoolPersonnel = group.school_personnel
+                    teacher = classroom.teacherclassroom.teacher,
+                    classroom = classroom
                 )
 
         except (Exception, DatabaseError) as e:
