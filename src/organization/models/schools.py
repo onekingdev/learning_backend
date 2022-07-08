@@ -75,6 +75,8 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
     last_name = models.CharField(max_length=128, null=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
     has_order = models.BooleanField(default=False)
+    zip = models.CharField(max_length=128, null=True)
+    country = models.CharField(max_length=128, null=True)
     coupon_code = models.ForeignKey(
         DiscountCode,
         on_delete=models.CASCADE,

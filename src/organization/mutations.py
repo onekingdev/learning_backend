@@ -5,7 +5,7 @@ import graphene
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from graphene import ID
-from organization.models.schools import SchoolPersonnel, TeacherClassroom
+from organization.models.schools import SchoolPersonnel, SchoolTeacher, TeacherClassroom
 from plans.models import TeacherClassroomPlan
 from users.schema import UserSchema, UserProfileSchema
 from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolPersonnelSchema, SchoolSchema, TeacherSchema, GroupSchema
@@ -73,7 +73,6 @@ class CreateTeacher(graphene.Mutation):
                     user=user,
                     first_name=first_name,
                     last_name=last_name,
-                    school=school,
                     zip=zip,
                     country=country,
                 )
@@ -83,6 +82,10 @@ class CreateTeacher(graphene.Mutation):
                     teacher.discountCode = discount
 
                 teacher.save();
+                SchoolTeacher.objects.create(
+                    school = school,
+                    teacher = teacher
+                )
                 
                 token = get_token(user)
                 refresh_token = create_refresh_token(user)
