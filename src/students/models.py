@@ -4,7 +4,7 @@ from app.models import TimestampModel, UUIDModel, IsActiveModel
 from experiences.models import Level
 from engine.models import TopicMasterySettings
 from block.models import BlockQuestionPresentation, BlockTransaction
-from kb.models.topics import GradePrerequisite
+from kb.models.topics import GradePrerequisite, Topic
 from treasuretrack.models import WeeklyTreasureLevel
 import datetime
 from decimal import Decimal
@@ -503,3 +503,22 @@ class StudentAchievement(TimestampModel, UUIDModel, IsActiveModel):
         'students.Student', on_delete=models.PROTECT, null=True)
     is_liberate = models.IntegerField(null=True)
     liberation_date = models.DateField(null=True, blank=True)
+
+class StudentHomework(TimestampModel, UUIDModel, IsActiveModel):
+    PREFIX = 'student_homework'
+    HOMEWORK_DONE = 'Done'
+    HOMEWORK_PENDING = 'Pending'
+    HOMEWORK_STATUS_SET = (
+        (HOMEWORK_DONE, 'Done'),
+        (HOMEWORK_PENDING, 'Pending'),
+    )
+    topic = models.ForeignKey(Topic, on_delete=models.PROTECT, null=False)
+    student = models.ForeignKey(Student, on_delete=models.PROTECT, null=False)
+    number_of_questions = models.IntegerField(null=False, default=10)
+    start_at = models.DateTimeField(editable=True, null=True, blank=True )
+    end_at = models.DateTimeField(editable=True, null=True, blank=True )
+    status = models.CharField(
+        default=HOMEWORK_PENDING,
+        choices=HOMEWORK_STATUS_SET,
+        max_length=16,
+    )
