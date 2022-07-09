@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     'treasuretrack',
     'universals',
     'payments',
+    'notes',
     'users',
     'wallets',
 ]
