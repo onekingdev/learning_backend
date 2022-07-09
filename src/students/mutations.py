@@ -8,7 +8,9 @@ from graphene import ID
 
 from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
-from .models import Student, StudentGrade
+
+from kb.models.topics import Topic
+from .models import Student, StudentGrade, StudentHomework
 from plans.models import StudentPlan
 from organization.models import School, Group
 from kb.models.grades import Grade
@@ -436,7 +438,56 @@ class UpdateStudent(graphene.Mutation):
         # group actions
         student.save()
 
-        return UpdateIsNew(student=student)
+        return UpdateStudent(student=student)
+
+class AssignStudentHomework(graphene.Mutation):
+    student_homework = graphene.Field('students.schema.StudentHomeworkSchema')
+    class Arguments:
+        student_id = graphene.ID(required=True)
+        teacher_id = graphene.ID(required=False)
+        subscriber_id = graphene.ID(required=False)
+        administrative_id = graphene.ID(required=False)
+        name = graphene.String(required=False)
+        topic_id = graphene.ID(required=True)
+        number_of_questions = graphene.Int(required=False)
+        start_at = graphene.Date(required=True)
+        end_at = graphene.Date(required=False)
+
+    def mutate(
+        self,
+        info,
+        student_id,
+        topic_id,
+        start_at,
+        teacher_id = None,
+        subscriber_id = None,
+        administrative_id = None,
+        name = None,
+        number_of_questions = 10,
+        end_at = None
+        ):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        
+        topic = Topic.objects.get(pk = topic_id)
+        student = Student.objects.get(pk = student_id)
+        if name is None:
+            name = topic.name
+        student_homework = StudentHomework.objects.create(
+            student_id = student_id,
+            topic_id = topic_id,
+            start_at = start_at,
+            end_at = end_at,
+            name=name,
+            number_of_questions = number_of_questions,
+            assigned_teacher_id = teacher_id,
+            assigned_subscriber_id = subscriber_id,
+            assigned_administrative_id = administrative_id
+        )
+
+        return AssignStudentHomework(student_homework=student_homework)
 
 
 class Mutation(graphene.ObjectType):
@@ -447,3 +498,4 @@ class Mutation(graphene.ObjectType):
     set_point = setPoint.Field()
     update_is_new = UpdateIsNew.Field()
     update_student = UpdateStudent.Field()
+    assign_student_homework = AssignStudentHomework.Field()

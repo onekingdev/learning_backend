@@ -5,6 +5,7 @@ from experiences.models import Level
 from engine.models import TopicMasterySettings
 from block.models import BlockQuestionPresentation, BlockTransaction
 from kb.models.topics import GradePrerequisite, Topic
+from organization.models.schools import AdministrativePersonnel, Subscriber, Teacher
 from treasuretrack.models import WeeklyTreasureLevel
 import datetime
 from decimal import Decimal
@@ -508,17 +509,25 @@ class StudentHomework(TimestampModel, UUIDModel, IsActiveModel):
     PREFIX = 'student_homework'
     HOMEWORK_DONE = 'Done'
     HOMEWORK_PENDING = 'Pending'
+    HOMEWORK_EXPIRED = 'Expired'
+
     HOMEWORK_STATUS_SET = (
         (HOMEWORK_DONE, 'Done'),
         (HOMEWORK_PENDING, 'Pending'),
+        (HOMEWORK_EXPIRED, 'Expired'),
     )
-    topic = models.ForeignKey(Topic, on_delete=models.PROTECT, null=False)
-    student = models.ForeignKey(Student, on_delete=models.PROTECT, null=False)
+    name = models.CharField( max_length=128, null=True, blank=True, )
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=False)
     number_of_questions = models.IntegerField(null=False, default=10)
-    start_at = models.DateTimeField(editable=True, null=True, blank=True )
-    end_at = models.DateTimeField(editable=True, null=True, blank=True )
+    start_at = models.DateField(editable=True, null=True, blank=True )
+    end_at = models.DateField(editable=True, null=True, blank=True )
     status = models.CharField(
         default=HOMEWORK_PENDING,
         choices=HOMEWORK_STATUS_SET,
         max_length=16,
     )
+    assigned_teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True, blank=True)
+    assigned_subscriber = models.ForeignKey(Subscriber, on_delete=models.CASCADE, null=True, blank=True)
+    assigned_administrative = models.ForeignKey(AdministrativePersonnel, on_delete=models.CASCADE, null=True, blank=True)
+

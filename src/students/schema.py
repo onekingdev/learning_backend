@@ -4,7 +4,7 @@ from django.db.models.functions import TruncDay
 from django.utils import timezone
 from datetime import timedelta
 from graphene_django import DjangoObjectType
-from students.models import Student, StudentTopicMastery, StudentGrade, StudentAchievement
+from students.models import Student, StudentHomework, StudentTopicMastery, StudentGrade, StudentAchievement
 from wallets.models import CoinWallet
 from wallets.schema import CoinWalletSchema
 from experiences.schema import LevelSchema
@@ -173,6 +173,11 @@ class StudentGradeSchema(DjangoObjectType):
 class StudentAchievementSchema(DjangoObjectType):
     class Meta:
         model = StudentAchievement
+        fields = "__all__"
+
+class StudentHomeworkSchema(DjangoObjectType):
+    class Meta:
+        model = StudentHomework
         fields = "__all__"
 
 class HonorRollWithCurrentGradeSchema(graphene.ObjectType):
