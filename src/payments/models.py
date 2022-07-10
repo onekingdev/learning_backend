@@ -13,7 +13,7 @@ class Order(TimestampModel, RandomSlugModel, IsActiveModel):
 
     guardian = models.ForeignKey('guardians.Guardian', on_delete=models.CASCADE, null=True)
     teacher = models.ForeignKey('organization.Teacher', on_delete=models.CASCADE, null=True)
-    subscriber = models.ForeignKey('organization.Subscriber', on_delete=models.CASCADE, null=True)
+    school = models.ForeignKey('organization.School', on_delete=models.CASCADE, null=True)
     sub_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     discount_code = models.CharField(max_length=255, blank=True)
     discount = models.DecimalField(max_digits=15, decimal_places=2, default=0)
@@ -118,7 +118,7 @@ class PaymentMethod(TimestampModel, RandomSlugModel, IsActiveModel):
 
     guardian = models.ForeignKey('guardians.Guardian', on_delete=models.CASCADE, null=True)
     teacher = models.ForeignKey('organization.Teacher', on_delete=models.CASCADE, null=True)
-    subscriber = models.ForeignKey('organization.Subscriber', on_delete=models.CASCADE, null=True)
+    school = models.ForeignKey('organization.School', on_delete=models.CASCADE, null=True)
     method = models.CharField(max_length=255, choices=PAYMENT_METHOD, default="CARD")
     card_first_name = models.CharField(max_length=255, blank=True, null=True)
     card_last_name = models.CharField(max_length=255, blank=True, null=True)
@@ -213,6 +213,7 @@ class PaymentHistory(TimestampModel, RandomSlugModel):
         return str
 
     def save(self, *args, **kwargs):
+        if self.message : self.message = self.message[:254]
         if not self.card_number and self.user:
             payment_method = PaymentMethod.objects.filter(is_default=True, guardian__user_id=self.user.id)
             if payment_method.count() != 0:

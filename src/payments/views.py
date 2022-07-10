@@ -62,12 +62,14 @@ def stripeWebHook(request):
                     # ---------- Get guardian student plan from subscription id -S----------------#
                     order_detail = OrderDetail.objects.get(subscription_id = subscription['id'])
                     guardian_student_plans = order_detail.guardianstudentplan_set.all()
+                    teacher_classrooms = order_detail.teacherclassroom_set.all()
+                    school_teachers = order_detail.schoolteacher_set.all()
                     # ---------- Get guardian student plan from subscription id -E----------------#
 
                     # --------------- Update Expire Date to after period days -S----------------- #
+                    period =2
+
                     for guardian_student_plan in guardian_student_plans:
-                        period =2
-                        
                         guardian_student_plan.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
                         guardian_student_plan.expired_at = subscription_end_at + datetime.timedelta(days=period)
                         guardian_student_plan.save()
@@ -79,6 +81,30 @@ def stripeWebHook(request):
 
                         guardian_student_plan.order_detail.order.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
                         guardian_student_plan.order_detail.order.save()
+
+                    for teacher_classrooms in teacher_classrooms:
+                        teacher_classrooms.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        teacher_classrooms.expired_at = subscription_end_at + datetime.timedelta(days=period)
+                        teacher_classrooms.save()
+
+                        teacher_classrooms.order_detail.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        teacher_classrooms.order_detail.expired_at = subscription_end_at + datetime.timedelta(days=period)
+                        teacher_classrooms.order_detail.save()
+
+                        teacher_classrooms.order_detail.order.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        teacher_classrooms.order_detail.order.save()
+
+                    for school_teachers in school_teachers:
+                        school_teachers.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        school_teachers.expired_at = subscription_end_at + datetime.timedelta(days=period)
+                        school_teachers.save()
+
+                        school_teachers.order_detail.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        school_teachers.order_detail.expired_at = subscription_end_at + datetime.timedelta(days=period)
+                        school_teachers.order_detail.save()
+
+                        school_teachers.order_detail.order.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        school_teachers.order_detail.order.save()
                     # --------------- Update Expire Date to after period days -E----------------- #
                 except Exception as e:
                     response_err.append("Subscription ID " + subscription['id'] + " : " + str(e))
@@ -104,11 +130,14 @@ def stripeWebHook(request):
                     # ---------- Get guardian student plan from subscription id -S----------------#
                     order_detail = OrderDetail.objects.get(subscription_id = subscription['id'])
                     guardian_student_plans = order_detail.guardianstudentplan_set.all()
+                    teacher_classrooms = order_detail.teacherclassroom_set.all()
+                    school_teachers = order_detail.schoolteacher_set.all()
                     # ---------- Get guardian student plan from subscription id -E----------------#
 
                     # --------------- Update Expire Date to after period days -S----------------- #
+                    period =2
+
                     for guardian_student_plan in guardian_student_plans:
-                        period =2
                         guardian_student_plan.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
                         guardian_student_plan.expired_at = subscription_end_at
                         guardian_student_plan.save()
@@ -120,6 +149,32 @@ def stripeWebHook(request):
 
                         guardian_student_plan.order_detail.order.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
                         guardian_student_plan.order_detail.order.save()
+
+                    for teacher_classroom in teacher_classrooms:
+                        teacher_classroom.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        teacher_classroom.expired_at = subscription_end_at
+                        teacher_classroom.save()
+
+                        teacher_classroom.order_detail.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        teacher_classroom.order_detail.expired_at = subscription_end_at
+                        teacher_classroom.error_message = message if teacher_classroom.order_detail.is_paid == False else ""
+                        teacher_classroom.order_detail.save()
+
+                        teacher_classroom.order_detail.order.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        teacher_classroom.order_detail.order.save()
+
+                    for school_teacher in school_teachers:
+                        school_teacher.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        school_teacher.expired_at = subscription_end_at
+                        school_teacher.save()
+
+                        school_teacher.order_detail.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        school_teacher.order_detail.expired_at = subscription_end_at
+                        school_teacher.error_message = message if school_teacher.order_detail.is_paid == False else ""
+                        school_teacher.order_detail.save()
+
+                        school_teacher.order_detail.order.is_paid = True if subscription_status == "active" or subscription_status == "incomplete" else False
+                        school_teacher.order_detail.order.save()
                     # --------------- Update Expire Date to after period days -E----------------- #
                 except Exception as e:
                     response_err.append("Subscription ID " + subscription['id'] + " : " + str(e))

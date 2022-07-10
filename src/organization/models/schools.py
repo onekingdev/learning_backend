@@ -39,6 +39,7 @@ class School(TimestampModel, RandomSlugModel, IsActiveModel):
     #     'organization.Organization', on_delete=models.PROTECT, null=True)
     zip = models.CharField(max_length=128, null=True)
     country = models.CharField(max_length=128, null=True)
+    district = models.CharField(max_length=128, null=True)
 
     
     # student = models.ManyToManyField('students.Student', blank=True)
@@ -69,8 +70,6 @@ class SchoolPersonnel(TimestampModel, RandomSlugModel, IsActiveModel):
         null=True
     )
 
-    has_order = models.BooleanField(default=False)
-
     first_name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)
     gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
@@ -94,31 +93,9 @@ class Teacher(SchoolPersonnel):
     PREFIX = 'teacher_personnel_'
     pass
 
-class Subscriber(TimestampModel, RandomSlugModel, IsActiveModel):
+class Subscriber(SchoolPersonnel):
     PREFIX = 'subscriber_'
-    GENDER_MALE = 'MALE'
-    GENDER_FEMALE = 'FEMALE'
-    GENDER_OTHER = 'OTHER'
-    GENDER_CHOICES = (
-        (GENDER_MALE, 'Male'),
-        (GENDER_FEMALE, 'Female'),
-        (GENDER_OTHER, 'Other'),
-    )
-
-    PREFIX = 'school_personnel_'
-
-    user = models.OneToOneField(
-        'users.User',
-        on_delete=models.PROTECT,
-        null=True
-    )
-
-    has_order = models.BooleanField(default=False)
-
-    first_name = models.CharField(max_length=128, null=True)
-    last_name = models.CharField(max_length=128, null=True)
-    gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICES)
-    has_order = models.BooleanField(default=False)
+    pass
 
 class SchoolSubscriber(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'subscriber_school_'
@@ -207,6 +184,8 @@ class SchoolTeacher(TimestampModel, RandomSlugModel, IsActiveModel):
     teacher = models.OneToOneField(
         Teacher,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
     plan = models.ForeignKey(
         'plans.Plan',

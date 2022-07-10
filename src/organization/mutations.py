@@ -1,14 +1,15 @@
 from msilib.schema import Class
 import os
 import random
+from re import sub
 import sys
 import graphene
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from graphene import ID
-from organization.models.schools import SchoolPersonnel, SchoolTeacher, TeacherClassroom
+from organization.models.schools import SchoolPersonnel, SchoolSubscriber, SchoolTeacher, Subscriber, TeacherClassroom
 from users.schema import UserSchema, UserProfileSchema
-from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolPersonnelSchema, SchoolSchema, TeacherSchema, GroupSchema
+from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolPersonnelSchema, SchoolSchema, SubscriberSchema, TeacherSchema, GroupSchema
 from organization.models import School, Group, Teacher, Classroom, AdministrativePersonnel
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from payments.models import DiscountCode
@@ -167,7 +168,7 @@ class CreateClassroom(graphene.Mutation):
 class CreateSchool(graphene.Mutation):
     user = graphene.Field(UserSchema)
     school = graphene.Field(SchoolSchema)
-    principle = graphene.Field(AdministrativePersonnelSchema)
+    subscriber = graphene.Field(SubscriberSchema)
     token = graphene.String()
     refresh_token = graphene.String()
     class Arguments:
@@ -181,6 +182,7 @@ class CreateSchool(graphene.Mutation):
         email = graphene.String(required=True)
         password = graphene.String(required=True)
         username = graphene.String(required=True)
+        coupon_code = graphene.String(required=False)
 
     def mutate(
         self,
@@ -195,14 +197,18 @@ class CreateSchool(graphene.Mutation):
         email,
         password,
         username,
+        coupon_code = None
     ):
 
         try:
             with transaction.atomic():
 
                 school = School(
-                    name=name,
-                    type_of=type,
+                    name = name,
+                    type_of = type,
+                    zip = zip,
+                    country = country,
+                    district = district,
                 )
                 school.save()
                 user = get_user_model()(
@@ -214,24 +220,87 @@ class CreateSchool(graphene.Mutation):
                 user.set_password(password)
                 user.email = email
                 user.save()
-                principle = AdministrativePersonnel(
-                    school = school,
+                subscriber = Subscriber(
                     user = user,
-                    name = name,
-                    last_name = 'Principle',
-                    zip = zip,
-                    country = country,
-                    district = district
+                    first_name = first_name,
+                    last_name = last_name,
+                    
                 )
-                principle.save()
+                if coupon_code:
+                    subscriber.coupon_code = DiscountCode.objects.get(code=coupon_code)
+                subscriber.save()
+                SchoolSubscriber.objects.create(
+                    subscriber = subscriber,
+                    school = school
+                )
                 token = get_token(user)
                 refresh_token = create_refresh_token(user)
                 return CreateSchool(
                     user = user,
                     school = school,
-                    principle = principle,
+                    subscriber = subscriber,
                     token = token,
                     refresh_token = refresh_token,
+                )
+
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
+class AddSchool(graphene.Mutation):
+    school = graphene.Field(SchoolSchema)
+    subscriber = graphene.Field(SubscriberSchema)
+    class Arguments:
+        name = graphene.String(required=True)
+        district = graphene.String(required=True)
+        type = graphene.String(required=True)
+        zip = graphene.String(required=True)
+        country = graphene.String(required=True)
+        coupon_code = graphene.String(required=True)
+
+    def mutate(
+        self,
+        info,
+        name,
+        district,
+        type,
+        zip,
+        country,
+        coupon_code,
+    ):
+
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                if user.schoolpersonnel.subscriber is None:
+                    raise Exception("You don't have permission to add a school")
+                subscriber = user.schoolpersonnel.subscriber
+
+                school = School(
+                    name = name,
+                    type_of = type,
+                    zip = zip,
+                    country = country,
+                    district = district,
+                )
+                school.save()
+                
+                if coupon_code:
+                    subscriber.coupon_code = DiscountCode.objects.get(code=coupon_code)
+
+                SchoolSubscriber.objects.create(
+                    subscriber = subscriber,
+                    school = school
+                )
+                
+                return AddSchool(
+                    school = school,
+                    subscriber = subscriber,
                 )
 
         except (Exception, DatabaseError) as e:
@@ -578,3 +647,4 @@ class Mutation(graphene.ObjectType):
     create_student_to_classroom = CreateStudentToClassroom.Field()
     create_group = CreateGroup.Field()
     remove_student_from_classroom = RemoveStudentFromClassroom.Field()
+    add_school = AddSchool.Field()
