@@ -11,7 +11,7 @@ from .models import (
     StudentBlockQuestionPresentationHistory
 )
 from .schema import BlockPresentationSchema
-from students.models import StudentTopicMastery, StudentTopicStatus, Student
+from students.models import StudentHomework, StudentTopicMastery, StudentTopicStatus, Student
 from kb.models import Topic, TopicGrade, AreaOfKnowledge
 from kb.models.content import AnswerOption, Question
 from kb.models.content import (
@@ -108,6 +108,81 @@ class CreatePathBlockPresentation(graphene.Mutation):
         return CreatePathBlockPresentation(
             block_presentation=block_presentation)
 
+class CreateHomeworkBlockPresentation(graphene.Mutation):
+    block_presentation = graphene.Field(BlockPresentationSchema)
+
+    class Arguments:
+        student_homework_id = graphene.ID(required=True)
+
+    def mutate(self, info, student_homework_id):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        if not user.student:
+            raise Exception("Not found student")
+        now = timezone.now()
+        
+        student = user.student
+
+        student_homework = StudentHomework.objects.get(pk = student_homework_id)
+        if( student_homework.student != student):
+            raise Exception("This homework is not yours!")
+        if( now.strptime(student_homework.start_at, "%Y-%m-%d") > now ):
+            raise Exception(f"You can start this homework at {student_homework.start_at}")
+        if( (student_homework.end_at is not None) and (now.strptime(student_homework.end_at, "%Y-%m-%d") < now)) :
+            student_homework.status = "Expired"
+            student_homework.save()
+            student_homework.delete()
+            raise Exception(f"You should finish this homework at {student_homework.end_at}. But time has passed!")
+
+        topic = student_homework.topic
+
+        try:
+            topic_grade = TopicGrade.objects.get(topic=topic)
+        except Topic.DoesNotExist:
+            raise Exception("Topic does not exist")
+
+        # Create block if it doesn't exist
+        block, new = Block.objects.get_or_create(
+            topic_grade=topic_grade,
+            modality='HOMEWORK',
+            student_homework=student_homework,
+        )
+        block.students.add(student)
+        block.save()
+        if block.questions.all().count() == 0:
+            available_question_query_set = (Question.objects
+                .filter(topic=topic_grade.topic)
+                .filter(grade=topic_grade.grade)
+                    # .filter(answeroption__len__gt=0)
+                .annotate(answeroption_count=Count('answeroption'))
+                .filter(answeroption_count__gt=0))
+            available_questions = list(
+                available_question_query_set
+            )
+            # for question in available_questions:
+            #     print("count is ",available_questions.answeroption_count)
+
+            if(len(available_questions) < 1):
+                raise Exception("Topic " + f'{topic_grade.topic.id}' + " hasn't questions which has answers")
+            while len(available_questions) < block.block_size:
+                for question in available_questions:
+                    available_questions.add(question)
+            random_questions = random.sample(
+                available_questions, block.block_size)
+            for question in random_questions:
+                block.questions.add(question)
+            block.save()
+        # Create block presentation for block
+        block_presentation, new = BlockPresentation.objects.get_or_create(
+            block=block,
+            student=student,
+        )
+        block_presentation.save()
+
+        return CreatePathBlockPresentation(
+            block_presentation=block_presentation)
 
 class CreateAIBlockPresentation(graphene.Mutation):
     block_presentation = graphene.Field(BlockPresentationSchema)
@@ -336,6 +411,15 @@ class FinishBlockPresentation(graphene.Mutation):
             coin_unit = 10
             exp = (correct_exp_unit * hits) + \
                 (incorrect_exp_unit * errors) + user.student.points
+        elif block.modality == 'HOMEWORK':
+            incorrect_exp_unit = 0
+            correct_exp_unit = 0
+            coin_unit = 0
+            exp = 0
+            student_homework = block.student_homework
+            student_homework.status = "Done"
+            student_homework.save()
+            student_homework.delete()
         else:
             incorrect_exp_unit = 0
             correct_exp_unit = 0

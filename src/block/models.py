@@ -141,6 +141,13 @@ class Block(TimestampModel, RandomSlugModel, IsActiveModel):
     coins_available = models.PositiveSmallIntegerField(default=100)
     coins_per_question = models.PositiveSmallIntegerField(default=10)
 
+    student_homework = models.ForeignKey(
+        'students.StudentHomework',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
     def save(self, *args, **kwargs):
         is_new = False
         if not self.pk:
