@@ -371,8 +371,10 @@ class UpdateClassroomSettings(graphene.Mutation):
         classroom_id = graphene.ID()
         language = graphene.String()
         enable_game = graphene.Boolean()
-        game_cost = graphene.Int()
-        time_zone = graphene.String()
+        game_cost_percentage = graphene.Int()
+        time_zone_value = graphene.String()
+        time_zone_offset = graphene.Int()
+        goal_coins_per_day = graphene.Int()
         monday_start = graphene.Time()
         monday_end = graphene.Time()
         tuesday_start = graphene.Time()
@@ -392,7 +394,7 @@ class UpdateClassroomSettings(graphene.Mutation):
         info,
         classroom_id,
         enable_game,
-        game_cost,
+        game_cost_percentage,
         monday_start,
         monday_end,
         tuesday_start,
@@ -407,7 +409,8 @@ class UpdateClassroomSettings(graphene.Mutation):
         saturday_end,
         sunday_start,
         sunday_end,
-        time_zone = None,
+        time_zone_value,
+        time_zone_offset,
         language = None,
     ):
 
@@ -419,8 +422,9 @@ class UpdateClassroomSettings(graphene.Mutation):
                 classroom = Classroom.objects.get(pk=classroom_id)
                 classroom.language = language
                 classroom.enable_games = enable_game
-                classroom.game_cost = game_cost
-                classroom.time_zone = time_zone
+                classroom.game_cost_percentage = game_cost_percentage
+                classroom.time_zone_value = time_zone_value
+                classroom.time_zone_offset = time_zone_offset
                 classroom.monday_start = monday_start
                 classroom.monday_end = monday_end
                 classroom.tuesday_start = tuesday_start

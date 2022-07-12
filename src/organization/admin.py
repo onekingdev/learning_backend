@@ -111,13 +111,13 @@ class TeacherAdmin(admin.ModelAdmin):
 
 @admin.register(Classroom)
 class ClassroomAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'language', 'audience', 'enable_games', 'game_cost', 'time_zone',
+    list_display = ('id', 'name', 'language', 'audience', 'enable_games', 'game_cost_percentage', 'time_zone_value',
                     'monday_start', 'monday_end', 'tuesday_start', 'tuesday_end', 'wednesday_start', 'wednesday_end',
                     'thursday_start', 'thursday_end', 'friday_start', 'friday_end', 'saturday_start', 'saturday_end',
                     'sunday_start', 'sunday_end')
     search_fields = ('id', 'name', 'audience__translations__name',
                      'school__name', 'teacher__name', 'teacher__last_name')
-    list_filter = ('grade', 'language', 'audience', 'game_cost',
-                   'time_zone', 'is_active', 'create_timestamp', 'update_timestamp')
+    list_filter = ('grade', 'language', 'audience', 'game_cost_percentage',
+                   'time_zone_value', 'is_active', 'create_timestamp', 'update_timestamp')
 
     inlines = [AssignTeacherToClassroomInline]
