@@ -3,7 +3,7 @@ from django.contrib import admin
 from students.models import Student
 from .models.org import Organization, OrganizationPersonnel
 from .models.schools import Group, School, SchoolAdministrativePersonnel, SchoolPersonnel, AdministrativePersonnel, SchoolTeacher, SchoolSubscriber, Teacher, Classroom, TeacherClassroom
-
+# from widgets import ImproveRawIdFieldsForm
 class SchoolTeacherInline(admin.StackedInline):
     model = SchoolTeacher
     extra = 0
@@ -25,6 +25,14 @@ class AssignTeacherToClassroomInline(admin.StackedInline):
     extra = 0
     verbose_name = "Assign Teacher With Plan"
     verbose_name_plural = "Assign Teacher With Plan"
+
+class AssingStudentsToClassroomInline(admin.StackedInline):
+    model = Student
+    raw_id_fields=('classroom',)
+    extra = 0
+    verbose_name = "Assign Students To Classroom"
+    verbose_name_plural = "Assign Student To Classroom"
+
 
 class SchoolSubscriberInline(admin.StackedInline):
     model = SchoolSubscriber
@@ -119,5 +127,7 @@ class ClassroomAdmin(admin.ModelAdmin):
                      'school__name', 'teacher__name', 'teacher__last_name')
     list_filter = ('grade', 'language', 'audience', 'game_cost_percentage',
                    'time_zone_value', 'is_active', 'create_timestamp', 'update_timestamp')
-
-    inlines = [AssignTeacherToClassroomInline]
+    inlines = [
+        AssignTeacherToClassroomInline,
+        AssingStudentsToClassroomInline
+    ]

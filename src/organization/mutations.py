@@ -7,6 +7,7 @@ import graphene
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from graphene import ID
+from block.models import BlockPresentation
 from organization.models.schools import SchoolPersonnel, SchoolSubscriber, SchoolTeacher, Subscriber, TeacherClassroom
 from users.schema import UserSchema, UserProfileSchema
 from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolPersonnelSchema, SchoolSchema, SubscriberSchema, TeacherSchema, GroupSchema
@@ -18,6 +19,12 @@ from audiences.models import Audience
 from users.models import User
 from students.models import Student, StudentGrade
 from students.schema import StudentSchema
+from django.utils import timezone
+from pytz import timezone as pytz_timezone
+import datetime
+from django.db.models.query_utils import Q
+from django.db.models import Sum, Count
+
 class CreateTeacherInput(graphene.InputObjectType):
     email = graphene.String()
     name = graphene.String()
@@ -596,7 +603,6 @@ class RemoveStudentFromClassroom(graphene.Mutation):
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
 
-
 class CreateGroup(graphene.Mutation):
     group = graphene.Field(GroupSchema)
     teacher = graphene.Field(TeacherSchema)
@@ -640,6 +646,74 @@ class CreateGroup(graphene.Mutation):
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
+class StudentWithCoinsSchema(graphene.ObjectType):
+    student = graphene.Field(StudentSchema)
+    coins_sum = graphene.Int()
+class ClassroomReport(graphene.Mutation):
+    coins_today = graphene.Int()
+    goal_coins_per_day = graphene.Int()
+    correct_questions_count_today = graphene.Int()
+    correct_questions_count_yesterday = graphene.Int()
+    coins_yesterday = graphene.Int()
+    class_leaders_yesterday = graphene.List(StudentWithCoinsSchema)
+    coins_all = graphene.Int()
+    questions_all = graphene.Int()
+
+    class Arguments:
+        classroom_id = graphene.ID()
+
+    def mutate(
+        self,
+        info,
+        classroom_id,
+    ):
+        classroom = Classroom.objects.get(pk = classroom_id)
+
+        #--------- convert timezone to classroom time zone and get today start and yesterday start in classroom timezone -S----------#
+        timezone_value = classroom.time_zone_value
+        now = timezone.now()
+        now = now.astimezone(pytz_timezone(timezone_value))
+        today_start = now.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+        yesterday_start = (today_start - datetime.timedelta(1))
+        #--------- convert timezone to classroom time zone and get today start and yesterday start in classroom timezone -E----------#
+        
+        #--------- make conditions to filter only students in the classroom -S--------------#
+        students = classroom.student_set.all()
+        filter_condition_students = None
+        for student in students:
+            if filter_condition_students is None:
+                filter_condition_students = Q(student=student)
+            else : filter_condition_students = filter_condition_students | Q(student=student)
+        #--------- make conditions to filter only students in the classroom -E--------------#
+        
+        query_set_block_presentations_from_yesterday = BlockPresentation.all_objects.filter(filter_condition_students).filter(update_timestamp__gt = yesterday_start)
+        query_set_block_presentations_only_yesterday = query_set_block_presentations_from_yesterday.filter(update_timestamp__lte = today_start)
+        query_set_block_presentations_only_today = query_set_block_presentations_from_yesterday.filter(update_timestamp__gt = today_start)
+        result_yesterday_for_leaders = query_set_block_presentations_only_yesterday.values('student').annotate(coins_sum=Sum('coins')).order_by('-coins_sum')[:5]
+        result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('coins'),Sum('hits'),Sum('total'))
+        result_today = query_set_block_presentations_only_today.aggregate(Sum('coins'),Sum('hits'),Sum('total'))
+        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('coins'),Sum('hits'),Sum('total'))
+
+        #----------replace student id to student schema in the leaders in the yesterday -S------#
+        for key,result_yesterday_for_leader in enumerate(result_yesterday_for_leaders) :
+            student_id =  result_yesterday_for_leaders[key]['student']
+            student = Student.objects.get(pk = student_id)
+            result_yesterday_for_leaders[key]['student'] = student
+        #----------replace student id to student schema in the leaders in the yesterday -E------#
+
+        return ClassroomReport(
+            coins_today =result_today['coins__sum'] if result_today['coins__sum'] else 0,
+            goal_coins_per_day = classroom.goal_coins_per_day if classroom.goal_coins_per_day else 0,
+            correct_questions_count_today = result_today['hits__sum'] if result_today['hits__sum'] else 0,
+            correct_questions_count_yesterday = result_yesterday['hits__sum'] if result_yesterday['hits__sum'] else 0,
+            coins_yesterday = result_yesterday['coins__sum'] if result_yesterday['coins__sum'] else 0,
+            class_leaders_yesterday = result_yesterday_for_leaders,
+            coins_all = result_all['coins__sum'] if result_all['coins__sum'] else 0,
+            questions_all = result_all['total__sum'] if result_all['total__sum'] else 0,
+        )
+
+
+        
 
 class Mutation(graphene.ObjectType):
     create_teacher = CreateTeacher.Field()
@@ -651,4 +725,5 @@ class Mutation(graphene.ObjectType):
     create_student_to_classroom = CreateStudentToClassroom.Field()
     create_group = CreateGroup.Field()
     remove_student_from_classroom = RemoveStudentFromClassroom.Field()
+    classroom_report = ClassroomReport.Field()
     add_school = AddSchool.Field()
