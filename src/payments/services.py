@@ -359,7 +359,7 @@ def payment_card_subscription(
         discount_code = DiscountCode.objects.get(code=order_detail.order.discount_code)
         trial_day = discount_code.trial_day
         if discount_code.percentage > 0:
-            coupon_id = card.create_or_get_coupon(code=discount_code.code, percentage=discount_code.percentage)
+            coupon_id = discount_code.stripe_coupon_id
 
     sub = card.create_subscription(
         customer_id=customer_id,
