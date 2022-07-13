@@ -148,19 +148,61 @@ class PaymentMethod(TimestampModel, RandomSlugModel, IsActiveModel):
 
 class DiscountCode(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'discount_code_'
+    COUPON_FOREVER = 'FOREVER'
+    COUPON_ONE_MONTH = 'ONE_MONTH'
+    COUPON_TWO_MONTH = 'TWO_MONTH'
+    COUPON_SIX_MONTH = 'SIX_MONTH'
+    COUPON_ONE_YEAR = 'ONE_YEAR'
 
+    COUPON_TYPE_CHOICES = (
+        (COUPON_FOREVER, 'FOREVER'),
+        (COUPON_ONE_MONTH, 'ONE_MONTH'),
+        (COUPON_TWO_MONTH, 'TWO_MONTH'),
+        (COUPON_SIX_MONTH, 'SIX_MONTH'),
+        (COUPON_ONE_YEAR, 'ONE_YEAR'),
+
+    )
     code = models.CharField(max_length=255, unique=True)
     percentage = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     trial_day = models.IntegerField(default=0)
     expired_at = models.DateTimeField()
     stripe_coupon_id = models.CharField(max_length=255, blank=True, null=True)
+    type = models.CharField(max_length=255, choices=COUPON_TYPE_CHOICES, default = COUPON_ONE_MONTH)
     slug = models.SlugField(editable=False)
 
     def __str__(self):
         return str(self.id)
 
     def save(self, *args, **kwargs):
+        from payments.card import Card
+        card = Card()
+
         self.slug = slugify(self.id)
+        if self.stripe_coupon_id is None:
+            duration = "once"
+            duration_in_months = None
+            if self.type == self.COUPON_FOREVER:
+                duration = "forever"
+                duration_in_months = None
+            elif self.type == self.COUPON_ONE_MONTH:
+                duration = "once"
+                duration_in_months = None
+            elif self.type == self.COUPON_TWO_MONTH:
+                duration = "repeating"
+                duration_in_months = 2
+            elif self.type == self.COUPON_SIX_MONTH:
+                duration = "repeating"
+                duration_in_months = 2
+            elif self.type == self.COUPON_ONE_YEAR:
+                duration = "repeating"
+                duration_in_months = 12
+            coupon = card.create_coupon(code = self.code, percentage = self.percentage, duration = duration, duration_in_months = duration_in_months)
+            self.stripe_coupon_id = coupon.id
+        else:
+            coupon = card.get_coupon(id = self.stripe_coupon_id)
+            if(coupon.name != self.code):
+                card.update_coupon(id = self.stripe_coupon_id, new_name = self.code)
+
         return super().save(*args, **kwargs)
 
 class PaymentHistory(TimestampModel, RandomSlugModel):

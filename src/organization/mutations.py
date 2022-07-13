@@ -712,9 +712,6 @@ class ClassroomReport(graphene.Mutation):
             questions_all = result_all['total__sum'] if result_all['total__sum'] else 0,
         )
 
-
-        
-
 class Mutation(graphene.ObjectType):
     create_teacher = CreateTeacher.Field()
     create_classroom = CreateClassroom.Field()

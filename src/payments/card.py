@@ -192,6 +192,24 @@ class Card:
             coupon = stripe.Coupon.retrieve(code)
         return coupon.id
 
+    def create_coupon(self, code, percentage, duration, duration_in_months):
+            
+        coupon = stripe.Coupon.create(
+            duration = duration,
+            duration_in_months = duration_in_months,
+            name = code,
+            percent_off = percentage
+        )
+        return coupon
+    
+    def get_coupon(self, id):
+        return stripe.Coupon.retrieve(id)
+
+    def update_coupon(self, id, new_name):
+        return stripe.Coupon.modify(
+            id,
+            name=new_name,
+        )
     def invoice_has_paid(self, invoice_id) -> bool:
         invoice = stripe.Invoice.retrieve(invoice_id)
         if invoice.status == "paid":

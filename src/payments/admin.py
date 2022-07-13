@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.forms import ModelForm
 from .models import Order, OrderDetail, PaymentHistory, PaypalTransaction, CardTransaction, PaymentMethod, DiscountCode
 from import_export import admin as import_export_admin
 
@@ -48,6 +49,11 @@ class CardTransactionAdmin(
             str = f"{first_4} *** {last_4}"
         return str
 
+class ReadOnlyDiscountCodeForm(ModelForm):
+    class Meta:
+        model = DiscountCode
+        exclude=['percentage','type']
+
 @admin.register(DiscountCode)
 class DiscountCodeAdmin(
         import_export_admin.ImportExportModelAdmin,
@@ -58,8 +64,17 @@ class DiscountCodeAdmin(
             'percentage',
             'trial_day',
             'expired_at',
+            'stripe_coupon_id',
+            'type',
             'is_active',
     )
+    def get_form(self, request, obj=None, **kwargs):
+        if obj:
+                kwargs['form'] = ReadOnlyDiscountCodeForm
+                print("here is update object")
+                
+        return super(DiscountCodeAdmin, self).get_form(request, obj, **kwargs)
+#     readonly_fields=('percentage', 'type',)
 
 @admin.register(OrderDetail)
 class OrderDetailAdmin(
