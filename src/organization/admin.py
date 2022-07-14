@@ -96,11 +96,11 @@ class SchoolPersonnelAdmin(admin.ModelAdmin):
 
 @admin.register(AdministrativePersonnel)
 class AdministrativePersonnelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'last_name',
-                    'gender')
-    search_fields = ('id', 'user__username', 'last_name',
+    list_display = ('id', 'user', 'first_name', 'last_name',
+                    'country')
+    search_fields = ('id', 'user__username', 'last_name', 'first_name'
                     )
-    list_filter = ('gender', 'is_active', 'create_timestamp', 'update_timestamp')
+    list_filter = ('is_active', 'create_timestamp', 'update_timestamp')
 
 
 @admin.register(Teacher)
