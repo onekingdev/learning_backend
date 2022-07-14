@@ -2,6 +2,8 @@ from django.db import models
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
 from organization.models.schools import Teacher
 from students.models import Student
+from datetime import datetime, tzinfo
+import pytz
 class Notes(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'notes_'
     title = models.CharField(max_length=64, null=False)
@@ -21,3 +23,10 @@ class Notes(TimestampModel, RandomSlugModel, IsActiveModel):
         null=True,
         blank=True
     )
+
+    def save(self, *args, **kwargs):
+        print(self.send_at)
+        print("type of ", type(self.send_at))
+        # self.send_at.replace(tzinfo = pytz.timezone('US/Pacific'))
+        print(self.send_at)
+        return super().save(*args, **kwargs)
