@@ -1,4 +1,3 @@
-from msilib.schema import Class
 import os
 import random
 from re import sub
