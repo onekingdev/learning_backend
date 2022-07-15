@@ -13,4 +13,5 @@ class NotesAdmin(
             'user_to',
             'send_at'
     )
+    search_fields = ('id', 'title', 'user_to__username', 'user_from__username')
 # Register your models here.
