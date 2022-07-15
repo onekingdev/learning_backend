@@ -111,8 +111,8 @@ class PrerequisiteAdmin(
     resource_class = resources.PrerequisiteResource
     list_display = ('id', 'topic', 'information')
     search_fields = ('id', 'topic__translations__name', 'prerequisites__translations__name',
-                     'information', 'random_slug')
-    list_filter = ('topic__area_of_knowledge__universal_area_knowledge', 'random_slug')
+                     'information', 'topic__area_of_knowledge')
+    list_filter = ('topic__area_of_knowledge__universal_area_knowledge', 'topic__area_of_knowledge')
     autocomplete_fields = ['topic', 'prerequisites']
 
 
@@ -346,8 +346,8 @@ class QuestionAdmin(
 class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
     resource_class = resources.QuestionImageAssetResource
     list_display = ('id', 'question', 'image')
-    search_fields = ('id', 'image', 'order', 'random_slug')
-    list_filter = ('random_slug', 'create_timestamp', 'update_timestamp')
+    search_fields = ('id', 'image', 'order', )
+    list_filter = ('question__grade', 'question__topic__area_of_knowledge', 'question__topic__area_of_knowledge__universal_area_knowledge', 'question__question_type')
     autocomplete_fields = ['question']
 
 
@@ -355,8 +355,8 @@ class QuestionImageAssetAdmin(import_export_admin.ImportExportModelAdmin):
 class QuestionAudioAssetAdmin(import_export_admin.ImportExportModelAdmin):
     resource_class = resources.QuestionAudioAssetResource
     list_display = ('id', 'question', 'audio_file')
-    search_fields = ('id', 'audio_file', 'order', 'random_slug')
-    list_filter = ('random_slug', 'create_timestamp', 'update_timestamp')
+    search_fields = ('id', 'audio_file', 'order')
+    list_filter = ('question__grade', 'question__topic__area_of_knowledge', 'question__topic__area_of_knowledge__universal_area_knowledge', 'question__question_type')
     autocomplete_fields = ['question']
 
 
@@ -364,11 +364,11 @@ class QuestionAudioAssetAdmin(import_export_admin.ImportExportModelAdmin):
 class QuestionTTSAssetAdmin(import_export_admin.ImportExportModelAdmin):
     list_display = ('id', 'question', 'tts_file')
     search_fields = ('id', 'tts_file', 'order', 'random_slug')
-    list_filter = ('random_slug', 'create_timestamp', 'update_timestamp')
+    list_filter = ('question__grade', 'question__topic__area_of_knowledge', 'question__topic__area_of_knowledge__universal_area_knowledge', 'question__question_type')
 
 
 @admin.register(QuestionVideoAsset)
 class QuestionVideoAssetAdmin(import_export_admin.ImportExportModelAdmin):
     list_display = ('id', 'question', 'url')
     search_fields = ('id', 'url', 'order', 'random_slug')
-    list_filter = ('random_slug', 'create_timestamp', 'update_timestamp')
+    list_filter = ('question__grade', 'question__topic__area_of_knowledge', 'question__topic__area_of_knowledge__universal_area_knowledge', 'question__question_type')
