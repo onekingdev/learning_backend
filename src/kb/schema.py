@@ -153,7 +153,7 @@ class QuestionSchema(DjangoObjectType):
     question_video_assets = graphene.List(QuestionVideoAssetSchema)
 
     question_audio_url = graphene.String()
-    answer_options = graphene.List('kb.schema.AnswerOptionInterface')
+    answer_options = graphene.List('kb.schema.AnswerOptionUnionSchema')
 
     def resolve_question_text(self, info, language_code=None):
         return strip_tags(self.safe_translation_getter("question_text", any_language=True))
