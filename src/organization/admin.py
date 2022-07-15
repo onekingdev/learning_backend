@@ -141,3 +141,9 @@ class SubscriberAdmin(admin.ModelAdmin):
     search_fields = ('id', 'user__username', 'last_name', 'first_name', 'zip', 'country'
                      )
     list_filter = ('gender', 'has_order', 'country', 'create_timestamp', 'update_timestamp', 'is_active')
+
+@admin.register(SchoolSubscriber)
+class SchoolubSubscriberAdmin(admin.ModelAdmin):
+    list_display = ('id', 'subscriber', 'school')
+    search_fields = ('id', 'subscriber__user__username', 'school__name')
+    list_filter = ('create_timestamp', 'update_timestamp', 'is_active')

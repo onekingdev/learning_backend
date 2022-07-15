@@ -213,14 +213,11 @@ class AnswerOptionInterface(graphene.Interface):
 
         return tts_string
 
-
 class AnswerOptionSchema(DjangoObjectType):
     class Meta:
         model = AnswerOption
         interfaces = (AnswerOptionInterface,)
         fields = "__all__"
-    
-
 
 class MultipleChoiceAnswerOptionSchema(DjangoObjectType):
     class Meta:
@@ -277,7 +274,6 @@ class MultipleChoiceAnswerOptionSchema(DjangoObjectType):
         return self.safe_translation_getter(
             "video", language_code=current_language)
 
-
 class MultipleSelectAnswerOptionSchema(DjangoObjectType):
     class Meta:
         model = MultipleSelectAnswerOption
@@ -328,7 +324,6 @@ class MultipleSelectAnswerOptionSchema(DjangoObjectType):
 
         return self.safe_translation_getter(
             "video", language_code=current_language)
-
 
 class TypeInAnswerOptionSchema(DjangoObjectType):
     class Meta:
@@ -387,7 +382,6 @@ class TypeInAnswerOptionSchema(DjangoObjectType):
         return self.safe_translation_getter(
             "video", language_code=current_language)
 
-
 class OrderAnswerOptionSchema(DjangoObjectType):
     class Meta:
         model = OrderAnswerOption
@@ -435,7 +429,6 @@ class OrderAnswerOptionSchema(DjangoObjectType):
         return self.safe_translation_getter(
             "video", language_code=current_language)
 
-
 class RelateAnswerOptionSchema(DjangoObjectType):
     class Meta:
         model = RelateAnswerOption
@@ -482,6 +475,32 @@ class RelateAnswerOptionSchema(DjangoObjectType):
 
         return self.safe_translation_getter(
             "value_image", language_code=current_language)
+
+
+class AnswerOptionUnionSchema(graphene.Union):
+    @classmethod
+    def resolve_type(cls, instance, info):
+
+        if isinstance(instance, MultipleChoiceAnswerOption):
+            return MultipleChoiceAnswerOptionSchema
+
+        elif isinstance(instance, MultipleSelectAnswerOption):
+            return MultipleSelectAnswerOptionSchema
+
+        elif isinstance(instance, TypeInAnswerOption):
+            return TypeInAnswerOptionSchema
+
+        elif isinstance(instance, OrderAnswerOption):
+            return OrderAnswerOptionSchema
+
+        elif isinstance(instance, RelateAnswerOption):
+            return RelateAnswerOptionSchema
+
+        return None
+
+    class Meta:
+
+        types = [MultipleChoiceAnswerOptionSchema, MultipleSelectAnswerOptionSchema, TypeInAnswerOptionSchema, OrderAnswerOptionSchema, RelateAnswerOptionSchema]
 
 
 class Query(graphene.ObjectType):
@@ -620,9 +639,9 @@ class Query(graphene.ObjectType):
 
     # ----------------- AnswerOption ----------------- #
 
-    answers_option = graphene.List(AnswerOptionSchema)
+    answers_option = graphene.List(AnswerOptionUnionSchema)
     answers_option_by_id = graphene.Field(
-        AnswerOptionSchema, id=graphene.ID())
+        AnswerOptionUnionSchema, id=graphene.ID())
 
     def resolve_answers_option(root, info, **kwargs):
         # Querying a list
