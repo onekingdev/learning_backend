@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from students.models import Student
 from .models.org import Organization, OrganizationPersonnel
-from .models.schools import Group, School, SchoolAdministrativePersonnel, SchoolPersonnel, AdministrativePersonnel, SchoolTeacher, SchoolSubscriber, Teacher, Classroom, TeacherClassroom
+from .models.schools import Group, School, SchoolAdministrativePersonnel, SchoolPersonnel, AdministrativePersonnel, SchoolTeacher, SchoolSubscriber, Subscriber, Teacher, Classroom, TeacherClassroom
 # from widgets import ImproveRawIdFieldsForm
 class SchoolTeacherInline(admin.StackedInline):
     model = SchoolTeacher
@@ -134,3 +134,10 @@ class ClassroomAdmin(admin.ModelAdmin):
         AssignTeacherToClassroomInline,
         AssingStudentsToClassroomInline
     ]
+
+@admin.register(Subscriber)
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'first_name', 'last_name', 'has_order', 'zip', 'country')
+    search_fields = ('id', 'user__username', 'last_name', 'first_name', 'zip', 'country'
+                     )
+    list_filter = ('gender', 'has_order', 'country', 'create_timestamp', 'update_timestamp', 'is_active')
