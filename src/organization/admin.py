@@ -62,11 +62,15 @@ class OrganizationPersonnelAdmin(admin.ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name',)
-    search_fields = ('id', 'name',
-                     )
-    list_filter = (
-                   'is_active', 'create_timestamp', 'update_timestamp')
+    list_display = ('id', 'name', 'classroom')
+    search_fields = ('id', 'name', 'classroom__name' )
+    list_filter = ('is_active', 'create_timestamp', 'update_timestamp')
+
+@admin.register(SchoolAdministrativePersonnel)
+class SchoolAdministrativePersonnelAdmin(admin.ModelAdmin):
+    list_display = ('id', 'school', 'administrative_personnel', 'is_paid', 'is_cancel', 'plan', 'order_detail', 'expired_at', 'period', 'price')
+    search_fields = ('id', 'school__name', 'administrative_personnel__user__username', 'plan__id', 'order_detail__id', 'expired_at', 'period', 'price' )
+    list_filter = ('period', 'expired_at', 'is_active', 'create_timestamp', 'update_timestamp')
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
@@ -124,9 +128,9 @@ class ClassroomAdmin(admin.ModelAdmin):
                     'thursday_start', 'thursday_end', 'friday_start', 'friday_end', 'saturday_start', 'saturday_end',
                     'sunday_start', 'sunday_end')
     search_fields = ('id', 'name', 'audience__translations__name',
-                     'school__name', 'teacher__name', 'teacher__last_name')
+                     'school__name', 'teacher__name', 'teacher__last_name', 'time_zone_value')
     list_filter = ('grade', 'language', 'audience', 'game_cost_percentage',
-                   'time_zone_value', 'is_active', 'create_timestamp', 'update_timestamp')
+                   'time_zone_value', 'is_active', 'create_timestamp', 'update_timestamp', 'time_zone_value', 'enable_games')
     inlines = [
         AssignTeacherToClassroomInline,
         AssingStudentsToClassroomInline
