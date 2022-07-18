@@ -42,6 +42,9 @@ class TeacherSchema(DjangoObjectType):
     class Meta:
         model = Teacher
         fields = "__all__"
+    classrooms = graphene.List('organization.schema.ClassroomSchema')
+    def resolve_classrooms(self, info):
+        return Classroom.objects.filter(teacherclassroom__teacher = self)
 
 class SubscriberSchema(DjangoObjectType):
     class Meta:
@@ -101,7 +104,8 @@ class Query(graphene.ObjectType):
     # ----------------- Group ----------------- #
 
     groups = graphene.List(GroupSchema)
-    group_by_id = graphene.Field(GroupSchema, id=graphene.String())
+    group_by_id = graphene.Field(GroupSchema, id=graphene.ID())
+    groups_by_school_id = graphene.List(GroupSchema, school_id = graphene.ID())
 
     def resolve_groups(root, info, **kwargs):
         # Querying a list
@@ -110,12 +114,16 @@ class Query(graphene.ObjectType):
     def resolve_group_by_id(root, info, id):
         # Querying a single question
         return Group.objects.get(pk=id)
+    
+    def resolve_groups_by_school_id(root, info, school_id):
+        # Querying a single question
+        return Group.objects.filter(classroom_id=school_id)
 
     # ----------------- School ----------------- #
 
     schools = graphene.List(SchoolSchema)
     school_by_id = graphene.Field(SchoolSchema, id=graphene.String())
-
+    
     def resolve_schools(root, info, **kwargs):
         # Querying a list
         return School.objects.all()
@@ -154,11 +162,11 @@ class Query(graphene.ObjectType):
     
     # ----------------- Teacher ----------------- #
 
-    teacher = graphene.List(TeacherSchema)
-    Teacher_by_id = graphene.Field(
+    teachers = graphene.List(TeacherSchema)
+    teacher_by_id = graphene.Field(
         TeacherSchema, id=graphene.String())
 
-    def resolve_teacher(root, info, **kwargs):
+    def resolve_teachers(root, info, **kwargs):
         # Querying a list
         return Teacher.objects.all()
 
@@ -168,11 +176,11 @@ class Query(graphene.ObjectType):
     
     # ----------------- Classroom ----------------- #
 
-    classroom = graphene.List(ClassroomSchema)
-    Teacher_by_id = graphene.Field(
+    classrooms = graphene.List(ClassroomSchema)
+    classroom_by_id = graphene.Field(
         ClassroomSchema, id=graphene.String())
 
-    def resolve_classroom(root, info, **kwargs):
+    def resolve_classrooms(root, info, **kwargs):
         # Querying a list
         return Classroom.objects.all()
 

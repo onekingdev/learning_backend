@@ -4,6 +4,7 @@ from django.db.models.functions import TruncDay
 from django.utils import timezone
 from datetime import timedelta
 from graphene_django import DjangoObjectType
+from organization.schema import ClassroomSchema
 from students.models import Student, StudentHomework, StudentTopicMastery, StudentGrade, StudentAchievement
 from wallets.models import CoinWallet
 from wallets.schema import CoinWalletSchema
@@ -239,6 +240,7 @@ class Query(graphene.ObjectType):
     students_grade = graphene.List(StudentGradeSchema)
     student_grade_by_id = graphene.Field(
         StudentGradeSchema, id=graphene.ID())
+    students_by_classroom_id = graphene.List(StudentSchema, classroom_id = graphene.ID())
 
     def resolve_students_grade(root, info, **kwargs):
         # Querying a list
@@ -247,6 +249,10 @@ class Query(graphene.ObjectType):
     def resolve_student_grade_by_id(root, info, id):
         # Querying a single question
         return StudentGrade.objects.get(pk=id)
+    
+    def resolve_students_by_classroom_id(root, info, classroom_id):
+        # Querying a single question
+        return Student.objects.filter(classroom_id = classroom_id)
 
     # ----------------- StudentAchievement ----------------- #
 
