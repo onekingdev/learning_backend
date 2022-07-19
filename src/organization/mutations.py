@@ -34,6 +34,7 @@ class CreateTeacherInput(graphene.InputObjectType):
     username = graphene.String()
 
 class CreateTeacher(graphene.Mutation):
+    """Create a user account for teacher API"""
     teacher = graphene.Field(TeacherSchema)
     user = graphene.Field(UserSchema)
     token = graphene.String()
@@ -116,6 +117,7 @@ class CreateTeacher(graphene.Mutation):
             return e
 
 class CreateClassroom(graphene.Mutation):
+    """Create a classroom for a specific teacher API"""
     user = graphene.Field(UserSchema)
     classroom = graphene.Field(ClassroomSchema)
     teacher = graphene.Field(TeacherSchema)
@@ -176,6 +178,7 @@ class CreateClassroom(graphene.Mutation):
             return e
 
 class CreateSchool(graphene.Mutation):
+    """Create a school with user account for subscriber of school API"""
     user = graphene.Field(UserSchema)
     school = graphene.Field(SchoolSchema)
     subscriber = graphene.Field(SubscriberSchema)
@@ -266,6 +269,7 @@ class CreateSchool(graphene.Mutation):
             return e
 
 class AddSchool(graphene.Mutation):
+    """Create a school and add it to a subscriber which is current logined subscriber user API"""
     school = graphene.Field(SchoolSchema)
     subscriber = graphene.Field(SubscriberSchema)
     class Arguments:
@@ -326,6 +330,7 @@ class AddSchool(graphene.Mutation):
             return e
 
 class CreateTeachersInSchool(graphene.Mutation):
+    """Create any number of the teachers necessary for the school and place them in the school API"""
     school = graphene.Field(SchoolSchema)
     class Arguments:
         teachers = graphene.List(CreateTeacherInput)
@@ -380,6 +385,7 @@ class CreateTeachersInSchool(graphene.Mutation):
             return e
 
 class UpdateClassroomSettings(graphene.Mutation):
+    """Update classroom settings API"""
     classroom = graphene.Field(ClassroomSchema)
     user = graphene.Field(UserSchema)
     class Arguments:
