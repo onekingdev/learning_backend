@@ -20,6 +20,7 @@ class CreateOrder(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
     teacher = graphene.Field('organization.schema.TeacherSchema')
     order = graphene.Field('payments.schema.OrderSchema')
+    school = graphene.Field('organization.schema.SchoolSchema')
     status = graphene.String()
     url_redirect = graphene.String()
 
@@ -113,6 +114,7 @@ class CreateOrder(graphene.Mutation):
                 return CreateOrder(
                     guardian=create_order_resp.order.guardian,
                     teacher = create_order_resp.order.teacher,
+                    school = create_order_resp.order.school,
                     order=create_order_resp.order,
                     status="success",
                     url_redirect=create_order_resp.url_redirect
