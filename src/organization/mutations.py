@@ -278,7 +278,7 @@ class AddSchool(graphene.Mutation):
         type = graphene.String(required=True)
         zip = graphene.String(required=True)
         country = graphene.String(required=True)
-        coupon_code = graphene.String(required=True)
+        coupon_code = graphene.String(required=False)
 
     def mutate(
         self,
@@ -288,7 +288,7 @@ class AddSchool(graphene.Mutation):
         type,
         zip,
         country,
-        coupon_code,
+        coupon_code = None,
     ):
 
         try:
