@@ -116,7 +116,9 @@ class CreateGuardian(graphene.Mutation):
                         raise Exception("Your discount code had been expired!")
                     guardian.coupon_code_id = discount.id
                     guardian.save()
-
+                if user.profile :
+                    user.profile.role = "guardian"
+                    user.profile.save()
                 profile_obj = profile.objects.get(user=user.id)
                 token = get_token(user)
                 refresh_token = create_refresh_token(user)

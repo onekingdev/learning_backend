@@ -93,6 +93,10 @@ class CreateTeacher(graphene.Mutation):
                     school = school,
                     teacher = teacher
                 )
+
+                if user.profile :
+                    user.profile.role = "teacher"
+                    user.profile.save()
                 
                 token = get_token(user)
                 refresh_token = create_refresh_token(user)
@@ -240,6 +244,11 @@ class CreateSchool(graphene.Mutation):
                     school = school
                 )
                 token = get_token(user)
+
+                if user.profile :
+                    user.profile.role = "subscriber"
+                    user.profile.save()
+                
                 refresh_token = create_refresh_token(user)
                 return CreateSchool(
                     user = user,

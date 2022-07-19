@@ -183,6 +183,10 @@ class CreateStudent(graphene.Mutation):
                 student.init_student_topic_mastery()
                 student.init_student_topic_status()
 
+                if user.profile :
+                    user.profile.role = "student"
+                    user.profile.save()
+
                 return CreateStudent(
                     guardian=guardian,
                     student=student,
