@@ -117,14 +117,13 @@ class CreateTeacher(graphene.Mutation):
             return e
 
 class CreateClassroom(graphene.Mutation):
-    """Create a classroom for a specific teacher API"""
+    """Create a classroom for a specific teacher depends on order API"""
     user = graphene.Field(UserSchema)
     classroom = graphene.Field(ClassroomSchema)
     teacher = graphene.Field(TeacherSchema)
     class Arguments:
         name = graphene.String(required=True)
         # grade_id = graphene.ID(required=True)
-        teacher_id = graphene.ID(required=False)
         # language = graphene.String(required=True)
         audience_id = graphene.ID(required=True)
 
@@ -133,7 +132,6 @@ class CreateClassroom(graphene.Mutation):
         info,
         name,
         audience_id,
-        teacher_id=None,
     ):
 
         try:
@@ -143,10 +141,7 @@ class CreateClassroom(graphene.Mutation):
                     raise Exception('Authentication Required')
                 # grade = Grade.objects.get(pk=grade_id)
                 audience = Audience.objects.get(pk=audience_id)
-                if teacher_id:
-                    teacher = Teacher.objects.get(pk=teacher_id)
-                else:
-                    teacher = user.schoolpersonnel.teacher;
+                teacher = user.schoolpersonnel.teacher;
                 
                 classroom = Classroom(
                     name=name,
@@ -165,6 +160,60 @@ class CreateClassroom(graphene.Mutation):
                 teacher_classrooms[0].save()
 
                 return CreateClassroom(
+                    user = user,
+                    classroom = classroom,
+                    teacher = teacher
+                )
+
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
+class CreateClassroomToSchool(graphene.Mutation):
+    """Create a classroom to school API"""
+    user = graphene.Field(UserSchema)
+    classroom = graphene.Field(ClassroomSchema)
+    teacher = graphene.Field(TeacherSchema)
+    class Arguments:
+        name = graphene.String(required=True)
+        teacher_id = graphene.ID(required=True)
+        audience_id = graphene.ID(required=True)
+
+    def mutate(
+        self,
+        info,
+        name,
+        audience_id,
+        teacher_id,
+    ):
+
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                role = user.profile.role
+                if(not(role == "adminTeacher" or role == "subscriber")):
+                    raise Exception("You don't have permission!")
+                # grade = Grade.objects.get(pk=grade_id)
+                audience = Audience.objects.get(pk=audience_id)
+                teacher = Teacher.objects.get(pk=teacher_id)
+                
+                classroom = Classroom(
+                    name=name,
+                    # grade=grade,
+                    # language=language,
+                    audience=audience,
+                )
+                # classroom.teacher = teacher
+                classroom.save()
+                
+                teacher_classrooms = TeacherClassroom.objects.create(teacher = teacher, classroom = classroom)
+
+                return CreateClassroomToSchool(
                     user = user,
                     classroom = classroom,
                     teacher = teacher
@@ -792,6 +841,7 @@ class ClassroomReport(graphene.Mutation):
 class Mutation(graphene.ObjectType):
     create_teacher = CreateTeacher.Field()
     create_classroom = CreateClassroom.Field()
+    create_classroom_to_school = CreateClassroomToSchool.Field()
     create_school = CreateSchool.Field()
     create_teachers_in_school = CreateTeachersInSchool.Field()
     update_classroom_settings = UpdateClassroomSettings.Field()
