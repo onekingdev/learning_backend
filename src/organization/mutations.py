@@ -508,6 +508,14 @@ class ImportStudentToClassroom(graphene.Mutation):
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
 
+class CreateStudentsInputs(graphene.InputObjectType):
+    classroom_id = graphene.ID()
+    grade_id = graphene.ID()
+    name = graphene.String()
+    last_name = graphene.String()
+    password = graphene.String()
+    username = graphene.String()
+
 class CreateStudentToClassroom(graphene.Mutation):
     classroom = graphene.Field(ClassroomSchema)
     student = graphene.Field(StudentSchema)
@@ -562,6 +570,59 @@ class CreateStudentToClassroom(graphene.Mutation):
                 return CreateStudentToClassroom(
                     classroom = classroom,
                     student = student
+                )
+
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
+class CreateStudentsToClassroom(graphene.Mutation):
+    classroom = graphene.Field(ClassroomSchema)
+    class Arguments:
+        students = graphene.List(CreateStudentsInputs)
+
+    def mutate(
+        self,
+        info,
+        students,
+    ):
+
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+
+                for student_data in students:
+
+                    user = get_user_model()(
+                        username = student_data.username,
+                        first_name = student_data.name,
+                        last_name = student_data.last_name,
+                    )
+                    user.set_password(student_data.password)
+                    user.save()
+                    classroom = Classroom.objects.get(pk=student_data.classroom_id)
+                    if(len(classroom.student_set.all()) > Classroom.LIMIT_STUDENTS):
+                        raise Exception("Number of students exceeded in this classroom")
+                    student = Student(
+                        first_name=student_data.name,
+                        last_name=student_data.last_name,
+                        full_name=student_data.name + ' ' + student_data.last_name,
+                        user = user,
+                        classroom = classroom,
+                        audience = classroom.audience,
+                    )
+                    student.save()
+                    studentGrade = StudentGrade.objects.get_or_create(
+                        student = student,
+                        grade_id = student_data.grade_id
+                    )
+                return CreateStudentToClassroom(
+                    classroom = classroom,
                 )
 
         except (Exception, DatabaseError) as e:
@@ -654,9 +715,11 @@ class CreateGroup(graphene.Mutation):
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
+
 class StudentWithCoinsSchema(graphene.ObjectType):
     student = graphene.Field(StudentSchema)
     coins_sum = graphene.Int()
+
 class ClassroomReport(graphene.Mutation):
     coins_today = graphene.Int()
     goal_coins_per_day = graphene.Int()
@@ -728,6 +791,7 @@ class Mutation(graphene.ObjectType):
     update_classroom_settings = UpdateClassroomSettings.Field()
     import_student_to_classroom = ImportStudentToClassroom.Field()
     create_student_to_classroom = CreateStudentToClassroom.Field()
+    create_students_to_classroom = CreateStudentsToClassroom.Field()
     create_group = CreateGroup.Field()
     remove_student_from_classroom = RemoveStudentFromClassroom.Field()
     classroom_report = ClassroomReport.Field()
