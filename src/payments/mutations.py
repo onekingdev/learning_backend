@@ -19,8 +19,8 @@ class OrderDetailInput(graphene.InputObjectType):
 class CreateOrder(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
     teacher = graphene.Field('organization.schema.TeacherSchema')
-    order = graphene.Field('payments.schema.OrderSchema')
     school = graphene.Field('organization.schema.SchoolSchema')
+    order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
     url_redirect = graphene.String()
 
@@ -139,6 +139,7 @@ class CreateOrder(graphene.Mutation):
 class ConfirmPaymentOrder(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
     teacher = graphene.Field('organization.schema.TeacherSchema')
+    school = graphene.Field('organization.schema.SchoolSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
 
@@ -176,6 +177,7 @@ class ConfirmPaymentOrder(graphene.Mutation):
                 return ConfirmPaymentOrder(
                     guardian=order.guardian,
                     teacher=order.teacher,
+                    school = order.school,
                     order=order,
                     status="success"
                 )
