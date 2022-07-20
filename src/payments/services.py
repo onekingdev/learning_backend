@@ -531,6 +531,9 @@ def create_order(
     order.total = total
     order.save()
 
+    person.has_order = True
+    person.save()
+
     url_redirect = ""
     if order.payment_method.upper() == "PAYPAL":
         paypal = Paypal()
@@ -943,7 +946,8 @@ def create_order_with_out_pay(
 
     order.total = total
     order.save()
-
+    person.has_order = True
+    person.save()
     if person.coupon_code:
         order.discount_code = person.coupon_code.code
         order.save()
