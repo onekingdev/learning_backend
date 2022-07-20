@@ -11,15 +11,24 @@ class NotesSchema(DjangoObjectType):
 class Query(graphene.ObjectType):
     # ----------------- Organization ----------------- #
 
-    notes = graphene.List(NotesSchema)
-    notes_by_id = graphene.Field(
-        NotesSchema, id=graphene.String())
+    notes_of_user_received = graphene.List(
+        NotesSchema)
+    notes_of_user_sent = graphene.List(
+        NotesSchema)
 
-    def resolve_organizations(root, info, **kwargs):
-        # Querying a list
-        return Notes.objects.all()
+    def resolve_notes_of_user_received(root, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
 
-    def resolve_organization_by_id(root, info, id):
-        # Querying a single question
-        return Notes.objects.get(pk=id)
+        user = info.context.user
+
+        return Notes.objects.filter(user_to = user).all()
+
+    def resolve_notes_of_user_sent(root, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+
+        user = info.context.user
+        
+        return Notes.objects.filter(user_from = user).all()
 
