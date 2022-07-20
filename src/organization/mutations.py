@@ -715,13 +715,29 @@ class CreateStudentsToClassroom(graphene.Mutation):
 
         try:
             with transaction.atomic():
-                user = info.context.user
-                if user.is_anonymous:
+                user_me = info.context.user
+                if user_me.is_anonymous:
                     raise Exception('Authentication Required')
 
                 for student_data in students:
                     classroom = Classroom.objects.get(pk=student_data.classroom_id)
-                    if(len(classroom.student_set.all()) >= Classroom.LIMIT_STUDENTS):
+                    print(student_data)
+                    if user_me.profile.role == "teacher":
+                        teacher = user_me.schoolpersonnel.teacher
+                        if(TeacherClassroom.objects.filter(classroom = classroom, teacher = teacher).count() < 1):
+                            raise Exception("You are a teacher but don't have permission to control this classroom!")
+                    elif user_me.profile.role == "subscriber":
+                        subscriber = user_me.schoolpersonnel.subscriber
+                        if(TeacherClassroom.objects.filter(classroom = classroom, teacher__schoolteacher__school__schoolsubscriber__subscriber = subscriber).count() < 1):
+                            raise Exception("You are a subscriber but don't have permission to control this classroom!")
+                    elif user_me.profile.role == "adminTeacher":
+                        adminTeacher = user_me.schoolpersonnel.administrativepersonnel
+                        if(TeacherClassroom.objects.filter(classroom = classroom, teacher__schoolteacher__school__schooladministrativepersonnel__administrative_personnel = adminTeacher).count() < 1):
+                            raise Exception("You are a administrative but don't have permission to control this classroom!")
+                    else:
+                        raise Exception("You don't have permission to control this classroom!")
+                
+                    if(len(classroom.student_set.all()) >= Classroom.STUDENTS_LIMIT):
                         raise Exception("Number of students exceeded in this classroom")
                     user = get_user_model()(
                         username = student_data.username,
