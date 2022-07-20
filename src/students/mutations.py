@@ -448,9 +448,6 @@ class AssignStudentHomework(graphene.Mutation):
     student_homework = graphene.Field('students.schema.StudentHomeworkSchema')
     class Arguments:
         student_id = graphene.ID(required=True)
-        teacher_id = graphene.ID(required=False)
-        subscriber_id = graphene.ID(required=False)
-        administrative_id = graphene.ID(required=False)
         name = graphene.String(required=False)
         topic_id = graphene.ID(required=True)
         number_of_questions = graphene.Int(required=False)
@@ -463,9 +460,7 @@ class AssignStudentHomework(graphene.Mutation):
         student_id,
         topic_id,
         start_at,
-        teacher_id = None,
-        subscriber_id = None,
-        administrative_id = None,
+        
         name = None,
         number_of_questions = 10,
         end_at = None
@@ -474,7 +469,12 @@ class AssignStudentHomework(graphene.Mutation):
 
         if not user.is_authenticated:
             raise Exception("Authentication credentials were not provided")
-        
+
+        if not(user.profile.role == "subscriber" or user.profile.role == "adminTeacher" or user.profile.role == "teacher"):
+            raise Exception("You don't have this permission!")
+        teacher_id = user.schoolpersonnel.teacher.id if user.profile.role == "teacher" else None
+        subscriber_id = user.schoolpersonnel.subscriber.id if user.profile.role == "subscriber" else None
+        administrative_id = user.schoolpersonnel.administrativepersonnel.id if user.profile.role == "adminTeacher" else None
         topic = Topic.objects.get(pk = topic_id)
         student = Student.objects.get(pk = student_id)
         if name is None:
