@@ -832,6 +832,8 @@ class CreateGroup(graphene.Mutation):
                 user = info.context.user
                 if user.is_anonymous:
                     raise Exception('Authentication Required')
+                if not(user.profile.role == "subscriber" or user.profile.role == "adminTeacher" or user.profile.role == "teacher"):
+                    raise Exception("You don't have this permission!")
                 classroom = Classroom.objects.get(pk = classroom_id)
                 group = Group(
                     name = name,
