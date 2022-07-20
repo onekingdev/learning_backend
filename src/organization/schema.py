@@ -61,6 +61,11 @@ class ClassroomSchema(DjangoObjectType):
         model = Classroom
         fields = "__all__"
 
+    is_empty = graphene.Boolean()
+
+    def resolve_is_empty(self, info, language_code=None):
+        return self.isEmpty
+
 class TeacherClassroomSchema(DjangoObjectType):
     class Meta:
         model = TeacherClassroom

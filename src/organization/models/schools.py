@@ -141,6 +141,14 @@ class Classroom(TimestampModel, RandomSlugModel, IsActiveModel):
     sunday_start = models.TimeField(null=True, editable=True)
     sunday_end = models.TimeField(null=True, editable=True)
 
+    @property
+    def isEmpty(self):
+        if(len(self.student_set.all()) > 0):
+            return False
+        else: return True
+
+
+
 class TeacherClassroom(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'teacher_classroom_'
     teacher = models.ForeignKey(
