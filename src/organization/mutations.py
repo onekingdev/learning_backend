@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from graphene import ID
 from block.models import BlockPresentation
-from organization.models.schools import SchoolPersonnel, SchoolSubscriber, SchoolTeacher, Subscriber, TeacherClassroom
+from organization.models.schools import SchoolAdministrativePersonnel, SchoolPersonnel, SchoolSubscriber, SchoolTeacher, Subscriber, TeacherClassroom
 from users.schema import UserSchema, UserProfileSchema
 from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolPersonnelSchema, SchoolSchema, SubscriberSchema, TeacherSchema, GroupSchema
 from organization.models import School, Group, Teacher, Classroom, AdministrativePersonnel
@@ -383,11 +383,13 @@ class CreateTeachersInSchool(graphene.Mutation):
     school = graphene.Field(SchoolSchema)
     class Arguments:
         teachers = graphene.List(CreateTeacherInput)
+        school_id = graphene.ID()
 
     def mutate(
         self,
         info,
-        teachers
+        teachers,
+        school_id
     ):
 
         try:
@@ -395,8 +397,28 @@ class CreateTeachersInSchool(graphene.Mutation):
                 user = info.context.user
                 if user.is_anonymous:
                     raise Exception('Authentication Required')
-                school = user.schoolpersonnel.school
-                for teacher in teachers:
+                if not(user.profile.role == "subscriber" or user.profile.role == "adminTeacher"):
+                    raise Exception("You don't have this permission!")
+
+                school = School.objects.get(pk = school_id)
+                if(user.profile.role == "subscriber") :
+                    subscriber = school.schoolsubscriber.subscriber
+                    if user.id != subscriber.user.id:
+                        raise Exception("You don't have permission to control this school!")
+                if(user.profile.role == "adminTeacher") :
+                    if len(SchoolAdministrativePersonnel.objects.filter(school = school, administrative_personnel__user = user)) == 0:
+                        raise Exception("You don't have permission to control this school!")
+
+                available_school_teachers = SchoolTeacher.objects.filter(school = school, teacher__isnull = True, order_detail__isnull=False)
+                print(available_school_teachers)
+                if len(available_school_teachers) < len(teachers):
+                    raise Exception("Number of teachers are bigger than registe available teachers number")
+                pointer = 0
+                for available_school_teacher in available_school_teachers:
+                    if pointer >= len(teachers):
+                        break
+                    teacher = teachers[pointer]
+                # for teacher in teachers:
                     user = get_user_model()(
                         username = teacher.username,
                         first_name = teacher.name,
@@ -406,21 +428,36 @@ class CreateTeachersInSchool(graphene.Mutation):
                     user.email = teacher.email
                     user.save()
                     if(teacher.user_type == "Admin"):
+                        
+                        # print("sap is ", sap)
                         admin = AdministrativePersonnel.objects.create(
-                            school = school,
+                            # schooladministrativepe rsonnel = sap,
                             user = user,
-                            name = teacher.name,
+                            first_name = teacher.name,
                             last_name = teacher.last_name,
                             gender = teacher.gender,
                         )
+                        sap = SchoolAdministrativePersonnel.objects.create(
+                            school = school,
+                            order_detail = available_school_teacher.order_detail,
+                            cancel_reason = available_school_teacher.cancel_reason,
+                            is_cancel = available_school_teacher.is_cancel,
+                            is_paid = available_school_teacher.is_paid,
+                            expired_at = available_school_teacher.expired_at,
+                            period = available_school_teacher.period,
+                            administrative_personnel = admin,
+                        )
+                        available_school_teacher.hard_delete()
                     else : 
                         teacher= Teacher.objects.create(
-                            school=school,
                             user=user,
-                            name=teacher.name,
+                            first_name=teacher.name,
                             last_name=teacher.last_name,
                             gender = teacher.gender,
                         )
+                        available_school_teachers[pointer].teacher = teacher
+                        available_school_teachers[pointer].save()
+                    pointer += 1
 
                 return CreateTeachersInSchool(
                     school = school
