@@ -1,20 +1,15 @@
 import graphene
 from graphql import GraphQLError
+
+from certificates.schema import CertificatesSchema, StudentCertificatesSchema
 from .models import Certificates, StudentCertificates
 
 
 # Create Certificate
 class CreateCertificate(graphene.Mutation):
-    id = graphene.ID()
-    image = graphene.String()
-    pos_title = graphene.Float()
-    pos_editable_text = graphene.Float()
-    pos_student_name = graphene.Float()
-    pos_text = graphene.Float()
-    pos_name = graphene.Float()
-    pos_from_who = graphene.Float()
+    certificate = graphene.Field(CertificatesSchema)
 
-    class Argument:
+    class Arguments:
         image = graphene.String(required=True)
         pos_title = graphene.Float(required=True)
         pos_editable_text = graphene.Float(required=True)
@@ -23,7 +18,6 @@ class CreateCertificate(graphene.Mutation):
         pos_name = graphene.Float(required=True)
         pos_from_who = graphene.Float(required=True)
 
-    @classmethod
     def mutate(root, info, image, pos_title, pos_editable_text, pos_student_name, pos_text, pos_name, pos_from_who):
         if not info.context.user.is_authenticated:
             raise Exception("Authentication credentials were not provided")
@@ -43,16 +37,9 @@ class CreateCertificate(graphene.Mutation):
 
 # Update Certificate
 class UpdateCertificate(graphene.Mutation):
-    certificate_id = graphene.ID()
-    image = graphene.String()
-    pos_title = graphene.Float()
-    pos_editable_text = graphene.Float()
-    pos_student_name = graphene.Float()
-    pos_text = graphene.Float()
-    pos_name = graphene.Float()
-    pos_from_who = graphene.Float()
+    certificate = graphene.Field(CertificatesSchema)
 
-    class Argument:
+    class Arguments:
         certificate_id = graphene.ID(required=True)
         image = graphene.String(required=False)
         pos_title = graphene.Float(required=False)
@@ -83,15 +70,11 @@ class UpdateCertificate(graphene.Mutation):
 
 # Create Student Certificate
 class CreateStudentCertificate(graphene.Mutation):
-    id = graphene.ID()
-    title = graphene.String()
-    editableText = graphene.String()
-    text = graphene.String()
-    certificate = graphene.Int()
-    fromWho = graphene.Int()
-    toWho = graphene.Int()
+    student_certificate = graphene.Field(StudentCertificatesSchema)
+    certificate = graphene.Field(CertificatesSchema)
 
-    class Argument:
+
+    class Arguments:
         title = graphene.String(required=True)
         editableText = graphene.String(required=True)
         text = graphene.String(required=True)
@@ -112,15 +95,9 @@ class CreateStudentCertificate(graphene.Mutation):
 
 # Update Student Certificate
 class UpdateStudentCertificate(graphene.Mutation):
-    id = graphene.ID()
-    title = graphene.String()
-    editableText = graphene.String()
-    text = graphene.String()
-    certificate = graphene.Int()
-    fromWho = graphene.Int()
-    toWho = graphene.Int()
-
-    class Argument:
+    student_certificate = graphene.Field(StudentCertificatesSchema)
+    
+    class Arguments:
         student_certificate_id = graphene.ID(required=True)
         title = graphene.String(required=False)
         editableText = graphene.String(required=False)

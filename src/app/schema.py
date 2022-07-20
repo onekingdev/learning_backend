@@ -35,6 +35,8 @@ import treasuretrack.schema
 import treasuretrack.mutations
 import badges.schema
 import notes.schema
+import certificates.schema
+import certificates.mutations
 from django.utils import timezone
 
 class CustomTokenAuth(ObtainJSONWebToken):
@@ -74,6 +76,7 @@ class Mutation(
     users.mutations.Mutation,
     treasuretrack.mutations.Mutation,
     organization.mutations.Mutation,
+    certificates.mutations.Mutation,
     graphene.ObjectType
 ):
     token_auth = CustomTokenAuth.Field()
@@ -103,6 +106,7 @@ class Query(
         wallets.schema.Query,
         badges.schema.Query,
         notes.schema.Query,
+        certificates.schema.Query,
         graphene.ObjectType):
     pass
 

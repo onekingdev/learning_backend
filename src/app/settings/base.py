@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'badges',
     'block',
     'collectibles',
+    'certificates',
     'emails',
     'engine',
     'experiences',
