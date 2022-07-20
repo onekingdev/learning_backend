@@ -91,6 +91,7 @@ class AdministrativePersonnel(SchoolPersonnel):
 
 class Teacher(SchoolPersonnel):
     PREFIX = 'teacher_personnel_'
+    CLASSROOM_LIMIT = 30
     pass
 
 class Subscriber(SchoolPersonnel):

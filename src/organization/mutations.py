@@ -139,6 +139,8 @@ class CreateClassroom(graphene.Mutation):
                 user = info.context.user
                 if user.is_anonymous:
                     raise Exception('Authentication Required')
+                if(user.schoolpersonnel is None):
+                    raise Exception("You don't have permission!")
                 # grade = Grade.objects.get(pk=grade_id)
                 audience = Audience.objects.get(pk=audience_id)
                 teacher = user.schoolpersonnel.teacher;
@@ -198,9 +200,24 @@ class CreateClassroomToSchool(graphene.Mutation):
                 role = user.profile.role
                 if(not(role == "adminTeacher" or role == "subscriber")):
                     raise Exception("You don't have permission!")
+                teacher = Teacher.objects.get(pk=teacher_id)
+                if(role == "adminTeacher"):
+                    school = user.schoolpersonnel.administrativepersonnel.schooladministrativepersonnel.school
+                    if len(SchoolTeacher.objects.filter(school = school, teacher = teacher) < 1):
+                        raise Exception("Teacher is not your school's teacher")
+                elif(role == "subscriber"):
+                    school = teacher.schoolteacher.school
+                    subscriber_me = user.schoolpersonnel.subscriber
+                    print("school is ", school.id)
+                    print("subscriber me is ", subscriber_me.id)
+                    if len(SchoolSubscriber.objects.filter(school = school, subscriber = subscriber_me)) < 1:
+                        raise Exception("Teacher is not your school's teacher")
+
+                if TeacherClassroom.objects.filter(teacher = teacher).count() >= Teacher.CLASSROOM_LIMIT:
+                    raise Exception("The number of teacher's classrooms has been exceeded")
+
                 # grade = Grade.objects.get(pk=grade_id)
                 audience = Audience.objects.get(pk=audience_id)
-                teacher = Teacher.objects.get(pk=teacher_id)
                 
                 classroom = Classroom(
                     name=name,
