@@ -55,7 +55,6 @@ class CreateTeacher(graphene.Mutation):
         info,
         first_name,
         last_name,
-        school_id,
         zip,
         country,
         email,
