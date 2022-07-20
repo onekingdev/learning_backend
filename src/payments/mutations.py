@@ -391,7 +391,7 @@ class CreateOrderWithOutPay(graphene.Mutation):
     order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
     teacher = graphene.Field('organization.schema.TeacherSchema')
-
+    school = graphene.Field('organization.schema.SchoolSchema')
     class Arguments:
         guardian_id = graphene.ID(required=False)
         teacher_id = graphene.ID(required=False)
@@ -458,6 +458,7 @@ class CreateOrderWithOutPay(graphene.Mutation):
                 return CreateOrderWithOutPay(
                     guardian=create_order_resp.order.guardian,
                     teacher=create_order_resp.order.teacher,
+                    school =create_order_resp.order.school,
                     order=create_order_resp.order,
                     status="success",
                 )
