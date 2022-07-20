@@ -528,6 +528,7 @@ class UpdateClassroomSettings(graphene.Mutation):
         sunday_end,
         time_zone_value,
         time_zone_offset,
+        goal_coins_per_day,
         language = None,
     ):
 
@@ -536,6 +537,8 @@ class UpdateClassroomSettings(graphene.Mutation):
                 user = info.context.user
                 if user.is_anonymous:
                     raise Exception('Authentication Required')
+                if not(user.profile.role == "subscriber" or user.profile.role == "adminTeacher" or user.profile.role == "teacher"):
+                    raise Exception("You don't have this permission!")
                 classroom = Classroom.objects.get(pk=classroom_id)
                 classroom.language = language
                 classroom.enable_games = enable_game
@@ -556,6 +559,7 @@ class UpdateClassroomSettings(graphene.Mutation):
                 classroom.saturday_end = saturday_end
                 classroom.sunday_start = sunday_start
                 classroom.sunday_end = sunday_end
+                classroom.goal_coins_per_day = goal_coins_per_day
                 classroom.save()
                 return UpdateClassroomSettings(
                     classroom = classroom,
