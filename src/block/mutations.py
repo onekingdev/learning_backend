@@ -419,7 +419,7 @@ class FinishBlockPresentation(graphene.Mutation):
             student_homework = block.student_homework
             student_homework.status = "Done"
             student_homework.save()
-            student_homework.delete()
+            # student_homework.delete()
         else:
             incorrect_exp_unit = 0
             correct_exp_unit = 0
