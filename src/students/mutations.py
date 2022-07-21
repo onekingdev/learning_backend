@@ -460,7 +460,6 @@ class AssignStudentHomework(graphene.Mutation):
         student_id,
         topic_id,
         start_at,
-        
         name = None,
         number_of_questions = 10,
         end_at = None
@@ -492,6 +491,57 @@ class AssignStudentHomework(graphene.Mutation):
         )
 
         return AssignStudentHomework(student_homework=student_homework)
+
+class AssignStudentsHomework(graphene.Mutation):
+    user = graphene.Field(UserSchema)
+    
+    class Arguments:
+        student_ids = graphene.List(ID, required=True)
+        name = graphene.String(required=False)
+        topic_id = graphene.ID(required=True)
+        number_of_questions = graphene.Int(required=False)
+        start_at = graphene.Date(required=True)
+        end_at = graphene.Date(required=False)
+
+    def mutate(
+        self,
+        info,
+        student_ids,
+        topic_id,
+        start_at,
+        name = None,
+        number_of_questions = 10,
+        end_at = None
+        ):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+
+        if not(user.profile.role == "subscriber" or user.profile.role == "adminTeacher" or user.profile.role == "teacher"):
+            raise Exception("You don't have this permission!")
+        teacher_id = user.schoolpersonnel.teacher.id if user.profile.role == "teacher" else None
+        subscriber_id = user.schoolpersonnel.subscriber.id if user.profile.role == "subscriber" else None
+        administrative_id = user.schoolpersonnel.administrativepersonnel.id if user.profile.role == "adminTeacher" else None
+        topic = Topic.objects.get(pk = topic_id)
+ 
+        for student_id in student_ids :
+
+            if name is None:
+                name = topic.name
+            student_homework = StudentHomework.objects.create(
+                student_id = student_id,
+                topic_id = topic_id,
+                start_at = start_at,
+                end_at = end_at,
+                name=name,
+                number_of_questions = number_of_questions,
+                assigned_teacher_id = teacher_id,
+                assigned_subscriber_id = subscriber_id,
+                assigned_administrative_id = administrative_id
+            )
+
+        return AssignStudentsHomework(user = user)
 
 
 class Mutation(graphene.ObjectType):
