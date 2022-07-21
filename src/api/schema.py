@@ -9,11 +9,14 @@ from django.utils import timezone
 
 from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
+from guardians.schema import GuardianSchema
+from organization.schema import AdministrativePersonnelSchema, SubscriberSchema, TeacherSchema
 # from graphql_auth.schema import UserQuery, MeQuery
 # from graphql_auth import mutations
 from students.models import Student
 from guardians.models import Guardian, GuardianStudent
 from payments.models import DiscountCode
+from students.schema import StudentSchema
 from users.schema import UserSchema, UserProfileSchema
 from users.models import User
 import graphene
@@ -209,13 +212,28 @@ class Mutation(graphene.ObjectType):
     # send_password_reset_email = mutations.SendPasswordResetEmail.Field()
     # password_reset = mutations.PasswordReset.Field()
 
+class WhoamiInput(graphene.ObjectType):
+   user = graphene.Field(UserSchema)
+   student = graphene.Field(StudentSchema)
+   guardian = graphene.Field(GuardianSchema)
+   subscriber = graphene.Field(SubscriberSchema)
+   teacher = graphene.Field(TeacherSchema)
+   administrativepersonnel = graphene.Field(AdministrativePersonnelSchema)
 
 class Query(graphene.ObjectType):
-    whoami = graphene.Field(UserSchema)
+    whoami = graphene.Field(WhoamiInput)
     users = graphene.List(UserSchema)
 
     def resolve_whoami(root, info, **kwargs):
         user = info.context.user
+        data = {
+            "user" : user,
+            "student" : user.student if hasattr(user, "student") else None,
+            "guardian": user.guardian if hasattr(user, "guardian") else None,
+            "subscriber": user.schoolpersonnel.subscriber if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber") else None,
+            "teacher": user.schoolpersonnel.teacher if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher") else None,
+            "administrativepersonnel": user.schoolpersonnel.administrativepersonnel if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "administrativepersonnel") else None,
+        } 
         # TODO: Move to cronjob
         # if user.student:
         #     student = user.student
@@ -233,7 +251,7 @@ class Query(graphene.ObjectType):
         #             side=Account.SIDE_CHOICE_RIGHT_INTEREST)
         if user.is_anonymous:
             raise Exception('Authentication Failure')
-        return user
+        return data
 
     def resolve_users(root, info, **kwargs):
         user = info.context.user
