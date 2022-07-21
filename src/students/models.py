@@ -531,3 +531,15 @@ class StudentHomework(TimestampModel, UUIDModel, IsActiveModel):
     assigned_subscriber = models.ForeignKey(Subscriber, on_delete=models.CASCADE, null=True, blank=True)
     assigned_administrative = models.ForeignKey(AdministrativePersonnel, on_delete=models.CASCADE, null=True, blank=True)
 
+    @property
+    def result(self):
+        blocks = self.block_set.all()
+        hits = 0
+        total = 0
+        for block in blocks:
+            block_presentations = block.blockpresentation_set.all()
+            for block_presentation in block_presentations:
+                hits += block_presentation.hits
+                total += block_presentation.total
+        return {"hits": hits, "total": total}
+

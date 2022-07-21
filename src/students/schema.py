@@ -26,6 +26,9 @@ class CoinGraphType(graphene.ObjectType):
     def resolve_coins(self, info):
         return self['coins']
 
+class StudentHomeworkResultType(graphene.ObjectType):
+    hits = graphene.Int()
+    total = graphene.Int()
 
 class QuestionsGraphType(graphene.ObjectType):
     day = graphene.Date()
@@ -180,6 +183,12 @@ class StudentHomeworkSchema(DjangoObjectType):
     class Meta:
         model = StudentHomework
         fields = "__all__"
+
+    result = graphene.Field(StudentHomeworkResultType)
+
+    def resolve_result(self, info):
+        result = self.result
+        return {"hits" : result['hits'], "total" : result['total']}
 
 class HonorRollWithCurrentGradeSchema(graphene.ObjectType):
     students = graphene.List(StudentSchema)

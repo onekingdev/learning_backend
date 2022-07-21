@@ -494,7 +494,7 @@ class AssignStudentHomework(graphene.Mutation):
 
 class AssignStudentsHomework(graphene.Mutation):
     user = graphene.Field(UserSchema)
-    
+
     class Arguments:
         student_ids = graphene.List(ID, required=True)
         name = graphene.String(required=False)
@@ -553,3 +553,4 @@ class Mutation(graphene.ObjectType):
     update_is_new = UpdateIsNew.Field()
     update_student = UpdateStudent.Field()
     assign_student_homework = AssignStudentHomework.Field()
+    assign_students_homework = AssignStudentsHomework.Field()
