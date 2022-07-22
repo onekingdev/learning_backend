@@ -116,7 +116,7 @@ class QuestionResource(TranslatableModelResource):
         model = Question
         skip_unchanged = True
         report_skipped = False
-        use_bulk = True
+        # use_bulk = True
         field = (
             'id',
             'identifier',
@@ -141,7 +141,7 @@ class QuestionResource(TranslatableModelResource):
             'update_timestamp',
             'topic_grade',
         )
-        import_id_fields = ('id')
+        import_id_fields = ('id', 'identifier')
 
 
 class QuestionImageAssetResource(ModelResource):
