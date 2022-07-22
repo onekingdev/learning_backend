@@ -544,6 +544,32 @@ class AssignStudentsHomework(graphene.Mutation):
 
         return AssignStudentsHomework(user = user)
 
+class ExtendStudentHomework(graphene.Mutation):
+    student_homework = graphene.Field('students.schema.StudentHomeworkSchema')
+    user = graphene.Field(UserSchema)
+    class Arguments:
+        student_homework_id = graphene.ID(required=True)
+        extend_date = graphene.Date(required=True)
+
+    def mutate(
+        self,
+        info,
+        student_homework_id,
+        extend_date,
+        ):
+        user = info.context.user
+
+        if not user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+
+        if not(user.profile.role == "subscriber" or user.profile.role == "adminTeacher" or user.profile.role == "teacher"):
+            raise Exception("You don't have this permission!")
+
+        student_homework = StudentHomework.objects.get(pk = student_homework_id)
+        student_homework.end_at = extend_date
+        student_homework.save()
+
+        return ExtendStudentHomework(user = user, student_homework=student_homework)
 
 class Mutation(graphene.ObjectType):
     create_student = CreateStudent.Field()
@@ -555,3 +581,4 @@ class Mutation(graphene.ObjectType):
     update_student = UpdateStudent.Field()
     assign_student_homework = AssignStudentHomework.Field()
     assign_students_homework = AssignStudentsHomework.Field()
+    extend_student_homework = ExtendStudentHomework.Field()
