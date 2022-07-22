@@ -99,7 +99,7 @@ class TopicAdmin(parler_admin.TranslatableAdmin, import_export_admin.ImportExpor
     resource_class = resources.TopicResource
     list_display = ('id', 'tree_actions', 'indented_title', 'area_of_knowledge', 'standard_topic',)
     search_fields = ('id', 'translations__name')
-    list_filter = ('area_of_knowledge', 'is_active', 'create_timestamp', 'update_timestamp')
+    list_filter = ('area_of_knowledge', 'topicgrade__grade' ,'is_active', 'create_timestamp', 'update_timestamp', )
     actions = [hard_delete_selected]
 
 
@@ -112,7 +112,7 @@ class PrerequisiteAdmin(
     list_display = ('id', 'topic', 'information')
     search_fields = ('id', 'topic__translations__name', 'prerequisites__translations__name',
                      'information', 'topic__area_of_knowledge')
-    list_filter = ('topic__area_of_knowledge__universal_area_knowledge', 'topic__area_of_knowledge')
+    list_filter = ('topic__area_of_knowledge__universal_area_knowledge', 'topic__area_of_knowledge', 'topic__topicgrade__grade' ,)
     autocomplete_fields = ['topic', 'prerequisites']
 
 
