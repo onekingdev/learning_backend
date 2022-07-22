@@ -33,7 +33,6 @@ class AreaOfKnowledgeResource(TranslatableModelResource):
         report_skipped = False
         import_id_fields = ('id', 'identifier')
 
-
 class TopicResource(TranslatableModelResource):
     language_code = Field(
         attribute='_current_language'
@@ -89,8 +88,6 @@ class GradeResource(TranslatableModelResource):
         )
         import_id_fields = ('id', 'identifier')
        
-
-
 class TopicGradeResource(ModelResource):
     class Meta:
         model = TopicGrade
@@ -111,8 +108,6 @@ class TopicGradeResource(ModelResource):
             'is_active'
         )
         import_id_fields = ('id', 'identifier')
-
-
 
 class QuestionResource(TranslatableModelResource):
     language_code = Field(
@@ -152,7 +147,6 @@ class QuestionResource(TranslatableModelResource):
         )
         import_id_fields = ('id', 'identifier')
 
-
 class QuestionImageAssetResource(ModelResource):
     class Meta:
         model = QuestionImageAsset
@@ -173,8 +167,6 @@ class QuestionImageAssetResource(ModelResource):
             'image'
         )
         import_id_fields = ('id', 'identifier')
-
-
 
 class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
@@ -232,8 +224,6 @@ class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
         )
         import_id_fields = ('id', 'identifier')
 
-
-
 class MultipleSelectAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
         attribute='_current_language'
@@ -289,8 +279,6 @@ class MultipleSelectAnswerOptionResource(TranslatableModelResource):
         )
         import_id_fields = ('id', 'identifier')
 
-
-
 class TypeInAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
         attribute='_current_language'
@@ -329,8 +317,6 @@ class TypeInAnswerOptionResource(TranslatableModelResource):
         )
         import_id_fields = ('id', 'identifier')
 
-
-
 class OrderAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
         attribute='_current_language'
@@ -368,8 +354,6 @@ class OrderAnswerOptionResource(TranslatableModelResource):
             'random_slug',
         )
         import_id_fields = ('id', 'identifier')
-
-
 
 class RelateAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
@@ -415,8 +399,6 @@ class RelateAnswerOptionResource(TranslatableModelResource):
         )
         import_id_fields = ('id', 'identifier')
 
-
-
 class AnswerOptionResource(TranslatableModelResource):
     language_code = Field(
         attribute='_current_language'
@@ -453,8 +435,6 @@ class AnswerOptionResource(TranslatableModelResource):
         )
         import_id_fields = ('id', 'identifier')
 
-
-
 class QuestionAudioAssetResource(ModelResource):
     class Meta:
         model = QuestionAudioAsset
@@ -476,8 +456,6 @@ class QuestionAudioAssetResource(ModelResource):
         )
         import_id_fields = ('id', 'identifier')
 
-
-
 class PrerequisiteResource(ModelResource):
     class Meta:
         model = Prerequisite
@@ -485,8 +463,6 @@ class PrerequisiteResource(ModelResource):
         report_skipped = False
         fields = ['id', 'topic', 'prerequisites', 'identifier']
         import_id_fields = ('id', 'identifier')
-
-
 
 class GradePrerequisiteResource(ModelResource):
     class Meta:
