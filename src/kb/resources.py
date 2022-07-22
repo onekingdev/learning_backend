@@ -31,6 +31,7 @@ class AreaOfKnowledgeResource(TranslatableModelResource):
         model = AreaOfKnowledge
         skip_unchanged = True
         report_skipped = False
+        import_id_fields = ('id', 'identifier')
 
 
 class TopicResource(TranslatableModelResource):
@@ -55,6 +56,7 @@ class TopicResource(TranslatableModelResource):
         fields = (
             'id',
             'language_code',
+            'identifier',
             'name',
             'is_active',
             'parent',
@@ -62,7 +64,7 @@ class TopicResource(TranslatableModelResource):
             'area_of_knowledge',
             'standard_topic',
         )
-
+        import_id_fields = ('id', 'identifier')
 
 class GradeResource(TranslatableModelResource):
     language_code = Field(
@@ -79,11 +81,14 @@ class GradeResource(TranslatableModelResource):
         report_skipped = False
         fields = (
             'id',
+            'identifier',
             'language_code',
             'name',
             'audience',
             'is_active',
         )
+        import_id_fields = ('id', 'identifier')
+       
 
 
 class TopicGradeResource(ModelResource):
@@ -93,16 +98,20 @@ class TopicGradeResource(ModelResource):
         report_skipped = False
         fields = (
             'id',
+            'identifier',
             'topic',
             'grade',
             'is_active',
         )
         export_order = (
             'id',
+            'identifier',
             'topic',
             'grade',
             'is_active'
         )
+        import_id_fields = ('id', 'identifier')
+
 
 
 class QuestionResource(TranslatableModelResource):
@@ -163,6 +172,8 @@ class QuestionImageAssetResource(ModelResource):
             'order',
             'image'
         )
+        import_id_fields = ('id', 'identifier')
+
 
 
 class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
@@ -192,7 +203,7 @@ class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
         report_skipped = False
         fields = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -204,7 +215,7 @@ class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
         )
         export_order = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -219,6 +230,8 @@ class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
+        import_id_fields = ('id', 'identifier')
+
 
 
 class MultipleSelectAnswerOptionResource(TranslatableModelResource):
@@ -247,7 +260,7 @@ class MultipleSelectAnswerOptionResource(TranslatableModelResource):
         report_skipped = False
         fields = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -259,7 +272,7 @@ class MultipleSelectAnswerOptionResource(TranslatableModelResource):
         )
         export_order = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -274,6 +287,8 @@ class MultipleSelectAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
+        import_id_fields = ('id', 'identifier')
+
 
 
 class TypeInAnswerOptionResource(TranslatableModelResource):
@@ -291,7 +306,7 @@ class TypeInAnswerOptionResource(TranslatableModelResource):
         report_skipped = False
         fields = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -300,7 +315,7 @@ class TypeInAnswerOptionResource(TranslatableModelResource):
         )
         export_order = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -312,6 +327,8 @@ class TypeInAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
+        import_id_fields = ('id', 'identifier')
+
 
 
 class OrderAnswerOptionResource(TranslatableModelResource):
@@ -329,7 +346,7 @@ class OrderAnswerOptionResource(TranslatableModelResource):
         report_skipped = False
         fields = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -338,7 +355,7 @@ class OrderAnswerOptionResource(TranslatableModelResource):
         )
         export_order = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -350,6 +367,8 @@ class OrderAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
+        import_id_fields = ('id', 'identifier')
+
 
 
 class RelateAnswerOptionResource(TranslatableModelResource):
@@ -373,7 +392,7 @@ class RelateAnswerOptionResource(TranslatableModelResource):
         report_skipped = False
         fields = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'key',
             'value',
@@ -382,7 +401,7 @@ class RelateAnswerOptionResource(TranslatableModelResource):
         )
         export_order = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'key',
             'value',
@@ -394,6 +413,8 @@ class RelateAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
+        import_id_fields = ('id', 'identifier')
+
 
 
 class AnswerOptionResource(TranslatableModelResource):
@@ -411,7 +432,7 @@ class AnswerOptionResource(TranslatableModelResource):
         report_skipped = False
         fields = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -419,7 +440,7 @@ class AnswerOptionResource(TranslatableModelResource):
         )
         export_order = (
             'id',
-            # 'identifier',
+            'identifier',
             'language_code',
             'answer_text',
             'question',
@@ -430,6 +451,8 @@ class AnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
+        import_id_fields = ('id', 'identifier')
+
 
 
 class QuestionAudioAssetResource(ModelResource):
@@ -451,6 +474,8 @@ class QuestionAudioAssetResource(ModelResource):
             'order',
             'audio_file'
         )
+        import_id_fields = ('id', 'identifier')
+
 
 
 class PrerequisiteResource(ModelResource):
@@ -458,7 +483,9 @@ class PrerequisiteResource(ModelResource):
         model = Prerequisite
         skip_unchanged = True
         report_skipped = False
-        fields = ['id', 'topic', 'prerequisites']
+        fields = ['id', 'topic', 'prerequisites', 'identifier']
+        import_id_fields = ('id', 'identifier')
+
 
 
 class GradePrerequisiteResource(ModelResource):
@@ -468,8 +495,11 @@ class GradePrerequisiteResource(ModelResource):
         report_skipped = False
         fields = [
             'id',
+            'identifier',
             'area_of_knowledge',
             'grade',
             'mastery',
             'competence',
         ]
+        import_id_fields = ('id', 'identifier')
+
