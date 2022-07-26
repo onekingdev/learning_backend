@@ -406,7 +406,7 @@ class UpdateStudent(graphene.Mutation):
         last_name = graphene.String(required=False)
         classroom_id = graphene.ID(required=False)
         username = graphene.String(required=False)
-        group_id = graphene.ID(required=False)
+        group_ids = graphene.List(graphene.ID, required=False)
         password = graphene.String(required=False)
 
     def mutate(
@@ -418,7 +418,7 @@ class UpdateStudent(graphene.Mutation):
         last_name=None,
         classroom_id=None,
         username=None,
-        group_id=None,
+        group_ids=None,
         password=None):
         user = info.context.user
 
@@ -428,17 +428,20 @@ class UpdateStudent(graphene.Mutation):
         student = Student.objects.get(pk = student_id)
         student.first_name = name
         student.last_name = last_name
-        studentGrade = StudentGrade(
+        studentGrade = StudentGrade.objects.get_or_create(
             grade = Grade.objects.get(pk = grade_id),
             student = student
         )
-        studentGrade.save()
         student.classroom = Classroom.objects.get(pk = classroom_id)
         student.user.username = username
         student.user.first_name = name
         student.user.last_name = last_name
         student.user.set_password(password)
         student.user.save()
+
+        for groud_id in group_ids:
+            group = Group.objects.get(pk = groud_id)
+            student.group.add(group)
         # group actions
         student.save()
 
