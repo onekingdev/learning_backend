@@ -44,17 +44,76 @@ class CustomTokenAuth(ObtainJSONWebToken):
     @classmethod
     def resolve(cls, root, info, **kwargs):
         user = info.context.user
-        if hasattr(user, 'student'):
-            student_plan = user.student.guardianstudentplan
-            student_plan.is_cancel = student_plan.order_detail.is_cancel
-            student_plan.is_paid = student_plan.order_detail.is_paid
-            student_plan.expired_at = student_plan.order_detail.expired_at
-            student_plan.save()
+        role = user.profile.role
+        if role == 'guardian':
+            pass
+        if role == 'student':
+            student = user.student
+            
+            if hasattr(student, 'guardianstudentplan'):
+                student_plan = student.guardianstudentplan
+                # student_plan.is_cancel = student_plan.order_detail.is_cancel
+                # student_plan.is_paid = student_plan.order_detail.is_paid
+                # student_plan.expired_at = student_plan.order_detail.expired_at
+                # student_plan.save()
 
-            if student_plan.is_cancel:
-                raise Exception("Please reactive your plan")
-            if student_plan.expired_at and student_plan.expired_at < timezone.now():
-                raise Exception("Expiration date has expired")
+                if student_plan.is_cancel:
+                    raise Exception("Please reactive your plan")
+                if student_plan.expired_at and student_plan.expired_at < timezone.now():
+                    raise Exception("Expiration date has expired")
+
+            elif hasattr(student, 'classroom'):
+                teacher_classroom = student.classroom.teacherclassroom
+                teacher = teacher_classroom.teacher
+                school_teacher = teacher.schoolteacher if hasattr(teacher, 'schoolteacher') else None
+                school_teacher_is_cancel = False
+                school_teacher_is_expired = False
+                school_teacher_not_registered = False
+                teacher_classroom_is_cancel = False
+                teacher_classroom_is_expired = False
+
+                if school_teacher:
+                    if school_teacher.is_cancel:
+                        school_teacher_is_cancel = True
+                    if school_teacher.expired_at and school_teacher.expired_at < timezone.now():
+                        school_teacher_is_expired = True
+                else:
+                    school_teacher_is_cancel = True
+                    school_teacher_is_expired = True
+                    school_teacher_not_registered = True
+
+                if teacher_classroom.is_cancel:
+                    teacher_classroom_is_cancel = True
+                if teacher_classroom.expired_at and teacher_classroom.expired_at < timezone.now():
+                    teacher_classroom_is_expired = True
+
+                if((school_teacher_is_cancel and not school_teacher_not_registered) or teacher_classroom_is_cancel):
+                    raise Exception("Please reactive your plan")
+
+                if((school_teacher_is_expired and not school_teacher_not_registered) or teacher_classroom_is_cancel):
+                    raise Exception("Expiration date has expired")
+                    
+            else :
+                raise Exception("You don't have any plan!")
+
+        if role == 'subscriber':
+            pass
+        if role == 'teacher':
+            pass
+        if role == 'adminTeacher':
+            pass
+
+        # if hasattr(user, 'student'):
+        #     student_plan = user.student.guardianstudentplan
+        #     student_plan.is_cancel = student_plan.order_detail.is_cancel
+        #     student_plan.is_paid = student_plan.order_detail.is_paid
+        #     student_plan.expired_at = student_plan.order_detail.expired_at
+        #     student_plan.save()
+
+        #     if student_plan.is_cancel:
+        #         raise Exception("Please reactive your plan")
+        #     if student_plan.expired_at and student_plan.expired_at < timezone.now():
+        #         raise Exception("Expiration date has expired")
             
         user.last_login = timezone.now()
         user.save()
