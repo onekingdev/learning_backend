@@ -520,8 +520,8 @@ class StudentHomework(TimestampModel, UUIDModel, IsActiveModel):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=False)
     number_of_questions = models.IntegerField(null=False, default=10)
-    start_at = models.DateField(editable=True, null=True, blank=True )
-    end_at = models.DateField(editable=True, null=True, blank=True )
+    start_at = models.DateTimeField(editable=True, null=True, blank=True )
+    end_at = models.DateTimeField(editable=True, null=True, blank=True )
     status = models.CharField(
         default=HOMEWORK_PENDING,
         choices=HOMEWORK_STATUS_SET,

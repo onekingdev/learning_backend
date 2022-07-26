@@ -452,8 +452,8 @@ class AssignStudentHomework(graphene.Mutation):
         name = graphene.String(required=False)
         topic_id = graphene.ID(required=True)
         number_of_questions = graphene.Int(required=False)
-        start_at = graphene.Date(required=True)
-        end_at = graphene.Date(required=False)
+        start_at = graphene.DateTime(required=True)
+        end_at = graphene.DateTime(required=False)
 
     def mutate(
         self,
@@ -501,8 +501,8 @@ class AssignStudentsHomework(graphene.Mutation):
         name = graphene.String(required=False)
         topic_id = graphene.ID(required=True)
         number_of_questions = graphene.Int(required=False)
-        start_at = graphene.Date(required=True)
-        end_at = graphene.Date(required=False)
+        start_at = graphene.DateTime(required=True)
+        end_at = graphene.DateTime(required=False)
 
     def mutate(
         self,
