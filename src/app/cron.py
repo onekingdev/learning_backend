@@ -7,7 +7,7 @@ def backup_database():
     backup_name = f'db-backup_${current_datetime}'
     backup_filename = f'{backup_name}.psql'
     
-    call_command('dbbackup', '--quiet', '--compress', '--output-filename', backup_name)
+    call_command('dbbackup', '--output-filename', backup_name)
 
     backup = Backup.objects.create(backup_name=backup_name, backup_file=backup_filename)
     backup.save()

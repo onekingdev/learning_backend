@@ -8,8 +8,8 @@ import os
 
 class DatabaseBackup(models.Model):
     id = models.AutoField(primary_key=True)
-    backup_name = models.CharField(max_length=64)
-    backup_filename = models.CharField(max_length=255)
+    backup_name = models.CharField(max_length=64, null = True, blank = True,)
+    backup_filename = models.CharField(max_length=255, null = True, blank = True,)
     backup_date = models.DateTimeField(auto_now_add=True)
 
     @property
