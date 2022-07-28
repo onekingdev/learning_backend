@@ -128,9 +128,9 @@ class CreateHomeworkBlockPresentation(graphene.Mutation):
         student_homework = StudentHomework.objects.get(pk = student_homework_id)
         if( student_homework.student != student):
             raise Exception("This homework is not yours!")
-        if( now.strptime(student_homework.start_at, "%Y-%m-%d") > now ):
+        if( student_homework.start_at > now ):
             raise Exception(f"You can start this homework at {student_homework.start_at}")
-        if( (student_homework.end_at is not None) and (now.strptime(student_homework.end_at, "%Y-%m-%d") < now)) :
+        if( (student_homework.end_at is not None) and (student_homework.end_at) < now) :
             student_homework.status = "Expired"
             student_homework.save()
             student_homework.delete()
