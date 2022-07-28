@@ -571,3 +571,4 @@ class Mutation(graphene.ObjectType):
     create_ai_block_presentation = CreateAIBlockPresentation.Field()
     finish_block_presentation = FinishBlockPresentation.Field()
     create_block_presentation_by_question_id = CreateBlockPresentationByQuestionId.Field()
+    create_homework_block_presentation=  CreateHomeworkBlockPresentation.Field()
