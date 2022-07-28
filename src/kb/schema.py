@@ -156,7 +156,8 @@ class QuestionSchema(DjangoObjectType):
     answer_options = graphene.List('kb.schema.AnswerOptionUnionSchema')
 
     def resolve_question_text(self, info, language_code=None):
-        return strip_tags(self.safe_translation_getter("question_text", any_language=True))
+        # return strip_tags(self.safe_translation_getter("question_text", any_language=True))
+        return self.safe_translation_getter("question_text", any_language=True)
 
     def resolve_question_image_assets(self, info):
         return self.get_questionimageasset_set()
