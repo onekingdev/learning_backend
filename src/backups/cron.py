@@ -1,9 +1,10 @@
 from django.core.management import call_command
-from datetime import datetime
 from backups.models import Backup
+from django.utils import timezone
 
 def backup_database():
-    current_datetime = datetime().strftime('%Y%m%d_%H%M%S')
+    current_datetime = timezone.now().strftime('%Y%m%d_%H%M%S')
+
     backup_name = f'db-backup_${current_datetime}'
     backup_filename = f'{backup_name}.psql'
     

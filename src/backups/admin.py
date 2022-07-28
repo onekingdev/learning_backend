@@ -30,7 +30,7 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         """
-        When create a backup data in the db, make database backup file
+        When create a backup model data in the db, make database backup file
         in other thread.
         """
         if not change and not obj.backup_filename:
@@ -43,10 +43,13 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
         else : super().save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
+        """
+        When delete a backup model data from the db, 
+        check if db backup filed exists.
+        If file exists, remove db backup file from local storage too.
+        """
         filename = obj.backup_filename
-        
         file_path = os.path.abspath(os.getcwd()) + f'\\backups\\database_backup\\{filename}'
-        print( file_path)
         if os.path.isfile(file_path) :
             os.remove(file_path)
             print(" this file exists")
@@ -55,6 +58,9 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
         return super().delete_model(request, obj)
 
     def get_urls(self):
+        """
+        Add custome defined urls for download and restore a database backup file
+        """
         urls = super(DatabaseBackupAdmin, self).get_urls()
         urls += [
             url(r'^download/(?P<pk>\d+)$', self.download_file,
@@ -65,6 +71,10 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
         return urls
 
     def download_link(self, obj):
+        """
+        Add the button to django admin list table to download db backup file.
+        When a user press this button, visit .../download/pk url.
+        """
         if obj.id is not None:
             return format_html(
                 '<a class = "download" href="{}" >Download</a>',
@@ -74,6 +84,9 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
     download_link.short_description = "Backup download"
 
     def download_file(self, request, pk):
+        """
+        Download a db backupfile indentified by databaseBackup model pk.
+        """
         database_backup = DatabaseBackup.objects.get(pk=pk)
         output_filename = database_backup.backup_filename
         backup_filepath = f'{Path(__file__).resolve().parent.parent}/backups/database_backup/{output_filename}'
@@ -89,6 +102,10 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
         return response
 
     def restore_link(self, obj):
+        """
+        Add the button to django admin list table to restore a db backup file.
+        When a user press this button, visit .../restore/pk url.
+        """
         if obj.id is not None:
             return format_html(
                 '<a class = "restore" href="{}">Restore</a>',
@@ -98,6 +115,9 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
     restore_link.short_description = "Restore DB"
 
     def restore_db(self, request, pk):
+        """
+        Restore a db backupfile indentified by databaseBackup model pk.
+        """
         database_backup = DatabaseBackup.objects.get(pk=pk)
         input_filename = database_backup.backup_filename
         call_command('dbrestore', '--quiet', '--noinput', '--input-filename', input_filename)
