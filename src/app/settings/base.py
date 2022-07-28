@@ -279,7 +279,7 @@ CRONJOBS = [
     # ('*/1 * * * *', 'treasuretrack.cron.giveWeeklyBonus')
     ('59 23 * * *', 'custom.cron.send_report_mail', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
     # ('*/2 * * * *', 'custom.cron.send_report_mail', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
-    ('0 1 * * *', 'app.cron.backup_database', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
+    ('0 1 * * *', 'backups.cron.backup_database', '>> ' + os.path.join(BASE_DIR,'log/cron_job.log' + ' 2>&1 ')),
 
 
 ]
