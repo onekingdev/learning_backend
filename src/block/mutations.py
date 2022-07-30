@@ -133,7 +133,7 @@ class CreateHomeworkBlockPresentation(graphene.Mutation):
         if( (student_homework.end_at is not None) and (student_homework.end_at) < now) :
             student_homework.status = "Expired"
             student_homework.save()
-            student_homework.delete()
+            # student_homework.delete()
             raise Exception(f"You should finish this homework at {student_homework.end_at}. But time has passed!")
 
         topic = student_homework.topic

@@ -3,7 +3,7 @@ from django.db.models import Sum
 from app.models import TimestampModel, UUIDModel, IsActiveModel
 from experiences.models import Level
 from engine.models import TopicMasterySettings
-from block.models import BlockQuestionPresentation, BlockTransaction
+from block.models import Block, BlockQuestionPresentation, BlockTransaction
 from kb.models.topics import GradePrerequisite, Topic
 from organization.models.schools import AdministrativePersonnel, Subscriber, Teacher
 from treasuretrack.models import WeeklyTreasureLevel
@@ -533,7 +533,7 @@ class StudentHomework(TimestampModel, UUIDModel, IsActiveModel):
 
     @property
     def result(self):
-        blocks = self.block_set.all()
+        blocks = Block.all_objects.filter(students__id = self.pk).all()
         hits = 0
         total = 0
         for block in blocks:
