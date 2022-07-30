@@ -191,8 +191,8 @@ class StudentHomeworkSchema(DjangoObjectType):
         result = self.result
         return {"hits" : result['hits'], "total" : result['total']}
 
-    block = graphene.List(BlockSchema)
-    def resolve_block(self, info):
+    block_with_deactive = graphene.List(BlockSchema)
+    def resolve_block_with_deactive(self, info):
         return Block.all_objects.filter(students__id = self.pk).all()
 
 class HonorRollWithCurrentGradeSchema(graphene.ObjectType):
