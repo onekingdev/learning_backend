@@ -55,6 +55,12 @@ class BlockSchema(DjangoObjectType):
     def resolve_questions(self, info):
         return self.questions.all()
 
+    block_presentation_all = graphene.List('block.schema.BlockPresentationSchema')
+    def resolve_block_presentation_all(self, info):
+        return BlockPresentation.all_objects.filter(block = self.pk).all()
+
+
+
 
 class BlockConfigurationSchema(DjangoObjectType):
     class Meta:

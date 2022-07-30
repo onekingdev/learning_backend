@@ -4,6 +4,7 @@ from django.db.models.functions import TruncDay
 from django.utils import timezone
 from datetime import timedelta
 from graphene_django import DjangoObjectType
+from block.schema import BlockSchema
 from organization.schema import ClassroomSchema
 from students.models import Student, StudentHomework, StudentTopicMastery, StudentGrade, StudentAchievement
 from wallets.models import CoinWallet
@@ -190,10 +191,10 @@ class StudentHomeworkSchema(DjangoObjectType):
         result = self.result
         return {"hits" : result['hits'], "total" : result['total']}
 
-    block = graphene.List(Block)
+    block = graphene.List(BlockSchema)
     def resolve_block(self, info):
         return Block.all_objects.filter(students__id = self.pk).all()
-        
+
 class HonorRollWithCurrentGradeSchema(graphene.ObjectType):
     students = graphene.List(StudentSchema)
     grade = graphene.Int()
