@@ -533,9 +533,7 @@ class StudentHomework(TimestampModel, UUIDModel, IsActiveModel):
 
     @property
     def result(self):
-        print("here is result", self.id)
-        blocks = Block.all_objects.filter(students__id = self.pk).all()
-        print(blocks)
+        blocks = Block.all_objects.filter(student_homework__id = self.pk).all()
         hits = 0
         total = 0
         for block in blocks:
