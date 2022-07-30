@@ -11,7 +11,7 @@ from wallets.schema import CoinWalletSchema
 from experiences.schema import LevelSchema
 from guardians.models import GuardianStudent
 from avatars.models import StudentAvatar
-from block.models import BlockTransaction, BlockQuestionPresentation
+from block.models import Block, BlockTransaction, BlockQuestionPresentation
 from treasuretrack.models import WeeklyTreasureLevel
 from treasuretrack.schema import WeeklyTreasureLevelSchema
 
@@ -190,6 +190,10 @@ class StudentHomeworkSchema(DjangoObjectType):
         result = self.result
         return {"hits" : result['hits'], "total" : result['total']}
 
+    block = graphene.List(Block)
+    def resolve_block(self, info):
+        return Block.all_objects.filter(students__id = self.pk).all()
+        
 class HonorRollWithCurrentGradeSchema(graphene.ObjectType):
     students = graphene.List(StudentSchema)
     grade = graphene.Int()
