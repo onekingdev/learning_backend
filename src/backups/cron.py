@@ -1,5 +1,5 @@
 from django.core.management import call_command
-from backups.models import Backup
+from backups.models import Backup, DatabaseBackup
 from django.utils import timezone
 
 def backup_database():
@@ -7,9 +7,9 @@ def backup_database():
 
     backup_name = f'db-backup_${current_datetime}'
     backup_filename = f'{backup_name}.psql'
+    description = "Daily Backup"
     
     call_command('dbbackup', '--output-filename', backup_name)
 
-    backup = Backup.objects.create(backup_name=backup_name, backup_file=backup_filename)
-    backup.save()
+    backup = Backup.objects.create(backup_name=backup_name, backup_file=backup_filename, status=DatabaseBackup.STATUS_READY, description=description)
     

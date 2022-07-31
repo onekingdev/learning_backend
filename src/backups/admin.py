@@ -16,9 +16,9 @@ from django.conf import settings
 
 @admin.register(DatabaseBackup)
 class DatabaseBackupAdmin(admin.ModelAdmin):
-    list_display = ('id', 'backup_name', 'backup_filename', 'backup_date', 'download_link', 'restore_link')
+    list_display = ('id', 'backup_name', "description", 'backup_filename', 'backup_date', 'status', 'download_link', 'restore_link')
     search_fields = ('id', 'backup_name', 'backup_filename')
-    readonly_fields = ('download_link','restore_link', 'backup_date',)
+    readonly_fields = ('download_link','restore_link', 'backup_date',  'status')
     list_filter = ('backup_date',)
     actions = None      # Remove default delete action in the table
 
@@ -27,6 +27,9 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
         Execute database backup django command for working in another thread.
         """
         call_command('dbbackup', '--output-filename', backup_name)
+        current_backup = DatabaseBackup.objects.get(backup_filename = backup_name)
+        current_backup.status = DatabaseBackup.STATUS_READY
+        current_backup.save()
     
     def save_model(self, request, obj, form, change):
         """
@@ -37,10 +40,13 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
             current_datetime = timezone.now().strftime('%Y%m%d_%H%M%S')
             if not obj.backup_name : obj.backup_name = f'db-backup_${current_datetime}'
             obj.backup_filename=f'db-backup_${current_datetime}.psql'
+            if obj.description is None : obj.description = "Manual Backup"
             th = threading.Thread(target=self.excute_dbbackup, args=[obj.backup_filename])
             th.start()
             super().save_model(request, obj, form, change)
-        else : super().save_model(request, obj, form, change)
+        else : 
+            obj.status = DatabaseBackup.STATUS_READY
+            super().save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
         """
@@ -77,8 +83,9 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
         """
         if obj.id is not None:
             return format_html(
-                '<a class = "download" href="{}" >Download</a>',
-                reverse('admin:backups_databasebackup_download', args=[obj.pk])
+                '<a class = "download" href="{}" style="visibility: {};">Download</a>',
+                reverse('admin:backups_databasebackup_download', args=[obj.pk]) , 
+                "hidden" if obj.status != DatabaseBackup.STATUS_READY else "unset"
             )
         return "-"
     download_link.short_description = "Backup download"
@@ -108,8 +115,9 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
         """
         if obj.id is not None:
             return format_html(
-                '<a class = "restore" href="{}">Restore</a>',
-                reverse('admin:backups_databasebackup_restore', args=[obj.pk])
+                '<a class = "restore" href="{}" style="visibility: {};">Restore</a>',
+                reverse('admin:backups_databasebackup_restore', args=[obj.pk]),
+                "hidden" if obj.status != DatabaseBackup.STATUS_READY else "unset"
             )
         return "-"
     restore_link.short_description = "Restore DB"
