@@ -1,5 +1,5 @@
 from django.core.management import call_command
-from backups.models import Backup, DatabaseBackup
+from backups.models import DatabaseBackup
 from django.utils import timezone
 
 def backup_database():
@@ -11,5 +11,5 @@ def backup_database():
     
     call_command('dbbackup', '--output-filename', backup_name)
 
-    backup = Backup.objects.create(backup_name=backup_name, backup_file=backup_filename, status=DatabaseBackup.STATUS_READY, description=description)
+    backup = DatabaseBackup.objects.create(backup_name=backup_name, backup_file=backup_filename, status=DatabaseBackup.STATUS_READY, description=description)
     
