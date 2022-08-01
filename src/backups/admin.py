@@ -130,6 +130,9 @@ class DatabaseBackupAdmin(admin.ModelAdmin):
         input_filename = database_backup.backup_filename
         call_command('dbrestore', '--quiet', '--noinput', '--input-filename', input_filename)
         messages.success(request, 'Successfully Restore our DB')
-
+        data = DatabaseBackup.objects.order_by("-backup_date").all()
+        if len(data) > 0 : 
+            data[0].status = DatabaseBackup.STATUS_READY
+            data[0].save()
         response = HttpResponseRedirect("/admin/backups/databasebackup/")
         return response
