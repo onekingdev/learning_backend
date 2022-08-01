@@ -927,6 +927,71 @@ class ClassroomReport(graphene.Mutation):
             questions_all = result_all['total__sum'] if result_all['total__sum'] else 0,
         )
 
+class SchoolReport(graphene.Mutation):
+    coins_today = graphene.Int()
+    goal_coins_per_day = graphene.Int()
+    correct_questions_count_today = graphene.Int()
+    correct_questions_count_yesterday = graphene.Int()
+    coins_yesterday = graphene.Int()
+    school_leaders_yesterday = graphene.List(StudentWithCoinsSchema)
+    coins_all = graphene.Int()
+    questions_all = graphene.Int()
+
+    class Arguments:
+        school_id = graphene.ID()
+
+    def mutate(
+        self,
+        info,
+        school_id,
+    ):
+        print("start school")
+        school = School.objects.get(pk = school_id)
+
+        now = timezone.now()
+        print(now)
+        today_start = now.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+        print("today")
+        yesterday_start = (today_start - datetime.timedelta(1))
+        print("yesterday")
+        classrooms_aggregate = Classroom.objects.filter(teacherclassroom__teacher__schoolteacher__school = school).aggregate(Sum('goal_coins_per_day'))
+        print("here classroom aggregate")
+        #--------- make conditions to filter only students in the classroom -S--------------#
+        students = Student.objects.filter(classroom__teacherclassroom__teacher__schoolteacher__school = school)
+
+        filter_condition_students = None
+        for student in students:
+            if filter_condition_students is None:
+                filter_condition_students = Q(student=student)
+            else : filter_condition_students = filter_condition_students | Q(student=student)
+        #--------- make conditions to filter only students in the classroom -E--------------#
+        
+        query_set_block_presentations_from_yesterday = BlockPresentation.all_objects.filter(filter_condition_students).filter(update_timestamp__gt = yesterday_start)
+        query_set_block_presentations_only_yesterday = query_set_block_presentations_from_yesterday.filter(update_timestamp__lte = today_start)
+        query_set_block_presentations_only_today = query_set_block_presentations_from_yesterday.filter(update_timestamp__gt = today_start)
+        result_yesterday_for_leaders = query_set_block_presentations_only_yesterday.values('student').annotate(coins_sum=Sum('coins')).order_by('-coins_sum')[:5]
+        result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('coins'),Sum('hits'),Sum('total'))
+        result_today = query_set_block_presentations_only_today.aggregate(Sum('coins'),Sum('hits'),Sum('total'))
+        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('coins'),Sum('hits'),Sum('total'))
+
+        #----------replace student id to student schema in the leaders in the yesterday -S------#
+        for key,result_yesterday_for_leader in enumerate(result_yesterday_for_leaders) :
+            student_id =  result_yesterday_for_leaders[key]['student']
+            student = Student.objects.get(pk = student_id)
+            result_yesterday_for_leaders[key]['student'] = student
+        #----------replace student id to student schema in the leaders in the yesterday -E------#
+
+        return SchoolReport(
+            coins_today =result_today['coins__sum'] if result_today['coins__sum'] else 0,
+            goal_coins_per_day = classrooms_aggregate['goal_coins_per_day__sum'] if classrooms_aggregate['goal_coins_per_day__sum'] else 0,
+            correct_questions_count_today = result_today['hits__sum'] if result_today['hits__sum'] else 0,
+            correct_questions_count_yesterday = result_yesterday['hits__sum'] if result_yesterday['hits__sum'] else 0,
+            coins_yesterday = result_yesterday['coins__sum'] if result_yesterday['coins__sum'] else 0,
+            school_leaders_yesterday = result_yesterday_for_leaders,
+            coins_all = result_all['coins__sum'] if result_all['coins__sum'] else 0,
+            questions_all = result_all['total__sum'] if result_all['total__sum'] else 0,
+        )
+
 class Mutation(graphene.ObjectType):
     create_teacher = CreateTeacher.Field()
     create_classroom = CreateClassroom.Field()
@@ -940,4 +1005,5 @@ class Mutation(graphene.ObjectType):
     create_group = CreateGroup.Field()
     remove_student_from_classroom = RemoveStudentFromClassroom.Field()
     classroom_report = ClassroomReport.Field()
+    school_report = SchoolReport.Field()
     add_school = AddSchool.Field()
