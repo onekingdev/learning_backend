@@ -6,7 +6,9 @@ import graphene
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
 from graphene import ID
+from avatars.models import Avatar, StudentAvatar
 from block.models import BlockPresentation
+from experiences.models import Battery
 from organization.models.schools import SchoolAdministrativePersonnel, SchoolPersonnel, SchoolSubscriber, SchoolTeacher, Subscriber, TeacherClassroom
 from users.schema import UserSchema, UserProfileSchema
 from organization.schema import AdministrativePersonnelSchema, ClassroomSchema, SchoolPersonnelSchema, SchoolSchema, SubscriberSchema, TeacherSchema, GroupSchema
@@ -705,6 +707,33 @@ class CreateStudentToClassroom(graphene.Mutation):
                     audience = classroom.audience,
                 )
                 student.save()
+
+                battery, new = Battery.objects.get_or_create(
+                    student=student,
+                )
+                battery.save()
+
+                # set default avatar
+                accessories = Avatar.objects.filter(type_of="ACCESSORIES")
+                heads = Avatar.objects.filter(type_of="HEAD")
+                clothes = Avatar.objects.filter(type_of="CLOTHES")
+                pants = Avatar.objects.filter(type_of="PANTS")
+
+                list_avatar_items = [random.choice(accessories), random.choice(heads), random.choice(clothes), random.choice(pants)]
+
+                for avatar in list_avatar_items:
+                    student_avatar = StudentAvatar.objects.create(
+                        student_id=student.id, avatar_id=avatar.id)
+                    avatar_type = avatar.type_of
+                    StudentAvatar.objects.filter(
+                        student=student,
+                        avatar__type_of=avatar_type,
+                        in_use=True).update(
+                        in_use=False)
+                    student_avatar.in_use = True
+                    student_avatar.save()
+
+                # set grade to student
                 studentGrade = StudentGrade.objects.get_or_create(
                     student = student,
                     grade_id = grade_id
@@ -775,6 +804,32 @@ class CreateStudentsToClassroom(graphene.Mutation):
                         audience = classroom.audience,
                     )
                     student.save()
+
+                    battery, new = Battery.objects.get_or_create(
+                        student=student,
+                    )
+                    battery.save()
+
+                    # set default avatar
+                    accessories = Avatar.objects.filter(type_of="ACCESSORIES")
+                    heads = Avatar.objects.filter(type_of="HEAD")
+                    clothes = Avatar.objects.filter(type_of="CLOTHES")
+                    pants = Avatar.objects.filter(type_of="PANTS")
+
+                    list_avatar_items = [random.choice(accessories), random.choice(heads), random.choice(clothes), random.choice(pants)]
+
+                    for avatar in list_avatar_items:
+                        student_avatar = StudentAvatar.objects.create(
+                            student_id=student.id, avatar_id=avatar.id)
+                        avatar_type = avatar.type_of
+                        StudentAvatar.objects.filter(
+                            student=student,
+                            avatar__type_of=avatar_type,
+                            in_use=True).update(
+                            in_use=False)
+                        student_avatar.in_use = True
+                        student_avatar.save()
+                        
                     studentGrade = StudentGrade.objects.get_or_create(
                         student = student,
                         grade_id = student_data.grade_id
