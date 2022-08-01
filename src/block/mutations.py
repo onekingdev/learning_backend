@@ -203,7 +203,7 @@ class CreateAIBlockPresentation(graphene.Mutation):
             student = user.student
         else:
             student = Student.objects.get(id=student_id)
-        if(len(student.guardianstudentplan.subject.filter(pk = aok_id)) < 1 and student.classroom is None):
+        if(student.classroom is None and len(student.guardianstudentplan.subject.filter(pk = aok_id)) < 1):
             raise Exception("You don't have correct permission to use this subject")
 
         # Define weights for status and mastery
