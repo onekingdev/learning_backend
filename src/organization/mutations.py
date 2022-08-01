@@ -119,24 +119,30 @@ class CreateClassroom(graphene.Mutation):
         # grade_id = graphene.ID(required=True)
         # language = graphene.String(required=True)
         audience_id = graphene.ID(required=True)
+        teacher_id = graphene.ID(required=False)
 
     def mutate(
         self,
         info,
         name,
         audience_id,
+        teacher_id = None,
     ):
 
         try:
             with transaction.atomic():
                 user = info.context.user
+                role = user.profile.role
                 if user.is_anonymous:
                     raise Exception('Authentication Required')
-                if(user.schoolpersonnel is None):
+                if(user.schoolpersonnel is None and teacher_id is None):
                     raise Exception("You don't have permission!")
+                elif(teacher_id is not None and not(role == "adminTeacher" or role == "subscriber")):
+                    raise Exception("You don't have permission!")
+
                 # grade = Grade.objects.get(pk=grade_id)
                 audience = Audience.objects.get(pk=audience_id)
-                teacher = user.schoolpersonnel.teacher;
+                teacher = user.schoolpersonnel.teacher if teacher_id is None else Teacher.objects.get(pk = teacher_id);
                 
                 classroom = Classroom(
                     name=name,
