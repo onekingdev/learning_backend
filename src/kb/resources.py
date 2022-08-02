@@ -31,7 +31,7 @@ class AreaOfKnowledgeResource(TranslatableModelResource):
         model = AreaOfKnowledge
         skip_unchanged = True
         report_skipped = False
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class TopicResource(TranslatableModelResource):
     language_code = Field(
@@ -63,7 +63,7 @@ class TopicResource(TranslatableModelResource):
             'area_of_knowledge',
             'standard_topic',
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class GradeResource(TranslatableModelResource):
     language_code = Field(
@@ -86,7 +86,7 @@ class GradeResource(TranslatableModelResource):
             'audience',
             'is_active',
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
        
 class TopicGradeResource(ModelResource):
     class Meta:
@@ -107,7 +107,7 @@ class TopicGradeResource(ModelResource):
             'grade',
             'is_active'
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class QuestionResource(TranslatableModelResource):
     language_code = Field(
@@ -145,7 +145,7 @@ class QuestionResource(TranslatableModelResource):
             'update_timestamp',
             'topic_grade',
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class QuestionImageAssetResource(ModelResource):
     class Meta:
@@ -166,7 +166,7 @@ class QuestionImageAssetResource(ModelResource):
             'order',
             'image'
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
@@ -222,7 +222,7 @@ class MultipleChoiceAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class MultipleSelectAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
@@ -277,7 +277,7 @@ class MultipleSelectAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class TypeInAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
@@ -315,7 +315,7 @@ class TypeInAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class OrderAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
@@ -353,7 +353,7 @@ class OrderAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class RelateAnswerOptionResource(TranslatableModelResource):
     language_code = Field(
@@ -397,7 +397,7 @@ class RelateAnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class AnswerOptionResource(TranslatableModelResource):
     language_code = Field(
@@ -433,7 +433,7 @@ class AnswerOptionResource(TranslatableModelResource):
             'update_timestamp',
             'random_slug',
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class QuestionAudioAssetResource(ModelResource):
     class Meta:
@@ -454,7 +454,7 @@ class QuestionAudioAssetResource(ModelResource):
             'order',
             'audio_file'
         )
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class PrerequisiteResource(ModelResource):
     class Meta:
@@ -462,7 +462,7 @@ class PrerequisiteResource(ModelResource):
         skip_unchanged = True
         report_skipped = False
         fields = ['id', 'topic', 'prerequisites', 'identifier']
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
 class GradePrerequisiteResource(ModelResource):
     class Meta:
@@ -477,5 +477,5 @@ class GradePrerequisiteResource(ModelResource):
             'mastery',
             'competence',
         ]
-        import_id_fields = ('id', 'identifier')
+        import_id_fields = ('id', )
 
