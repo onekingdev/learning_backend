@@ -9,7 +9,7 @@ def backup_database():
     backup_filename = f'{backup_name}.psql'
     description = "Daily Backup"
     
-    call_command('dbbackup', '--output-filename', backup_name)
+    call_command('dbbackup', '--output-filename', backup_filename)
 
     backup = DatabaseBackup.objects.create(backup_name=backup_name, backup_filename=backup_filename, status=DatabaseBackup.STATUS_READY, description=description)
     
