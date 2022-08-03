@@ -5,7 +5,7 @@ from .models import Plan, GuardianStudentPlan, StudentPlan
 
 @admin.register(Plan)
 class PlanAdmin(import_export_admin.ImportExportModelAdmin):
-    list_display = ('id', 'name', 'description', 'area_of_knowledge', 'price_month', 'price_year', 'currency')
+    list_display = ('id', 'name', 'description', 'area_of_knowledge', 'price_month', 'price_preferential_month', 'quantity_preferential_month', 'price_year', 'price_preferential_year', 'quantity_preferential_year', 'currency', 'quantity_lower_limit')
     search_fields = ('id', 'name', 'description')
     list_filter = ('area_of_knowledge', 'currency', 'price_month', 'price_year',
                    'is_active', 'create_timestamp', 'update_timestamp')

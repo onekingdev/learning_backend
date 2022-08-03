@@ -470,9 +470,9 @@ def create_order(
         #         order_detail_price += tmp_order_detail.quantity * (tmp_order_detail.plan.price_year / 2)
 
         if tmp_order_detail.period == "MONTHLY":
-            order_detail_price += tmp_order_detail.plan.price_month if(tmp_order_detail.quantity == 1) else (tmp_order_detail.quantity - 1) * (tmp_order_detail.plan.price_preferential_month) + tmp_order_detail.plan.price_month
+            order_detail_price += tmp_order_detail.plan.price_month * tmp_order_detail.quantity if(tmp_order_detail.quantity < tmp_order_detail.plan.quantity_preferential_month) else (tmp_order_detail.quantity - tmp_order_detail.plan.quantity_preferential_month + 1) * (tmp_order_detail.plan.price_preferential_month) + tmp_order_detail.plan.price_month * (tmp_order_detail.plan.quantity_preferential_month - 1)
         else:
-            order_detail_price += tmp_order_detail.plan.price_year if(tmp_order_detail.quantity == 1) else (tmp_order_detail.quantity - 1) * (tmp_order_detail.plan.price_preferential_year) + tmp_order_detail.plan.price_year
+            order_detail_price += tmp_order_detail.plan.price_year * tmp_order_detail.quantity if(tmp_order_detail.quantity < tmp_order_detail.plan.quantity_preferential_year) else (tmp_order_detail.quantity - tmp_order_detail.plan.quantity_preferential_year + 1) * (tmp_order_detail.plan.price_preferential_year) + tmp_order_detail.plan.price_year * (tmp_order_detail.plan.quantity_preferential_year - 1)
 
         # # check plan payment id by payment_method
         # payment_method_plan_id = ""

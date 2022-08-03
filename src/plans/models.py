@@ -13,13 +13,16 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
         ("ALL", "ALL"), ("ONE", "ONE"), ("TWO", "TWO")), default="ALL", blank=True, null=True)
     slug = models.SlugField(editable=False)
     price_month = models.DecimalField(
-        max_digits=15, decimal_places=2, default=0)
+        max_digits=15, decimal_places=3, default=0)
     price_preferential_month = models.DecimalField(
         max_digits=15, decimal_places=3, default=0)
+    quantity_preferential_month = models.IntegerField(null=False, default = 2)
     price_year = models.DecimalField(
-        max_digits=15, decimal_places=2, default=0)
+        max_digits=15, decimal_places=3, default=0)
     price_preferential_year = models.DecimalField(
         max_digits=15, decimal_places=3, default=0)
+    quantity_preferential_year = models.IntegerField(null=False, default = 2)
+    quantity_lower_limit = models.IntegerField(null=False, default = 1)
     currency = models.CharField(max_length=4)
     stripe_monthly_plan_id = models.CharField(max_length=255, blank=True)
     stripe_monthly_plan_preferential_price_id = models.CharField(
