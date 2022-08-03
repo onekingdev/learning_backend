@@ -11,5 +11,5 @@ def backup_database():
     
     call_command('dbbackup', '--output-filename', backup_name)
 
-    backup = DatabaseBackup.objects.create(backup_name=backup_name, backup_file=backup_filename, status=DatabaseBackup.STATUS_READY, description=description)
+    backup = DatabaseBackup.objects.create(backup_name=backup_name, backup_filename=backup_filename, status=DatabaseBackup.STATUS_READY, description=description)
     
