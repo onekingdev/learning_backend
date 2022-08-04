@@ -53,29 +53,31 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
             #---------------- Get price object from stripe by id and get price and quantity from price obj -S-----------------#
             monthly_price = card.get_price_by_id(id = self.stripe_monthly_plan_id)
             print(monthly_price)
-            for tier in monthly_price.tiers:
-                if(tier.up_to is not None):
-                    price['price_month'] = float(tier.unit_amount_decimal) / 100
-                    price['quantity_preferential_month'] = int(tier.up_to) + 1
+            try:
 
-            monthly_preferential_price = card.get_price_by_id(id = self.stripe_monthly_plan_preferential_price_id)
-            for tier in monthly_preferential_price.tiers:
-                if(tier.up_to is None):
-                    price['price_preferential_month'] = float(tier.unit_amount_decimal) / 100
-                    
+                for tier in monthly_price.tiers:
+                    if(tier.up_to is not None):
+                        price['price_month'] = float(tier.unit_amount_decimal) / 100
+                        price['quantity_preferential_month'] = int(tier.up_to) + 1
 
-            yearly_price = card.get_price_by_id(id = self.stripe_yearly_plan_id)
-            print(yearly_price)
+                monthly_preferential_price = card.get_price_by_id(id = self.stripe_monthly_plan_preferential_price_id)
+                for tier in monthly_preferential_price.tiers:
+                    if(tier.up_to is None):
+                        price['price_preferential_month'] = float(tier.unit_amount_decimal) / 100
+                        
 
-            for tier in yearly_price.tiers:
-                if(tier.up_to is not None):
-                    price['price_year'] = float(tier.unit_amount_decimal) / 100
-                    price['quantity_preferential_year'] = int(tier.up_to) + 1
+                yearly_price = card.get_price_by_id(id = self.stripe_yearly_plan_id)
+                for tier in yearly_price.tiers:
+                    if(tier.up_to is not None):
+                        price['price_year'] = float(tier.unit_amount_decimal) / 100
+                        price['quantity_preferential_year'] = int(tier.up_to) + 1
 
-            yearly_preferential_price = card.get_price_by_id(id = self.stripe_yearly_plan_preferential_price_id)
-            for tier in yearly_preferential_price.tiers:
-                if(tier.up_to is None):
-                    price['price_preferential_year'] = float(tier.unit_amount_decimal) / 100
+                yearly_preferential_price = card.get_price_by_id(id = self.stripe_yearly_plan_preferential_price_id)
+                for tier in yearly_preferential_price.tiers:
+                    if(tier.up_to is None):
+                        price['price_preferential_year'] = float(tier.unit_amount_decimal) / 100
+            except Exception as e:
+                print(e)
             #---------------- Get price object from stripe by id and get price and quantity from price obj -E-----------------#
 
             #---------------- If price is not equal with price in strip, create another price in the strip -S-----------------#
@@ -95,11 +97,13 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
                     price_preferential_year = self.price_preferential_year,
                     quantity_preferential_year = self.quantity_preferential_year
                 )
-
-                card.delete_price(price_id = self.stripe_monthly_plan_id)
-                card.delete_price(price_id = self.stripe_monthly_plan_preferential_price_id)
-                card.delete_price(price_id = self.stripe_yearly_plan_id)
-                card.delete_price(price_id = self.stripe_yearly_plan_preferential_price_id)
+                try:
+                    card.delete_price(price_id = self.stripe_monthly_plan_id)
+                    card.delete_price(price_id = self.stripe_monthly_plan_preferential_price_id)
+                    card.delete_price(price_id = self.stripe_yearly_plan_id)
+                    card.delete_price(price_id = self.stripe_yearly_plan_preferential_price_id)
+                except Exception as e :
+                    print(e)
 
                 self.stripe_monthly_plan_id = prices['price_month'].id
                 self.stripe_monthly_plan_preferential_price_id = prices['price_month'].id
