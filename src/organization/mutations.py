@@ -142,9 +142,17 @@ class CreateClassroom(graphene.Mutation):
                 elif(teacher_id is not None and not(role == "adminTeacher" or role == "subscriber")):
                     raise Exception("You don't have permission!")
 
+                    
                 # grade = Grade.objects.get(pk=grade_id)
                 audience = Audience.objects.get(pk=audience_id)
+                    
                 teacher = user.schoolpersonnel.teacher if teacher_id is None else Teacher.objects.get(pk = teacher_id);
+                if (role == "adminTeacher"):
+                    count = SchoolTeacher.objects.filter(teacher = teacher, school__schooladministrativepersonnel__administrativePersonnel = user.schoolpersonnel.administrativepersonnel).count()
+                    if(count < 1) : raise Exception("You don't have permission!")
+                elif(role == "subscriber"):
+                    count = SchoolTeacher.objects.filter(teacher = teacher, school__schoolsubscriber__subscriber = user.schoolpersonnel.subscriber).count()
+                    if(count < 1) : raise Exception("You don't have permission!")
                 
                 classroom = Classroom(
                     name=name,
