@@ -2,13 +2,15 @@ from django.db import models
 from django.utils.text import slugify
 from app.models import RandomSlugModel, TimestampModel, IsActiveModel
 from organization.models.schools import Classroom, Teacher, TeacherClassroom
-
+from payments.card import Card
+from math import isclose
 
 class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'plan_'
 
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255, blank=True)
+    product_id = models.CharField(max_length=255, null=True, blank = True)
     area_of_knowledge = models.CharField(max_length=255, choices=(
         ("ALL", "ALL"), ("ONE", "ONE"), ("TWO", "TWO")), default="ALL", blank=True, null=True)
     slug = models.SlugField(editable=False)
@@ -36,7 +38,92 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
         return self.name
 
     def save(self, *args, **kwargs):
+        card = Card()
         self.slug = slugify(self.name)
+        is_update = True if self.pk else False
+        if is_update:
+            price = {
+                "price_month": 0,
+                "price_preferential_month": 0,
+                "quantity_preferential_month": 0,
+                "price_year": 0,
+                "price_preferential_year": 0,
+                "quantity_preferential_year": 0,
+            }
+            #---------------- Get price object from stripe by id and get price and quantity from price obj -S-----------------#
+            monthly_price = card.get_price_by_id(id = self.stripe_monthly_plan_id)
+            print(monthly_price)
+            for tier in monthly_price.tiers:
+                if(tier.up_to is not None):
+                    price['price_month'] = float(tier.unit_amount_decimal) / 100
+                    price['quantity_preferential_month'] = int(tier.up_to) + 1
+
+            monthly_preferential_price = card.get_price_by_id(id = self.stripe_monthly_plan_preferential_price_id)
+            for tier in monthly_preferential_price.tiers:
+                if(tier.up_to is None):
+                    price['price_preferential_month'] = float(tier.unit_amount_decimal) / 100
+                    
+
+            yearly_price = card.get_price_by_id(id = self.stripe_yearly_plan_id)
+            print(yearly_price)
+
+            for tier in yearly_price.tiers:
+                if(tier.up_to is not None):
+                    price['price_year'] = float(tier.unit_amount_decimal) / 100
+                    price['quantity_preferential_year'] = int(tier.up_to) + 1
+
+            yearly_preferential_price = card.get_price_by_id(id = self.stripe_yearly_plan_preferential_price_id)
+            for tier in yearly_preferential_price.tiers:
+                if(tier.up_to is None):
+                    price['price_preferential_year'] = float(tier.unit_amount_decimal) / 100
+            #---------------- Get price object from stripe by id and get price and quantity from price obj -E-----------------#
+
+            #---------------- If price is not equal with price in strip, create another price in the strip -S-----------------#
+            if( not(isclose(self.price_month, price['price_month'])) or
+                not(isclose(self.price_preferential_month, price['price_preferential_month'])) or
+                self.quantity_preferential_month != price['quantity_preferential_month'] or
+                not(isclose(self.price_year, price['price_year'])) or
+                not(isclose(self.price_preferential_year, price['price_preferential_year'])) or
+                self.quantity_preferential_year != price['quantity_preferential_year']
+            ):
+                prices = card.create_price(
+                    product_id =self.product_id,
+                    price_month = self.price_month,
+                    price_preferential_month = self.price_preferential_month,
+                    quantity_preferential_month = self.quantity_preferential_month,
+                    price_year = self.price_year,
+                    price_preferential_year = self.price_preferential_year,
+                    quantity_preferential_year = self.quantity_preferential_year
+                )
+
+                card.delete_price(price_id = self.stripe_monthly_plan_id)
+                card.delete_price(price_id = self.stripe_monthly_plan_preferential_price_id)
+                card.delete_price(price_id = self.stripe_yearly_plan_id)
+                card.delete_price(price_id = self.stripe_yearly_plan_preferential_price_id)
+
+                self.stripe_monthly_plan_id = prices['price_month'].id
+                self.stripe_monthly_plan_preferential_price_id = prices['price_month'].id
+                self.stripe_yearly_plan_id = prices['price_year'].id
+                self.stripe_yearly_plan_preferential_price_id = prices['price_year'].id 
+            #---------------- If price is not equal with price in strip, create another price in the strip -E-----------------#
+             
+        else:
+            product = card.create_product(name = self.name, description = self.description)
+            self.product_id = product.id
+            prices = card.create_price(
+                    product_id =self.product_id,
+                    price_month = self.price_month,
+                    price_preferential_month = self.price_preferential_month,
+                    quantity_preferential_month = self.quantity_preferential_month,
+                    price_year = self.price_year,
+                    price_preferential_year = self.price_preferential_year,
+                    quantity_preferential_year = self.quantity_preferential_year
+                )
+
+            self.stripe_monthly_plan_id = prices['price_month'].id
+            self.stripe_monthly_plan_preferential_price_id = prices['price_month'].id
+            self.stripe_yearly_plan_id = prices['price_year'].id
+            self.stripe_yearly_plan_preferential_price_id = prices['price_year'].id 
         return super().save(*args, **kwargs)
 
 

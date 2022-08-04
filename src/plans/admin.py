@@ -10,6 +10,8 @@ class PlanAdmin(import_export_admin.ImportExportModelAdmin):
     list_filter = ('area_of_knowledge', 'currency', 'price_month', 'price_year',
                    'is_active', 'create_timestamp', 'update_timestamp')
 
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 @admin.register(GuardianStudentPlan)
 class GuardianStudentPlanAdmin(admin.ModelAdmin):

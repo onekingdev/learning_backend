@@ -210,6 +210,7 @@ class Card:
             id,
             name=new_name,
         )
+    
     def invoice_has_paid(self, invoice_id) -> bool:
         invoice = stripe.Invoice.retrieve(invoice_id)
         if invoice.status == "paid":
@@ -281,3 +282,66 @@ class Card:
             card_tx.save()
         else:
             raise Exception(resp['message'])
+
+    def get_price_by_id(self, id: str):
+        print(f"active:'true' AND id: '{id}'")
+        return stripe.Price.retrieve(
+            id,
+            expand= ['tiers'],
+        )
+
+    def create_price(
+        self,
+        product_id: str,
+        price_month: float,
+        price_preferential_month: float,
+        quantity_preferential_month: float,
+        price_year: float,
+        price_preferential_year: float,
+        quantity_preferential_year: int
+    ):
+        
+        price_month = stripe.Price.create(
+            currency = "usd",
+            recurring = {"interval": "month"},
+            product = product_id,
+            tiers_mode = "graduated",
+            billing_scheme = "tiered",
+            tiers = [{
+                    "unit_amount_decimal": price_month * 100,
+                    "up_to": quantity_preferential_month - 1
+                },{
+                    "unit_amount_decimal": price_preferential_month * 100,
+                    "up_to": "inf"
+                },
+            ]
+            
+        )
+        price_year = stripe.Price.create(
+            currency = "usd",
+            recurring = {"interval": "year"},
+            product = product_id,
+            tiers_mode = "graduated",
+            billing_scheme = "tiered",
+            tiers = [{
+                    "unit_amount_decimal": price_year * 100,
+                    "up_to": quantity_preferential_year - 1
+                },{
+                    "unit_amount_decimal": price_preferential_year * 100,
+                    "up_to": "inf"
+                },
+            ]
+        )
+        return {
+            "price_month": price_month,
+            "price_year": price_year,
+        }
+        
+    def delete_price(self, price_id):
+        stripe.Price.modify(
+            price_id,
+            active=False
+        )
+
+    def create_product(self, name: str, description:str):
+        return stripe.Product.create(name = name, description = description)
