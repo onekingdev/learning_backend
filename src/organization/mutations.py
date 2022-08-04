@@ -156,7 +156,7 @@ class CreateClassroom(graphene.Mutation):
                 classroom.save()
                 
                 #------ If user is a admin Teacher or Subscriber, create Teacher Classroom depend on teacher classroom limit -S-----------#
-                if(not(teacher.has_order) and teacher.school_teacher.order_detail):
+                if(not(teacher.has_order) and teacher.schoolteacher.order_detail):
                     if TeacherClassroom.objects.filter(teacher = teacher).count() >= Teacher.CLASSROOM_LIMIT:
                         raise Exception("The number of Classrooms has been exceeded! Please buy a new classroom")
                     else:
