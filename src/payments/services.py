@@ -289,15 +289,17 @@ def change_order_detail_payment_method(
         school_id = None,
     ) -> User:
     user = None
+    print("before get user")
     if guardian_id is not None:
         user = Guardian.objects.get(pk = guardian_id).user
     elif teacher_id is not None:
         user = Teacher.objects.get(pk = teacher_id).user
     elif school_id is not None:
         user = School.objects.get(pk = school_id).user
-
+    print("after get user")
     payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, teacher_id = teacher_id, school_id = school_id, is_default=True)
     order_details = OrderDetail.objects.filter(order__guardian_id=guardian_id, order__teacher_id=teacher_id, order__school_id=school_id, is_cancel=False)
+    
     for order_detail in order_details:
         if order_detail.order.payment_method == "CARD":
             card = Card()
@@ -318,6 +320,25 @@ def change_order_detail_payment_method(
                 email=user.email,
                 phone=payment_method.phone
             )
+    if(len(order_details) == 0):
+        card = Card()
+        card.change_payment_method(
+            number=payment_method.card_number,
+            exp_month=payment_method.card_exp_month,
+            exp_year=payment_method.card_exp_year,
+            cvc=payment_method.card_cvc,
+            first_name=payment_method.card_first_name,
+            last_name=payment_method.card_last_name,
+            address1=payment_method.address1,
+            address2=payment_method.address2,
+            city=payment_method.city,
+            state=payment_method.state,
+            country=payment_method.country,
+            post_code=payment_method.post_code,
+            email=user.email,
+            phone=payment_method.phone
+        )
+    
     return user
 
 
@@ -429,14 +450,12 @@ def create_order(
         discount_code='',
         payment_method=payment_method
     )
-    print("before condition")
     if guardian_id is not None:
         order.guardian = guardian
     elif teacher_id is not None:
         order.teacher = teacher
     elif school_id is not None:
         order.school = school
-        print("in shcool", school)
     order.save()
     #---------------------- create order -E-------------------------#
 
@@ -658,8 +677,6 @@ def confirm_order_payment(
         order_details = OrderDetail.objects.filter(order_id=order_id)
 
         for order_detail in order_details:
-            print("infore")
-            
             card_tx = CardTransaction.objects.get(order_detail_id=order_detail.id)
 
             result_sub = card.check_subscription(order_detail.subscription_id)
@@ -713,7 +730,6 @@ def confirm_order_payment(
                         period = order_detail.period,
                     )
                 elif teacher_id is not None:
-                    print("before create teacher classroom")
                     TeacherClassroom.objects.create(
                         order_detail_id=order_detail.id,
                         teacher_id=order.teacher.id,
@@ -723,13 +739,6 @@ def confirm_order_payment(
                         period = order_detail.period,
                     )
                 elif school_id is not None:
-                    print("before create school teacher")
-                    print(order_detail)
-                    print("school is ", order.school)
-                    print("plan is ", order_detail.plan)
-                    print("is paid", all_paid),
-                    print("expire at", result_sub["expired_at"] )
-                    print("period", order_detail.period)
                     SchoolTeacher.objects.create(
                         order_detail_id=order_detail.id,
                         school_id=order.school.id,
@@ -738,7 +747,6 @@ def confirm_order_payment(
                         expired_at = result_sub["expired_at"] + datetime.timedelta(days=period),
                         period = order_detail.period,
                     )
-                    print("after create shocol teacher")
                 # elif order.school is not None:
                 #     SchoolAdministrativePersonnel.objects.create(
                 #         order_detail_id=order_detail.id,
@@ -813,7 +821,6 @@ def confirm_order_payment(
                         period = order_detail.period,
                     )
                 elif teacher_id is not None:
-                    print("before create teacher classroom")
                     TeacherClassroom.objects.create(
                         order_detail_id=order_detail.id,
                         teacher_id=order.teacher.id,
