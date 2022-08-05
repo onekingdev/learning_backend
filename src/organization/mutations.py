@@ -83,10 +83,11 @@ class CreateTeacher(graphene.Mutation):
                     zip=zip,
                     country=country,
                 )
+                print("before coupon code")
                 if coupon_code:
                     coupon_code = coupon_code.upper()
                     discount = DiscountCode.objects.get(code=coupon_code)
-                    teacher.discountCode = discount
+                    teacher.coupon_code = discount
 
                 teacher.save();
 
