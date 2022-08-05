@@ -169,34 +169,46 @@ class CreateGuardianStudent(graphene.Mutation):
 
 
 # TODO: move to guardian mutations
-class ChangeGuardianEmailPassword(graphene.Mutation):
+class ChangeUserEmailPassword(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
     user = graphene.Field(UserSchema)
+    student = graphene.Field(StudentSchema)
+    subscriber = graphene.Field(SubscriberSchema)
+    teacher = graphene.Field(TeacherSchema)
+    administrativepersonnel = graphene.Field(AdministrativePersonnelSchema)
     profile = graphene.Field(UserProfileSchema)
     token = graphene.String()
     refresh_token = graphene.String()
 
     class Arguments:
-        username = graphene.String(required=True)
         password = graphene.String(required=False)
         email = graphene.String(required=False)
 
-    def mutate(self, info, username, password, email):
-        user = User.objects.get(username=username)
-        if password is not None and password != "":
+    def mutate(self, info, password = None, email = None):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception('Authentication Required')
+        if password is not None:
             user.set_password(password)
-        if email is not None and email != "":
+        if email is not None:
             user.email = email
         user.save()
 
-        guardian = Guardian.objects.get(user_id=user.id)
+        guardian = user.guardian if hasattr(user, "guardian") else None
+        student = user.student if hasattr(user, "student") else None
+        subscriber = user.schoolpersonnel.subscriber if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber") else None
+        teacher = user.schoolpersonnel.teacher if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher") else None
+        administrativepersonnel = user.schoolpersonnel.administrativepersonnel if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "administrativepersonnel") else None
 
         profile_obj = profile.objects.get(user=user.id)
         token = get_token(user)
         refresh_token = create_refresh_token(user)
-
-        return ChangeGuardianEmailPassword(
-            guardian=guardian,
+        return ChangeUserEmailPassword(
+            guardian = guardian,
+            student = student,
+            subscriber = subscriber,
+            teacher = teacher,
+            administrativepersonnel = administrativepersonnel,
             user=user, profile=profile_obj,
             token=token,
             refresh_token=refresh_token
@@ -207,7 +219,7 @@ class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
     create_guardian = CreateGuardian.Field()
     create_guardian_student = CreateGuardianStudent.Field()
-    change_guardian_email_password = ChangeGuardianEmailPassword.Field()
+    change_user_email_password = ChangeUserEmailPassword.Field()
     # register = mutations.Register.Field()
     # verify_account = mutations.VerifyAccount.Field()
     # resend_activation_email = mutations.ResendActivationEmail.Field()

@@ -178,30 +178,31 @@ class DiscountCode(TimestampModel, RandomSlugModel, IsActiveModel):
         card = Card()
 
         self.slug = slugify(self.id)
-        if self.stripe_coupon_id is None:
-            duration = "once"
-            duration_in_months = None
-            if self.type == self.COUPON_FOREVER:
-                duration = "forever"
-                duration_in_months = None
-            elif self.type == self.COUPON_ONE_MONTH:
+        if self.percentage != 0 :
+            if self.stripe_coupon_id is None:
                 duration = "once"
                 duration_in_months = None
-            elif self.type == self.COUPON_TWO_MONTH:
-                duration = "repeating"
-                duration_in_months = 2
-            elif self.type == self.COUPON_SIX_MONTH:
-                duration = "repeating"
-                duration_in_months = 2
-            elif self.type == self.COUPON_ONE_YEAR:
-                duration = "repeating"
-                duration_in_months = 12
-            coupon = card.create_coupon(code = self.code, percentage = self.percentage, duration = duration, duration_in_months = duration_in_months)
-            self.stripe_coupon_id = coupon.id
-        else:
-            coupon = card.get_coupon(id = self.stripe_coupon_id)
-            if(coupon.name != self.code):
-                card.update_coupon(id = self.stripe_coupon_id, new_name = self.code)
+                if self.type == self.COUPON_FOREVER:
+                    duration = "forever"
+                    duration_in_months = None
+                elif self.type == self.COUPON_ONE_MONTH:
+                    duration = "once"
+                    duration_in_months = None
+                elif self.type == self.COUPON_TWO_MONTH:
+                    duration = "repeating"
+                    duration_in_months = 2
+                elif self.type == self.COUPON_SIX_MONTH:
+                    duration = "repeating"
+                    duration_in_months = 2
+                elif self.type == self.COUPON_ONE_YEAR:
+                    duration = "repeating"
+                    duration_in_months = 12
+                coupon = card.create_coupon(code = self.code, percentage = self.percentage, duration = duration, duration_in_months = duration_in_months)
+                self.stripe_coupon_id = coupon.id
+            else:
+                coupon = card.get_coupon(id = self.stripe_coupon_id)
+                if(coupon.name != self.code):
+                    card.update_coupon(id = self.stripe_coupon_id, new_name = self.code)
 
         return super().save(*args, **kwargs)
 
