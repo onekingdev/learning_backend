@@ -8,10 +8,12 @@ import graphene
 from django.db import transaction, DatabaseError
 from django.utils import timezone
 from graphene import ID
+from organization.schema import AdministrativePersonnelSchema, SubscriberSchema, TeacherSchema
 
 from payments.card import Card
 from payments.models import PaymentMethod, Order, OrderDetail
 from students.models import Student
+from students.schema import StudentSchema
 from .models import Plan, GuardianStudentPlan
 from guardians.models import Guardian
 from kb.models import AreaOfKnowledge
@@ -234,57 +236,7 @@ class ConfirmUpdateGuardianPlan(graphene.Mutation):
 
 
 # Cancel guardian plan with reason
-class CancelGuardianPlan(graphene.Mutation):
-    guardian = graphene.Field('guardians.schema.GuardianSchema')
-    status = graphene.String()
 
-    class Arguments:
-        order_detail_id = graphene.ID(required=True)
-        reason = graphene.String(required=True)
-
-    def mutate(
-            self,
-            info,
-            order_detail_id,
-            reason):
-        try:
-            with transaction.atomic():
-
-                order_detail = OrderDetail.objects.get(pk=order_detail_id)
-
-                old_payment = order_detail.order.payment_method
-
-                if old_payment == "CARD":
-                    card = Card()
-                    sub = card.cancel_subscription(sub_id=order_detail.subscription_id)
-
-                    if sub.status != "canceled":
-                        raise Exception(f"cannot unsub order_detail_id {order_detail.id} from stripe")
-
-                order_detail.status = "canceled"
-                order_detail.cancel_reason = reason
-                order_detail.is_cancel = True
-                order_detail.update_timestamp = timezone.now()
-                order_detail.save()
-
-                # cancel guardian student plan
-                guardian_student_plans = GuardianStudentPlan.objects.filter(order_detail_id=order_detail.id)
-                for guardian_student_plan in guardian_student_plans:
-                    guardian_student_plan.is_cancel = True
-                    guardian_student_plan.cancel_reason = reason
-                    guardian_student_plan.update_timestamp = timezone.now()
-                    guardian_student_plan.save()
-
-                return CancelGuardianPlan(
-                    guardian=order_detail.order.guardian,
-                    status="success"
-                )
-        except (Exception, DatabaseError) as e:
-            transaction.rollback()
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
-            return e
 
 
 # Cancel membership (all order_detail and guardian student plan)
@@ -596,7 +548,6 @@ class CheckGuardianPlan(graphene.Mutation):
 
 
 class Mutation(graphene.ObjectType):
-    cancel_guardian_plan = CancelGuardianPlan.Field()
     cancel_membership = CancelMembership.Field()
     add_guardian_plan = AddGuardianPlan.Field()
     update_guardian_plan = UpdateGuardianPlan.Field()

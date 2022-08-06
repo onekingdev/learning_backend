@@ -3,11 +3,16 @@ import sys
 import graphene
 from django.db import transaction, DatabaseError
 from guardians.models import Guardian
-from organization.models.schools import SchoolSubscriber
+from organization.models.schools import SchoolSubscriber, SchoolTeacher, TeacherClassroom
+from organization.schema import AdministrativePersonnelSchema, SubscriberSchema, TeacherSchema
 from payments import services
+from payments.card import Card
 from plans import services as plan_services
-from .models import Order, PaymentHistory, PaymentMethod
+from plans.models import GuardianStudentPlan
+from students.schema import StudentSchema
+from .models import Order, OrderDetail, PaymentHistory, PaymentMethod
 from users.models import User
+from django.utils import timezone
 
 class OrderDetailInput(graphene.InputObjectType):
     plan_id = graphene.ID()
@@ -478,10 +483,92 @@ class CreateOrderWithOutPay(graphene.Mutation):
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
 
+class CancelOrderdetailById(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
+    student = graphene.Field(StudentSchema)
+    subscriber = graphene.Field(SubscriberSchema)
+    teacher = graphene.Field(TeacherSchema)
+    administrativepersonnel = graphene.Field(AdministrativePersonnelSchema)
+    status = graphene.String()
 
+    class Arguments:
+        order_detail_id = graphene.ID(required=True)
+        reason = graphene.String(required=True)
+
+    def mutate(
+            self,
+            info,
+            order_detail_id,
+            reason):
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                order_detail = OrderDetail.objects.get(pk=order_detail_id)
+
+                old_payment = order_detail.order.payment_method
+
+                if old_payment == "CARD":
+                    card = Card()
+                    sub = card.cancel_subscription(sub_id=order_detail.subscription_id)
+
+                    if sub.status != "canceled":
+                        raise Exception(f"cannot unsub order_detail_id {order_detail.id} from stripe")
+
+                order_detail.status = "canceled"
+                order_detail.cancel_reason = reason
+                order_detail.is_cancel = True
+                order_detail.update_timestamp = timezone.now()
+                order_detail.save()
+
+                # cancel guardian student plan
+                guardian_student_plans = GuardianStudentPlan.objects.filter(order_detail_id=order_detail.id)
+                for guardian_student_plan in guardian_student_plans:
+                    guardian_student_plan.is_cancel = True
+                    guardian_student_plan.cancel_reason = reason
+                    guardian_student_plan.update_timestamp = timezone.now()
+                    guardian_student_plan.save()
+
+                teacher_classrooms = TeacherClassroom.objects.filter(order_detail_id=order_detail.id)
+                for teacher_classroom in teacher_classrooms:
+                    teacher_classroom.is_cancel = True
+                    teacher_classroom.cancel_reason = reason
+                    teacher_classroom.update_timestamp = timezone.now()
+                    teacher_classroom.save()
+
+                school_teachers = SchoolTeacher.objects.filter(order_detail_id=order_detail.id)
+                for school_teacher in school_teachers:
+                    school_teacher.is_cancel = True
+                    school_teacher.cancel_reason = reason
+                    school_teacher.update_timestamp = timezone.now()
+                    school_teacher.save()
+
+                guardian = user.guardian if hasattr(user, "guardian") else None
+                student = user.student if hasattr(user, "student") else None
+                subscriber = user.schoolpersonnel.subscriber if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber") else None
+                teacher = user.schoolpersonnel.teacher if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher") else None
+                administrativepersonnel = user.schoolpersonnel.administrativepersonnel if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "administrativepersonnel") else None
+
+                return CancelOrderdetailById(
+                    guardian = guardian,
+                    student = student,
+                    subscriber = subscriber,
+                    teacher = teacher,
+                    administrativepersonnel = administrativepersonnel,
+                    status="success"
+                )
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
 class Mutation(graphene.ObjectType):
     create_order = CreateOrder.Field()
     create_order_with_out_pay = CreateOrderWithOutPay.Field()
     confirm_payment_order = ConfirmPaymentOrder.Field()
     change_payment_method = ChangePaymentMethod.Field()
     edit_payment_method = EditPaymentMethod.Field()
+    cancel_orderdetail_by_id = CancelOrderdetailById.Field()
+
