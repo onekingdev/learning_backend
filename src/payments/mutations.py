@@ -7,12 +7,12 @@ from organization.models.schools import SchoolSubscriber, SchoolTeacher, Teacher
 from organization.schema import AdministrativePersonnelSchema, SubscriberSchema, TeacherSchema
 from payments import services
 from payments.card import Card
-from plans import services as plan_services
 from plans.models import GuardianStudentPlan
 from students.schema import StudentSchema
 from .models import Order, OrderDetail, PaymentHistory, PaymentMethod
 from users.models import User
 from django.utils import timezone
+import payments.services as payment_services
 
 class OrderDetailInput(graphene.InputObjectType):
     plan_id = graphene.ID()
@@ -564,6 +564,132 @@ class CancelOrderdetailById(graphene.Mutation):
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
+
+class TmpOrderDetailInput:
+    plan_id: int
+    quantity: int
+    period: str
+
+    def __init__(self, plan_id, quantity, period):
+        self.plan_id = plan_id
+        self.quantity = quantity
+        self.period = period
+
+class UpdateOrderdetailById(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
+    student = graphene.Field(StudentSchema)
+    subscriber = graphene.Field(SubscriberSchema)
+    teacher = graphene.Field(TeacherSchema)
+    administrativepersonnel = graphene.Field(AdministrativePersonnelSchema)
+    order = graphene.Field('payments.schema.OrderSchema')
+    url_redirect = graphene.String()
+    status = graphene.String()
+
+    class Arguments:
+        order_detail_id = graphene.ID(required=True)
+        period = graphene.String()
+        return_url = graphene.String(required=True)
+        school_id = graphene.ID(required = False)
+
+    def mutate(
+            self,
+            info,
+            order_detail_id,
+            period,
+            return_url,
+            school_id = None,
+    ):
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                role = user.profile.role
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                if(role != "teacher" and role != "subscriber" and role != "guardian"):
+                    raise Exception("You don't have permission")
+
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber"):
+                    subscriber = user.schoolpersonnel.subscriber
+                    if(school_id is None):
+                        raise Exception('Please send school id.')
+                    if(SchoolSubscriber.objects.filter(school_id = school_id, subscriber = subscriber).count() < 1):
+                        raise Exception('This school is not your school.')
+
+                if hasattr(user, "guardian"):
+                    guardian = user.guardian
+                    if(OrderDetail.objects.filter(pk = order_detail_id, order__guardian = guardian).count() < 1):
+                        raise Exception("You don't have permission to change this order detail!")
+                        
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher"):
+                    teacher = user.schoolpersonnel.teacher.id
+                    if(OrderDetail.objects.filter(pk = order_detail_id, order__teacher = teacher).count() < 1):
+                        raise Exception("You don't have permission to change this order detail!")
+
+                role = user.profile.role
+               
+                order_detail = OrderDetail.objects.get(pk=order_detail_id)
+
+                if order_detail.is_cancel:
+                    raise Exception(f"order detail id {order_detail.id} already cancel")
+
+                order_detail_input = [TmpOrderDetailInput(
+                    plan_id=order_detail.plan.id,
+                    quantity=order_detail.quantity,
+                    period=period
+                )]
+
+                payment_method = PaymentMethod.objects.get(
+                    guardian_id=user.guardian.id if hasattr(user, "guardian") else None,
+                    teacher_id=user.schoolpersonnel.teacher.id if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher") else None,
+                    school_id=school_id,
+                    is_default=True
+                )
+
+                # create new subscribe
+                order_resp = payment_services.create_order(
+                    guardian_id=user.guardian.id if hasattr(user, "guardian") else None,
+                    teacher_id=user.schoolpersonnel.teacher.id if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher") else None,
+                    school_id=school_id,
+                    discount_code="",
+                    discount=0,
+                    sub_total=0,
+                    total=0,
+                    payment_method=payment_method.method,
+                    order_detail_list=order_detail_input,
+                    return_url=return_url,
+                    card_first_name=payment_method.card_first_name,
+                    card_last_name=payment_method.card_last_name,
+                    card_number=payment_method.card_number,
+                    card_exp_month=payment_method.card_exp_month,
+                    card_exp_year=payment_method.card_exp_year,
+                    card_cvc=payment_method.card_cvc,
+                    address1=payment_method.address1,
+                    address2=payment_method.address2,
+                    city=payment_method.city,
+                    state=payment_method.state,
+                    post_code=payment_method.post_code,
+                    country=payment_method.country,
+                    phone=payment_method.phone,
+                    order_detail_id=order_detail.id
+                )
+
+                return UpdateOrderdetailById(
+                    student = user.student if hasattr(user, "student") else None,
+                    guardian = user.guardian if hasattr(user, "guardian") else None,
+                    subscriber = user.schoolpersonnel.subscriber if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber") else None,
+                    teacher = user.schoolpersonnel.teacher if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher") else None,
+                    administrativepersonnel = user.schoolpersonnel.administrativepersonnel if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "administrativepersonnel") else None,
+                    order=order_resp.order,
+                    url_redirect=order_resp.url_redirect,
+                    status="success"
+                )
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
 class Mutation(graphene.ObjectType):
     create_order = CreateOrder.Field()
     create_order_with_out_pay = CreateOrderWithOutPay.Field()
@@ -571,4 +697,5 @@ class Mutation(graphene.ObjectType):
     change_payment_method = ChangePaymentMethod.Field()
     edit_payment_method = EditPaymentMethod.Field()
     cancel_orderdetail_by_id = CancelOrderdetailById.Field()
+    update_orderdetail_by_id = UpdateOrderdetailById.Field()
 
