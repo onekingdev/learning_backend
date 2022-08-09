@@ -235,61 +235,6 @@ class ConfirmUpdateGuardianPlan(graphene.Mutation):
             return e
 
 
-# Cancel guardian plan with reason
-
-
-
-# Cancel membership (all order_detail and guardian student plan)
-class CancelMembership(graphene.Mutation):
-    guardian = graphene.Field('guardians.schema.GuardianSchema')
-    status = graphene.String()
-
-    class Arguments:
-        guardian_id = graphene.ID(required=True)
-        reason = graphene.String(required=True)
-
-    def mutate(
-            self,
-            info,
-            guardian_id,
-            reason):
-        try:
-            with transaction.atomic():
-                guardian = Guardian.objects.get(pk=guardian_id)
-                guardian_student_plans = GuardianStudentPlan.objects.filter(guardian_id=guardian.id)
-                for guardian_student_plan in guardian_student_plans:
-                    guardian_student_plan.is_cancel = True
-                    guardian_student_plan.cancel_reason = reason
-                    guardian_student_plan.update_timestamp = timezone.now()
-                    guardian_student_plan.save()
-
-                order_details = OrderDetail.objects.filter(order__guardian_id=guardian.id, is_cancel=False)
-                for order_detail in order_details:
-                    if order_detail.order.payment_method == "CARD":
-                        card = Card()
-                        sub = card.cancel_subscription(order_detail.subscription_id)
-
-                        if sub.status != "canceled":
-                            raise Exception(f"cannot unsub order_detail_id {order_detail.id} from stripe")
-
-                    order_detail.status = "canceled"
-                    order_detail.cancel_reason = reason
-                    order_detail.is_cancel = True
-                    order_detail.update_timestamp = timezone.now()
-                    order_detail.save()
-
-                return CancelMembership(
-                    guardian=guardian,
-                    status="success"
-                )
-        except (Exception, DatabaseError) as e:
-            transaction.rollback()
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
-            return e
-
-
 # check guardian plan
 class CheckGuardianPlan(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
@@ -548,7 +493,6 @@ class CheckGuardianPlan(graphene.Mutation):
 
 
 class Mutation(graphene.ObjectType):
-    cancel_membership = CancelMembership.Field()
     add_guardian_plan = AddGuardianPlan.Field()
     update_guardian_plan = UpdateGuardianPlan.Field()
     confirm_update_guardian_plan = ConfirmUpdateGuardianPlan.Field()

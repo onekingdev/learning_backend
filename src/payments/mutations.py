@@ -843,6 +843,104 @@ class AddOrder(graphene.Mutation):
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
 
+# Cancel membership (all order_detail and guardian student plan)
+class CancelMembership(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
+    student = graphene.Field(StudentSchema)
+    subscriber = graphene.Field(SubscriberSchema)
+    teacher = graphene.Field(TeacherSchema)
+    administrativepersonnel = graphene.Field(AdministrativePersonnelSchema)
+    status = graphene.String()
+
+    class Arguments:
+        reason = graphene.String(required=True)
+
+    def mutate(
+            self,
+            info,
+            reason):
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                role = user.profile.role
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                if(role != "teacher" and role != "subscriber" and role != "guardian"):
+                    raise Exception("You don't have permission")
+
+                guardian = None
+                teacher = None
+                subscriber = None
+                schools = []
+
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber"):
+                    subscriber = user.schoolpersonnel.subscriber
+
+                if hasattr(user, "guardian"):
+                    guardian = user.guardian
+                        
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher"):
+                    teacher = user.schoolpersonnel.teacher.id
+
+                if(guardian):
+                    guardian_student_plans = guardian.guardianstudentplan_set.all()
+                    for guardian_student_plan in guardian_student_plans:
+                        guardian_student_plan.is_cancel = True
+                        guardian_student_plan.cancel_reason = reason
+                        guardian_student_plan.update_timestamp = timezone.now()
+                        guardian_student_plan.save()
+                elif(teacher):
+                    teacher_classrooms = teacher.teacherclassroom_set().all()
+                    for teacher_classroom in teacher_classrooms:
+                        teacher_classroom.is_cancel = True
+                        teacher_classroom.cancel_reason = reason
+                        teacher_classroom.update_timestamp = timezone.now()
+                        teacher_classroom.save()
+                else:
+                    school_subscribers = subscriber.schoolsubscriber_set.all()
+                    for school_subscriber in school_subscribers:
+                        school = school_subscriber.school
+                        schools.append(school)
+                        school_teachers = school.schoolteacher_set.all()
+                        for school_teacher in school_teachers:
+                            school_teacher.is_cancel = True
+                            school_teacher.cancel_reason = reason
+                            school_teacher.update_timestamp = timezone.now()
+                            school_teacher.save()
+                if len(schools) > 0:
+                    order_details = OrderDetail.objects.filter(order__school__in=schools, is_cancel=False)
+                else:
+                    order_details = OrderDetail.objects.filter(order__guardian=guardian, order__teacher=teacher, is_cancel=False)
+                print("order details : ", order_details)
+                for order_detail in order_details:
+                    if order_detail.order.payment_method == "CARD":
+                        card = Card()
+                        
+                        try:
+                            sub = card.cancel_subscription(order_detail.subscription_id)
+                            if sub.status != "canceled":
+                                raise Exception(f"cannot unsub order_detail_id {order_detail.id} from stripe")
+                        except (Exception, AssertionError, DatabaseError) as e:
+                            print(e)
+
+                    order_detail.status = "canceled"
+                    order_detail.cancel_reason = reason
+                    order_detail.is_cancel = True
+                    order_detail.update_timestamp = timezone.now()
+                    order_detail.save()
+
+                return CancelMembership(
+                    guardian=guardian,
+                    teacher = teacher,
+                    subscriber = subscriber,
+                    status="success"
+                )
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
 
 
 class Mutation(graphene.ObjectType):
@@ -854,5 +952,6 @@ class Mutation(graphene.ObjectType):
     cancel_orderdetail_by_id = CancelOrderdetailById.Field()
     update_orderdetail_by_id = UpdateOrderdetailById.Field()
     confirm_update_orderdetail = ConfirmUpdateOrderdetail.Field()
+    cancel_membership = CancelMembership.Field()
     add_order = AddOrder.Field()
 
