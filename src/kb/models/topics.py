@@ -64,6 +64,16 @@ class Topic(
             prerequisites = None
         return prerequisites
 
+    @property
+    def prerequisites_str(self):
+        prerequisites_str = ""
+        prerequisites = self.prerequisites
+        if(prerequisites is not None): 
+            prerequisites_str = " ".join(str(prerequisite) + "///" for prerequisite in prerequisites)
+            prerequisites_str = prerequisites_str[:len(prerequisites_str) - 3]
+        # return prerequisites_str
+        return prerequisites_str
+        
     def mastery_level(self, student):
         from students.models import StudentTopicMastery
         mastery_level = StudentTopicMastery.objects.get(

@@ -23,14 +23,13 @@ class StudentTopicStatus(admin.ModelAdmin):
     list_filter = ('student__first_name', 'topic__area_of_knowledge__universal_area_knowledge',
                    'create_timestamp', 'update_timestamp')
 
-
 @admin.register(StudentTopicMastery)
 class StudentTopicMastery(admin.ModelAdmin):
-    list_display = ('id', 'student', 'topic', 'mastery_level', 'status')
+    list_display = ('id', 'student', 'topic','topic_prerequsite_str', 'grade', 'mastery_level', 'status')
     search_fields = ('id', 'topic__translations__name', 'student__user__username',
                      'student__first_name', 'student__last_name', 'student__full_name')
-    list_filter = ('student', 'topic__area_of_knowledge__universal_area_knowledge',
-                   'mastery_level', 'create_timestamp', 'update_timestamp')
+    list_filter = ('topic__area_of_knowledge__universal_area_knowledge',
+                   'mastery_level', 'create_timestamp', 'update_timestamp',)
 
 
 @admin.register(StudentAchievement)

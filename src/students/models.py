@@ -12,6 +12,7 @@ from treasuretrack.models import WeeklyTreasureLevel
 import datetime
 from decimal import Decimal
 from django.utils import timezone
+from django.contrib import admin
 
 TYPE_ACCESSORIES = 'ACCESSORIES'
 TYPE_HEAD = 'HEAD'
@@ -79,7 +80,18 @@ class StudentTopicMastery(TimestampModel, UUIDModel):
         except StudentTopicStatus.DoesNotExist:
             status = None
         return status
-
+    @property
+    def grade(self):
+        try:
+            # print(dir(self.topic))
+            grade = self.topic.topicgrade_set.all()[0].grade
+        except Exception as e:
+            grade = None
+        return grade
+    @property
+    @admin.display(description='Prerequsites')
+    def topic_prerequsite_str(self):
+        return self.topic.prerequisites_str
 
 class Student(TimestampModel, UUIDModel, IsActiveModel):
     GENDER_MALE = 'MALE'
