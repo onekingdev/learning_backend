@@ -625,8 +625,6 @@ class UpdateOrderdetailById(graphene.Mutation):
                     if(OrderDetail.objects.filter(pk = order_detail_id, order__teacher = teacher).count() < 1):
                         raise Exception("You don't have permission to change this order detail!")
 
-                role = user.profile.role
-               
                 order_detail = OrderDetail.objects.get(pk=order_detail_id)
 
                 if order_detail.is_cancel:
@@ -690,6 +688,93 @@ class UpdateOrderdetailById(graphene.Mutation):
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
 
+class ConfirmUpdateOrderdetail(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
+    student = graphene.Field(StudentSchema)
+    subscriber = graphene.Field(SubscriberSchema)
+    teacher = graphene.Field(TeacherSchema)
+    administrativepersonnel = graphene.Field(AdministrativePersonnelSchema)
+    order = graphene.Field('payments.schema.OrderSchema')
+    status = graphene.String()
+
+    class Arguments:
+        order_detail_id = graphene.ID(required=True)
+        school_id = graphene.ID(required = False)
+
+    def mutate(
+            self,
+            info,
+            order_detail_id,
+            school_id = None,
+    ):
+        try:
+            with transaction.atomic():
+                user = info.context.user
+                role = user.profile.role
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                if(role != "teacher" and role != "subscriber" and role != "guardian"):
+                    raise Exception("You don't have permission")
+
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber"):
+                    subscriber = user.schoolpersonnel.subscriber
+                    if(school_id is None):
+                        raise Exception('Please send school id.')
+                    if(SchoolSubscriber.objects.filter(school_id = school_id, subscriber = subscriber).count() < 1):
+                        raise Exception('This school is not your school.')
+
+                if hasattr(user, "guardian"):
+                    guardian = user.guardian
+                    if(OrderDetail.objects.filter(pk = order_detail_id, order__guardian = guardian).count() < 1):
+                        raise Exception("You don't have permission to change this order detail!")
+                        
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher"):
+                    teacher = user.schoolpersonnel.teacher.id
+                    if(OrderDetail.objects.filter(pk = order_detail_id, order__teacher = teacher).count() < 1):
+                        raise Exception("You don't have permission to change this order detail!")
+
+                new_order_detail = OrderDetail.objects.get(pk=order_detail_id)
+                old_order_detail = OrderDetail.objects.get(pk=new_order_detail.update_from_detail_id)
+                order = new_order_detail.order
+                # add new order_detail to guardian student plan
+                guardian_student_plans = GuardianStudentPlan.objects.filter(order_detail_id=old_order_detail.id)
+
+                for guardian_student_plan in guardian_student_plans:
+                    guardian_student_plan.order_detail_id = new_order_detail.id
+                    guardian_student_plan.is_paid = new_order_detail.is_paid
+                    guardian_student_plan.is_cancel = new_order_detail.is_cancel
+                    guardian_student_plan.expired_at = new_order_detail.expired_at
+                    guardian_student_plan.period = new_order_detail.period
+                    guardian_student_plan.price = new_order_detail.total
+
+                    guardian_student_plan.save()
+
+
+                # cancel old order_detail
+                old_payment = old_order_detail.order.payment_method
+
+                if old_payment == "CARD":
+                    card = Card()
+                    sub = card.cancel_subscription(sub_id=old_order_detail.subscription_id)
+
+                    if sub.status != "canceled":
+                        raise Exception(f"cannot unsub order_detail_id {old_order_detail.id} from stripe")
+
+                old_order_detail.is_cancel = True
+                old_order_detail.update_timestamp = timezone.now()
+                old_order_detail.save()
+
+                return ConfirmUpdateOrderdetail(
+                    guardian=order.guardian,
+                    order=order,
+                    status="success"
+                )
+        except (Exception, DatabaseError) as e:
+            transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
 class Mutation(graphene.ObjectType):
     create_order = CreateOrder.Field()
     create_order_with_out_pay = CreateOrderWithOutPay.Field()
@@ -698,4 +783,5 @@ class Mutation(graphene.ObjectType):
     edit_payment_method = EditPaymentMethod.Field()
     cancel_orderdetail_by_id = CancelOrderdetailById.Field()
     update_orderdetail_by_id = UpdateOrderdetailById.Field()
+    confirm_update_orderdetail = ConfirmUpdateOrderdetail.Field()
 
