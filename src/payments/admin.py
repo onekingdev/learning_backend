@@ -186,13 +186,13 @@ class OrderDetailAdmin(
     @admin.display(description='Teacher', ordering='order__teacher')
     def teacher(self, obj):
         if obj.order:
-                return obj.order.teacher
+                return obj.order.teacher.user.username if obj.order.teacher is not None else None
         return None
 
     @admin.display(description='Guardian', ordering='order__guardian')
     def guardian(self, obj):
         if obj.order:
-                return obj.order.guardian
+                return obj.order.guardian.user.username if obj.order.guardian is not None else None
         return None
 
     @admin.display(description='School', ordering='order__school')

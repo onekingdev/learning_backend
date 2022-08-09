@@ -577,7 +577,6 @@ class UpdateOrderdetailById(graphene.Mutation):
     student = graphene.Field(StudentSchema)
     subscriber = graphene.Field(SubscriberSchema)
     teacher = graphene.Field(TeacherSchema)
-    administrativepersonnel = graphene.Field(AdministrativePersonnelSchema)
     order = graphene.Field('payments.schema.OrderSchema')
     url_redirect = graphene.String()
     status = graphene.String()
@@ -673,7 +672,6 @@ class UpdateOrderdetailById(graphene.Mutation):
                     guardian = user.guardian if hasattr(user, "guardian") else None,
                     subscriber = user.schoolpersonnel.subscriber if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber") else None,
                     teacher = user.schoolpersonnel.teacher if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher") else None,
-                    administrativepersonnel = user.schoolpersonnel.administrativepersonnel if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "administrativepersonnel") else None,
                     order=order_resp.order,
                     url_redirect=order_resp.url_redirect,
                     status="success"
@@ -689,7 +687,6 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
     subscriber = graphene.Field(SubscriberSchema)
     teacher = graphene.Field(TeacherSchema)
-    administrativepersonnel = graphene.Field(AdministrativePersonnelSchema)
     order = graphene.Field('payments.schema.OrderSchema')
     status = graphene.String()
 
@@ -727,7 +724,7 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
                         raise Exception("You don't have permission to change this order detail!")
                         
                 if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher"):
-                    teacher = user.schoolpersonnel.teacher.id
+                    teacher = user.schoolpersonnel.teacher
                     if(OrderDetail.objects.filter(pk = order_detail_id, order__teacher = teacher).count() < 1):
                         raise Exception("You don't have permission to change this order detail!")
 
@@ -783,7 +780,6 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
                 old_order_detail.is_cancel = True
                 old_order_detail.update_timestamp = timezone.now()
                 old_order_detail.save()
-
                 return ConfirmUpdateOrderdetail(
                     guardian=guardian,
                     subscriber=subscriber,
