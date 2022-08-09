@@ -737,8 +737,8 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
                 old_order_detail = OrderDetail.objects.get(pk=new_order_detail.update_from_detail_id)
                 order = new_order_detail.order
                 # add new order_detail to guardian student plan
-                guardian_student_plans = GuardianStudentPlan.objects.filter(order_detail_id=old_order_detail.id)
 
+                guardian_student_plans = GuardianStudentPlan.objects.filter(order_detail_id=old_order_detail.id)
                 for guardian_student_plan in guardian_student_plans:
                     guardian_student_plan.order_detail_id = new_order_detail.id
                     guardian_student_plan.is_paid = new_order_detail.is_paid
@@ -748,6 +748,28 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
                     guardian_student_plan.price = new_order_detail.total
 
                     guardian_student_plan.save()
+
+                teacher_classrooms = TeacherClassroom.objects.filter(order_detail_id=old_order_detail.id)
+                for teacher_classroom in teacher_classrooms:
+                    teacher_classroom.order_detail_id = new_order_detail.id
+                    teacher_classroom.is_paid = new_order_detail.is_paid
+                    teacher_classroom.is_cancel = new_order_detail.is_cancel
+                    teacher_classroom.expired_at = new_order_detail.expired_at
+                    teacher_classroom.period = new_order_detail.period
+                    teacher_classroom.price = new_order_detail.total
+
+                    teacher_classroom.save()
+
+                school_teachers = SchoolTeacher.objects.filter(order_detail_id=old_order_detail.id)
+                for school_teacher in school_teachers:
+                    school_teacher.order_detail_id = new_order_detail.id
+                    school_teacher.is_paid = new_order_detail.is_paid
+                    school_teacher.is_cancel = new_order_detail.is_cancel
+                    school_teacher.expired_at = new_order_detail.expired_at
+                    school_teacher.period = new_order_detail.period
+                    school_teacher.price = new_order_detail.total
+
+                    school_teacher.save()
 
 
                 # cancel old order_detail
