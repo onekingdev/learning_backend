@@ -38,6 +38,7 @@ import notes.schema
 import certificates.schema
 import certificates.mutations
 from django.utils import timezone
+import threading
 
 class CustomTokenAuth(ObtainJSONWebToken):
 
@@ -95,7 +96,8 @@ class CustomTokenAuth(ObtainJSONWebToken):
                     
             else :
                 raise Exception("You don't have any plan!")
-
+            th = threading.Thread(target=student.import_new_topic)
+            th.start()
         if role == 'subscriber':
             pass
         if role == 'teacher':

@@ -555,7 +555,8 @@ class FinishBlockPresentation(graphene.Mutation):
             account=account,
         )
         block_transaction.save()
-
+        student.import_new_topic_mastery()
+        student.import_new_topic_status()
         student.update_student_topic_mastery(block_topic)
         student.update_student_topic_status(block_aok)
 

@@ -1,9 +1,11 @@
+from ipaddress import v4_int_to_packed
 from django.db import models
 from django.db.models import Sum
 from app.models import TimestampModel, UUIDModel, IsActiveModel
 from experiences.models import Level
 from engine.models import TopicMasterySettings
 from block.models import Block, BlockPresentation, BlockQuestionPresentation, BlockTransaction
+from kb.models import areas_of_knowledge
 from kb.models.topics import GradePrerequisite, Topic
 from organization.models.schools import AdministrativePersonnel, Subscriber, Teacher
 from treasuretrack.models import WeeklyTreasureLevel
@@ -336,6 +338,7 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             mastery_level = 'C'
         else:
             mastery_level = 'M'
+        print(StudentTopicMastery.objects.filter(student=self, topic=topic))
         student_topic_mastery, new = StudentTopicMastery.objects.get_or_create(
             student=self, topic=topic, )
         student_topic_mastery.mastery_level = mastery_level
@@ -445,6 +448,120 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
             
             topic_status.status = status
             topic_status.save()
+
+    def import_new_topic_mastery(self):
+        from plans.models import GuardianStudentPlan
+        from kb.models import AreaOfKnowledge
+        try:
+            available_aoks = GuardianStudentPlan.objects.get(
+                student=self).subject.all()
+        except GuardianStudentPlan.DoesNotExist:
+            audience = self.get_active_audience
+            available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
+
+        grade = self.grade
+        
+        topics_in_mastery = Topic.objects.filter(area_of_knowledge__in = available_aoks, mastery__student = self).values_list('pk', flat=True)
+        topics_without_status = Topic.objects.filter(area_of_knowledge__in = available_aoks).exclude(pk__in = topics_in_mastery)
+        
+        if(topics_without_status.count() < 1) : return
+        
+        for aok in available_aoks:
+            topics = topics_without_status.filter(area_of_knowledge = aok)
+        
+            try:
+                grade_prerequisite = GradePrerequisite.objects.get(
+                    area_of_knowledge=aok,
+                    grade=grade,
+                )
+            except GradePrerequisite.DoesNotExist:
+                grade_prerequisite = None
+            if grade_prerequisite:
+                competence_topics = grade_prerequisite.competence.all()
+                mastery_topics = grade_prerequisite.mastery.all()
+                np_topics = topics.difference(
+                    competence_topics,
+                    mastery_topics
+                )
+                for topic in competence_topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                    )
+                    if(new): topic_mastery.mastery_level='C'
+                    topic_mastery.save()
+                for topic in mastery_topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                    )
+                    if(new): topic_mastery.mastery_level='M'
+                    topic_mastery.save()
+                for topic in np_topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                    )
+                    topic_mastery.save()
+            else:
+                for topic in topics:
+                    topic_mastery, new = StudentTopicMastery.objects.get_or_create(
+                        student=self,
+                        topic=topic,
+                    )
+                    topic_mastery.save()
+
+    def import_new_topic_status(self):
+        from plans.models import GuardianStudentPlan
+        from kb.models import AreaOfKnowledge
+        try:
+            available_aoks = GuardianStudentPlan.objects.get(
+                student=self).subject.all()
+        except GuardianStudentPlan.DoesNotExist:
+            audience = self.get_active_audience
+            available_aoks = AreaOfKnowledge.objects.filter(audience=audience)
+        grade = self.grade
+        
+        topics_in_status = Topic.objects.filter(area_of_knowledge__in = available_aoks, status__student = self).values_list('pk', flat=True)
+        topics_without_status = Topic.objects.filter(area_of_knowledge__in = available_aoks).exclude(pk__in = topics_in_status)
+        
+        if(topics_without_status.count() < 1): return
+        
+        for aok in available_aoks:
+            topics = aok.topic_set.all()
+            topics = topics_without_status.filter(area_of_knowledge = aok)
+            print(aok)
+            print(topics)
+            for topic in topics:
+                if topic.prerequisites is None:
+                    status = 'A'
+                else:
+                    prerequisites = topic.prerequisites
+                    prerequisites_mastery = []
+                    for prerequisite in prerequisites:
+                        prerequisites_mastery.append(
+                            prerequisite.mastery_level(self)
+                        )
+                    if 'NP' in prerequisites_mastery:
+                        status = 'B'
+                    elif 'N' in prerequisites_mastery:
+                        status = 'B'
+                    elif 'C' in prerequisites_mastery:
+                        status = 'P'
+                    else:
+                        status = 'A'
+                topic_status, new = StudentTopicStatus.objects.get_or_create(
+                    student=self,
+                    topic=topic,
+                )
+                if(new) : topic_status.status = status
+                topic_status.save()
+
+    def import_new_topic(self):
+        print("starting import new topic")
+        self.import_new_topic_mastery()
+        self.import_new_topic_status()
+        print("finish")
 
     def __str__(self):
         return self.user.username
