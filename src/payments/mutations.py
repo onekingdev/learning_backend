@@ -690,7 +690,6 @@ class UpdateOrderdetailById(graphene.Mutation):
 
 class ConfirmUpdateOrderdetail(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
-    student = graphene.Field(StudentSchema)
     subscriber = graphene.Field(SubscriberSchema)
     teacher = graphene.Field(TeacherSchema)
     administrativepersonnel = graphene.Field(AdministrativePersonnelSchema)
@@ -715,7 +714,9 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
                     raise Exception('Authentication Required')
                 if(role != "teacher" and role != "subscriber" and role != "guardian"):
                     raise Exception("You don't have permission")
-
+                subscriber = None
+                guardian = None
+                teacher = None
                 if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber"):
                     subscriber = user.schoolpersonnel.subscriber
                     if(school_id is None):
@@ -787,7 +788,9 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
                 old_order_detail.save()
 
                 return ConfirmUpdateOrderdetail(
-                    guardian=order.guardian,
+                    guardian=guardian,
+                    subscriber=subscriber,
+                    teacher = teacher,
                     order=order,
                     status="success"
                 )

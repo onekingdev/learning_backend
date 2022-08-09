@@ -226,7 +226,10 @@ class Card:
         }
 
     def cancel_subscription(self, sub_id):
+        if sub_id is None:
+            raise Exception("This order detail hasn't subscription id!")
         sub = stripe.Subscription.delete(sub_id)
+        
         return sub
 
     # def get_latest_invoice(self, ):
