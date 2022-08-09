@@ -170,9 +170,6 @@ class ConfirmPaymentOrder(graphene.Mutation):
                 elif order.school is not None:
                     school = order.school
                     user = SchoolSubscriber.objects.get(school = school).subscriber.user
-                print("user is ", user)
-                print("order is ", order)
-
 
                 PaymentHistory.objects.create(
                     type = "backend_anction_confirm_payment_order",
@@ -811,7 +808,7 @@ class AddOrder(graphene.Mutation):
     status = graphene.String()
 
     class Arguments:
-        guardian_id = graphene.ID(required=True)
+        guardian_id = graphene.ID(required=False)
         teacher_id = graphene.ID(required=False)
         school_id = graphene.ID(required=False)
         order_detail_input = graphene.List(OrderDetailInput)
