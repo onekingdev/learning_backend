@@ -13,6 +13,7 @@ from .models import Order, OrderDetail, PaymentHistory, PaymentMethod
 from users.models import User
 from django.utils import timezone
 import payments.services as payment_services
+import datetime
 
 class OrderDetailInput(graphene.InputObjectType):
     plan_id = graphene.ID()
@@ -625,7 +626,7 @@ class UpdateOrderdetailById(graphene.Mutation):
 
                 if order_detail.is_cancel:
                     raise Exception(f"order detail id {order_detail.id} already cancel")
-
+                
                 order_detail_input = [TmpOrderDetailInput(
                     plan_id=order_detail.plan.id,
                     quantity=order_detail.quantity,
@@ -667,6 +668,7 @@ class UpdateOrderdetailById(graphene.Mutation):
                     order_detail_id=order_detail.id
                 )
 
+                
                 return UpdateOrderdetailById(
                     student = user.student if hasattr(user, "student") else None,
                     guardian = user.guardian if hasattr(user, "guardian") else None,
@@ -727,9 +729,20 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
                     teacher = user.schoolpersonnel.teacher
                     if(OrderDetail.objects.filter(pk = order_detail_id, order__teacher = teacher).count() < 1):
                         raise Exception("You don't have permission to change this order detail!")
-
+                    # raise Exception(f"unpaid for card in sub_id: {order_detail.subscription_id}")
                 new_order_detail = OrderDetail.objects.get(pk=order_detail_id)
                 old_order_detail = OrderDetail.objects.get(pk=new_order_detail.update_from_detail_id)
+                card = Card()
+                result_sub = card.check_subscription(new_order_detail.subscription_id)
+                all_paid = True
+                if result_sub["status"] != "active" and result_sub["status"] != "trialing":
+                    all_paid = False
+                period = 2
+                new_order_detail.status = result_sub["status"]
+                new_order_detail.expired_at = result_sub["expired_at"] + datetime.timedelta(days=period)
+                new_order_detail.is_paid = all_paid
+                new_order_detail.save()
+                
                 order = new_order_detail.order
                 # add new order_detail to guardian student plan
 
@@ -778,6 +791,7 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
                         raise Exception(f"cannot unsub order_detail_id {old_order_detail.id} from stripe")
 
                 old_order_detail.is_cancel = True
+                old_order_detail.cancel_reason = "Update subscription period."
                 old_order_detail.update_timestamp = timezone.now()
                 old_order_detail.save()
                 return ConfirmUpdateOrderdetail(
