@@ -775,6 +775,76 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
             return e
+
+class AddOrder(graphene.Mutation):
+    guardian = graphene.Field('guardians.schema.GuardianSchema')
+    teacher = graphene.Field('organization.schema.TeacherSchema')
+    school = graphene.Field('organization.schema.SchoolSchema')
+    order = graphene.Field('payments.schema.OrderSchema')
+    order = graphene.Field('payments.schema.OrderSchema')
+    url_redirect = graphene.String()
+    status = graphene.String()
+
+    class Arguments:
+        guardian_id = graphene.ID(required=True)
+        teacher_id = graphene.ID(required=False)
+        school_id = graphene.ID(required=False)
+        order_detail_input = graphene.List(OrderDetailInput)
+        return_url = graphene.String(required=True)
+        coupon = graphene.String(required=False)
+
+    def mutate(
+            self,
+            info,
+            guardian_id,
+            order_detail_input,
+            return_url,
+            coupon=None
+    ):
+        try:
+            # with transaction.atomic():
+
+                payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, is_default=True)
+
+                order_resp = payment_services.create_order(
+                    guardian_id=guardian_id,
+                    discount_code=coupon,
+                    discount=0,
+                    sub_total=0,
+                    total=0,
+                    payment_method=payment_method.method,
+                    order_detail_list=order_detail_input,
+                    return_url=return_url,
+                    card_first_name=payment_method.card_first_name,
+                    card_last_name=payment_method.card_last_name,
+                    card_number=payment_method.card_number,
+                    card_exp_month=payment_method.card_exp_month,
+                    card_exp_year=payment_method.card_exp_year,
+                    card_cvc=payment_method.card_cvc,
+                    address1=payment_method.address1,
+                    address2=payment_method.address2,
+                    city=payment_method.city,
+                    state=payment_method.state,
+                    post_code=payment_method.post_code,
+                    country=payment_method.country,
+                    phone=payment_method.phone
+                )
+
+                return AddOrder(
+                    guardian=order_resp.order.guardian,
+                    order=order_resp.order,
+                    url_redirect=order_resp.url_redirect,
+                    status="success"
+                )
+        except (Exception, DatabaseError) as e:
+            # transaction.rollback()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return e
+
+
+
 class Mutation(graphene.ObjectType):
     create_order = CreateOrder.Field()
     create_order_with_out_pay = CreateOrderWithOutPay.Field()
@@ -784,4 +854,5 @@ class Mutation(graphene.ObjectType):
     cancel_orderdetail_by_id = CancelOrderdetailById.Field()
     update_orderdetail_by_id = UpdateOrderdetailById.Field()
     confirm_update_orderdetail = ConfirmUpdateOrderdetail.Field()
+    add_order = AddOrder.Field()
 
