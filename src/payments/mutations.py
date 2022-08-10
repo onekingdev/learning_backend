@@ -954,7 +954,8 @@ class CancelMembership(graphene.Mutation):
                         guardian_student_plan.update_timestamp = timezone.now()
                         guardian_student_plan.save()
                 elif(teacher):
-                    teacher_classrooms = teacher.teacherclassroom_set().all()
+                    print(teacher)
+                    teacher_classrooms = teacher.teacherclassroom_set.all()
                     for teacher_classroom in teacher_classrooms:
                         teacher_classroom.is_cancel = True
                         teacher_classroom.cancel_reason = reason
