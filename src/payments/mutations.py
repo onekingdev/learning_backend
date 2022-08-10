@@ -866,9 +866,9 @@ class AddOrder(graphene.Mutation):
                 )
 
                 order_resp = payment_services.create_order(
-                    guardian=guardian,
-                    school=school,
-                    teacher=teacher,
+                    guardian_id=guardian.id if guardian is not None else None,
+                    school_id=school.id if school is not None else None,
+                    teacher_id=teacher.id if teacher is not None else None,
                     discount_code=coupon,
                     discount=0,
                     sub_total=0,
