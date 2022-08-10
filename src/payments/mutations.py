@@ -944,7 +944,7 @@ class CancelMembership(graphene.Mutation):
                     guardian = user.guardian
                         
                 if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher"):
-                    teacher = user.schoolpersonnel.teacher.id
+                    teacher = user.schoolpersonnel.teacher
 
                 if(guardian):
                     guardian_student_plans = guardian.guardianstudentplan_set.all()
