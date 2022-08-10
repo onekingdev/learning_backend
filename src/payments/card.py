@@ -154,13 +154,13 @@ class Card:
                     type = "payment_action_payment_method_attach",
                     user = User.objects.get(stripe_customer_id=customer.id),
                 )
-
             stripe.Customer.modify(
                 customer.id,
                 invoice_settings={
                     "default_payment_method": payment_method.id
                 }
             )
+            print("payment create")
             PaymentHistory.objects.create(
                 type = "payment_action_payment_method_modify",
                 user = User.objects.get(stripe_customer_id=customer.id),

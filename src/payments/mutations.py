@@ -1,12 +1,14 @@
 import os
 import sys
+from this import s
 import graphene
 from django.db import transaction, DatabaseError
 from guardians.models import Guardian
-from organization.models.schools import School, SchoolSubscriber, SchoolTeacher, TeacherClassroom
-from organization.schema import AdministrativePersonnelSchema, SubscriberSchema, TeacherSchema
+from organization.models.schools import School, SchoolSubscriber, SchoolTeacher, Subscriber, TeacherClassroom
+from organization.schema import AdministrativePersonnelSchema, SchoolSchema, SubscriberSchema, TeacherSchema
 from payments import services
 from payments.card import Card
+from payments.schema import PaymentMethodSchema
 from plans.models import GuardianStudentPlan
 from students.schema import StudentSchema
 from .models import Order, OrderDetail, PaymentHistory, PaymentMethod
@@ -214,10 +216,13 @@ class ConfirmPaymentOrder(graphene.Mutation):
 # Add new payment
 class ChangePaymentMethod(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
+    teacher = graphene.Field(TeacherSchema)
+    school = graphene.Field(SchoolSchema)
+    subscriber = graphene.Field(SubscriberSchema)
     status = graphene.String()
 
     class Arguments:
-        guardian_id = graphene.ID(required=True)
+        school_id = graphene.ID(required=False)
         method = graphene.String(required=True)
         first_name = graphene.String(required=False)
         last_name = graphene.String(required=False)
@@ -236,8 +241,8 @@ class ChangePaymentMethod(graphene.Mutation):
     def mutate(
             self,
             info,
-            guardian_id,
             method,
+            school_id=None,
             first_name=None,
             last_name=None,
             card_number=None,
@@ -254,8 +259,33 @@ class ChangePaymentMethod(graphene.Mutation):
     ):
         try:
             with transaction.atomic():
+                user = info.context.user
+                role = user.profile.role
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                if(role != "teacher" and role != "subscriber" and role != "guardian"):
+                    raise Exception("You don't have permission")
+                subscriber = None
+                guardian = None
+                teacher = None
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber"):
+                    subscriber = user.schoolpersonnel.subscriber
+                    if(school_id is None):
+                        raise Exception('Please send school id.')
+                    if(SchoolSubscriber.objects.filter(school_id = school_id, subscriber = subscriber).count() < 1):
+                        raise Exception('This school is not your school.')
+
+                if hasattr(user, "guardian"):
+                    guardian = user.guardian
+                        
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher"):
+                    teacher = user.schoolpersonnel.teacher
+                    # raise Exception(f"unpaid for card in sub_id: {order_detail.subscription_id}")
+
                 services.change_default_payment_method(
-                    guardian_id=guardian_id,
+                    guardian_id=guardian.id if guardian is not None else None,
+                    teacher_id = teacher.id if teacher is not None else None,
+                    school_id = school_id,
                     method=method,
                     card_number=card_number,
                     card_exp_month=card_exp_month,
@@ -272,15 +302,22 @@ class ChangePaymentMethod(graphene.Mutation):
                     phone=phone
                 )
 
-                user = services.change_order_detail_payment_method(guardian_id=guardian_id)
+                user = services.change_order_detail_payment_method(
+                    guardian_id= guardian.id if guardian is not None else None,
+                    teacher_id = teacher.id if teacher is not None else None,
+                    school_id = school_id,
+                )
                 guardian = user.guardian
                 PaymentHistory.objects.create(
                     type = "backend_anction_change_default_payment_method",
-                    user = guardian.user,
+                    user = user,
                     card_number = card_number
                 )
                 return ChangePaymentMethod(
                     guardian=guardian,
+                    school = School.objects.get(pk = school_id) if school_id is not None else None,
+                    teacher = teacher,
+                    subscriber = subscriber,
                     status="success"
                 )
         except (Exception, DatabaseError) as e:
@@ -288,7 +325,7 @@ class ChangePaymentMethod(graphene.Mutation):
             try:
                 PaymentHistory.objects.create(
                     type = "backend_anction_change_default_payment_method_error",
-                    user = Guardian.objects.get(pk=guardian_id).user,
+                    user = user,
                     card_number = card_number,
                     message = str(e)
                 )
@@ -302,7 +339,7 @@ class ChangePaymentMethod(graphene.Mutation):
 
 # Add new payment
 class EditPaymentMethod(graphene.Mutation):
-    guardian = graphene.Field('guardians.schema.GuardianSchema')
+    payment_method = graphene.Field(PaymentMethodSchema)
     status = graphene.String()
 
     class Arguments:
@@ -342,8 +379,14 @@ class EditPaymentMethod(graphene.Mutation):
     ):
         try:
             with transaction.atomic():
-
-                guardian_id = services.edit_payment_method(
+                user = info.context.user
+                role = user.profile.role
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                if(role != "teacher" and role != "subscriber" and role != "guardian"):
+                    raise Exception("You don't have permission")
+               
+                payment_method = services.edit_payment_method(
                     payment_method_id=payment_method_id,
                     card_number=card_number,
                     card_exp_month=card_exp_month,
@@ -360,15 +403,20 @@ class EditPaymentMethod(graphene.Mutation):
                     phone=phone
                 )
 
-                user = services.change_order_detail_payment_method(guardian_id=guardian_id)
-                guardian = user.guardian
+                user = services.change_order_detail_payment_method(
+                    guardian_id=payment_method.guardian.id,
+                    teacher_id=payment_method.teacher.id,
+                    school_id=payment_method.school.id,
+                )
+
                 PaymentHistory.objects.create(
                     type = "backend_anction_edit_payment_method",
-                    user = guardian.user,
+                    user = user,
+                    payment_method = payment_method,
                     card_number = card_number
                 )
                 return ChangePaymentMethod(
-                    guardian=guardian,
+                    payment_method=payment_method,
                     status="success"
                 )
         except (Exception, DatabaseError) as e:

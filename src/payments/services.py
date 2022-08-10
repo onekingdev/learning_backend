@@ -215,7 +215,7 @@ def change_default_payment_method(
         phone=phone,
     )
 
-    payment_methods = PaymentMethod.objects.filter(guardian_id=guardian_id)
+    payment_methods = PaymentMethod.objects.filter(guardian_id=guardian_id, teacher_id = teacher_id, school_id = school_id)
     for payment_method in payment_methods:
         payment_method.is_default = False
         payment_method.save()
@@ -280,7 +280,7 @@ def edit_payment_method(
     payment_method.country = country
     payment_method.phone = phone
     payment_method.save()
-    return payment_method.guardian.id
+    return payment_method
 
 
 def change_order_detail_payment_method(
@@ -336,7 +336,8 @@ def change_order_detail_payment_method(
             country=payment_method.country,
             post_code=payment_method.post_code,
             email=user.email,
-            phone=payment_method.phone
+            phone=payment_method.phone,
+            customer_id=user.stripe_customer_id
         )
     
     return user
