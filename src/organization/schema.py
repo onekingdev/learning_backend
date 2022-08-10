@@ -2,7 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from organization.models import Organization, OrganizationPersonnel, Group, School, SchoolPersonnel, AdministrativePersonnel, Teacher, Classroom
 from organization.models.schools import SchoolAdministrativePersonnel, SchoolSubscriber, SchoolTeacher, Subscriber, TeacherClassroom
-
+from payments.models import PaymentMethod
 
 class OrganizationSchema(DjangoObjectType):
     class Meta:
@@ -26,7 +26,12 @@ class SchoolSchema(DjangoObjectType):
     class Meta:
         model = School
         fields = "__all__"
-
+    payment_method = graphene.Field('payments.schema.PaymentMethodSchema')
+    def resolve_payment_method(self, info):
+        payment_method = PaymentMethod.objects.filter(is_default=True, school_id=self.id)
+        if payment_method.count() != 0:
+            return payment_method[0]
+        return
 
 class SchoolPersonnelSchema(DjangoObjectType):
     class Meta:
@@ -43,8 +48,15 @@ class TeacherSchema(DjangoObjectType):
         model = Teacher
         fields = "__all__"
     classrooms = graphene.List('organization.schema.ClassroomSchema')
+    payment_method = graphene.Field('payments.schema.PaymentMethodSchema')
     def resolve_classrooms(self, info):
         return Classroom.objects.filter(teacherclassroom__teacher = self)
+    def resolve_payment_method(self, info):
+        payment_method = PaymentMethod.objects.filter(is_default=True, teacher_id=self.id)
+        if payment_method.count() != 0:
+            return payment_method[0]
+        return
+
 
 class SubscriberSchema(DjangoObjectType):
     class Meta:
