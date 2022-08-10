@@ -811,6 +811,7 @@ class ConfirmUpdateOrderdetail(graphene.Mutation):
 class AddOrder(graphene.Mutation):
     guardian = graphene.Field('guardians.schema.GuardianSchema')
     teacher = graphene.Field('organization.schema.TeacherSchema')
+    subscriber = graphene.Field(SubscriberSchema)
     school = graphene.Field('organization.schema.SchoolSchema')
     order = graphene.Field('payments.schema.OrderSchema')
     order = graphene.Field('payments.schema.OrderSchema')
@@ -853,7 +854,6 @@ class AddOrder(graphene.Mutation):
 
                 if hasattr(user, "guardian"):
                     guardian = user.guardian
-                    
                         
                 if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher"):
                     teacher = user.schoolpersonnel.teacher
@@ -892,7 +892,10 @@ class AddOrder(graphene.Mutation):
                 )
 
                 return AddOrder(
-                    guardian=order_resp.order.guardian,
+                    guardian=guardian,
+                    teacher = teacher,
+                    subscriber = subscriber,
+                    school = school,
                     order=order_resp.order,
                     url_redirect=order_resp.url_redirect,
                     status="success"
