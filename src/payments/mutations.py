@@ -3,7 +3,7 @@ import sys
 import graphene
 from django.db import transaction, DatabaseError
 from guardians.models import Guardian
-from organization.models.schools import SchoolSubscriber, SchoolTeacher, TeacherClassroom
+from organization.models.schools import School, SchoolSubscriber, SchoolTeacher, TeacherClassroom
 from organization.schema import AdministrativePersonnelSchema, SubscriberSchema, TeacherSchema
 from payments import services
 from payments.card import Card
@@ -818,8 +818,6 @@ class AddOrder(graphene.Mutation):
     status = graphene.String()
 
     class Arguments:
-        guardian_id = graphene.ID(required=False)
-        teacher_id = graphene.ID(required=False)
         school_id = graphene.ID(required=False)
         order_detail_input = graphene.List(OrderDetailInput)
         return_url = graphene.String(required=True)
@@ -828,18 +826,49 @@ class AddOrder(graphene.Mutation):
     def mutate(
             self,
             info,
-            guardian_id,
             order_detail_input,
             return_url,
-            coupon=None
+            coupon=None,
+            school_id=None
     ):
         try:
             # with transaction.atomic():
+                user = info.context.user
+                role = user.profile.role
+                if user.is_anonymous:
+                    raise Exception('Authentication Required')
+                if(role != "teacher" and role != "subscriber" and role != "guardian"):
+                    raise Exception("You don't have permission")
+                subscriber = None
+                guardian = None
+                teacher = None
+                school = None
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "subscriber"):
+                    subscriber = user.schoolpersonnel.subscriber
+                    if(school_id is None):
+                        raise Exception('Please send school id.')
+                    if(SchoolSubscriber.objects.filter(school_id = school_id, subscriber = subscriber).count() < 1):
+                        raise Exception('This school is not your school.')
+                    school = School.objects.get(pk = school_id)
 
-                payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, is_default=True)
+                if hasattr(user, "guardian"):
+                    guardian = user.guardian
+                    
+                        
+                if hasattr(user, "schoolpersonnel") and hasattr(user.schoolpersonnel, "teacher"):
+                    teacher = user.schoolpersonnel.teacher
+                   
+                payment_method = PaymentMethod.objects.get(
+                    teacher=teacher,
+                    school=school,
+                    guardian=guardian,
+                    is_default=True
+                )
 
                 order_resp = payment_services.create_order(
-                    guardian_id=guardian_id,
+                    guardian=guardian,
+                    school=school,
+                    teacher=teacher,
                     discount_code=coupon,
                     discount=0,
                     sub_total=0,
