@@ -163,9 +163,7 @@ class ConfirmPaymentOrder(graphene.Mutation):
             with transaction.atomic():
 
                 order = services.confirm_order_payment(order_id)
-                print("finish confirm order")
                 # plan_services.create_guardian_student_plan(order)
-                print("finish create plan services")
                 if order.guardian is not None:
                     user = order.guardian.user
                 elif order.teacher is not None:
@@ -402,20 +400,19 @@ class EditPaymentMethod(graphene.Mutation):
                     country=country,
                     phone=phone
                 )
-
                 user = services.change_order_detail_payment_method(
-                    guardian_id=payment_method.guardian.id,
-                    teacher_id=payment_method.teacher.id,
-                    school_id=payment_method.school.id,
+                    guardian_id=payment_method.guardian.id if payment_method.guardian else None,
+                    teacher_id=payment_method.teacher.id if payment_method.teacher else None,
+                    school_id=payment_method.school.id if payment_method.school else None,
+                    payment_method_id = payment_method_id,
                 )
 
                 PaymentHistory.objects.create(
                     type = "backend_anction_edit_payment_method",
                     user = user,
-                    payment_method = payment_method,
                     card_number = card_number
                 )
-                return ChangePaymentMethod(
+                return EditPaymentMethod(
                     payment_method=payment_method,
                     status="success"
                 )
@@ -424,7 +421,7 @@ class EditPaymentMethod(graphene.Mutation):
             try:
                 PaymentHistory.objects.create(
                     type = "backend_anction_edit_payment_method_error",
-                    user = PaymentMethod.objects.get(pk=payment_method_id).guardian.user,
+                    user = user,
                     card_number = card_number,
                     message = str(e)
                 )

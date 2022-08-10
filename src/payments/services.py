@@ -287,17 +287,17 @@ def change_order_detail_payment_method(
         guardian_id=None,
         teacher_id = None,
         school_id = None,
+        payment_method_id = None,
     ) -> User:
     user = None
-    print("before get user")
     if guardian_id is not None:
         user = Guardian.objects.get(pk = guardian_id).user
     elif teacher_id is not None:
         user = Teacher.objects.get(pk = teacher_id).user
     elif school_id is not None:
         user = School.objects.get(pk = school_id).user
-    print("after get user")
-    payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, teacher_id = teacher_id, school_id = school_id, is_default=True)
+    if payment_method_id is None : payment_method = PaymentMethod.objects.get(guardian_id=guardian_id, teacher_id = teacher_id, school_id = school_id, is_default=True)
+    else: payment_method = PaymentMethod.objects.get(pk = payment_method_id)
     order_details = OrderDetail.objects.filter(order__guardian_id=guardian_id, order__teacher_id=teacher_id, order__school_id=school_id, is_cancel=False)
     
     for order_detail in order_details:
