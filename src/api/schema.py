@@ -185,7 +185,7 @@ class ChangeUserNameEmailPassword(graphene.Mutation):
         password = graphene.String(required=False)
         email = graphene.String(required=False)
 
-    def mutate(self, info, username, password = None, email = None):
+    def mutate(self, info, username = None, password = None, email = None):
         user = info.context.user
         if user.is_anonymous:
             raise Exception('Authentication Required')
@@ -222,7 +222,7 @@ class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
     create_guardian = CreateGuardian.Field()
     create_guardian_student = CreateGuardianStudent.Field()
-    change_user_email_password = ChangeUserNameEmailPassword.Field()
+    change_user_name_email_password = ChangeUserNameEmailPassword.Field()
     # register = mutations.Register.Field()
     # verify_account = mutations.VerifyAccount.Field()
     # resend_activation_email = mutations.ResendActivationEmail.Field()
