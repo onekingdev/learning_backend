@@ -426,17 +426,25 @@ class UpdateStudent(graphene.Mutation):
             raise Exception("Authentication credentials were not provided")
 
         student = Student.objects.get(pk = student_id)
-        student.first_name = name
-        student.last_name = last_name
-        studentGrade = StudentGrade.objects.get_or_create(
-            grade = Grade.objects.get(pk = grade_id),
-            student = student
-        )
-        student.classroom = Classroom.objects.get(pk = classroom_id)
-        student.user.username = username
-        student.user.first_name = name
-        student.user.last_name = last_name
-        student.user.set_password(password)
+        if(name is not None):
+            student.first_name = name
+        if(last_name is not None):
+            student.last_name = last_name
+        if(grade_id is not None):
+            studentGrade = StudentGrade.objects.get_or_create(
+                grade = Grade.objects.get(pk = grade_id),
+                student = student
+            )
+        if(classroom_id is not None):
+            student.classroom = Classroom.objects.get(pk = classroom_id)
+        if(username is not None):
+            student.user.username = username
+        if(name is not None):
+            student.user.first_name = name
+        if(last_name is not None):
+            student.user.last_name = last_name
+        if(password is not None):
+            student.user.set_password(password)
         student.user.save()
 
         for groud_id in group_ids:
