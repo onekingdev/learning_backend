@@ -240,15 +240,17 @@ class Student(TimestampModel, UUIDModel, IsActiveModel):
                     topic_mastery, new = StudentTopicMastery.objects.get_or_create(
                         student=self,
                         topic=topic,
-                        mastery_level='C',
+                        # mastery_level='C',
                     )
+                    topic_mastery.mastery_level='C'
                     topic_mastery.save()
                 for topic in mastery_topics:
                     topic_mastery, new = StudentTopicMastery.objects.get_or_create(
                         student=self,
                         topic=topic,
-                        mastery_level='M',
+                        # mastery_level='M',
                     )
+                    topic_mastery.mastery_level='M'
                     topic_mastery.save()
                 for topic in np_topics:
                     topic_mastery, new = StudentTopicMastery.objects.get_or_create(
