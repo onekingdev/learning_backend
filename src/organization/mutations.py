@@ -716,6 +716,10 @@ class CreateStudentToClassroom(graphene.Mutation):
                     audience = classroom.audience,
                 )
                 student.save()
+                
+                student.init_student_topic_mastery()
+                student.init_student_topic_status()
+
 
                 battery, new = Battery.objects.get_or_create(
                     student=student,
