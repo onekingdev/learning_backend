@@ -233,7 +233,7 @@ class CreateClassroomToSchool(graphene.Mutation):
                     if len(SchoolSubscriber.objects.filter(school = school, subscriber = subscriber_me)) < 1:
                         raise Exception("Teacher is not your school's teacher")
 
-                if TeacherClassroom.objects.filter(teacher = teacher).count() >= Teacher.CLASSROOM_LIMIT:
+                if TeacherClassroom.objects.filter(teacher = teacher, classroom__isnull = False).count() >= Teacher.CLASSROOM_LIMIT:
                     raise Exception("The number of teacher's classrooms has been exceeded")
 
                 # grade = Grade.objects.get(pk=grade_id)
@@ -248,8 +248,11 @@ class CreateClassroomToSchool(graphene.Mutation):
                 # classroom.teacher = teacher
                 classroom.save()
                 
-                teacher_classrooms = TeacherClassroom.objects.create(teacher = teacher, classroom = classroom)
-
+                teacher_classrooms = TeacherClassroom.objects.filter(teacher = teacher, classroom__isnull = True)
+                if(teacher_classrooms.count() < 1):
+                    raise Exception("No available to create a new teacher classrooms")
+                teacher_classrooms[0].classroom = classroom
+                teacher_classrooms[0].save()
                 return CreateClassroomToSchool(
                     user = user,
                     classroom = classroom,
@@ -492,6 +495,9 @@ class CreateTeachersInSchool(graphene.Mutation):
                             last_name=teacher.last_name,
                             gender = teacher.gender,
                         )
+                        for i in range(Teacher.CLASSROOM_LIMIT):
+                            TeacherClassroom.objects.create(teacher = teacher)
+                            
                         available_school_teachers[pointer].teacher = teacher
                         available_school_teachers[pointer].save()
                     pointer += 1
