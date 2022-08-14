@@ -1003,9 +1003,9 @@ class ClassroomReport(graphene.Mutation):
         query_set_block_presentations_only_yesterday = query_set_block_presentations_from_yesterday.filter(update_timestamp__lte = today_start)
         query_set_block_presentations_only_today = query_set_block_presentations_from_yesterday.filter(update_timestamp__gt = today_start)
         result_yesterday_for_leaders = query_set_block_presentations_only_yesterday.values('student').annotate(coins_sum=Sum('coins')).order_by('-coins_sum')[:5]
-        result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('coins'),Sum('hits'),Sum('total'))
-        result_today = query_set_block_presentations_only_today.aggregate(Sum('coins'),Sum('hits'),Sum('total'))
-        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('coins'),Sum('hits'),Sum('total'))
+        result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('bonus_coins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_today = query_set_block_presentations_only_today.aggregate(Sum('bonus_coins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('bonus_coins'), Sum('coins'),Sum('hits'),Sum('total'))
 
         #----------replace student id to student schema in the leaders in the yesterday -S------#
         for key,result_yesterday_for_leader in enumerate(result_yesterday_for_leaders) :
