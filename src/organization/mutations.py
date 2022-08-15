@@ -987,7 +987,7 @@ class ClassroomReport(graphene.Mutation):
         now = timezone.now()
         now = now.astimezone(pytz_timezone(timezone_value))
         today_start = now.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-        yesterday_start = (today_start - datetime.timedelta(1000))
+        yesterday_start = (today_start - datetime.timedelta(1))
         #--------- convert timezone to classroom time zone and get today start and yesterday start in classroom timezone -E----------#
         
       
