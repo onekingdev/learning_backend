@@ -1003,9 +1003,9 @@ class ClassroomReport(graphene.Mutation):
         query_set_block_presentations_only_yesterday = query_set_block_presentations_from_yesterday.filter(update_timestamp__lte = today_start)
         query_set_block_presentations_only_today = query_set_block_presentations_from_yesterday.filter(update_timestamp__gt = today_start)
         result_yesterday_for_leaders = query_set_block_presentations_only_yesterday.values('student').annotate(coins_sum=Sum('coins')).order_by('-coins_sum')[:5]
-        result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('bonus_coins'), Sum('coins'),Sum('hits'),Sum('total'))
-        result_today = query_set_block_presentations_only_today.aggregate(Sum('bonus_coins'), Sum('coins'),Sum('hits'),Sum('total'))
-        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('bonus_coins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_today = query_set_block_presentations_only_today.aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
 
         #----------replace student id to student schema in the leaders in the yesterday -S------#
         for key,result_yesterday_for_leader in enumerate(result_yesterday_for_leaders) :
@@ -1015,13 +1015,13 @@ class ClassroomReport(graphene.Mutation):
         #----------replace student id to student schema in the leaders in the yesterday -E------#
 
         return ClassroomReport(
-            coins_today =result_today['coins__sum'] if result_today['coins__sum'] else 0,
+            coins_today =(result_today['coins__sum'] if result_today['coins__sum'] else 0) + (result_today['bonusCoins__sum'] if result_today['bonusCoins__sum'] else 0),
             goal_coins_per_day = classroom.goal_coins_per_day if classroom.goal_coins_per_day else 0,
             correct_questions_count_today = result_today['hits__sum'] if result_today['hits__sum'] else 0,
             correct_questions_count_yesterday = result_yesterday['hits__sum'] if result_yesterday['hits__sum'] else 0,
-            coins_yesterday = result_yesterday['coins__sum'] if result_yesterday['coins__sum'] else 0,
+            coins_yesterday = (result_yesterday['coins__sum'] if result_yesterday['coins__sum'] else 0) + (result_yesterday['bonusCoins__sum'] if result_yesterday['bonusCoins__sum'] else 0) , 
             class_leaders_yesterday = result_yesterday_for_leaders,
-            coins_all = result_all['coins__sum'] if result_all['coins__sum'] else 0,
+            coins_all = (result_all['coins__sum'] if result_all['coins__sum'] else 0) + (result_all['bonusCoins__sum'] if result_all['bonusCoins__sum'] else 0) ,
             questions_all = result_all['total__sum'] if result_all['total__sum'] else 0,
         )
 
@@ -1068,9 +1068,9 @@ class SchoolReport(graphene.Mutation):
         query_set_block_presentations_only_yesterday = query_set_block_presentations_from_yesterday.filter(update_timestamp__lte = today_start)
         query_set_block_presentations_only_today = query_set_block_presentations_from_yesterday.filter(update_timestamp__gt = today_start)
         result_yesterday_for_leaders = query_set_block_presentations_only_yesterday.values('student').annotate(coins_sum=Sum('coins')).order_by('-coins_sum')[:5]
-        result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('bonus_coins'), Sum('coins'),Sum('hits'),Sum('total'))
-        result_today = query_set_block_presentations_only_today.aggregate(Sum('bonus_coins'), Sum('coins'),Sum('hits'),Sum('total'))
-        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('bonus_coins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_today = query_set_block_presentations_only_today.aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
 
         #----------replace student id to student schema in the leaders in the yesterday -S------#
         for key,result_yesterday_for_leader in enumerate(result_yesterday_for_leaders) :
@@ -1080,13 +1080,13 @@ class SchoolReport(graphene.Mutation):
         #----------replace student id to student schema in the leaders in the yesterday -E------#
 
         return SchoolReport(
-            coins_today =result_today['coins__sum'] if result_today['coins__sum'] else 0,
+            coins_today =(result_today['coins__sum'] if result_today['coins__sum'] else 0) + (result_today['bonusCoins__sum'] if result_today['bonusCoins__sum'] else 0) ,
             goal_coins_per_day = classrooms_aggregate['goal_coins_per_day__sum'] if classrooms_aggregate['goal_coins_per_day__sum'] else 0,
             correct_questions_count_today = result_today['hits__sum'] if result_today['hits__sum'] else 0,
             correct_questions_count_yesterday = result_yesterday['hits__sum'] if result_yesterday['hits__sum'] else 0,
-            coins_yesterday = result_yesterday['coins__sum'] if result_yesterday['coins__sum'] else 0,
+            coins_yesterday = (result_yesterday['coins__sum'] if result_yesterday['coins__sum'] else 0) + (result_yesterday['bonusCoins__sum'] if result_yesterday['bonusCoins__sum'] else 0) , 
             school_leaders_yesterday = result_yesterday_for_leaders,
-            coins_all = result_all['coins__sum'] if result_all['coins__sum'] else 0,
+            coins_all = (result_all['coins__sum'] if result_all['coins__sum'] else 0) + (result_all['bonusCoins__sum'] if result_all['bonusCoins__sum'] else 0) ,
             questions_all = result_all['total__sum'] if result_all['total__sum'] else 0,
         )
 
