@@ -24,7 +24,7 @@ from django.utils import timezone
 from pytz import timezone as pytz_timezone
 import datetime
 from django.db.models.query_utils import Q
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, F
 
 class CreateTeacherInput(graphene.InputObjectType):
     email = graphene.String()
@@ -987,28 +987,21 @@ class ClassroomReport(graphene.Mutation):
         now = timezone.now()
         now = now.astimezone(pytz_timezone(timezone_value))
         today_start = now.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-        yesterday_start = (today_start - datetime.timedelta(1))
+        yesterday_start = (today_start - datetime.timedelta(1000))
         #--------- convert timezone to classroom time zone and get today start and yesterday start in classroom timezone -E----------#
         
-        #--------- make conditions to filter only students in the classroom -S--------------#
-        students = classroom.student_set.all()
-        filter_condition_students = None
-        for student in students:
-            if filter_condition_students is None:
-                filter_condition_students = Q(student=student)
-            else : filter_condition_students = filter_condition_students | Q(student=student)
-        #--------- make conditions to filter only students in the classroom -E--------------#
-        
-        query_set_block_presentations_from_yesterday = BlockPresentation.all_objects.filter(filter_condition_students).filter(update_timestamp__gt = yesterday_start)
+      
+        query_set_block_presentations_from_yesterday = BlockPresentation.all_objects.filter(student__classroom = classroom).filter(update_timestamp__gt = yesterday_start)
         query_set_block_presentations_only_yesterday = query_set_block_presentations_from_yesterday.filter(update_timestamp__lte = today_start)
         query_set_block_presentations_only_today = query_set_block_presentations_from_yesterday.filter(update_timestamp__gt = today_start)
-        result_yesterday_for_leaders = query_set_block_presentations_only_yesterday.values('student').annotate(coins_sum=Sum('coins')).order_by('-coins_sum')[:5]
+        result_yesterday_for_leaders = query_set_block_presentations_only_yesterday.values('student').annotate(coins_sum=Sum('coins')).annotate(bonusCoins_sum=Sum('coins')).annotate(coinWithBonus_sum=F('coins_sum') + F('coins')).order_by('-coins_sum')[:5]
         result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
         result_today = query_set_block_presentations_only_today.aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
-        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_all = BlockPresentation.all_objects.filter(student__classroom = classroom).aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
 
         #----------replace student id to student schema in the leaders in the yesterday -S------#
         for key,result_yesterday_for_leader in enumerate(result_yesterday_for_leaders) :
+            result_yesterday_for_leaders[key]['coins_sum'] = result_yesterday_for_leaders[key]['coinWithBonus_sum']
             student_id =  result_yesterday_for_leaders[key]['student']
             student = Student.objects.get(pk = student_id)
             result_yesterday_for_leaders[key]['student'] = student
@@ -1054,23 +1047,14 @@ class SchoolReport(graphene.Mutation):
         print("yesterday")
         classrooms_aggregate = Classroom.objects.filter(teacherclassroom__teacher__schoolteacher__school = school).aggregate(Sum('goal_coins_per_day'))
         print("here classroom aggregate")
-        #--------- make conditions to filter only students in the classroom -S--------------#
-        students = Student.objects.filter(classroom__teacherclassroom__teacher__schoolteacher__school = school)
-
-        filter_condition_students = None
-        for student in students:
-            if filter_condition_students is None:
-                filter_condition_students = Q(student=student)
-            else : filter_condition_students = filter_condition_students | Q(student=student)
-        #--------- make conditions to filter only students in the classroom -E--------------#
-        
-        query_set_block_presentations_from_yesterday = BlockPresentation.all_objects.filter(filter_condition_students).filter(update_timestamp__gt = yesterday_start)
+                
+        query_set_block_presentations_from_yesterday = BlockPresentation.all_objects.filter(student__classroom__teacherclassroom__teacher__schoolteacher__school = school).filter(update_timestamp__gt = yesterday_start)
         query_set_block_presentations_only_yesterday = query_set_block_presentations_from_yesterday.filter(update_timestamp__lte = today_start)
         query_set_block_presentations_only_today = query_set_block_presentations_from_yesterday.filter(update_timestamp__gt = today_start)
-        result_yesterday_for_leaders = query_set_block_presentations_only_yesterday.values('student').annotate(coins_sum=Sum('coins')).order_by('-coins_sum')[:5]
+        result_yesterday_for_leaders = query_set_block_presentations_only_yesterday.values('student').annotate(coins_sum=Sum('coins')).annotate(bonusCoins_sum=Sum('coins')).annotate(coinWithBonus_sum=F('coins_sum') + F('coins')).order_by('-coins_sum')[:5]
         result_yesterday = query_set_block_presentations_only_yesterday.aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
         result_today = query_set_block_presentations_only_today.aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
-        result_all = BlockPresentation.all_objects.filter(filter_condition_students).aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
+        result_all = BlockPresentation.all_objects.filter(student__classroom__teacherclassroom__teacher__schoolteacher__school = school).aggregate(Sum('bonusCoins'), Sum('coins'),Sum('hits'),Sum('total'))
 
         #----------replace student id to student schema in the leaders in the yesterday -S------#
         for key,result_yesterday_for_leader in enumerate(result_yesterday_for_leaders) :
