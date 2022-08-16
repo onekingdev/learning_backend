@@ -149,7 +149,7 @@ class CreateClassroom(graphene.Mutation):
                     
                 teacher = user.schoolpersonnel.teacher if teacher_id is None else Teacher.objects.get(pk = teacher_id);
                 if (role == "adminTeacher"):
-                    count = SchoolTeacher.objects.filter(teacher = teacher, school__schooladministrativepersonnel__administrativePersonnel = user.schoolpersonnel.administrativepersonnel).count()
+                    count = SchoolTeacher.objects.filter(teacher = teacher, school__schooladministrativepersonnel = user.schoolpersonnel.administrativepersonnel.schooladministrativepersonnel).count()
                     if(count < 1) : raise Exception("You don't have permission!")
                 elif(role == "subscriber"):
                     count = SchoolTeacher.objects.filter(teacher = teacher, school__schoolsubscriber__subscriber = user.schoolpersonnel.subscriber).count()
