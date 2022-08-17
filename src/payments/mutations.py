@@ -480,7 +480,6 @@ class CreateOrderWithOutPay(graphene.Mutation):
             user = SchoolSubscriber.objects.get(school_id = school_id).subscriber.user
         try:
             with transaction.atomic():
-                print("teacher id is ", teacher_id)
                 create_order_resp = services.create_order_with_out_pay(
                     guardian_id=guardian_id,
                     teacher_id = teacher_id,
