@@ -4,7 +4,7 @@ from django.utils import timezone
 from app import settings
 from app.utils import add_months
 from guardians.models import Guardian
-from organization.models.schools import School, SchoolAdministrativePersonnel, SchoolSubscriber, SchoolTeacher, Subscriber, Teacher, TeacherClassroom
+from organization.models.schools import School, SchoolAdministrativePersonnel, SchoolPersonnel, SchoolSubscriber, SchoolTeacher, Subscriber, Teacher, TeacherClassroom
 from payments.card import Card
 from payments.models import Order, OrderDetail, PaypalTransaction, PaymentMethod, CardTransaction, DiscountCode
 from payments.paypal import Paypal
@@ -658,6 +658,7 @@ def confirm_order_payment(
         country=None,
         phone=None
 ) -> Order:
+
     order = Order.objects.get(pk=order_id)
 
     if order.is_paid:
@@ -780,11 +781,13 @@ def confirm_order_payment(
             school_id = None
             teacher_id = None
             if order_detail.order.guardian:
-                guardian_id = order_detail.order.guardian.id,
+                guardian_id = order_detail.order.guardian.id
             if order_detail.order.school:
-                school_id = order_detail.order.school.id,
+                school_id = order_detail.order.school.id
             if order_detail.order.teacher:
-                teacher_id = order_detail.order.teacher.id,
+                teacher_id = order_detail.order.teacher.id
+            print("teacher id is ", teacher_id)
+            
             order_detail.status = "active"
 
             add_or_update_payment_method(
@@ -812,33 +815,96 @@ def confirm_order_payment(
             order_detail.is_paid = True
             order_detail.save()
             for package_amount in range(0, order_detail.quantity):
+                start_date = None
+                free_days = None
                 if guardian_id is not None:
+                    coupon_code = Guardian.objects.get(pk = guardian_id).coupon_code
+                    if(coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.COUPON_ONE_MONTH]):
+                        free_days = 31
+                        start_date = datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.COUPON_TWO_MONTH]):
+                        free_days = 62
+                        start_date = datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.COUPON_SIX_MONTH]):
+                        free_days = 186
+                        start_date = datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.ONE_YEAR]):
+                        free_days = 366
+                        start_date = datetime.now()
                     guardian_student_plan = GuardianStudentPlan.objects.create(
                         order_detail_id=order_detail.id,
                         guardian_id=order.guardian.id,
                         plan_id=order_detail.plan.id,
                         is_paid = all_paid,
-                        expired_at = None,
+                        expired_at = None if start_date is None else start_date + datetime.timedelta(free_days),
                         period = order_detail.period,
                     )
+                    
+                    order_detail.expired_at = None if start_date is None else start_date + datetime.timedelta(free_days)
+
                 elif teacher_id is not None:
-                    TeacherClassroom.objects.create(
+                    coupon_code = SchoolPersonnel.objects.get(teacher__id = teacher_id).coupon_code
+
+                    if(coupon_code.type == DiscountCode.COUPON_ONE_MONTH):
+                        free_days = 31
+                        start_date = datetime.datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_TWO_MONTH):
+                        free_days = 62
+                        start_date = datetime.datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_SIX_MONTH):
+                        free_days = 186
+                        start_date = datetime.datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_ONE_YEAR):
+                        free_days = 366
+                        start_date = datetime.datetime.now()
+
+                    teacher_classroom = TeacherClassroom.objects.create(
                         order_detail_id=order_detail.id,
                         teacher_id=order.teacher.id,
                         plan_id=order_detail.plan.id,
                         is_paid = all_paid,
-                        expired_at = None,
+                        expired_at = None if start_date is None else start_date + datetime.timedelta(free_days),
                         period = order_detail.period,
                     )
+                    
+                    order_detail.expired_at = None if start_date is None else start_date + datetime.timedelta(free_days)
                 elif school_id is not None:
-                    SchoolTeacher.objects.create(
+                    coupon_code = SchoolSubscriber.objects.get(school__id = school_id).subscriber.coupon_code
+
+                    if(coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.COUPON_ONE_MONTH]):
+                        free_days = 31
+                        start_date = datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.COUPON_TWO_MONTH]):
+                        free_days = 62
+                        start_date = datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.COUPON_SIX_MONTH]):
+                        free_days = 186
+                        start_date = datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.ONE_YEAR]):
+                        free_days = 366
+                        start_date = datetime.now()
+
+                    school_teacher = SchoolTeacher.objects.create(
                         order_detail_id=order_detail.id,
                         school_id=order.school.id,
                         plan_id=order_detail.plan.id,
                         is_paid = all_paid,
-                        expired_at = None,
+                        expired_at = None if start_date is None else start_date + datetime.timedelta(free_days),
                         period = order_detail.period,
                     )
+                    order_detail.expired_at = None if start_date is None else start_date + datetime.timedelta(free_days)
+                
+            order_detail.save()
+                
+                # elif order.school is not None:
+                #     SchoolAdministrativePersonnel.objects.create(
+                #         order_detail_id=order_detail.id,
+                #         administrative_personnel=order.school.id,
+                #         plan_id=order_detail.plan.id,
+                #         is_paid = True,
+                #         expired_at = result_sub["expired_at"] + datetime.timedelta(days=period),
+                #         period = order_detail.period,
+                #     )
 
 
     # change order paid status to true
