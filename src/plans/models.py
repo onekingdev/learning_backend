@@ -9,7 +9,7 @@ class Plan(TimestampModel, RandomSlugModel, IsActiveModel):
     PREFIX = 'plan_'
 
     name = models.CharField(max_length=255)
-    description = models.CharField(max_length=255, blank=True)
+    description = models.CharField(max_length=255, null=False, blank=False, default = "")
     product_id = models.CharField(max_length=255, null=True, blank = True)
     area_of_knowledge = models.CharField(max_length=255, choices=(
         ("ALL", "ALL"), ("ONE", "ONE"), ("TWO", "TWO")), default="ALL", blank=True, null=True)
