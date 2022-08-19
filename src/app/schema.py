@@ -35,6 +35,7 @@ import treasuretrack.schema
 import treasuretrack.mutations
 import badges.schema
 import notes.schema
+import notes.mutations
 import certificates.schema
 import certificates.mutations
 from django.utils import timezone
@@ -138,6 +139,7 @@ class Mutation(
     treasuretrack.mutations.Mutation,
     organization.mutations.Mutation,
     certificates.mutations.Mutation,
+    notes.mutations.Mutation,
     graphene.ObjectType
 ):
     token_auth = CustomTokenAuth.Field()

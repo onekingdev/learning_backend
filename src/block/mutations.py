@@ -337,7 +337,6 @@ class CreateBlockPresentationByQuestionId(graphene.Mutation):
         )
         topic = questions.all()[0].topic
         topicGrade = TopicGrade.objects.get(topic = topic)
-        print(topicGrade)
         # block, new = Block.objects.get_or_create(
         #     topic_grade=topicGrade,
         #     modality='TEST',
@@ -506,18 +505,14 @@ class FinishBlockPresentation(graphene.Mutation):
                     )
             elif question_type == 'R':
                 answer_options = question['relate_answer_options']
+                block_question_presentation.status = 'CORRECT'
                 for answer_option in answer_options:
-                    relate_answer_option, new = RelateAnswerOption.objects.get_or_create(
+                    relate_answer_options = RelateAnswerOption.objects.filter(
                         question=question_object,
                         translations__key=answer_option['key'],
                         translations__value=answer_option['value'],
                     )
-                    relate_answer_option.key = answer_option['key']
-                    relate_answer_option.value = answer_option['value']
-                    relate_answer_option.save()
-                    block_question_presentation.chosen_answer.add(
-                        relate_answer_option
-                    )
+                    if(len(relate_answer_options) < 1): block_question_presentation.status = 'INCORRECT'
 
             block_question_presentation.save()
             student_block_question_history.block_question_presentation.add(block_question_presentation)

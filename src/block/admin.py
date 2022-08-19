@@ -15,6 +15,7 @@ from .models import(
 )
 from kb.models.content import Question
 from parler import admin as parler_admin
+from django.forms import ModelForm
 
 
 # Register your models here.
@@ -76,6 +77,12 @@ class BlockAdmin(admin.ModelAdmin):
             BlockAssignment.objects.get_or_create(
                 block=form.instance, student=student)
 
+class BlockQuestionPresentationAdminForm(ModelForm):
+    #    email_users = forms.ModelMultipleChoiceField(queryset=User.objects.order_by('username'))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # test = self.instance.chosen_answer.order_by(self.instance.chosen_answer.through._meta.db_table+'.id').all()
+        # self.initial['chosen_answer'] = (test[0], test[1], test[2])
 
 @admin.register(BlockQuestionPresentation)
 class BlockQuestionPresentationAdmin(admin.ModelAdmin):
@@ -84,6 +91,8 @@ class BlockQuestionPresentationAdmin(admin.ModelAdmin):
     list_filter = ('question__question_type', 'question__grade', 'topic__area_of_knowledge',
                    'status', 'chosen_answer__is_correct', 'create_timestamp', 'update_timestamp')
     autocomplete_fields = ['question', 'topic', 'chosen_answer']
+    form = BlockQuestionPresentationAdminForm
+
 
 
 @admin.register(BlockConfiguration)

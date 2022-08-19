@@ -262,20 +262,21 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
         self.topic = self.block_presentation.block.topic_grade.topic
         is_correct = True
 
-        if self.pk:
-            if self.typed_answer is None:
-                for answer in self.chosen_answer.all():
-                    if not answer.is_correct:
-                        is_correct = False
+        # if self.pk:
+        #     if self.typed_answer is None:
+        #         for answer in self.chosen_answer.all():
+        #             if not answer.is_correct:
+        #                 is_correct = False
 
-                if is_correct:
-                    self.status = self.STATUS_CORRECT
-                elif not is_correct:
-                    self.status = self.STATUS_INCORRECT
-                else:
-                    self.status = self.STATUS_PENDING
+        #         if is_correct:
+        #             self.status = self.STATUS_CORRECT
+        #         elif not is_correct:
+        #             self.status = self.STATUS_INCORRECT
+        #         else:
+        #             self.status = self.STATUS_PENDING
 
         super(BlockQuestionPresentation, self).save(*args, **kwargs)
+
 
 
 class StudentBlockQuestionPresentationHistory(TimestampModel):

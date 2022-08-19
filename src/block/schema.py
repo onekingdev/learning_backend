@@ -93,7 +93,7 @@ class BlockQuestionPresentationSchema(DjangoObjectType):
         return self.question
     
     def resolve_chosen_answer(self, info, **kwargs):
-        return self.chosen_answer.all()
+        return self.chosen_answer.order_by(self.chosen_answer.through._meta.db_table+'.id').all()
 
 class StudentBlockQuestionPresentationHistorySchema(DjangoObjectType):
     class Meta:
