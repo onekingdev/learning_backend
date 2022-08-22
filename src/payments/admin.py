@@ -118,6 +118,7 @@ class DiscountCodeAdmin(
             'expired_at',
             'stripe_coupon_id',
             'type',
+            'for_who',
             'is_active',
     )
     def get_form(self, request, obj=None, **kwargs):

@@ -23,9 +23,8 @@ from students.schema import StudentSchema
 from django.utils import timezone
 from pytz import timezone as pytz_timezone
 import datetime
-from django.db.models.query_utils import Q
 from django.db.models import Sum, Count, F
-
+from django.db.models import Q
 class CreateTeacherInput(graphene.InputObjectType):
     email = graphene.String()
     name = graphene.String()
@@ -86,8 +85,10 @@ class CreateTeacher(graphene.Mutation):
                 print("before coupon code")
                 if coupon_code:
                     coupon_code = coupon_code.upper()
-                    discount = DiscountCode.objects.get(code=coupon_code)
-                    teacher.coupon_code = discount
+                    discount = DiscountCode.objects.filter(code=coupon_code).filter(Q(for_who = DiscountCode.COUPON_FOR_ALL) | Q(for_who = DiscountCode.COUPON_FOR_TEACHER))
+                    if(discount.count() < 1):
+                        raise Exception("Coupon code is not correct!")
+                    teacher.coupon_code = discount[0]
 
                 teacher.save();
 
@@ -337,7 +338,10 @@ class CreateSchool(graphene.Mutation):
                     
                 )
                 if coupon_code:
-                    subscriber.coupon_code = DiscountCode.objects.get(code=coupon_code)
+                    discount = DiscountCode.objects.filter(code=coupon_code).filter(Q(for_who = DiscountCode.COUPON_FOR_ALL) | Q(for_who = DiscountCode.COUPON_FOR_SUBSCRIBER))
+                    if(discount.count() < 1):
+                        raise Exception("Coupon code is not correct!")
+                    subscriber.coupon_code = discount[0]
                 subscriber.save()
                 SchoolSubscriber.objects.create(
                     subscriber = subscriber,
@@ -407,7 +411,10 @@ class AddSchool(graphene.Mutation):
                 school.save()
                 
                 if coupon_code:
-                    subscriber.coupon_code = DiscountCode.objects.get(code=coupon_code)
+                    discount = DiscountCode.objects.filter(code=coupon_code).filter(Q(for_who = DiscountCode.COUPON_FOR_ALL) | Q(for_who = DiscountCode.COUPON_FOR_SUBSCRIBER))
+                    if(discount.count() < 1):
+                        raise Exception("Coupon code is not correct!")
+                    subscriber.coupon_code = discount[0]
 
                 SchoolSubscriber.objects.create(
                     subscriber = subscriber,

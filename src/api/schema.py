@@ -6,7 +6,7 @@ from django.db import transaction, DatabaseError
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
-
+from django.db.models import Q
 from api.models import profile
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from guardians.schema import GuardianSchema
@@ -114,7 +114,10 @@ class CreateGuardian(graphene.Mutation):
 
                 if coupon:
                     coupon = coupon.upper()
-                    discount = DiscountCode.objects.get(code=coupon, is_active=True)
+                    discount = DiscountCode.objects.filter(code=coupon).filter(Q(for_who = DiscountCode.COUPON_FOR_ALL) | Q(for_who = DiscountCode.COUPON_FOR_GUARDIAN))
+                    if(discount.count() < 1):
+                        raise Exception("Coupon code is not correct!")
+                    discount = discount[0]
                     if((not discount.expired_at) and discount.expired_at < timezone.now()):
                         discount.is_active = False
                         discount.save()

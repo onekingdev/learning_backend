@@ -193,7 +193,6 @@ class Card:
         return coupon.id
 
     def create_coupon(self, code, percentage, duration, duration_in_months):
-        print(percentage, percentage is not 0, percentage != 0)
         coupon = stripe.Coupon.create(
             duration = duration,
             duration_in_months = duration_in_months,

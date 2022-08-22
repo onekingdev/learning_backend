@@ -162,12 +162,25 @@ class DiscountCode(TimestampModel, RandomSlugModel, IsActiveModel):
         (COUPON_ONE_YEAR, 'ONE_YEAR'),
 
     )
+    COUPON_FOR_GUARDIAN = 'FOR_GUARDIAN'
+    COUPON_FOR_TEACHER = 'FOR_TEACHER'
+    COUPON_FOR_SUBSCRIBER = 'FOR_SUBSCRIBER'
+    COUPON_FOR_ALL = 'FOR_ALL'
+
+    COUPON_FOR_CHOICES = (
+        (COUPON_FOR_GUARDIAN, 'FOR_GUARDIAN'),
+        (COUPON_FOR_TEACHER, 'FOR_TEACHER'),
+        (COUPON_FOR_SUBSCRIBER, 'FOR_SUBSCRIBER'),
+        (COUPON_FOR_ALL, 'FOR_ALL'),
+    )
+
     code = models.CharField(max_length=255, unique=True)
     percentage = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     trial_day = models.IntegerField(default=0)
     expired_at = models.DateTimeField()
     stripe_coupon_id = models.CharField(max_length=255, blank=True, null=True)
     type = models.CharField(max_length=255, choices=COUPON_TYPE_CHOICES, default = COUPON_ONE_MONTH)
+    for_who = models.CharField(max_length=255, choices=COUPON_FOR_CHOICES, default = COUPON_FOR_ALL)
     slug = models.SlugField(editable=False)
 
     def __str__(self):
