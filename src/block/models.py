@@ -277,8 +277,6 @@ class BlockQuestionPresentation(IsActiveModel, TimestampModel, RandomSlugModel):
 
         super(BlockQuestionPresentation, self).save(*args, **kwargs)
 
-
-
 class StudentBlockQuestionPresentationHistory(TimestampModel):
     student = models.ForeignKey('students.Student', on_delete=models.CASCADE, blank=False, null=False)
     block_question_presentation = models.ManyToManyField(BlockQuestionPresentation, blank=False)

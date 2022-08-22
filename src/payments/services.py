@@ -871,18 +871,18 @@ def confirm_order_payment(
                 elif school_id is not None:
                     coupon_code = SchoolSubscriber.objects.get(school__id = school_id).subscriber.coupon_code
 
-                    if(coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.COUPON_ONE_MONTH]):
+                    if(coupon_code.type == DiscountCode.COUPON_ONE_MONTH):
                         free_days = 31
-                        start_date = datetime.now()
-                    elif (coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.COUPON_TWO_MONTH]):
+                        start_date = datetime.datetime.now()
+                    elif (coupon_code.type ==DiscountCode.COUPON_TWO_MONTH):
                         free_days = 62
-                        start_date = datetime.now()
-                    elif (coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.COUPON_SIX_MONTH]):
+                        start_date = datetime.datetime.now()
+                    elif (coupon_code.type == DiscountCode.COUPON_SIX_MONTH):
                         free_days = 186
-                        start_date = datetime.now()
-                    elif (coupon_code.type == DiscountCode.COUPON_TYPE_CHOICES[DiscountCode.ONE_YEAR]):
+                        start_date = datetime.datetime.now()
+                    elif (coupon_code.type == DiscountCode.ONE_YEAR):
                         free_days = 366
-                        start_date = datetime.now()
+                        start_date = datetime.datetime.now()
 
                     school_teacher = SchoolTeacher.objects.create(
                         order_detail_id=order_detail.id,
