@@ -511,6 +511,7 @@ class FinishBlockPresentation(graphene.Mutation):
             elif question_type == 'R':
                 answer_options = question['relate_answer_options']
                 block_question_presentation.status = 'CORRECT'
+                if len(answer_options) < 1: block_question_presentation.status = 'INCORRECT'
                 for answer_option in answer_options:
                     relate_answer_options = RelateAnswerOption.objects.filter(
                         question=question_object,
