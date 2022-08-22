@@ -456,14 +456,18 @@ class FinishBlockPresentation(graphene.Mutation):
                 answer_option = MultipleChoiceAnswerOption.objects.get(
                     id=question['multiple_choice_answer_option']
                 )
+                if(answer_option.is_correct): block_question_presentation.status = 'CORRECT'
+                else: block_question_presentation.status = 'INCORRECT'
                 block_question_presentation.chosen_answer.add(answer_option)
             elif question_type == 'MS':
+                block_question_presentation.status = 'CORRECT'
                 for answer in question['multiple_select_answer_options']:
                     answer_option = MultipleSelectAnswerOption.objects.get(
                         id=answer
                     )
                     block_question_presentation.chosen_answer.add(
                         answer_option)
+                    if(not answer_option.is_correct): block_question_presentation.status = 'INCORRECT'
             elif question_type == 'T':
                 is_correct = True
                 answer_text = question['type_in_answer_option']['typed_answer']
@@ -471,6 +475,7 @@ class FinishBlockPresentation(graphene.Mutation):
                 correct_answer = TypeInAnswerOption.objects.get(
                     id=correct_answer_id
                 )
+                
                 if correct_answer.case_sensitive:
                     if answer_text == correct_answer.answer_text:
                         is_correct = True
@@ -513,7 +518,6 @@ class FinishBlockPresentation(graphene.Mutation):
                         translations__value=answer_option['value'],
                     )
                     if(len(relate_answer_options) < 1): block_question_presentation.status = 'INCORRECT'
-
             block_question_presentation.save()
             student_block_question_history.block_question_presentation.add(block_question_presentation)
         student_block_question_history.save()

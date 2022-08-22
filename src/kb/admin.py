@@ -336,7 +336,7 @@ class QuestionAdmin(
         QuestionAudioAssetInline
     ]
     fields = ('question_text', 'topic', 'grade', 'question_type')
-    list_display = ('id', 'question', 'question_type', 'topic', 'grade', 'grade_audience', 'question_type')
+    list_display = ('id', 'question', 'question_type', 'topic', 'grade', 'grade_audience')
     search_fields = ('id', 'translations__question_text')
     list_filter = ('question_type', 'topic__area_of_knowledge', 'grade', 'grade__audience')
     autocomplete_fields = ['topic']

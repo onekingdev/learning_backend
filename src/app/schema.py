@@ -98,6 +98,7 @@ class CustomTokenAuth(ObtainJSONWebToken):
             else :
                 raise Exception("You don't have any plan!")
             th = threading.Thread(target=student.import_new_topic)
+            print("thread start")
             th.start()
         if role == 'subscriber':
             pass
