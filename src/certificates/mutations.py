@@ -70,7 +70,7 @@ class UpdateCertificate(graphene.Mutation):
 
 # Create Student Certificate
 class CreateStudentCertificate(graphene.Mutation):
-    student_certificate = graphene.Field(StudentCertificatesSchema)
+    student_certificates = graphene.List(StudentCertificatesSchema)
     certificate = graphene.Field(CertificatesSchema)
 
 
@@ -80,17 +80,20 @@ class CreateStudentCertificate(graphene.Mutation):
         text = graphene.String(required=True)
         certificate = graphene.Int(required=True)
         fromWho = graphene.Int(required=True)
-        toWho = graphene.Int(required=True)
+        toWhos = graphene.List(graphene.Int, required=True)
 
-    def mutate(root, info, title, editable_text, text, certificate, from_who, to_who):
+    def mutate(root, info, title, editable_text, text, certificate, from_who, to_whos):
         if not info.context.user.is_authenticated:
             raise GraphQLError("Authentication credentials were not provided")
 
-        student_certificate = StudentCertificates(title=title, editableText=editable_text,
-                                                  text=text, certificate=certificate,
-                                                  fromWho=from_who, toWho=to_who)
-        student_certificate.save()
-        return CreateStudentCertificate(student_certificate=student_certificate, certificate=certificate)
+        student_certificates = []
+        for to_who in to_whos:
+            student_certificate = StudentCertificates(title=title, editableText=editable_text,
+                                                    text=text, certificate=certificate,
+                                                    fromWho=from_who, toWho=to_who)
+            student_certificate.save()
+            student_certificates.append(student_certificate)
+        return CreateStudentCertificate(student_certificates=student_certificates, certificate=certificate)
 
 
 # Update Student Certificate
