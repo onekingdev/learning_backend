@@ -23,8 +23,8 @@ class Query(graphene.ObjectType):
     def resolve_certificates(root, info, **kwargs):
         return Certificates.objects.all()
 
-    def resolve_certificates_by_id(root, info, certificate_id):
-        return Certificates.objects.get(pk=certificate_id)
+    def resolve_certificates_by_id(root, info, id):
+        return Certificates.objects.get(pk=id)
 
     # ----------------- StudentCertificates ----------------- #
     student_certificates = graphene.List(StudentCertificatesSchema)
@@ -33,5 +33,5 @@ class Query(graphene.ObjectType):
     def resolve_student_certificates(root, info, **kwargs):
         return StudentCertificates.objects.all()
 
-    def resolve_student_certificates_by_id(root, info, student_certificate_id):
-        return StudentCertificates.objects.get(pk=student_certificate_id)
+    def resolve_student_certificates_by_id(root, info, id):
+        return StudentCertificates.objects.get(pk=id)
