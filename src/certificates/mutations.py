@@ -3,8 +3,8 @@ from graphql import GraphQLError
 
 from certificates.schema import CertificatesSchema, StudentCertificatesSchema
 from .models import Certificates, StudentCertificates
-
-
+from students.models import Student
+from organization.models import Teacher
 # Create Certificate
 class CreateCertificate(graphene.Mutation):
     certificate = graphene.Field(CertificatesSchema)
@@ -85,12 +85,14 @@ class CreateStudentCertificate(graphene.Mutation):
     def mutate(root, info, title, editable_text, text, certificate, from_who, to_whos):
         if not info.context.user.is_authenticated:
             raise GraphQLError("Authentication credentials were not provided")
-
+        certificate = Certificates.objects.get(pk = certificate)
         student_certificates = []
         for to_who in to_whos:
+            fromWho = Teacher.objects.get(pk = from_who)
+            toWho = Student.objects.get(pk = to_who)
             student_certificate = StudentCertificates(title=title, editableText=editable_text,
                                                     text=text, certificate=certificate,
-                                                    fromWho=from_who, toWho=to_who)
+                                                    fromWho=fromWho, toWho=toWho)
             student_certificate.save()
             student_certificates.append(student_certificate)
         return CreateStudentCertificate(student_certificates=student_certificates, certificate=certificate)
