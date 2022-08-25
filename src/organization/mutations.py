@@ -25,6 +25,8 @@ from pytz import timezone as pytz_timezone
 import datetime
 from django.db.models import Sum, Count, F
 from django.db.models import Q
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 class CreateTeacherInput(graphene.InputObjectType):
     email = graphene.String()
     name = graphene.String()
@@ -82,6 +84,21 @@ class CreateTeacher(graphene.Mutation):
                     zip=zip,
                     country=country,
                 )
+                # Send email
+                email_template = "emails/signup/teacher-signup-email-template.txt"
+
+                c = {"teacher_name": first_name}
+
+                email = render_to_string(email_template, c)
+
+                send_mail(
+                    'Welcome to Learn With Socrates!',
+                    email,
+                    'Learn With Scorates',
+                    [user.email],
+                    fail_silently=False,
+                )
+
                 print("before coupon code")
                 if coupon_code:
                     coupon_code = coupon_code.upper()
@@ -335,8 +352,22 @@ class CreateSchool(graphene.Mutation):
                     user = user,
                     first_name = first_name,
                     last_name = last_name,
-                    
                 )
+                # Send email
+                email_template = "emails/signup/school-signup-email-template.txt"
+
+                c = {"subscriber_name": first_name}
+
+                email = render_to_string(email_template, c)
+
+                send_mail(
+                    'Welcome to Learn With Socrates!',
+                    email,
+                    'Learn With Scorates',
+                    [user.email],
+                    fail_silently=False,
+                )
+
                 if coupon_code:
                     discount = DiscountCode.objects.filter(code=coupon_code).filter(Q(for_who = DiscountCode.COUPON_FOR_ALL) | Q(for_who = DiscountCode.COUPON_FOR_SUBSCRIBER))
                     if(discount.count() < 1):
