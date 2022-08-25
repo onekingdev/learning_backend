@@ -76,11 +76,11 @@ class CreateStudentCertificate(graphene.Mutation):
 
     class Arguments:
         title = graphene.String(required=True)
-        editableText = graphene.String(required=True)
+        editable_text = graphene.String(required=True)
         text = graphene.String(required=True)
         certificate = graphene.Int(required=True)
-        fromWho = graphene.Int(required=True)
-        toWhos = graphene.List(graphene.Int, required=True)
+        from_who = graphene.Int(required=True)
+        to_whos = graphene.List(graphene.Int, required=True)
 
     def mutate(root, info, title, editable_text, text, certificate, from_who, to_whos):
         if not info.context.user.is_authenticated:
