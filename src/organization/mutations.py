@@ -2,6 +2,7 @@ import os
 import random
 from re import sub
 import sys
+from emails.services import sendSignUpEmail
 import graphene
 from django.contrib.auth import get_user_model
 from django.db import transaction, DatabaseError
@@ -85,19 +86,7 @@ class CreateTeacher(graphene.Mutation):
                     country=country,
                 )
                 # Send email
-                email_template = "emails/signup/teacher-signup-email-template.txt"
-
-                c = {"teacher_name": first_name}
-
-                email = render_to_string(email_template, c)
-
-                send_mail(
-                    'Welcome to Learn With Socrates!',
-                    email,
-                    'Learn With Scorates',
-                    [user.email],
-                    fail_silently=False,
-                )
+                sendSignUpEmail(customer=user, template_name="teacher", to_email=email)
 
                 print("before coupon code")
                 if coupon_code:
@@ -354,19 +343,7 @@ class CreateSchool(graphene.Mutation):
                     last_name = last_name,
                 )
                 # Send email
-                email_template = "emails/signup/school-signup-email-template.txt"
-
-                c = {"subscriber_name": first_name}
-
-                email = render_to_string(email_template, c)
-
-                send_mail(
-                    'Welcome to Learn With Socrates!',
-                    email,
-                    'Learn With Scorates',
-                    [user.email],
-                    fail_silently=False,
-                )
+                sendSignUpEmail(customer=user, template_name="subscriber", to_email=email)
 
                 if coupon_code:
                     discount = DiscountCode.objects.filter(code=coupon_code).filter(Q(for_who = DiscountCode.COUPON_FOR_ALL) | Q(for_who = DiscountCode.COUPON_FOR_SUBSCRIBER))

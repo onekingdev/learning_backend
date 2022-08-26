@@ -1,6 +1,11 @@
+from logging import exception
+from unicodedata import name
 from django.conf import settings
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from django.core.mail import send_mail
+from .models import EmailTemplate, EmailHistory
+from django.template.loader import render_to_string
 
 
 def sendTemplate(
@@ -34,3 +39,25 @@ def sendTemplate(
     except Exception as e:
         return str("Error: {0}".format(e))
     return str(response.status_code)
+
+def sendSignUpEmail(
+        template_name, # guardian, teacher, subscriber
+        to_email,
+        customer, # user reference
+    ):
+    try:
+        emailTemplate = EmailTemplate.objects.get(name = template_name)
+        realContent = emailTemplate.content.replace("{{customer_name}}", customer.first_name)
+        send_mail(
+            'Welcome to Learn With Socrates!',
+            realContent,
+            'Learn With Scorates',
+            [to_email],
+            fail_silently=False,
+        )
+
+        emailHistory = EmailHistory(email_template=emailTemplate, user=customer, success=True)
+        emailHistory.save()
+    except (Exception) as e:
+        emailHistory = EmailHistory(user=customer, success=False, note=e)
+        emailHistory.save()

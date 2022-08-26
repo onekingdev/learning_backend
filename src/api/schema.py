@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.db.models import Q
 from api.models import profile
+from emails.services import sendSignUpEmail
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from guardians.schema import GuardianSchema
 from organization.schema import AdministrativePersonnelSchema, SubscriberSchema, TeacherSchema
@@ -98,19 +99,8 @@ class CreateGuardian(graphene.Mutation):
                 )
                 guardian.save()
 
-                email_template = "emails/join.txt"
-
-                c = {"first_name": guardian.first_name}
-
-                email = render_to_string(email_template, c)
-
-                send_mail(
-                    'Welcome to Learn With Socrates!',
-                    email,
-                    'Learn With Scorates',
-                    [user.email],
-                    fail_silently=False,
-                )
+                # Send email
+                sendSignUpEmail(customer=user, template_name="guardian", to_email=email)
 
                 if coupon:
                     coupon = coupon.upper()
